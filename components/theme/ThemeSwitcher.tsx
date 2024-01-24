@@ -1,18 +1,21 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "../ui/button";
 
 type Props = {};
 
-const ThemeSwitcher = (props: Props) => {
+const ThemeSwitcher = ({
+  className,
+}: Props & React.HTMLAttributes<HTMLDivElement>) => {
   const { theme, setTheme } = useTheme();
   return (
     <Button
       variant="ghost"
       size="icon"
       aria-label="Toggle Theme"
-      className="mr-6"
+      className={cn(className)}
       onClick={() => {
         setTheme(theme === "dark" ? "light" : "dark");
       }}
