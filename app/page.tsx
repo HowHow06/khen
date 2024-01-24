@@ -16,7 +16,9 @@ export default function Home() {
           <h1 className="text-5xl font-extrabold">
             Welcome to <br /> Khen Ho2 Tool Suite
           </h1>
-          <p className="text-base lg:text-xl">Hoho's all in one tool suite!</p>
+          <p className="text-base lg:text-xl">
+            Hoho&apos;s all in one tool suite!
+          </p>
           <Link href="/ppt-generator">
             <Button>PPT Generator</Button>
           </Link>
