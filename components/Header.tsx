@@ -19,7 +19,7 @@ const Header = (props: Props) => {
   return (
     <header>
       <Container>
-        <div className="flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 w-full items-center justify-between">
           <div className="flex items-center">
             <Sheet>
               <SheetTrigger>
