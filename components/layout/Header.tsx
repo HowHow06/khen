@@ -1,10 +1,10 @@
 import { Linkedin, Menu } from "lucide-react";
 import Link from "next/link";
-import Logo from "./icon/logo";
-import ThemeSwitcher from "./theme/ThemeSwitcher";
-import { Button } from "./ui/button";
-import Container from "./ui/container";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import Logo from "../icon/logo";
+import ThemeSwitcher from "../theme/ThemeSwitcher";
+import { Button } from "../ui/button";
+import Container from "../ui/container";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 
 type Props = {};
 
