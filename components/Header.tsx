@@ -36,6 +36,20 @@ const Header = (props: Props) => {
                       {route.label}
                     </Link>
                   ))}
+                  <Link
+                    href="/"
+                    className="block px-2 py-1 text-base"
+                    aria-label="Sign In"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/"
+                    className="block px-2 py-1 text-base"
+                    aria-label="Sign Up"
+                  >
+                    Sign Up
+                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -46,20 +60,23 @@ const Header = (props: Props) => {
           </div>
 
           <div className="flex items-center divide-x">
-            <nav className="flex scale-0 items-center space-x-4 pr-2 md:scale-100 lg:space-x-6">
-              {/* scale-0 so that it is hidden from mobile size to md size */}
-              {routes.map((route, i) => (
-                <Button asChild variant="ghost" key={route.label}>
-                  <Link
-                    key={i}
-                    href={route.href}
-                    className="text-sm font-medium transition-colors"
-                  >
-                    {route.label}
-                  </Link>
-                </Button>
-              ))}
-            </nav>
+            <div className="hidden md:block">
+              <nav className="flex  items-center space-x-4 pr-2  lg:space-x-6">
+                {/* scale-0 so that it is hidden from mobile size to md size */}
+                {routes.map((route, i) => (
+                  <Button asChild variant="ghost" key={route.label}>
+                    <Link
+                      key={i}
+                      href={route.href}
+                      className="text-sm font-medium transition-colors"
+                    >
+                      {route.label}
+                    </Link>
+                  </Button>
+                ))}
+              </nav>
+            </div>
+
             <div className="flex items-center space-x-2 pl-2 ">
               <Link
                 href={`https://www.linkedin.com/in/howard-lim-3b79a21b8/`}
@@ -74,12 +91,14 @@ const Header = (props: Props) => {
               {/* auth to be implemented */}
               <Button
                 variant="ghost"
-                // className="mr-2"
+                className="hidden md:inline"
                 aria-label="Sign In"
               >
                 Sign In
               </Button>
-              <Button aria-label="Sign Up">Sign Up</Button>
+              <Button aria-label="Sign Up" className="hidden md:inline">
+                Sign Up
+              </Button>
             </div>
           </div>
         </div>
