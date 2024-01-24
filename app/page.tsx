@@ -13,14 +13,12 @@ export default function Home() {
 
       <Container className="mb-36">
         <div className="relative flex flex-col place-items-center space-y-10 text-center">
-          <h1 className="text-4xl font-extrabold">
+          <h1 className="text-5xl font-extrabold">
             Welcome to <br /> Khen Ho2 Tool Suite
           </h1>
-          <p className="font-semibold">
-            Generate PPT slides for lyrics with ease!
-          </p>
+          <p className="text-base lg:text-xl">Hoho's all in one tool suite!</p>
           <Link href="/ppt-generator">
-            <Button>Get Started</Button>
+            <Button>PPT Generator</Button>
           </Link>
         </div>
       </Container>
