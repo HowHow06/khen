@@ -5,8 +5,8 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Container className="items-center justify-between font-mono text-sm lg:flex">
-        <div className="fixed bottom-2 left-0 flex h-14 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
+      <Container className="flex items-center justify-between font-mono text-sm">
+        <div className="static bottom-2 left-0 hidden h-auto w-auto items-end justify-center lg:flex lg:bg-none">
           By Hoho
         </div>
       </Container>
