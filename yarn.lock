@@ -518,6 +518,11 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/opencc-js@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@types/opencc-js/-/opencc-js-1.0.3.tgz#8168bbdd245fc276a3ae744c114ab1fd630a4a81"
+  integrity sha512-TENp7YkI2hNlc4dplhivSHj0hU4DORCK56VY7rniaSfA5f87uD3uv+kPIRuH9h64TGv976iVFi4gEHZZtS2y8Q==
+
 "@types/prop-types@*":
   version "15.7.11"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.11.tgz#2596fb352ee96a1379c657734d4b913a613ad563"
