@@ -1,13 +1,7 @@
+import MainLyricSection from "@/components/sections/MainLyricSection";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowRight, ChevronDown } from "lucide-react";
 
 type Props = {};
 
@@ -57,50 +51,7 @@ const PptGeneratorPage = (props: Props) => {
         <h2 className="mt-8 text-xl font-semibold tracking-tight">
           2. Insert Main Lyric
         </h2>
-        <div className="">
-          <div className="my-2 flex space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Insert...
-                  <ChevronDown className="ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator /> */}
-                <DropdownMenuItem>Section</DropdownMenuItem>
-                <DropdownMenuItem>Sub-section</DropdownMenuItem>
-                <DropdownMenuItem>Main Title</DropdownMenuItem>
-                <DropdownMenuItem>Secondary Title</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Chinese Character Conversion
-                  <ChevronDown className="ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Convert to Simplified</DropdownMenuItem>
-                <DropdownMenuItem>
-                  你 <ArrowRight /> 祢
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  他<ArrowRight />祂
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline">Generate Pinyin</Button>
-            <Button variant="outline">Copy to clipboard</Button>
-            <Button variant="outline">Clear</Button>
-          </div>
-          <Textarea
-            placeholder="Insert the main lyrics here."
-            className="min-h-60"
-          />
-        </div>
+        <MainLyricSection />
       </Container>
       <Container>
         <h2 className="mt-8 text-xl font-semibold tracking-tight">
