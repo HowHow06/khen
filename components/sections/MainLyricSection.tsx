@@ -8,10 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
+import { LYRIC_SECTION } from "@/lib/constants";
 import {
   convertToSimplified,
   convertToTraditional,
 } from "@/lib/text-converter";
+import { LyricSectionType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { MutableRefObject, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -22,10 +24,41 @@ type TextareaRefType = HTMLTextAreaElement | null;
 
 const MainLyricSection = (props: Props) => {
   const [text, setText] = useState<string>("");
-  const textareaRef = useRef<TextareaRefType>(null); // Ref for the textarea
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
+  const textareaRef = useRef<TextareaRefType>(null);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
+    setCursorPosition(event.target.selectionStart);
+  };
+
+  const handleSelect = (event: React.UIEvent<HTMLTextAreaElement>) => {
+    setCursorPosition(event.currentTarget.selectionStart);
+  };
+
+  const insertLyricSection = (section: LyricSectionType) => {
+    if (textareaRef.current) {
+      const sectionValue =
+        text && cursorPosition != 0
+          ? "\n" + LYRIC_SECTION[section]
+          : LYRIC_SECTION[section];
+      const sectionLength = sectionValue.length + 1;
+
+      const newText =
+        text.slice(0, cursorPosition) +
+        `${sectionValue} ` +
+        text.slice(cursorPosition);
+      setText(newText);
+      setCursorPosition(cursorPosition + sectionLength);
+
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.selectionStart = cursorPosition + sectionLength;
+          textareaRef.current.selectionEnd = cursorPosition + sectionLength;
+        }
+      }, 0);
+    }
   };
 
   const onConvertToSimplifiedClick = () => {
@@ -86,6 +119,9 @@ const MainLyricSection = (props: Props) => {
   return (
     <div className="">
       <div className="my-2 flex space-x-2">
+        {/* <Button variant="outline" onClick={insertSection}>
+          Test Button Insert Section
+        </Button> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -93,13 +129,29 @@ const MainLyricSection = (props: Props) => {
               <ChevronDown className="ml-1" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent
+            align="start"
+            onCloseAutoFocus={(event) => event.preventDefault()} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+          >
             {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator /> */}
-            <DropdownMenuItem>Section</DropdownMenuItem>
-            <DropdownMenuItem>Sub-section</DropdownMenuItem>
-            <DropdownMenuItem>Main Title</DropdownMenuItem>
-            <DropdownMenuItem>Secondary Title</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => insertLyricSection("SECTION")}>
+              Section
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => insertLyricSection("SUBSECTION")}>
+              Sub-section
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => insertLyricSection("MAINTITLE")}>
+              Main Title
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => insertLyricSection("SECONDARYTITLE")}
+            >
+              Secondary Title
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => insertLyricSection("EMPTYSLIDE")}>
+              Empty Slide
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
@@ -110,19 +162,19 @@ const MainLyricSection = (props: Props) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={onConvertToSimplifiedClick}>
+            <DropdownMenuItem onSelect={onConvertToSimplifiedClick}>
               Convert to Simplified
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={onConvertToTraditionalClick}>
+            <DropdownMenuItem onSelect={onConvertToTraditionalClick}>
               Convert to Traditional
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => onReplaceCharacterClick("你", "祢")}
+              onSelect={() => onReplaceCharacterClick("你", "祢")}
             >
               你 <ArrowRight /> 祢
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => onReplaceCharacterClick("他", "祂")}
+              onSelect={() => onReplaceCharacterClick("他", "祂")}
             >
               他<ArrowRight />祂
             </DropdownMenuItem>
@@ -145,6 +197,7 @@ const MainLyricSection = (props: Props) => {
         className="min-h-60"
         value={text}
         onChange={handleTextChange}
+        onSelect={handleSelect}
       />
     </div>
   );
