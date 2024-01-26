@@ -13,19 +13,23 @@ import {
   convertToSimplified,
   convertToTraditional,
 } from "@/lib/text-converter";
-import { LyricSectionType } from "@/lib/type";
+import { LyricSectionType, TextareaRefType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { MutableRefObject, useRef, useState } from "react";
+import { MutableRefObject, useState } from "react";
 import { toast } from "sonner";
 
-type Props = {};
+type MainLyricSectionProps = {
+  mainTextareaRef: MutableRefObject<TextareaRefType>;
+  updateSecondaryText: (text: string) => void;
+};
 
-type TextareaRefType = HTMLTextAreaElement | null;
-
-const MainLyricSection = (props: Props) => {
+const MainLyricSection = ({
+  mainTextareaRef,
+  updateSecondaryText,
+}: MainLyricSectionProps) => {
+  console.log("mainlyric render"); //TODO: remove this
   const [text, setText] = useState<string>("");
   const [cursorPosition, setCursorPosition] = useState<number>(0);
-  const textareaRef = useRef<TextareaRefType>(null);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
@@ -37,7 +41,7 @@ const MainLyricSection = (props: Props) => {
   };
 
   const insertLyricSection = (section: LyricSectionType) => {
-    if (textareaRef.current) {
+    if (mainTextareaRef.current) {
       const sectionValue =
         text && cursorPosition != 0
           ? "\n" + LYRIC_SECTION[section]
@@ -52,10 +56,11 @@ const MainLyricSection = (props: Props) => {
       setCursorPosition(cursorPosition + sectionLength);
 
       setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          textareaRef.current.selectionStart = cursorPosition + sectionLength;
-          textareaRef.current.selectionEnd = cursorPosition + sectionLength;
+        if (mainTextareaRef.current) {
+          mainTextareaRef.current.focus();
+          mainTextareaRef.current.selectionStart =
+            cursorPosition + sectionLength;
+          mainTextareaRef.current.selectionEnd = cursorPosition + sectionLength;
         }
       }, 0);
     }
@@ -86,13 +91,7 @@ const MainLyricSection = (props: Props) => {
       navigator.clipboard
         .writeText(targetRef.current.value)
         .then(() => {
-          toast.success("Text copied to clipboard", {
-            // description: "Text copied to clipboard",
-            // action: {
-            //   label: "Undo",
-            //   onClick: () => console.log("Undo"),
-            // },
-          });
+          toast.success("Text copied to clipboard");
         })
         .catch((err) => {
           console.error("Failed to copy text: ", err);
@@ -115,6 +114,10 @@ const MainLyricSection = (props: Props) => {
       duration: 10 * 1000,
     });
   };
+
+  function onGeneratePinyinClick() {
+    updateSecondaryText("hi bro");
+  }
 
   return (
     <div className="">
@@ -180,10 +183,12 @@ const MainLyricSection = (props: Props) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline">Generate Pinyin</Button>
+        <Button variant="outline" onClick={onGeneratePinyinClick}>
+          Generate Pinyin
+        </Button>
         <Button
           variant="outline"
-          onClick={() => onCopyToClipboardClick(textareaRef)}
+          onClick={() => onCopyToClipboardClick(mainTextareaRef)}
         >
           Copy to clipboard
         </Button>
@@ -192,7 +197,7 @@ const MainLyricSection = (props: Props) => {
         </Button>
       </div>
       <Textarea
-        ref={textareaRef}
+        ref={mainTextareaRef}
         placeholder="Insert the main lyrics here."
         className="min-h-60"
         value={text}

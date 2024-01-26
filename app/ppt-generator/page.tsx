@@ -1,7 +1,6 @@
-import MainLyricSection from "@/components/sections/MainLyricSection";
+import PptGeneratorClientSection from "@/components/sections/PptGeneratorClientSection";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
-import { Textarea } from "@/components/ui/textarea";
 
 type Props = {};
 
@@ -47,43 +46,7 @@ const PptGeneratorPage = (props: Props) => {
         </h2>
         <div className="">to be implemented...</div>
       </Container>
-      <Container>
-        <h2 className="mt-8 text-xl font-semibold tracking-tight">
-          2. Insert Main Lyric
-        </h2>
-        <MainLyricSection />
-      </Container>
-      <Container>
-        <h2 className="mt-8 text-xl font-semibold tracking-tight">
-          3. Insert Secondary Lyric
-        </h2>
-        <div className="">
-          <div className="my-2 flex space-x-2">
-            <Button variant="outline">Copy to clipboard</Button>
-            <Button variant="outline">Clear</Button>
-          </div>
-          <Textarea
-            placeholder="Insert the secondary lyrics here."
-            className="min-h-60"
-          />
-        </div>
-      </Container>
-      <Container>
-        <h2 className="mt-8 text-xl font-semibold tracking-tight">
-          4. Settings
-        </h2>
-        <div className="">
-          <Button variant="outline">Open Settings</Button>
-        </div>
-      </Container>
-      <Container>
-        <h2 className="mt-8 text-xl font-semibold tracking-tight">
-          5. Generate PPT!
-        </h2>
-        <div className="">
-          <Button variant="default">Generate</Button>
-        </div>
-      </Container>
+      <PptGeneratorClientSection />
     </>
   );
 };
