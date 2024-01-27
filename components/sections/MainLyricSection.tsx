@@ -13,6 +13,7 @@ import {
   convertToTraditional,
 } from "@/lib/character-converter";
 import { LYRIC_SECTION } from "@/lib/constants";
+import { getPinyin } from "@/lib/pinyin";
 import { LyricSectionType, TextareaRefType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { MutableRefObject, useState } from "react";
@@ -115,9 +116,10 @@ const MainLyricSection = ({
     });
   };
 
-  function onGeneratePinyinClick() {
-    //TODO: change to actual pinyin
-    updateSecondaryText("hi bro");
+  function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
+    const pinyinText = getPinyin({ text: text, hasTone: hasTone });
+    updateSecondaryText(pinyinText);
+    toast.success(`Pinyin ${hasTone ? "with" : "without"} tone generated.`);
   }
 
   return (
@@ -165,7 +167,7 @@ const MainLyricSection = ({
               <ChevronDown className="ml-1" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="start">
             <DropdownMenuItem onSelect={onConvertToSimplifiedClick}>
               Convert to Simplified
             </DropdownMenuItem>
@@ -184,9 +186,27 @@ const MainLyricSection = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" onClick={onGeneratePinyinClick}>
-          Generate Pinyin
-        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              Generate Pinyin
+              <ChevronDown className="ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem
+              onSelect={() => onGeneratePinyinClick({ hasTone: false })}
+            >
+              without tone
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => onGeneratePinyinClick({ hasTone: true })}
+            >
+              with tone
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           variant="outline"
           onClick={() => onCopyToClipboardClick(mainTextareaRef)}
