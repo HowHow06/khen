@@ -1,7 +1,8 @@
 "use client";
 import { TextareaRefType } from "@/lib/type";
 import { MutableRefObject } from "react";
-import { Button } from "../ui/button";
+import ClearTextButton from "../ClearTextButton";
+import CopyToClipboardButton from "../CopyToClipboardButton";
 import { Textarea } from "../ui/textarea";
 
 type SecondaryLyricSectionProps = {
@@ -25,8 +26,8 @@ const SecondaryLyricSection = ({
     <>
       <div className="">
         <div className="my-2 flex space-x-2">
-          <Button variant="outline">Copy to clipboard</Button>
-          <Button variant="outline">Clear</Button>
+          <CopyToClipboardButton targetRef={secondaryTextareaRef} />
+          <ClearTextButton text={secondaryText} setText={setSecondaryText} />
         </div>
         <Textarea
           ref={secondaryTextareaRef}

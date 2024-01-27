@@ -18,6 +18,8 @@ import { LyricSectionType, TextareaRefType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { MutableRefObject, useState } from "react";
 import { toast } from "sonner";
+import ClearTextButton from "../ClearTextButton";
+import CopyToClipboardButton from "../CopyToClipboardButton";
 
 type MainLyricSectionProps = {
   mainTextareaRef: MutableRefObject<TextareaRefType>;
@@ -83,37 +85,6 @@ const MainLyricSection = ({
     const replacedText = text.replaceAll(toFind, toReplaceWith);
     setText(replacedText);
     toast.success("Text replaced.");
-  };
-
-  const onCopyToClipboardClick = (
-    targetRef: MutableRefObject<TextareaRefType>,
-  ) => {
-    if (targetRef.current?.value) {
-      navigator.clipboard
-        .writeText(targetRef.current.value)
-        .then(() => {
-          toast.success("Text copied to clipboard");
-        })
-        .catch((err) => {
-          console.error("Failed to copy text: ", err);
-          toast.error("Failed to copy text");
-        });
-      return;
-    }
-
-    toast.info("The field is empty.");
-  };
-
-  const onClearClick = () => {
-    const tempText = text;
-    setText("");
-    toast.success("Text cleared", {
-      action: {
-        label: "Undo",
-        onClick: () => setText(tempText),
-      },
-      duration: 10 * 1000,
-    });
   };
 
   function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
@@ -207,15 +178,8 @@ const MainLyricSection = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button
-          variant="outline"
-          onClick={() => onCopyToClipboardClick(mainTextareaRef)}
-        >
-          Copy to clipboard
-        </Button>
-        <Button variant="outline" onClick={onClearClick}>
-          Clear
-        </Button>
+        <CopyToClipboardButton targetRef={mainTextareaRef} />
+        <ClearTextButton text={text} setText={setText} />
       </div>
       <Textarea
         ref={mainTextareaRef}
