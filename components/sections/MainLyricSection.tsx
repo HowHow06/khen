@@ -8,11 +8,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { LYRIC_SECTION } from "@/lib/constants";
 import {
   convertToSimplified,
   convertToTraditional,
-} from "@/lib/text-converter";
+} from "@/lib/character-converter";
+import { LYRIC_SECTION } from "@/lib/constants";
 import { LyricSectionType, TextareaRefType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { MutableRefObject, useState } from "react";
@@ -116,6 +116,7 @@ const MainLyricSection = ({
   };
 
   function onGeneratePinyinClick() {
+    //TODO: change to actual pinyin
     updateSecondaryText("hi bro");
   }
 
