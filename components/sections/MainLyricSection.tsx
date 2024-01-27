@@ -95,7 +95,7 @@ const MainLyricSection = ({
 
   return (
     <div className="">
-      <div className="my-2 flex space-x-2">
+      <div className="my-2 flex flex-wrap gap-2">
         {/* <Button variant="outline" onClick={insertSection}>
           Test Button Insert Section
         </Button> */}
@@ -184,7 +184,7 @@ const MainLyricSection = ({
       <Textarea
         ref={mainTextareaRef}
         placeholder="Insert the main lyrics here."
-        className="min-h-60"
+        className="min-h-52 md:min-h-72"
         value={text}
         onChange={handleTextChange}
         onSelect={handleSelect}

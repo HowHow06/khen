@@ -25,14 +25,14 @@ const SecondaryLyricSection = ({
   return (
     <>
       <div className="">
-        <div className="my-2 flex space-x-2">
+        <div className="my-2 flex flex-wrap gap-2">
           <CopyToClipboardButton targetRef={secondaryTextareaRef} />
           <ClearTextButton text={secondaryText} setText={setSecondaryText} />
         </div>
         <Textarea
           ref={secondaryTextareaRef}
           placeholder="Insert the secondary lyrics here."
-          className="min-h-60"
+          className="min-h-52 md:min-h-72"
           value={secondaryText}
           onChange={handleTextChange}
         />
