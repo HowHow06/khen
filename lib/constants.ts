@@ -14,6 +14,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   差派: "chāi pài",
   朝阳: "zhāo yáng",
   不着: "bù zháo",
+  祢: "nǐ",
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
