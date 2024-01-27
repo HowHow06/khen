@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
 import MainLyricSection from "./MainLyricSection";
+import PptGeneratorSetting from "./PptGeneratorSettings";
 import SecondaryLyricSection from "./SecondaryLyricSection";
 
 type Props = {};
@@ -40,9 +41,7 @@ const PptGeneratorClientSection = (props: Props) => {
         <h2 className="mt-8 text-xl font-semibold tracking-tight">
           4. Settings
         </h2>
-        <div className="">
-          <Button variant="outline">Open Settings</Button>
-        </div>
+        <PptGeneratorSetting />
       </Container>
       <Container>
         <h2 className="mt-8 text-xl font-semibold tracking-tight">
