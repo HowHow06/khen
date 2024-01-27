@@ -18,6 +18,7 @@
     "next": "14.1.0",
     "next-themes": "^0.2.1",
     "opencc-js": "^1.0.5",
+    "pinyin-pro": "^3.19.3",
     "pptxgenjs": "^3.12.0",
     "react": "^18",
     "react-dom": "^18",
