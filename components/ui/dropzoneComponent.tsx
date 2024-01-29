@@ -18,7 +18,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
 }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      console.log("ACCEPTED FILE:", acceptedFiles);
+      console.log("ACCEPTED FILE:", acceptedFiles); // TODO: remove this
       if (maxFiles == 1 && acceptedFiles.length == 1) {
         onFilesSelected(acceptedFiles[0]); // Call the passed callback function
         return;
