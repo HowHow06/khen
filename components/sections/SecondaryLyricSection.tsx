@@ -1,5 +1,5 @@
 "use client";
-import { TextareaRefType } from "@/lib/type";
+import { TextareaRefType } from "@/lib/types";
 import { MutableRefObject } from "react";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";

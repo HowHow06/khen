@@ -14,7 +14,7 @@ import {
 } from "@/lib/character-converter";
 import { LYRIC_SECTION } from "@/lib/constant";
 import { getPinyin } from "@/lib/pinyin";
-import { LyricSectionType, TextareaRefType } from "@/lib/type";
+import { LyricSectionType, TextareaRefType } from "@/lib/types";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { MutableRefObject, useState } from "react";
 import { toast } from "sonner";

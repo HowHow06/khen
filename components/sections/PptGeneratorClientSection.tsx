@@ -1,5 +1,5 @@
 "use client";
-import { TextareaRefType } from "@/lib/type";
+import { TextareaRefType } from "@/lib/types";
 import { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import Container from "../ui/container";

@@ -1,8 +1,5 @@
 import { convertToTraditional } from "../character-converter";
-import {
-  BaseSettingMetaType,
-  PptGenerationSettingMetaType,
-} from "../type/ppt-generator";
+import { BaseSettingMetaType, PptGenerationSettingMetaType } from "../types";
 
 export const LYRIC_SECTION = {
   SECTION: "----",

@@ -1,4 +1,4 @@
-import { TextareaRefType } from "@/lib/type";
+import { TextareaRefType } from "@/lib/types";
 import { MutableRefObject } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
