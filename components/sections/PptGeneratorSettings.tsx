@@ -1,18 +1,19 @@
+"use client";
 // components/Sidebar.js
+import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import { ScrollArea } from "../ui/scroll-area";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,25 +54,25 @@ const PptGeneratorSetting = () => {
               done.
             </SheetDescription> */}
           </SheetHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input id="name" value="Pedro Duarte" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Username
-              </Label>
-              <Input id="username" value="@peduarte" className="col-span-3" />
-            </div>
-          </div>
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button type="submit">Save changes</Button>
-            </SheetClose>
-          </SheetFooter>
+          <Tabs defaultValue="general" className="mt-2 w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="section">Section</TabsTrigger>
+              <TabsTrigger value="content">Content</TabsTrigger>
+            </TabsList>
+            <TabsContent value="general">
+              <ScrollArea className="h-[75vh] pl-3 pr-4">
+                <GeneralSettings />
+                {/* <SheetFooter>
+                  <SheetClose asChild>
+                    <Button type="submit">Save changes</Button>
+                  </SheetClose>
+                </SheetFooter> */}
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="section">Section</TabsContent>
+            <TabsContent value="content">Content Style</TabsContent>
+          </Tabs>
         </SheetContent>
       </Sheet>
     </div>

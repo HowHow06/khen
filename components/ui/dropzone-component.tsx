@@ -4,7 +4,7 @@ import React, { HTMLAttributes, useCallback } from "react";
 import { Accept, useDropzone } from "react-dropzone";
 
 type DropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
-  onFilesSelected: (files: File[] | File) => void;
+  onFilesSelected: (files: File[]) => void;
   acceptedFileTypes?: Accept;
   maxFiles?: number;
   description?: string;
@@ -21,15 +21,11 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       console.log("ACCEPTED FILE:", acceptedFiles); // TODO: remove this
-      if (maxFiles == 1 && acceptedFiles.length == 1) {
-        onFilesSelected(acceptedFiles[0]); // Call the passed callback function
-        return;
-      }
-
       onFilesSelected(acceptedFiles); // Call the passed callback function
     },
-    [onFilesSelected, maxFiles],
+    [onFilesSelected],
   );
+  // TODO: implement handler on error, for example: file not accepted, too many files etc.
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
