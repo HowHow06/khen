@@ -1,8 +1,3 @@
-import { LYRIC_SECTION } from "./constants";
-
-export type LyricSectionType = keyof typeof LYRIC_SECTION;
-export type TextareaRefType = HTMLTextAreaElement | null;
-
 export type HorizontalAlignSettingType = "left" | "center" | "right";
 export type ShadowTypeSettingType = "outer" | "inner";
 export type TransitionSettingType = ""; // TODO: implement this
@@ -86,3 +81,21 @@ export type BaseSettingMetaType = {
 export type PptGenerationSettingMetaType = {
   [key in PptGenerationCategory]: BaseSettingMetaType;
 };
+
+export type PptSettingsCategoryState = {
+  [key: string]: any; // Replace 'any' with a more specific type as needed
+};
+
+export type PptSettingsState = {
+  general: PptSettingsCategoryState;
+  // Add other categories as needed
+};
+
+export type PptUpdateSettingAction = {
+  type: "UPDATE_SETTING";
+  category: keyof PptSettingsState; // Specifies the category to be updated
+  key: string; // The specific setting key within the category
+  value: any; // Replace 'any' with the type of your value
+};
+
+export type PptSettingsAction = PptUpdateSettingAction; // Add more action types as union types if needed
