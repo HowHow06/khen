@@ -27,15 +27,32 @@ export const generatePptSettingsInitialState = (
   return initialState;
 };
 
+const fileTypeValidator = (file: File, validTypes: string[]) => {
+  return validTypes.includes(file.type);
+};
+
 const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
   switch (setting.fieldType) {
     case "boolean":
       return z.boolean().default(setting.defaultValue ?? false);
     case "number":
       return z.number().default(setting.defaultValue ?? 0);
+    case "image":
+      return z.custom<File>(
+        (file) => {
+          if (!(file instanceof File)) {
+            return false;
+          }
+          const validTypes = ["image/jpeg", "image/png"];
+          return fileTypeValidator(file, validTypes);
+        },
+        {
+          message: "Invalid image", // Custom error message
+        },
+      );
     // TODO: Add cases for other field types
     default:
-      return z.string().default(setting.defaultValue ?? "");
+      return z.string();
   }
 };
 
