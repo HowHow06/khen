@@ -1,12 +1,13 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { HTMLAttributes, useCallback } from "react";
+import React, { HTMLAttributes, useCallback, useState } from "react";
 import { Accept, useDropzone } from "react-dropzone";
 
 type DropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
   onFilesSelected: (files: File[] | File) => void;
   acceptedFileTypes?: Accept;
   maxFiles?: number;
+  description?: string;
 };
 
 const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
@@ -14,8 +15,11 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
   onFilesSelected,
   acceptedFileTypes,
   maxFiles,
+  description = "Drag and drop your file here.",
   ...props
 }) => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       console.log("ACCEPTED FILE:", acceptedFiles); // TODO: remove this
@@ -41,7 +45,7 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
       className={cn("rounded-lg border px-2 py-5 text-center", className)}
     >
       <input {...getInputProps()} {...props} />
-      <div>Drag and drop your file here.</div>
+      <div>{description}</div>
     </div>
   );
 };
