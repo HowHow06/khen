@@ -97,6 +97,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldSlug: "transition",
     fieldDisplayName: "Transition",
     fieldType: "transition",
+    isHidden: true,
   },
   mainBackgroundImage: {
     fieldSlug: "main-background-image",
