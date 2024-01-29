@@ -12,7 +12,7 @@ import {
   convertToSimplified,
   convertToTraditional,
 } from "@/lib/character-converter";
-import { LYRIC_SECTION } from "@/lib/constants";
+import { LYRIC_SECTION } from "@/lib/constant";
 import { getPinyin } from "@/lib/pinyin";
 import { LyricSectionType, TextareaRefType } from "@/lib/type";
 import { ArrowRight, ChevronDown } from "lucide-react";
