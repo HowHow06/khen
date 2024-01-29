@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import React, { HTMLAttributes, useCallback, useState } from "react";
+import React, { HTMLAttributes, useCallback } from "react";
 import { Accept, useDropzone } from "react-dropzone";
 
 type DropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
@@ -18,8 +18,6 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
   description = "Drag and drop your file here.",
   ...props
 }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       console.log("ACCEPTED FILE:", acceptedFiles); // TODO: remove this
