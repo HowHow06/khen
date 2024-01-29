@@ -48,7 +48,7 @@ const renderInputField = (
 
   if (settingItemMeta.fieldType == "color") {
     return (
-      <div className="col-span-6 ml-4">
+      <div className="col-span-6 ml-4 flex flex-col items-center">
         <ColorPicker color={field.value} onChange={field.onChange} />
       </div>
     );
