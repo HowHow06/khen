@@ -21,6 +21,11 @@ const defaultSettingsValue = generatePptSettingsInitialState(
 );
 
 const PptGeneratorClientSection = (props: Props) => {
+  console.log("big chunk section render"); //TODO: remove this
+  const mainTextareaRef = useRef<TextareaRefType>(null);
+  const secondaryTextareaRef = useRef<TextareaRefType>(null);
+  const [secondaryText, setSecondaryText] = useState<string>("");
+
   // console.log(`defaultSettingsValue: `, defaultSettingsValue); // TODO: remove this
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
@@ -33,12 +38,6 @@ const PptGeneratorClientSection = (props: Props) => {
     // ✅ This will be type-safe and validated.
     console.log("SUBMITE:", values);
   }
-
-  console.log("big chunk section render"); //TODO: remove this
-  const mainTextareaRef = useRef<TextareaRefType>(null);
-  const secondaryTextareaRef = useRef<TextareaRefType>(null);
-  const [secondaryText, setSecondaryText] = useState<string>("");
-
   return (
     <>
       <Container>
