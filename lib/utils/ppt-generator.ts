@@ -1,14 +1,15 @@
+import { SETTING_CATEGORY } from "../constant";
 import { PptGenerationSettingMetaType, PptSettingsState } from "../types";
 
 export const generatePptSettingsInitialState = (
   settings: PptGenerationSettingMetaType,
 ): PptSettingsState => {
   const initialState: PptSettingsState = {
-    general: {},
+    [SETTING_CATEGORY.GENERAL]: {},
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
-    if (category == "general") {
+    if (category == SETTING_CATEGORY.GENERAL) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
         if (setting.defaultValue !== undefined) {
           initialState[category as keyof PptSettingsState][key] =

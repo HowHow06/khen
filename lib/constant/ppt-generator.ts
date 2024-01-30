@@ -1,6 +1,15 @@
 import { convertToTraditional } from "../character-converter";
 import { BaseSettingMetaType, PptGenerationSettingMetaType } from "../types";
 
+export const SETTING_CATEGORY = {
+  FILE: "file",
+  GENERAL: "general",
+  SECTION: "section",
+  CONTENT: "content",
+  COVER: "cover",
+  CONTENT_TEXTBOX: "contentTextbox",
+} as const;
+
 export const LYRIC_SECTION = {
   SECTION: "----",
   SUBSECTION: "---",
@@ -314,10 +323,10 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
 
 // NOTE: this is metadata of the available settings for the users
 export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
-  file: PPT_GENERATION_FILE_SETTINGS,
-  general: PPT_GENERATION_GENERAL_SETTINGS,
-  section: PPT_GENERATION_SECTION_SETTINGS,
-  cover: PPT_GENERATION_COVER_SETTINGS,
-  contentTextbox: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
-  content: PPT_GENERATION_CONTENT_SETTINGS,
+  [SETTING_CATEGORY.FILE]: PPT_GENERATION_FILE_SETTINGS,
+  [SETTING_CATEGORY.GENERAL]: PPT_GENERATION_GENERAL_SETTINGS,
+  [SETTING_CATEGORY.SECTION]: PPT_GENERATION_SECTION_SETTINGS,
+  [SETTING_CATEGORY.COVER]: PPT_GENERATION_COVER_SETTINGS,
+  [SETTING_CATEGORY.CONTENT_TEXTBOX]: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
+  [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
 };

@@ -1,4 +1,4 @@
-import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
+import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { useFormContext } from "react-hook-form";
 import {
   FormControl,
@@ -29,8 +29,8 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
             <>
               <FormField
                 control={control}
-                name={"general." + key}
-                key={"general." + key}
+                name={SETTING_CATEGORY.GENERAL + "." + key}
+                key={SETTING_CATEGORY.GENERAL + "." + key}
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-6 items-center gap-3">
                     <FormLabel className="col-span-4 text-left text-sm">

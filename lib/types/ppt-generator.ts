@@ -1,3 +1,5 @@
+import { SETTING_CATEGORY } from "../constant";
+
 export type HorizontalAlignSettingType = "left" | "center" | "right";
 export type ShadowTypeSettingType = "outer" | "inner";
 export type TransitionSettingType = ""; // TODO: implement this
@@ -67,12 +69,7 @@ export type BaseSettingItemMetaType = {
 );
 
 type PptGenerationCategory =
-  | "file"
-  | "general"
-  | "section"
-  | "content"
-  | "cover"
-  | "contentTextbox";
+  (typeof SETTING_CATEGORY)[keyof typeof SETTING_CATEGORY];
 
 export type BaseSettingMetaType = {
   [key: string]: BaseSettingItemMetaType;
@@ -87,6 +84,6 @@ export type PptSettingsCategoryState = {
 };
 
 export type PptSettingsState = {
-  general: PptSettingsCategoryState;
+  [SETTING_CATEGORY.GENERAL]: PptSettingsCategoryState;
   // Add other categories as needed
 };

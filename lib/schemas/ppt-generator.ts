@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PPT_GENERATION_SETTINGS_META } from "../constant";
+import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "../constant";
 import {
   BaseSettingItemMetaType,
   PptGenerationSettingMetaType,
@@ -38,7 +38,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
   Object.entries(metaData).forEach(([category, settings]) => {
-    if (category == "general") {
+    if (category == SETTING_CATEGORY.GENERAL) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
         categorySchema[key] = createZodSchemaFromSettingItem(setting);
