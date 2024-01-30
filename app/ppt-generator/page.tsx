@@ -1,4 +1,4 @@
-import PptGeneratorClientSection from "@/components/sections/PptGeneratorClientSection";
+import PptGeneratorClientSection from "@/components/ppt-generator/PptGeneratorClientSection";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 
