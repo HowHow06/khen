@@ -123,13 +123,14 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldSlug: "sections-auto-numbering",
     fieldDisplayName: "Section Auto Numbering",
     fieldType: "boolean",
-    defaultValue: false,
+    defaultValue: true,
   },
   useDifferentSettingForEachSection: {
     fieldSlug: "use-different-setting-for-each-section",
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: "boolean",
     defaultValue: false,
+    isHidden: true, // TODO: khen-29
   },
 };
 
