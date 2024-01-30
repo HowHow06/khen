@@ -1,12 +1,5 @@
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
-import { BaseSettingItemMetaType } from "@/lib/types";
-import { ReactNode } from "react";
-import {
-  ControllerRenderProps,
-  FieldValues,
-  useFormContext,
-} from "react-hook-form";
-import ColorPicker from "../ui/color-picker";
+import { useFormContext } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -14,46 +7,12 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import ImageDropzoneComponent from "../ui/image-dropzone-component";
-import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
-import { Switch } from "../ui/switch";
+import SettingInputField from "./SettingInputField";
 
 type GeneralSettingsProps = {
   // settings: PptSettingsState;
   // dispatch: React.Dispatch<PptSettingsAction>;
-};
-
-// TODO: move this to utils
-const renderInputField = (
-  settingItemMeta: BaseSettingItemMetaType,
-  field: ControllerRenderProps<FieldValues, string>,
-): ReactNode => {
-  if (settingItemMeta.fieldType == "boolean") {
-    return <Switch checked={field.value} onCheckedChange={field.onChange} />;
-  }
-
-  if (settingItemMeta.fieldType == "number") {
-    return <Input className="col-span-2 text-sm" type="number" {...field} />;
-  }
-
-  if (settingItemMeta.fieldType == "image") {
-    return (
-      <ImageDropzoneComponent
-        className="col-span-6 text-sm"
-        onFilesSelected={(file) => field.onChange(file)}
-      />
-    );
-  }
-
-  if (settingItemMeta.fieldType == "color") {
-    return (
-      <div className="col-span-6 ml-4 flex flex-col items-center">
-        <ColorPicker color={field.value} onChange={field.onChange} />
-      </div>
-    );
-  }
-  return <></>;
 };
 
 const GeneralSettings = ({}: GeneralSettingsProps) => {
@@ -77,7 +36,12 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
                     <FormLabel className="col-span-4 text-left text-sm">
                       {value.fieldDisplayName}
                     </FormLabel>
-                    <FormControl>{renderInputField(value, field)}</FormControl>
+                    <FormControl>
+                      <SettingInputField
+                        settingItemMeta={value}
+                        field={field}
+                      />
+                    </FormControl>
                     {/* <FormDescription className="col-span-6">
                       This is description.
                     </FormDescription> */}
