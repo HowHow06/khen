@@ -12,8 +12,8 @@ import { Button } from "../ui/button";
 import Container from "../ui/container";
 import { Form } from "../ui/form";
 import MainLyricSection from "./MainLyricSection";
-import PptGeneratorSetting from "./PptGeneratorSettings";
 import SecondaryLyricSection from "./SecondaryLyricSection";
+import PptGeneratorSetting from "./settings/PptGeneratorSettings";
 type Props = {};
 
 const defaultSettingsValue = generatePptSettingsInitialState(

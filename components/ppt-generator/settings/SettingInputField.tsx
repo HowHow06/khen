@@ -1,10 +1,10 @@
 import { BaseSettingItemMetaType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
-import ColorPicker from "../ui/color-picker";
-import ImageDropzoneComponent from "../ui/image-dropzone-component";
-import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
+import ColorPicker from "../../ui/color-picker";
+import ImageDropzoneComponent from "../../ui/image-dropzone-component";
+import { Input } from "../../ui/input";
+import { Switch } from "../../ui/switch";
 
 type SettingInputFieldProps = {
   settingItemMeta: BaseSettingItemMetaType;

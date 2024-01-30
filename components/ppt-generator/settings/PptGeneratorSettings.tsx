@@ -3,16 +3,16 @@
 import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
-import { Button } from "../ui/button";
-import { ScrollArea } from "../ui/scroll-area";
+import { Button } from "../../ui/button";
+import { ScrollArea } from "../../ui/scroll-area";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../ui/sheet";
-import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
+} from "../../ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
 import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {

@@ -6,8 +6,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Separator } from "../ui/separator";
+} from "../../ui/form";
+import { Separator } from "../../ui/separator";
 import SettingInputField from "./SettingInputField";
 
 type GeneralSettingsProps = {
