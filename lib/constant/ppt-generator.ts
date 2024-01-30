@@ -59,6 +59,17 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
 };
 
 const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
+  mainBackgroundImage: {
+    fieldSlug: "main-background-image",
+    fieldDisplayName: "Main Background Image",
+    fieldType: "image",
+  },
+  mainBackgroundColor: {
+    fieldSlug: "main-background-color",
+    fieldDisplayName: "Main Background Color",
+    fieldType: "color",
+    defaultValue: "#000000",
+  },
   separateSectionsToFiles: {
     fieldSlug: "separate-sections-to-files",
     fieldDisplayName: "Separate Sections Into Different Files",
@@ -95,6 +106,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Line Count Per Slide",
     fieldType: "number",
     defaultValue: 2,
+    isHidden: true, // TODO: to implement
   },
   ignoreSubcontentWhenIdentical: {
     fieldSlug: "ignore-subcontent-when-identical",
@@ -107,17 +119,6 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Transition",
     fieldType: "transition",
     isHidden: true, // TODO: implement transition, KHEN-26
-  },
-  mainBackgroundImage: {
-    fieldSlug: "main-background-image",
-    fieldDisplayName: "Main Background Image",
-    fieldType: "image",
-  },
-  mainBackgroundColor: {
-    fieldSlug: "main-background-color",
-    fieldDisplayName: "Main Background Color",
-    fieldType: "color",
-    defaultValue: "#000000",
   },
   sectionsAutoNumbering: {
     fieldSlug: "sections-auto-numbering",
