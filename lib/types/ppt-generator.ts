@@ -85,5 +85,8 @@ export type PptSettingsCategoryState = {
 
 export type PptSettingsState = {
   [SETTING_CATEGORY.GENERAL]: PptSettingsCategoryState;
+  // [SETTING_CATEGORY.SECTION]?: {
+  //   [sectionKey: string]: PptSettingsCategoryState;
+  // };
   // Add other categories as needed
 };

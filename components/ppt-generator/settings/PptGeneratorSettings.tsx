@@ -1,8 +1,11 @@
 "use client";
 // components/Sidebar.js
+import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
+import { cn } from "@/lib/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
 import { ScrollArea } from "../../ui/scroll-area";
 import {
@@ -16,11 +19,17 @@ import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
 import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
+  const { getValues } = useFormContext();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  const isUseSectionSettings =
+    getValues(
+      `${SETTING_CATEGORY.GENERAL}.${PPT_GENERATION_SETTINGS_META.general.useDifferentSettingForEachSection}`,
+    ) == true;
 
   return (
     <div className="">
@@ -55,24 +64,37 @@ const PptGeneratorSetting = () => {
             </SheetDescription> */}
           </SheetHeader>
           <Tabs defaultValue="general" className="mt-2 w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList
+              className={cn(
+                "grid w-full",
+                isUseSectionSettings ? "grid-cols-3" : "grid-cols-2",
+              )}
+            >
               <TabsTrigger value="general">General</TabsTrigger>
-              <TabsTrigger value="section">Section</TabsTrigger>
+              {/* {isUseSectionSettings ? (
+                <TabsTrigger value="section">Section</TabsTrigger>
+              ) : (
+                <></>
+              )} */}
               <TabsTrigger value="content">Content</TabsTrigger>
             </TabsList>
             <TabsContent value="general">
               <ScrollArea className="h-[75vh] pl-3 pr-4">
                 <GeneralSettings />
-                {/* <SheetFooter>
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="section">
+              <ScrollArea className="h-[75vh] pl-3 pr-4">
+                {/* <SectionSettings /> */}
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="content">Content Style</TabsContent>
+          </Tabs>
+          {/* <SheetFooter>
                   <SheetClose asChild>
                     <Button type="submit">Save changes</Button>
                   </SheetClose>
                 </SheetFooter> */}
-              </ScrollArea>
-            </TabsContent>
-            <TabsContent value="section">Section</TabsContent>
-            <TabsContent value="content">Content Style</TabsContent>
-          </Tabs>
         </SheetContent>
       </Sheet>
     </div>
