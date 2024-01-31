@@ -32,6 +32,7 @@ const PptGeneratorClientSection = (props: Props) => {
     defaultValues: defaultSettingsValue,
   });
   // console.log("FORM error: ", form.formState.errors); // TODO: remove this
+  // console.log("FORM values: ", form.getValues()); // TODO: remove this
 
   function onSubmit(values: z.infer<typeof settingsSchema>) {
     // Do something with the form values.
