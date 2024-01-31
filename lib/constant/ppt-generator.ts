@@ -255,6 +255,12 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     defaultValue: fontFaces.MicrosoftYaHei.value,
     groupingName: "text",
   },
+  fontSize: {
+    fieldKey: "fontSize",
+    fieldDisplayName: "Font Size",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    groupingName: "text",
+  },
   charSpacing: {
     fieldKey: "charSpacing",
     fieldDisplayName: "Character Spacing",
