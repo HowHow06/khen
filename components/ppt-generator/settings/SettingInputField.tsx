@@ -82,6 +82,31 @@ const renderInputField = (
       />
     );
   }
+
+  if (settingItemMeta.fieldType == "percentage") {
+    return (
+      <Input
+        className="col-span-2 text-sm"
+        type="number"
+        min={0}
+        max={100}
+        {...field}
+      />
+    );
+  }
+
+  if (settingItemMeta.fieldType == "proportion") {
+    return (
+      <Input
+        className="col-span-2 text-sm"
+        type="number"
+        min={0.0}
+        max={1.0}
+        step={0.1}
+        {...field}
+      />
+    );
+  }
   return <></>;
 };
 
