@@ -1,7 +1,12 @@
 import { z } from "zod";
-import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "../constant";
+import {
+  HORIZONTAL_ALIGNMENT,
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+} from "../constant";
 import {
   BaseSettingItemMetaType,
+  HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
 } from "../types";
 
@@ -30,6 +35,17 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
       );
     case "font":
       return z.string();
+    case "horizontal-align":
+      return z.custom<string>(
+        (value) => {
+          return Object.values(HORIZONTAL_ALIGNMENT).includes(
+            value as HorizontalAlignSettingType,
+          );
+        },
+        {
+          message: "Invalid horizontal alignment", // Custom error message
+        },
+      );
     // TODO: Add cases for other field types
     default:
       return z.string();
