@@ -1,5 +1,5 @@
 import { Combobox } from "@/components/ui/combo-box";
-import { fontFacesItems } from "@/lib/constant";
+import { fontFacesItems, horizontalAlignmentItems } from "@/lib/constant";
 import { BaseSettingItemMetaType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
@@ -51,6 +51,20 @@ const renderInputField = (
         notFoundLabel="Font not found."
         defaultLabel="Select font..."
         className="col-span-6 w-full text-sm"
+      />
+    );
+  }
+
+  if (settingItemMeta.fieldType == "horizontal-align") {
+    return (
+      <Combobox
+        items={horizontalAlignmentItems}
+        selectedValue={field.value}
+        onItemSelect={field.onChange}
+        notFoundLabel="Font not found."
+        defaultLabel="Select font..."
+        className="col-span-6 w-full text-sm"
+        hasNoSearch
       />
     );
   }
