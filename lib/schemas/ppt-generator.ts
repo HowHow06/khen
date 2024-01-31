@@ -65,6 +65,16 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           message: "Invalid shadow type",
         },
       );
+    case "percentage":
+      return z
+        .number()
+        .min(0, "Percentage must be at least 0")
+        .max(100, "Percentage must not exceed 100");
+    case "proportion":
+      return z
+        .number()
+        .min(0.0, { message: "Must be at least 0.0" })
+        .max(1.0, { message: "Must not exceed 1.0" });
     // TODO: Add cases for other field types
     default:
       return z.string();
