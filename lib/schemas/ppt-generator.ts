@@ -28,6 +28,8 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           message: "Invalid image", // Custom error message
         },
       );
+    case "font":
+      return z.string();
     // TODO: Add cases for other field types
     default:
       return z.string();
@@ -38,7 +40,10 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
   Object.entries(metaData).forEach(([category, settings]) => {
-    if (category == SETTING_CATEGORY.GENERAL) {
+    if (
+      category == SETTING_CATEGORY.GENERAL ||
+      category == SETTING_CATEGORY.CONTENT
+    ) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
         categorySchema[key] = createZodSchemaFromSettingItem(setting);
