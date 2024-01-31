@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { Collection } from "../types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,4 +12,37 @@ export function toKebabCase(str: string) {
     .replace(/\s+/g, "-") // replace whitespace with hyphens
     .replace(/-+/g, "-") // replace multiple hyphens with a single hyphen
     .toLowerCase(); // convert to lowercase
+}
+
+function groupItem<T, K extends keyof any>(
+  item: T,
+  keyOrFunc: ((item: T) => K) | K,
+  result: Record<K, T[]>,
+): void {
+  const key =
+    typeof keyOrFunc === "function"
+      ? keyOrFunc(item)
+      : (item[keyOrFunc as unknown as keyof T] as K);
+
+  if (!result[key]) {
+    result[key] = [];
+  }
+  result[key].push(item);
+}
+
+export function groupBy<T, K extends keyof any>(
+  collection: Collection<T>,
+  keyOrFunc: ((item: T) => K) | K,
+): Record<K, T[]> {
+  const result: Record<K, T[]> = {} as Record<K, T[]>;
+
+  if (Array.isArray(collection)) {
+    collection.forEach((item) => groupItem(item, keyOrFunc, result));
+  } else {
+    Object.values(collection).forEach((item) =>
+      groupItem(item, keyOrFunc, result),
+    );
+  }
+
+  return result;
 }
