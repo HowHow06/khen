@@ -29,7 +29,6 @@ export type NumberSettingItemMetaType = {
 export type PercentageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;
   defaultValue?: number;
-  useIndexRepresentation?: boolean; // if true, the range will be 0.0-1.0
 };
 export type ImageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
@@ -55,6 +54,10 @@ export type TransitionTypeSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TRANSITION;
   defaultValue?: TransitionSettingType;
 };
+export type ProportionSettingItemMetaType = {
+  fieldType: typeof SETTING_FIELD_TYPE.PROPORTION;
+  defaultValue?: number;
+};
 
 export type BaseSettingItemMetaType = {
   fieldSlug: string; // TODO: revise if slug is needed
@@ -74,6 +77,7 @@ export type BaseSettingItemMetaType = {
   | HorizontalAlignSettingItemMetaType
   | ShadowTypeSettingItemMetaType
   | TransitionTypeSettingItemMetaType
+  | ProportionSettingItemMetaType
 );
 
 type PptGenerationCategory =
