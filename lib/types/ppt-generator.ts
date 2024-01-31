@@ -1,6 +1,7 @@
 import {
   HORIZONTAL_ALIGNMENT,
   SETTING_CATEGORY,
+  SETTING_FIELD_TYPE,
   SHADOW_TYPE,
 } from "../constant";
 
@@ -12,46 +13,46 @@ export type TransitionSettingType = ""; // TODO: implement this
 export type FontFaceSettingType = string;
 
 export type TextSettingItemMetaType = {
-  fieldType: "text";
+  fieldType: typeof SETTING_FIELD_TYPE.TEXT;
   defaultValue?: string;
 };
 export type BooleanSettingItemMetaType = {
-  fieldType: "boolean";
+  fieldType: typeof SETTING_FIELD_TYPE.BOOLEAN;
   defaultValue: boolean;
 };
 export type NumberSettingItemMetaType = {
-  fieldType: "number";
+  fieldType: typeof SETTING_FIELD_TYPE.NUMBER;
   defaultValue?: number;
   rangeMin?: number;
   rangeMax?: number;
 };
 export type PercentageSettingItemMetaType = {
-  fieldType: "percentage";
+  fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;
   defaultValue?: number;
   useIndexRepresentation?: boolean; // if true, the range will be 0.0-1.0
 };
 export type ImageSettingItemMetaType = {
-  fieldType: "image";
+  fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
   defaultValue?: any; //TODO: change type for this
 };
 export type ColorSettingItemMetaType = {
-  fieldType: "color";
+  fieldType: typeof SETTING_FIELD_TYPE.COLOR;
   defaultValue: string;
 };
 export type FontSettingItemMetaType = {
-  fieldType: "font";
+  fieldType: typeof SETTING_FIELD_TYPE.FONT;
   defaultValue: FontFaceSettingType;
 };
 export type HorizontalAlignSettingItemMetaType = {
-  fieldType: "horizontal-align";
+  fieldType: typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN;
   defaultValue?: HorizontalAlignSettingType;
 };
 export type ShadowTypeSettingItemMetaType = {
-  fieldType: "shadow-type";
+  fieldType: typeof SETTING_FIELD_TYPE.SHADOW_TYPE;
   defaultValue?: ShadowTypeSettingType;
 };
 export type TransitionTypeSettingItemMetaType = {
-  fieldType: "transition";
+  fieldType: typeof SETTING_FIELD_TYPE.TRANSITION;
   defaultValue?: TransitionSettingType;
 };
 
