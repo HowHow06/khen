@@ -1,5 +1,6 @@
 import { convertToTraditional } from "../character-converter";
 import { BaseSettingMetaType, PptGenerationSettingMetaType } from "../types";
+import { fontFaces } from "./font-face";
 
 export const SETTING_CATEGORY = {
   FILE: "file",
@@ -172,6 +173,7 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
     fieldSlug: "cover-title-font",
     fieldDisplayName: "Font",
     fieldType: "font",
+    defaultValue: fontFaces.MicrosoftYaHei.value,
     groupingName: "style",
   },
   coverTitleFontSize: {
@@ -220,6 +222,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldSlug: "font",
     fieldDisplayName: "Font Face",
     fieldType: "font",
+    defaultValue: fontFaces.MicrosoftYaHei.value,
     groupingName: "text",
   },
   charSpacing: {
@@ -332,3 +335,6 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.CONTENT_TEXTBOX]: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
 };
+
+export const fontFacesItems: { value: string; label: string }[] =
+  Object.entries(fontFaces).map(([key, font]) => font);
