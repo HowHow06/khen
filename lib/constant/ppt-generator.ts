@@ -2,9 +2,16 @@ import { convertToTraditional } from "../character-converter";
 import {
   BaseSettingMetaType,
   ComboboxItemsType,
+  HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
 } from "../types";
 import { fontFaces } from "./font-face";
+
+export const HORIZONTAL_ALIGNMENT = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+} as const;
 
 export const SETTING_CATEGORY = {
   FILE: "file",
@@ -343,3 +350,11 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
 export const fontFacesItems: ComboboxItemsType = Object.entries(fontFaces).map(
   ([key, font]) => font,
 );
+
+export const horizontalAlignmentItems: ComboboxItemsType<HorizontalAlignSettingType> =
+  Object.values(HORIZONTAL_ALIGNMENT).map((alignment) => {
+    return {
+      value: alignment,
+      label: alignment,
+    };
+  });

@@ -1,6 +1,7 @@
-import { SETTING_CATEGORY } from "../constant";
+import { HORIZONTAL_ALIGNMENT, SETTING_CATEGORY } from "../constant";
 
-export type HorizontalAlignSettingType = "left" | "center" | "right";
+export type HorizontalAlignSettingType =
+  (typeof HORIZONTAL_ALIGNMENT)[keyof typeof HORIZONTAL_ALIGNMENT];
 export type ShadowTypeSettingType = "outer" | "inner";
 export type TransitionSettingType = ""; // TODO: implement this
 export type FontFaceSettingType = string;
