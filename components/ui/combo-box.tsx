@@ -16,13 +16,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ComboboxItemsType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type ComboxBoxProps = {
-  items: {
-    value: string;
-    label: string;
-  }[];
+  items: ComboboxItemsType;
   selectedValue?: string;
   defaultLabel?: string;
   notFoundLabel?: string;

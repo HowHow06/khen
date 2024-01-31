@@ -1,5 +1,9 @@
 import { convertToTraditional } from "../character-converter";
-import { BaseSettingMetaType, PptGenerationSettingMetaType } from "../types";
+import {
+  BaseSettingMetaType,
+  ComboboxItemsType,
+  PptGenerationSettingMetaType,
+} from "../types";
 import { fontFaces } from "./font-face";
 
 export const SETTING_CATEGORY = {
@@ -336,5 +340,6 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
 };
 
-export const fontFacesItems: { value: string; label: string }[] =
-  Object.entries(fontFaces).map(([key, font]) => font);
+export const fontFacesItems: ComboboxItemsType = Object.entries(fontFaces).map(
+  ([key, font]) => font,
+);
