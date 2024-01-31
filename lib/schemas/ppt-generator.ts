@@ -66,15 +66,17 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
         },
       );
     case "percentage":
+      if (setting.useProportionForm) {
+        return z
+          .number()
+          .min(0.0, { message: "Must be at least 0.0" })
+          .max(1.0, { message: "Must not exceed 1.0" });
+      }
       return z
         .number()
         .min(0, "Percentage must be at least 0")
         .max(100, "Percentage must not exceed 100");
-    case "proportion":
-      return z
-        .number()
-        .min(0.0, { message: "Must be at least 0.0" })
-        .max(1.0, { message: "Must not exceed 1.0" });
+
     // TODO: Add cases for other field types
     default:
       return z.string();

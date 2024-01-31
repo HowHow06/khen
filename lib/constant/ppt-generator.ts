@@ -19,7 +19,6 @@ export const SETTING_FIELD_TYPE = {
   HORIZONTAL_ALIGN: "horizontal-align",
   SHADOW_TYPE: "shadow-type",
   TRANSITION: "transition",
-  PROPORTION: "proportion",
 } as const;
 
 export const HORIZONTAL_ALIGNMENT = {
@@ -352,7 +351,8 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
   shadowOpacity: {
     fieldSlug: "shadow-opacity",
     fieldDisplayName: "Opacity",
-    fieldType: SETTING_FIELD_TYPE.PROPORTION,
+    fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
+    useProportionForm: true,
     groupingName: "shadow",
   },
 };
