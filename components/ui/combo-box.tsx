@@ -25,6 +25,7 @@ type ComboxBoxProps = {
   defaultLabel?: string;
   notFoundLabel?: string;
   className?: string;
+  hasNoSearch?: boolean;
   onItemSelect?: (value: string) => void;
 };
 
@@ -34,6 +35,7 @@ export function Combobox({
   defaultLabel = "Select...",
   notFoundLabel = "No item found.",
   className,
+  hasNoSearch = false,
   onItemSelect = () => {},
 }: ComboxBoxProps) {
   const [open, setOpen] = React.useState(false);
@@ -56,11 +58,15 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-full min-w-40 p-0">
         <Command>
-          <CommandInput placeholder={defaultLabel} />
-          <CommandEmpty>{notFoundLabel}</CommandEmpty>
-          <CommandGroup className="h-[30vh] max-h-48">
+          {!hasNoSearch && (
+            <>
+              <CommandInput placeholder={defaultLabel} />
+              <CommandEmpty>{notFoundLabel}</CommandEmpty>
+            </>
+          )}
+          <CommandGroup className="max-h-48">
             {items.map((item) => (
               <CommandItem
                 key={item.value}
