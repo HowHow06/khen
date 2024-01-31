@@ -48,7 +48,10 @@ export function Combobox({
           className="w-[200px] justify-between"
         >
           {selectedValue
-            ? items.find((item) => item.value === selectedValue)?.label
+            ? items.find(
+                (item) =>
+                  item.value.toLowerCase() === selectedValue.toLowerCase(),
+              )?.label
             : defaultLabel}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
