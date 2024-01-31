@@ -19,6 +19,7 @@ export const SETTING_FIELD_TYPE = {
   HORIZONTAL_ALIGN: "horizontal-align",
   SHADOW_TYPE: "shadow-type",
   TRANSITION: "transition",
+  PROPORTION: "proportion",
 } as const;
 
 export const HORIZONTAL_ALIGNMENT = {
