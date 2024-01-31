@@ -3,6 +3,7 @@ import { SETTING_CATEGORY } from "../constant";
 export type HorizontalAlignSettingType = "left" | "center" | "right";
 export type ShadowTypeSettingType = "outer" | "inner";
 export type TransitionSettingType = ""; // TODO: implement this
+export type FontFaceSettingType = string;
 
 export type TextSettingItemMetaType = {
   fieldType: "text";
@@ -33,7 +34,7 @@ export type ColorSettingItemMetaType = {
 };
 export type FontSettingItemMetaType = {
   fieldType: "font";
-  defaultValue?: string;
+  defaultValue: FontFaceSettingType;
 };
 export type HorizontalAlignSettingItemMetaType = {
   fieldType: "horizontal-align";
@@ -79,12 +80,13 @@ export type PptGenerationSettingMetaType = {
   [key in PptGenerationCategory]: BaseSettingMetaType;
 };
 
-export type PptSettingsCategoryState = {
+export type PptSettingsItemState = {
   [key: string]: any; // Replace 'any' with a more specific type as needed
 };
 
 export type PptSettingsState = {
-  [SETTING_CATEGORY.GENERAL]: PptSettingsCategoryState;
+  [SETTING_CATEGORY.GENERAL]: PptSettingsItemState;
+  [SETTING_CATEGORY.CONTENT]: PptSettingsItemState;
   // [SETTING_CATEGORY.SECTION]?: {
   //   [sectionKey: string]: PptSettingsCategoryState;
   // };
