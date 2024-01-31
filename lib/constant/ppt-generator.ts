@@ -252,6 +252,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldSlug: "align",
     fieldDisplayName: "Align",
     fieldType: "horizontal-align",
+    defaultValue: HORIZONTAL_ALIGNMENT.CENTER,
     groupingName: "text",
   },
   hasGlow: {
