@@ -73,17 +73,17 @@ export { CUSTOM_PINYIN_MAP };
 
 const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
   filename: {
-    fieldSlug: "filename",
+    fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
     fieldType: SETTING_FIELD_TYPE.TEXT,
   },
   filenamePrefix: {
-    fieldSlug: "filenamePrefix",
+    fieldKey: "filenamePrefix",
     fieldDisplayName: "File Name Prefix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
   },
   filenameSuffix: {
-    fieldSlug: "filenameSuffix",
+    fieldKey: "filenameSuffix",
     fieldDisplayName: "File Name Suffix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
   },
@@ -91,74 +91,74 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
 
 const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
   mainBackgroundImage: {
-    fieldSlug: "mainBackgroundImage",
+    fieldKey: "mainBackgroundImage",
     fieldDisplayName: "Main Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
   },
   mainBackgroundColor: {
-    fieldSlug: "mainBackgroundColor",
+    fieldKey: "mainBackgroundColor",
     fieldDisplayName: "Main Background Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
   },
   separateSectionsToFiles: {
-    fieldSlug: "separateSectionsToFiles",
+    fieldKey: "separateSectionsToFiles",
     fieldDisplayName: "Separate Sections Into Different Files",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
   },
   useBackgroundColorWhenEmpty: {
-    fieldSlug: "useBackgroundColorWhenEmpty",
+    fieldKey: "useBackgroundColorWhenEmpty",
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
   },
   ignoreSubcontent: {
-    fieldSlug: "ignoreSubcontent",
+    fieldKey: "ignoreSubcontent",
     fieldDisplayName: "Ignore Secondary Content",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
   },
   useSingleTextbox: {
-    fieldSlug: "useSingleTextbox",
+    fieldKey: "useSingleTextbox",
     fieldDisplayName: "Use Single Textbox",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     isHidden: true,
   },
   singleLineMode: {
-    fieldSlug: "singleLineMode",
+    fieldKey: "singleLineMode",
     fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
   },
   lineCountPerSlide: {
-    fieldSlug: "lineCountPerSlide",
+    fieldKey: "lineCountPerSlide",
     fieldDisplayName: "Line Count Per Slide",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
     isHidden: true, // TODO: to implement
   },
   ignoreSubcontentWhenIdentical: {
-    fieldSlug: "ignoreSubcontentWhenIdentical",
+    fieldKey: "ignoreSubcontentWhenIdentical",
     fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
   },
   transition: {
-    fieldSlug: "transition",
+    fieldKey: "transition",
     fieldDisplayName: "Transition",
     fieldType: SETTING_FIELD_TYPE.TRANSITION,
     isHidden: true, // TODO: implement transition, KHEN-26
   },
   sectionsAutoNumbering: {
-    fieldSlug: "sectionsAutoNumbering",
+    fieldKey: "sectionsAutoNumbering",
     fieldDisplayName: "Section Auto Numbering",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
   },
   useDifferentSettingForEachSection: {
-    fieldSlug: "useDifferentSettingForEachSection",
+    fieldKey: "useDifferentSettingForEachSection",
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
@@ -168,24 +168,24 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
 
 const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
   useMainBackgroundImage: {
-    fieldSlug: "useMainBackgroundImage",
+    fieldKey: "useMainBackgroundImage",
     fieldDisplayName: "Use Main Background Image",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
   },
   sectionBackgroundImage: {
-    fieldSlug: "sectionBackgroundImage",
+    fieldKey: "sectionBackgroundImage",
     fieldDisplayName: "Section Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
   },
   useMainBackgroundColor: {
-    fieldSlug: "useMainBackgroundColor",
+    fieldKey: "useMainBackgroundColor",
     fieldDisplayName: "Use Main Background Color",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
   },
   sectionBackgroundColor: {
-    fieldSlug: "sectionBackgroundColor",
+    fieldKey: "sectionBackgroundColor",
     fieldDisplayName: "Section Background Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
@@ -194,26 +194,26 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
 
 const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   coverTitlePositionY: {
-    fieldSlug: "coverTitlePositionY",
+    fieldKey: "coverTitlePositionY",
     fieldDisplayName: "Position Y",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     groupingName: "position",
   },
   coverTitleFont: {
-    fieldSlug: "coverTitleFont",
+    fieldKey: "coverTitleFont",
     fieldDisplayName: "Font",
     fieldType: SETTING_FIELD_TYPE.FONT,
     defaultValue: fontFaces.MicrosoftYaHei.value,
     groupingName: "style",
   },
   coverTitleFontSize: {
-    fieldSlug: "coverTitleFontSize",
+    fieldKey: "coverTitleFontSize",
     fieldDisplayName: "Font Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "style",
   },
   coverTitleFontColor: {
-    fieldSlug: "coverTitleFontColor",
+    fieldKey: "coverTitleFontColor",
     fieldDisplayName: "Font Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
@@ -222,12 +222,12 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
 
 const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   textboxPositionX: {
-    fieldSlug: "textboxPositionX",
+    fieldKey: "textboxPositionX",
     fieldDisplayName: "Position X",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
   },
   textboxPositionY: {
-    fieldSlug: "textboxPositionY",
+    fieldKey: "textboxPositionY",
     fieldDisplayName: "Position Y",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
   },
@@ -235,121 +235,121 @@ const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
 
 const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
   bold: {
-    fieldSlug: "bold",
+    fieldKey: "bold",
     fieldDisplayName: "Bold",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
     groupingName: "text",
   },
   fontColor: {
-    fieldSlug: "fontColor",
+    fieldKey: "fontColor",
     fieldDisplayName: "Font Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
     groupingName: "text",
   },
   font: {
-    fieldSlug: "font",
+    fieldKey: "font",
     fieldDisplayName: "Font Face",
     fieldType: SETTING_FIELD_TYPE.FONT,
     defaultValue: fontFaces.MicrosoftYaHei.value,
     groupingName: "text",
   },
   charSpacing: {
-    fieldSlug: "charSpacing",
+    fieldKey: "charSpacing",
     fieldDisplayName: "Character Spacing",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "text",
   },
   align: {
-    fieldSlug: "align",
+    fieldKey: "align",
     fieldDisplayName: "Align",
     fieldType: SETTING_FIELD_TYPE.HORIZONTAL_ALIGN,
     defaultValue: HORIZONTAL_ALIGNMENT.CENTER,
     groupingName: "text",
   },
   hasGlow: {
-    fieldSlug: "hasGlow",
+    fieldKey: "hasGlow",
     fieldDisplayName: "Enable Glow",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     groupingName: "glow",
   },
   glowSize: {
-    fieldSlug: "glowSize",
+    fieldKey: "glowSize",
     fieldDisplayName: "Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "glow",
   },
   glowColor: {
-    fieldSlug: "glowColor",
+    fieldKey: "glowColor",
     fieldDisplayName: "Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
     groupingName: "glow",
   },
   hasOutline: {
-    fieldSlug: "hasOutline",
+    fieldKey: "hasOutline",
     fieldDisplayName: "Enable Outline",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     groupingName: "outline",
   },
   outlineWeight: {
-    fieldSlug: "outlineWeight",
+    fieldKey: "outlineWeight",
     fieldDisplayName: "Weight",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "outline",
   },
   outlineColor: {
-    fieldSlug: "outlineColor",
+    fieldKey: "outlineColor",
     fieldDisplayName: "Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
     groupingName: "outline",
   },
   hasShadow: {
-    fieldSlug: "hasShadow",
+    fieldKey: "hasShadow",
     fieldDisplayName: "Enable Shadow",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
     groupingName: "shadow",
   },
   shadowType: {
-    fieldSlug: "shadowType",
+    fieldKey: "shadowType",
     fieldDisplayName: "Type",
     fieldType: SETTING_FIELD_TYPE.SHADOW_TYPE,
     defaultValue: "outer",
     groupingName: "shadow",
   },
   shadowColor: {
-    fieldSlug: "shadowColor",
+    fieldKey: "shadowColor",
     fieldDisplayName: "Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
     groupingName: "shadow",
   },
   shadowBlur: {
-    fieldSlug: "shadowBlur",
+    fieldKey: "shadowBlur",
     fieldDisplayName: "Blur",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "shadow",
   },
   shadowOffset: {
-    fieldSlug: "shadowOffset",
+    fieldKey: "shadowOffset",
     fieldDisplayName: "Offset",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "shadow",
   },
   shadowAngle: {
-    fieldSlug: "shadowAngle",
+    fieldKey: "shadowAngle",
     fieldDisplayName: "Angle",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     rangeMax: 359,
     groupingName: "shadow",
   },
   shadowOpacity: {
-    fieldSlug: "shadowOpacity",
+    fieldKey: "shadowOpacity",
     fieldDisplayName: "Opacity",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     useProportionForm: true,

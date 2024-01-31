@@ -93,7 +93,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     ) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        categorySchema[setting.fieldSlug] =
+        categorySchema[setting.fieldKey] =
           createZodSchemaFromSettingItem(setting);
       });
       schemaObject[category] = z.object(categorySchema);

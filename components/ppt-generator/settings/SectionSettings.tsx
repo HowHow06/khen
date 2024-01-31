@@ -30,8 +30,8 @@ const SectionSettings = ({}: SectionSettingsProps) => {
             <>
               <FormField
                 control={control}
-                name={SETTING_CATEGORY.SECTION + "." + value.fieldSlug}
-                key={SETTING_CATEGORY.SECTION + "." + value.fieldSlug}
+                name={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
+                key={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-6 items-center gap-3">
                     <FormLabel className="col-span-4 text-left text-sm">

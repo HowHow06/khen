@@ -57,7 +57,7 @@ export type TransitionTypeSettingItemMetaType = {
 };
 
 export type BaseSettingItemMetaType = {
-  fieldSlug: string; // TODO: revise if slug is needed
+  fieldKey: string; // TODO: revise if slug is needed
   fieldDisplayName?: string;
   remark?: string;
   tips?: string;
