@@ -352,8 +352,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
   shadowOpacity: {
     fieldSlug: "shadow-opacity",
     fieldDisplayName: "Opacity",
-    fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
-    useIndexRepresentation: true,
+    fieldType: SETTING_FIELD_TYPE.PROPORTION,
     groupingName: "shadow",
   },
 };
