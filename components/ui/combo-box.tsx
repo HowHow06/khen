@@ -66,7 +66,7 @@ export function Combobox({
               <CommandEmpty>{notFoundLabel}</CommandEmpty>
             </>
           )}
-          <CommandGroup className="max-h-48">
+          <CommandGroup className="max-h-56">
             {items.map((item) => (
               <CommandItem
                 key={item.value}
