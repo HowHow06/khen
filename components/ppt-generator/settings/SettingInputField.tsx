@@ -1,3 +1,5 @@
+import { Combobox } from "@/components/ui/combo-box";
+import { fontFacesItems } from "@/lib/constant";
 import { BaseSettingItemMetaType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
@@ -37,6 +39,19 @@ const renderInputField = (
       <div className="col-span-6 ml-4 flex flex-col items-center">
         <ColorPicker color={field.value} onChange={field.onChange} />
       </div>
+    );
+  }
+
+  if (settingItemMeta.fieldType == "font") {
+    return (
+      <Combobox
+        items={fontFacesItems}
+        selectedValue={field.value}
+        onItemSelect={field.onChange}
+        notFoundLabel="Font not found."
+        defaultLabel="Select font..."
+        className="col-span-6 w-full text-sm"
+      />
     );
   }
   return <></>;
