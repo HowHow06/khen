@@ -353,11 +353,11 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
 };
 
-export const fontFacesItems: ComboboxItemsType = Object.entries(fontFaces).map(
-  ([key, font]) => font,
-);
+export const FONT_FACES_ITEMS: ComboboxItemsType = Object.entries(
+  fontFaces,
+).map(([key, font]) => font);
 
-export const horizontalAlignmentItems: ComboboxItemsType<HorizontalAlignSettingType> =
+export const HORIZONTAL_ALIGNMENT_ITEMS: ComboboxItemsType<HorizontalAlignSettingType> =
   Object.values(HORIZONTAL_ALIGNMENT).map((alignment) => {
     return {
       value: alignment,
@@ -365,7 +365,7 @@ export const horizontalAlignmentItems: ComboboxItemsType<HorizontalAlignSettingT
     };
   });
 
-export const shadowTypeItems: ComboboxItemsType<ShadowTypeSettingType> =
+export const SHADOW_TYPE_ITEMS: ComboboxItemsType<ShadowTypeSettingType> =
   Object.values(SHADOW_TYPE).map((shadowType) => {
     return {
       value: shadowType,
