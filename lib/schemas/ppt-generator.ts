@@ -35,6 +35,12 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           message: "Invalid image",
         },
       );
+    case "color":
+      return z
+        .string()
+        .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/, {
+          message: "Invalid hex color",
+        });
     case "font":
       return z.string();
     case "horizontal-align":
