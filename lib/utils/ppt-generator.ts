@@ -16,7 +16,7 @@ export const generatePptSettingsInitialState = (
     ) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
         if (setting.defaultValue !== undefined) {
-          initialState[category as keyof PptSettingsState][key] =
+          initialState[category as keyof PptSettingsState][setting.fieldSlug] =
             setting.defaultValue;
         }
       });
