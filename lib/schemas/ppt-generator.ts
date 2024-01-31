@@ -3,11 +3,13 @@ import {
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
+  SHADOW_TYPE,
 } from "../constant";
 import {
   BaseSettingItemMetaType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
+  ShadowTypeSettingType,
 } from "../types";
 
 const fileTypeValidator = (file: File, validTypes: string[]) => {
@@ -30,7 +32,7 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           return fileTypeValidator(file, validTypes);
         },
         {
-          message: "Invalid image", // Custom error message
+          message: "Invalid image",
         },
       );
     case "font":
@@ -43,7 +45,18 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           );
         },
         {
-          message: "Invalid horizontal alignment", // Custom error message
+          message: "Invalid horizontal alignment",
+        },
+      );
+    case "shadow-type":
+      return z.custom<string>(
+        (value) => {
+          return Object.values(SHADOW_TYPE).includes(
+            value as ShadowTypeSettingType,
+          );
+        },
+        {
+          message: "Invalid shadow type",
         },
       );
     // TODO: Add cases for other field types
