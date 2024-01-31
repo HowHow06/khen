@@ -6,10 +6,14 @@ export const generatePptSettingsInitialState = (
 ): PptSettingsState => {
   const initialState: PptSettingsState = {
     [SETTING_CATEGORY.GENERAL]: {},
+    [SETTING_CATEGORY.CONTENT]: {},
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
-    if (category == SETTING_CATEGORY.GENERAL) {
+    if (
+      category == SETTING_CATEGORY.GENERAL ||
+      category == SETTING_CATEGORY.CONTENT
+    ) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
         if (setting.defaultValue !== undefined) {
           initialState[category as keyof PptSettingsState][key] =
