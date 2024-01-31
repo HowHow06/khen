@@ -1,8 +1,13 @@
-import { HORIZONTAL_ALIGNMENT, SETTING_CATEGORY } from "../constant";
+import {
+  HORIZONTAL_ALIGNMENT,
+  SETTING_CATEGORY,
+  SHADOW_TYPE,
+} from "../constant";
 
 export type HorizontalAlignSettingType =
   (typeof HORIZONTAL_ALIGNMENT)[keyof typeof HORIZONTAL_ALIGNMENT];
-export type ShadowTypeSettingType = "outer" | "inner";
+export type ShadowTypeSettingType =
+  (typeof SHADOW_TYPE)[keyof typeof SHADOW_TYPE];
 export type TransitionSettingType = ""; // TODO: implement this
 export type FontFaceSettingType = string;
 

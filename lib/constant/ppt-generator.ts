@@ -4,6 +4,7 @@ import {
   ComboboxItemsType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
+  ShadowTypeSettingType,
 } from "../types";
 import { fontFaces } from "./font-face";
 
@@ -11,6 +12,11 @@ export const HORIZONTAL_ALIGNMENT = {
   LEFT: "left",
   CENTER: "center",
   RIGHT: "right",
+} as const;
+
+export const SHADOW_TYPE = {
+  OUTER: "outer",
+  INNER: "inner",
 } as const;
 
 export const SETTING_CATEGORY = {
@@ -356,5 +362,13 @@ export const horizontalAlignmentItems: ComboboxItemsType<HorizontalAlignSettingT
     return {
       value: alignment,
       label: alignment,
+    };
+  });
+
+export const shadowTypeItems: ComboboxItemsType<ShadowTypeSettingType> =
+  Object.values(SHADOW_TYPE).map((shadowType) => {
+    return {
+      value: shadowType,
+      label: shadowType,
     };
   });
