@@ -1,5 +1,9 @@
 import { Combobox } from "@/components/ui/combo-box";
-import { FONT_FACES_ITEMS, HORIZONTAL_ALIGNMENT_ITEMS } from "@/lib/constant";
+import {
+  FONT_FACES_ITEMS,
+  HORIZONTAL_ALIGNMENT_ITEMS,
+  SHADOW_TYPE_ITEMS,
+} from "@/lib/constant";
 import { BaseSettingItemMetaType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
@@ -61,8 +65,18 @@ const renderInputField = (
         items={HORIZONTAL_ALIGNMENT_ITEMS}
         selectedValue={field.value}
         onItemSelect={field.onChange}
-        notFoundLabel="Font not found."
-        defaultLabel="Select font..."
+        className="col-span-6 w-full text-sm"
+        hasNoSearch
+      />
+    );
+  }
+
+  if (settingItemMeta.fieldType == "shadow-type") {
+    return (
+      <Combobox
+        items={SHADOW_TYPE_ITEMS}
+        selectedValue={field.value}
+        onItemSelect={field.onChange}
         className="col-span-6 w-full text-sm"
         hasNoSearch
       />
