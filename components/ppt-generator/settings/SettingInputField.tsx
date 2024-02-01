@@ -26,7 +26,14 @@ const renderInputField = (
   }
 
   if (settingItemMeta.fieldType == "number") {
-    return <Input className="col-span-2 text-sm" type="number" {...field} />;
+    return (
+      <Input
+        {...field}
+        className="col-span-2 text-sm"
+        type="number"
+        onChange={(event) => field.onChange(parseFloat(event.target.value))}
+      />
+    );
   }
 
   if (settingItemMeta.fieldType == "image") {
@@ -86,12 +93,13 @@ const renderInputField = (
   if (settingItemMeta.fieldType == "percentage") {
     return (
       <Input
+        {...field}
         className="col-span-2 text-sm"
         type="number"
         {...(settingItemMeta.useProportionForm
           ? { min: 0.0, max: 1.0, step: 0.1 }
           : { min: 0, max: 100 })}
-        {...field}
+        onChange={(event) => field.onChange(parseFloat(event.target.value))}
       />
     );
   }
