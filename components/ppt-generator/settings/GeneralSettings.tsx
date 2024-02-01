@@ -7,7 +7,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../../ui/form";
-import { Separator } from "../../ui/separator";
 import SettingInputField from "./SettingInputField";
 
 type GeneralSettingsProps = {
@@ -19,7 +18,7 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
   const { control } = useFormContext();
 
   return (
-    <div className="mr-2 grid gap-3 py-4">
+    <div className="mr-2 grid divide-y py-2">
       {Object.entries(PPT_GENERATION_SETTINGS_META.general).map(
         ([key, value]) => {
           if (value.isHidden) {
@@ -32,7 +31,7 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
                 name={SETTING_CATEGORY.GENERAL + "." + value.fieldKey}
                 key={SETTING_CATEGORY.GENERAL + "." + value.fieldKey}
                 render={({ field }) => (
-                  <FormItem className="grid grid-cols-6 items-center gap-3">
+                  <FormItem className="grid grid-cols-6 items-center gap-x-3 py-4">
                     <FormLabel className="col-span-4 text-left text-sm">
                       {value.fieldDisplayName}
                     </FormLabel>
@@ -46,7 +45,6 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
                       This is description.
                     </FormDescription> */}
                     <FormMessage className="col-span-6 " />
-                    <Separator className="col-span-6 " />
                   </FormItem>
                 )}
               />
