@@ -229,11 +229,13 @@ const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
     fieldKey: "textboxPositionX",
     fieldDisplayName: "Position X (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
+    defaultValue: 0,
   },
   textboxPositionY: {
     fieldKey: "textboxPositionY",
     fieldDisplayName: "Position Y (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
+    defaultValue: 0,
   },
 };
 
