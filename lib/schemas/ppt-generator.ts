@@ -149,6 +149,21 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
 
       schemaObject[category] = z.record(z.object(contentZodSchema));
     }
+
+    if (category == SETTING_CATEGORY.COVER) {
+      const contentSchema: { [groupingName: string]: any } = {};
+      Object.entries(settings).forEach(([key, setting]) => {
+        if (setting.isHidden) {
+          return;
+        }
+
+        const settingSchema = createZodSchemaFromSettingItem(setting);
+
+        contentSchema[setting.fieldKey] = settingSchema;
+      });
+
+      schemaObject[category] = z.record(z.object(contentSchema));
+    }
     // TODO: define for other categories
   });
   return z.object(schemaObject);
