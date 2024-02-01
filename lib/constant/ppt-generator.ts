@@ -392,3 +392,8 @@ export const SHADOW_TYPE_ITEMS: ComboboxItemsType<ShadowTypeSettingType> =
       label: shadowType,
     };
   });
+
+export const CONTENT_TYPE = {
+  MAIN: "main",
+  SECONDARY: "secondary",
+};
