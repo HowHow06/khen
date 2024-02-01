@@ -10,8 +10,9 @@ import {
   DEFAULT_LINE_COUNT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
+  TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
-import { cn, groupBy } from "@/lib/utils";
+import { cn, groupBy, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import {
@@ -39,7 +40,7 @@ const ContentSettings = ({
     }).reduce<{}>((result, _, currentIndex) => {
       return {
         ...result,
-        [`Textbox Line ${currentIndex + 1}`]: Object.values(
+        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]: Object.values(
           PPT_GENERATION_SETTINGS_META.contentTextbox,
         ),
       };
@@ -75,7 +76,7 @@ const ContentSettings = ({
             <>
               <AccordionItem value={fieldNamePrefix + groupingName}>
                 <AccordionTrigger className="text-base font-bold capitalize">
-                  {groupingName}
+                  {toNormalCase(groupingName)}
                 </AccordionTrigger>
                 <AccordionContent className="mx-3 grid divide-y pb-2">
                   {settings.map((value) => {
