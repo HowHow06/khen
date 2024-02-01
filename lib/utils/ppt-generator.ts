@@ -1,7 +1,9 @@
 import {
   CONTENT_TYPE,
   DEFAULT_GROUPING_NAME,
+  DEFAULT_LINE_COUNT,
   SETTING_CATEGORY,
+  TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 import { PptGenerationSettingMetaType, PptSettingsState } from "../types";
 
@@ -41,6 +43,21 @@ export const generatePptSettingsInitialState = (
           initialState[categoryName][contentType][groupingName][
             setting.fieldKey
           ] = setting.defaultValue;
+        });
+        Array.from({ length: DEFAULT_LINE_COUNT }).forEach((_, index) => {
+          Object.entries(settings.contentTextbox).forEach(([key, setting]) => {
+            if (setting.isHidden || setting.defaultValue === undefined) {
+              return;
+            }
+
+            const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
+            if (!initialState[categoryName][contentType][groupingName]) {
+              initialState[categoryName][contentType][groupingName] = {};
+            }
+            initialState[categoryName][contentType][groupingName][
+              setting.fieldKey
+            ] = setting.defaultValue;
+          });
         });
       });
     }
