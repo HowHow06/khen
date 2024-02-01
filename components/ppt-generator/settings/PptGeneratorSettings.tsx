@@ -1,5 +1,6 @@
 "use client";
 // components/Sidebar.js
+import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   CONTENT_TYPE,
   PPT_GENERATION_SETTINGS_META,
@@ -25,6 +26,8 @@ import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
   const { getValues } = useFormContext();
+  const { settingsUIState, setCurrentCategoryTab, setCurrentContentTab } =
+    usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSettingSidebar = () => {
@@ -69,7 +72,12 @@ const PptGeneratorSetting = () => {
               done.
             </SheetDescription> */}
           </SheetHeader>
-          <Tabs defaultValue="general" className="mt-2 w-full">
+          <Tabs
+            defaultValue={SETTING_CATEGORY.GENERAL}
+            className="mt-2 w-full"
+            value={settingsUIState.currentCategoryTab}
+            onValueChange={setCurrentCategoryTab}
+          >
             <ScrollArea className="w-full pb-3">
               <TabsList
                 className={cn(
@@ -113,7 +121,12 @@ const PptGeneratorSetting = () => {
             </TabsContent>
             <TabsContent value={SETTING_CATEGORY.CONTENT}>
               <ScrollArea className="h-[75vh] pl-3 pr-4">
-                <Tabs defaultValue="main" className="w-full">
+                <Tabs
+                  defaultValue={CONTENT_TYPE.MAIN}
+                  value={settingsUIState.currentContentTab}
+                  onValueChange={setCurrentContentTab}
+                  className="w-full"
+                >
                   <TabsList className="my-2 grid w-full grid-cols-2">
                     <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
                     <TabsTrigger value={CONTENT_TYPE.SECONDARY}>

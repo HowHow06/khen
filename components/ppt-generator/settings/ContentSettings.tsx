@@ -1,4 +1,5 @@
 "use client";
+import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   Accordion,
   AccordionContent,
@@ -26,6 +27,7 @@ const ContentSettings = ({
   contentKey,
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
+  const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
   const { control } = useFormContext();
   const settingsMetaGrouped = useMemo(
     () => groupBy(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
@@ -36,11 +38,25 @@ const ContentSettings = ({
 
   return (
     <div className={cn("mr-0", className)}>
-      <Accordion type="multiple" className="w-full">
+      <Accordion
+        type="multiple"
+        className="w-full"
+        value={
+          contentKey
+            ? settingsUIState.openAccordions[contentKey]
+            : settingsUIState.openAccordions["base"]
+        }
+        onValueChange={(accordions) =>
+          setAccordionsOpen({
+            accordions: accordions,
+            grouping: contentKey,
+          })
+        }
+      >
         {Object.entries(settingsMetaGrouped).map(([groupingName, settings]) => {
           return (
             <>
-              <AccordionItem value={groupingName}>
+              <AccordionItem value={fieldNamePrefix + groupingName}>
                 <AccordionTrigger className="text-base font-bold capitalize">
                   {groupingName}
                 </AccordionTrigger>

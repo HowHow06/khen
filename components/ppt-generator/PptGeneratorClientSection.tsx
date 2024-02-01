@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { PptSettingsUIProvider } from "../context/PptSettingsUIContext";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
 import { Form } from "../ui/form";
@@ -67,7 +68,9 @@ const PptGeneratorClientSection = (props: Props) => {
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               4. Settings
             </h2>
-            <PptGeneratorSetting />
+            <PptSettingsUIProvider>
+              <PptGeneratorSetting />
+            </PptSettingsUIProvider>
           </Container>
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
