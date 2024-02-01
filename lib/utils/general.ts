@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { DEFAULT_GROUPING_NAME } from "../constant";
 import { Collection } from "../types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,10 +20,14 @@ function groupItem<T, K extends keyof any>(
   keyOrFunc: ((item: T) => K) | K,
   result: Record<K, T[]>,
 ): void {
-  const key =
+  let key =
     typeof keyOrFunc === "function"
       ? keyOrFunc(item)
       : (item[keyOrFunc as unknown as keyof T] as K);
+
+  if (!key) {
+    key = DEFAULT_GROUPING_NAME as K;
+  }
 
   if (!result[key]) {
     result[key] = [];
