@@ -8,6 +8,8 @@ import {
 } from "../types";
 import { fontFaces } from "./font-face";
 
+export const DEFAULT_LINE_COUNT = 2;
+
 export const SETTING_FIELD_TYPE = {
   TEXT: "text",
   BOOLEAN: "boolean",
@@ -195,7 +197,7 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
 const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   coverTitlePositionY: {
     fieldKey: "coverTitlePositionY",
-    fieldDisplayName: "Position Y",
+    fieldDisplayName: "Position Y (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     groupingName: "position",
   },
@@ -223,12 +225,12 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
 const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   textboxPositionX: {
     fieldKey: "textboxPositionX",
-    fieldDisplayName: "Position X",
+    fieldDisplayName: "Position X (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
   },
   textboxPositionY: {
     fieldKey: "textboxPositionY",
-    fieldDisplayName: "Position Y",
+    fieldDisplayName: "Position Y (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
   },
 };

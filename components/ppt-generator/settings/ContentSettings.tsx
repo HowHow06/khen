@@ -6,7 +6,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
+import {
+  DEFAULT_LINE_COUNT,
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+} from "@/lib/constant";
 import { cn, groupBy } from "@/lib/utils";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
@@ -29,10 +33,23 @@ const ContentSettings = ({
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
   const { control } = useFormContext();
-  const settingsMetaGrouped = useMemo(
-    () => groupBy(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
-    [],
-  );
+  const settingsMetaGrouped = useMemo(() => {
+    const textBoxSettings = Array.from({
+      length: DEFAULT_LINE_COUNT,
+    }).reduce<{}>((result, _, currentIndex) => {
+      return {
+        ...result,
+        [`Textbox Line ${currentIndex + 1}`]: Object.values(
+          PPT_GENERATION_SETTINGS_META.contentTextbox,
+        ),
+      };
+    }, {});
+    return {
+      ...textBoxSettings,
+      ...groupBy(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
+    };
+  }, []);
+
   const fieldNamePrefix =
     SETTING_CATEGORY.CONTENT + "." + (contentKey ? contentKey + "." : "");
 
