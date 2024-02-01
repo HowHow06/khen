@@ -95,6 +95,7 @@ export type PptSettingsState = {
   [SETTING_CATEGORY.GENERAL]: PptSettingsItemState;
   [SETTING_CATEGORY.CONTENT]: PptSettingsItemState;
   [SETTING_CATEGORY.COVER]: PptSettingsItemState;
+  [SETTING_CATEGORY.FILE]: PptSettingsItemState;
   // [SETTING_CATEGORY.SECTION]?: {
   //   [sectionKey: string]: PptSettingsCategoryState;
   // };

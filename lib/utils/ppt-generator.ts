@@ -14,10 +14,14 @@ export const generatePptSettingsInitialState = (
     [SETTING_CATEGORY.GENERAL]: {},
     [SETTING_CATEGORY.CONTENT]: {},
     [SETTING_CATEGORY.COVER]: {},
+    [SETTING_CATEGORY.FILE]: {},
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
-    if (category == SETTING_CATEGORY.GENERAL) {
+    if (
+      category == SETTING_CATEGORY.GENERAL ||
+      category == SETTING_CATEGORY.FILE
+    ) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
         if (setting.isHidden) {
           return;
