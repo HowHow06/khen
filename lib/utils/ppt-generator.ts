@@ -13,6 +13,7 @@ export const generatePptSettingsInitialState = (
   const initialState: PptSettingsState = {
     [SETTING_CATEGORY.GENERAL]: {},
     [SETTING_CATEGORY.CONTENT]: {},
+    [SETTING_CATEGORY.COVER]: {},
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
@@ -58,6 +59,19 @@ export const generatePptSettingsInitialState = (
               setting.fieldKey
             ] = setting.defaultValue;
           });
+        });
+      });
+    }
+    if (category == SETTING_CATEGORY.COVER) {
+      Object.values(CONTENT_TYPE).forEach((contentType) => {
+        const categoryName = category as keyof PptSettingsState;
+        initialState[categoryName][contentType] = {};
+        Object.entries(settingsMeta).forEach(([key, setting]) => {
+          if (setting.isHidden || setting.defaultValue === undefined) {
+            return;
+          }
+          initialState[categoryName][contentType][setting.fieldKey] =
+            setting.defaultValue;
         });
       });
     }
