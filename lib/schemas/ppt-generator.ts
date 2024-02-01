@@ -83,20 +83,26 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
   }
 };
 
+// TODO: refactor this function
 const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
   Object.entries(metaData).forEach(([category, settings]) => {
-    if (
-      category == SETTING_CATEGORY.GENERAL ||
-      category == SETTING_CATEGORY.CONTENT
-    ) {
+    if (category == SETTING_CATEGORY.GENERAL) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
         categorySchema[setting.fieldKey] =
           createZodSchemaFromSettingItem(setting);
       });
       schemaObject[category] = z.object(categorySchema);
+    }
+    if (category == SETTING_CATEGORY.CONTENT) {
+      let categorySchema: any = {};
+      Object.entries(settings).forEach(([key, setting]) => {
+        categorySchema[setting.fieldKey] =
+          createZodSchemaFromSettingItem(setting);
+      });
+      schemaObject[category] = z.record(z.object(categorySchema));
     }
     // TODO: define for other categories
   });

@@ -1,4 +1,4 @@
-import { SETTING_CATEGORY } from "../constant";
+import { CONTENT_TYPE, SETTING_CATEGORY } from "../constant";
 import { PptGenerationSettingMetaType, PptSettingsState } from "../types";
 
 export const generatePptSettingsInitialState = (
@@ -10,10 +10,7 @@ export const generatePptSettingsInitialState = (
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
-    if (
-      category == SETTING_CATEGORY.GENERAL ||
-      category == SETTING_CATEGORY.CONTENT
-    ) {
+    if (category == SETTING_CATEGORY.GENERAL) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
         if (setting.defaultValue !== undefined) {
           initialState[category as keyof PptSettingsState][setting.fieldKey] =
@@ -21,6 +18,19 @@ export const generatePptSettingsInitialState = (
         }
       });
     }
+    if (category == SETTING_CATEGORY.CONTENT) {
+      Object.values(CONTENT_TYPE).forEach((contentType) => {
+        initialState[category as keyof PptSettingsState][contentType] = {};
+        Object.entries(settingsMeta).forEach(([key, setting]) => {
+          if (setting.defaultValue !== undefined) {
+            initialState[category as keyof PptSettingsState][contentType][
+              setting.fieldKey
+            ] = setting.defaultValue;
+          }
+        });
+      });
+    }
+    // TODO: implement initial value for content
     // TODO: define for other categories
   });
 
