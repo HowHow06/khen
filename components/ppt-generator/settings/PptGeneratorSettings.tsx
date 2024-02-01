@@ -7,7 +7,7 @@ import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
-import { ScrollArea } from "../../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
   Sheet,
   SheetContent,
@@ -16,6 +16,7 @@ import {
   SheetTrigger,
 } from "../../ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
+import ContentSettings from "./ContentSettings";
 import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
@@ -55,6 +56,7 @@ const PptGeneratorSetting = () => {
         <SheetContent
           onPointerDownOutside={(event) => event.preventDefault()}
           setIsOpen={setIsOpen}
+          className="w-1/4 sm:max-w-[50%]"
         >
           <SheetHeader>
             <SheetTitle>Settings</SheetTitle>
@@ -64,23 +66,63 @@ const PptGeneratorSetting = () => {
             </SheetDescription> */}
           </SheetHeader>
           <Tabs defaultValue="general" className="mt-2 w-full">
-            <TabsList
-              className={cn(
-                "grid w-full",
-                isUseSectionSettings ? "grid-cols-3" : "grid-cols-2",
-              )}
-            >
-              <TabsTrigger value="general">General</TabsTrigger>
-              {/* {isUseSectionSettings ? (
-                <TabsTrigger value="section">Section</TabsTrigger>
+            <ScrollArea className="w-full pb-3">
+              <TabsList
+                className={cn(
+                  "grid w-max min-w-full",
+                  isUseSectionSettings ? "grid-cols-4" : "grid-cols-3",
+                )}
+              >
+                <TabsTrigger value="general" className="min-w-20">
+                  General
+                </TabsTrigger>
+                <TabsTrigger value="cover" className="min-w-20">
+                  Cover
+                </TabsTrigger>
+                <TabsTrigger value="content" className="min-w-20">
+                  Content
+                </TabsTrigger>
+                {/* {isUseSectionSettings ? (
+                <TabsTrigger value="section" className="min-w-20">Section</TabsTrigger>
               ) : (
                 <></>
               )} */}
-              <TabsTrigger value="content">Content</TabsTrigger>
-            </TabsList>
+                <ScrollBar orientation="horizontal" />
+              </TabsList>
+            </ScrollArea>
             <TabsContent value="general">
               <ScrollArea className="h-[75vh] pl-3 pr-4">
                 <GeneralSettings />
+              </ScrollArea>
+            </TabsContent>
+            <TabsContent value="cover">
+              <ScrollArea className="h-[75vh] pl-3 pr-4">Cover</ScrollArea>
+            </TabsContent>
+            <TabsContent value="content">
+              {/* <div className="grid grid-cols-2">
+                <ScrollArea className="h-[75vh] pl-3 pr-4">
+                  <Label>Main</Label>
+                  <ContentSettings contentKey="main" />
+                </ScrollArea>
+                <ScrollArea className="h-[75vh] pl-3 pr-4">
+                  <Label>Secondary</Label>
+                  <ContentSettings contentKey="secondary" />
+                </ScrollArea>
+              </div> */}
+
+              <ScrollArea className="h-[75vh] pl-3 pr-4">
+                <Tabs defaultValue="main" className="w-full">
+                  <TabsList className="my-2 grid w-full grid-cols-2">
+                    <TabsTrigger value="main">Main</TabsTrigger>
+                    <TabsTrigger value="secondary">Secondary</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="main">
+                    <ContentSettings contentKey="main" />
+                  </TabsContent>
+                  <TabsContent value="secondary">
+                    <ContentSettings contentKey="secondary" />
+                  </TabsContent>
+                </Tabs>
               </ScrollArea>
             </TabsContent>
             <TabsContent value="section">
@@ -88,7 +130,6 @@ const PptGeneratorSetting = () => {
                 {/* <SectionSettings /> */}
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="content">Content Style</TabsContent>
           </Tabs>
           {/* <SheetFooter>
                   <SheetClose asChild>
