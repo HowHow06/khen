@@ -1,4 +1,8 @@
-import { CONTENT_TYPE, SETTING_CATEGORY } from "../constant";
+import {
+  CONTENT_TYPE,
+  DEFAULT_GROUPING_NAME,
+  SETTING_CATEGORY,
+} from "../constant";
 import { PptGenerationSettingMetaType, PptSettingsState } from "../types";
 
 export const generatePptSettingsInitialState = (
@@ -12,6 +16,9 @@ export const generatePptSettingsInitialState = (
   Object.entries(settings).forEach(([category, settingsMeta]) => {
     if (category == SETTING_CATEGORY.GENERAL) {
       Object.entries(settingsMeta).forEach(([key, setting]) => {
+        if (setting.isHidden) {
+          return;
+        }
         if (setting.defaultValue !== undefined) {
           initialState[category as keyof PptSettingsState][setting.fieldKey] =
             setting.defaultValue;
@@ -20,13 +27,20 @@ export const generatePptSettingsInitialState = (
     }
     if (category == SETTING_CATEGORY.CONTENT) {
       Object.values(CONTENT_TYPE).forEach((contentType) => {
-        initialState[category as keyof PptSettingsState][contentType] = {};
+        const categoryName = category as keyof PptSettingsState;
+        initialState[categoryName][contentType] = {};
         Object.entries(settingsMeta).forEach(([key, setting]) => {
-          if (setting.defaultValue !== undefined) {
-            initialState[category as keyof PptSettingsState][contentType][
-              setting.fieldKey
-            ] = setting.defaultValue;
+          if (setting.isHidden || setting.defaultValue === undefined) {
+            return;
           }
+          const groupingName = (setting.groupingName ||
+            DEFAULT_GROUPING_NAME) as keyof PptSettingsState;
+          if (!initialState[categoryName][contentType][groupingName]) {
+            initialState[categoryName][contentType][groupingName] = {};
+          }
+          initialState[categoryName][contentType][groupingName][
+            setting.fieldKey
+          ] = setting.defaultValue;
         });
       });
     }
