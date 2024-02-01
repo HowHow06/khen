@@ -23,18 +23,20 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
     case "number":
       return z.number().default(setting.defaultValue ?? 0);
     case "image":
-      return z.custom<File>(
-        (file) => {
-          if (!(file instanceof File)) {
-            return false;
-          }
-          const validTypes = ["image/jpeg", "image/png"];
-          return fileTypeValidator(file, validTypes);
-        },
-        {
-          message: "Invalid image",
-        },
-      );
+      return z
+        .custom<File>(
+          (file) => {
+            if (!(file instanceof File)) {
+              return false;
+            }
+            const validTypes = ["image/jpeg", "image/png"];
+            return fileTypeValidator(file, validTypes);
+          },
+          {
+            message: "Invalid image",
+          },
+        )
+        .optional();
     case "color":
       return z
         .string()
