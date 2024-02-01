@@ -15,6 +15,25 @@ export function toKebabCase(str: string) {
     .toLowerCase(); // convert to lowercase
 }
 
+export function toNormalCase(input: string): string {
+  // Step 1: Replace underscores (_) and hyphens (-) with spaces
+  let result = input.replace(/[-_]/g, " ");
+
+  // Step 2: Add spaces before capital letters (for camelCase and PascalCase)
+  // and avoid adding a space at the beginning if the string starts with a capital letter
+  result = result.replace(/([A-Z])/g, (match, p1, offset) =>
+    offset === 0 ? p1 : ` ${p1}`,
+  );
+
+  // Step 3: Lowercase the entire string except the first character
+  result = result.toLowerCase();
+
+  // Step 4: Uppercase the first character of the result
+  result = result.charAt(0).toUpperCase() + result.slice(1);
+
+  return result;
+}
+
 function groupItem<T, K extends keyof any>(
   item: T,
   keyOrFunc: ((item: T) => K) | K,
