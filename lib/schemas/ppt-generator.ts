@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  DEFAULT_GROUPING_NAME,
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
@@ -93,22 +94,40 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     if (category == SETTING_CATEGORY.GENERAL) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        if (!setting.isHidden) {
-          categorySchema[setting.fieldKey] =
-            createZodSchemaFromSettingItem(setting);
+        if (setting.isHidden) {
+          return;
         }
+        categorySchema[setting.fieldKey] =
+          createZodSchemaFromSettingItem(setting);
       });
       schemaObject[category] = z.object(categorySchema);
     }
     if (category == SETTING_CATEGORY.CONTENT) {
-      let categorySchema: any = {};
+      let contentSchema: { [groupingName: string]: any } = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        if (!setting.isHidden) {
-          categorySchema[setting.fieldKey] =
-            createZodSchemaFromSettingItem(setting);
+        if (setting.isHidden) {
+          return;
         }
+
+        const settingSchema = createZodSchemaFromSettingItem(setting);
+        const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
+
+        if (!contentSchema[groupingName]) {
+          contentSchema[groupingName] = {};
+        }
+
+        contentSchema[groupingName][setting.fieldKey] = settingSchema;
       });
-      schemaObject[category] = z.record(z.object(categorySchema));
+      // Convert each groupingName object into a z.object and wrap the whole thing in z.record
+      const contentZodSchema = Object.entries(contentSchema).reduce(
+        (acc, [groupingName, fields]) => {
+          acc[groupingName] = z.object(fields);
+          return acc;
+        },
+        {} as { [groupingName: string]: any },
+      );
+
+      schemaObject[category] = z.record(z.object(contentZodSchema));
     }
     // TODO: define for other categories
   });
