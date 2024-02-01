@@ -77,59 +77,59 @@ const PptGeneratorSetting = () => {
                   isUseSectionSettings ? "grid-cols-4" : "grid-cols-3",
                 )}
               >
-                <TabsTrigger value="general" className="min-w-20">
+                <TabsTrigger
+                  value={SETTING_CATEGORY.GENERAL}
+                  className="min-w-20"
+                >
                   General
                 </TabsTrigger>
-                <TabsTrigger value="cover" className="min-w-20">
+                <TabsTrigger
+                  value={SETTING_CATEGORY.COVER}
+                  className="min-w-20"
+                >
                   Cover
                 </TabsTrigger>
-                <TabsTrigger value="content" className="min-w-20">
+                <TabsTrigger
+                  value={SETTING_CATEGORY.CONTENT}
+                  className="min-w-20"
+                >
                   Content
                 </TabsTrigger>
                 {/* {isUseSectionSettings ? (
-                <TabsTrigger value="section" className="min-w-20">Section</TabsTrigger>
+                <TabsTrigger value={SETTING_CATEGORY.SECTION} className="min-w-20">Section</TabsTrigger>
               ) : (
                 <></>
               )} */}
                 <ScrollBar orientation="horizontal" />
               </TabsList>
             </ScrollArea>
-            <TabsContent value="general">
+            <TabsContent value={SETTING_CATEGORY.GENERAL}>
               <ScrollArea className="h-[75vh] pl-3 pr-4">
                 <GeneralSettings />
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="cover">
+            <TabsContent value={SETTING_CATEGORY.COVER}>
               <ScrollArea className="h-[75vh] pl-3 pr-4">Cover</ScrollArea>
             </TabsContent>
-            <TabsContent value="content">
-              {/* <div className="grid grid-cols-2">
-                <ScrollArea className="h-[75vh] pl-3 pr-4">
-                  <Label>Main</Label>
-                  <ContentSettings contentKey="main" />
-                </ScrollArea>
-                <ScrollArea className="h-[75vh] pl-3 pr-4">
-                  <Label>Secondary</Label>
-                  <ContentSettings contentKey="secondary" />
-                </ScrollArea>
-              </div> */}
-
+            <TabsContent value={SETTING_CATEGORY.CONTENT}>
               <ScrollArea className="h-[75vh] pl-3 pr-4">
                 <Tabs defaultValue="main" className="w-full">
                   <TabsList className="my-2 grid w-full grid-cols-2">
-                    <TabsTrigger value="main">Main</TabsTrigger>
-                    <TabsTrigger value="secondary">Secondary</TabsTrigger>
+                    <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
+                    <TabsTrigger value={CONTENT_TYPE.SECONDARY}>
+                      Secondary
+                    </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="main">
+                  <TabsContent value={CONTENT_TYPE.MAIN}>
                     <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
                   </TabsContent>
-                  <TabsContent value="secondary">
+                  <TabsContent value={CONTENT_TYPE.SECONDARY}>
                     <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </TabsContent>
                 </Tabs>
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="section">
+            <TabsContent value={SETTING_CATEGORY.SECTION}>
               <ScrollArea className="h-[75vh] pl-3 pr-4">
                 {/* <SectionSettings /> */}
               </ScrollArea>
