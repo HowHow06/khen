@@ -10,6 +10,7 @@ import React, {
 type PptSettingsUIState = {
   currentCategoryTab: string;
   currentContentTab: string;
+  currentCoverTab: string;
   openAccordions: {
     [key: string]: string[];
   };
@@ -18,6 +19,7 @@ type PptSettingsUIState = {
 type PptSettingsUIAction =
   | { type: "SET_CURRENT_CATEGORY_TAB"; tab: string }
   | { type: "SET_CURRENT_CONTENT_TAB"; tab: string }
+  | { type: "SET_CURRENT_COVER_TAB"; tab: string }
   | {
       type: "SET_ACCORDION_OPEN";
       accordions: string[];
@@ -29,6 +31,7 @@ type PptSettingsUIContextType = {
   // dispatch: React.Dispatch<PptSettingsUIAction>;
   setCurrentCategoryTab: (tab: string) => void;
   setCurrentContentTab: (tab: string) => void;
+  setCurrentCoverTab: (tab: string) => void;
   setAccordionsOpen: (props: {
     accordions: string[];
     grouping?: string;
@@ -38,6 +41,7 @@ type PptSettingsUIContextType = {
 const initialState: PptSettingsUIState = {
   currentCategoryTab: SETTING_CATEGORY.GENERAL,
   currentContentTab: CONTENT_TYPE.MAIN,
+  currentCoverTab: CONTENT_TYPE.MAIN,
   openAccordions: {
     base: [],
   },
@@ -59,6 +63,9 @@ const pptSettingsUIReducer = (
 
     case "SET_CURRENT_CONTENT_TAB":
       return { ...state, currentContentTab: action.tab };
+
+    case "SET_CURRENT_COVER_TAB":
+      return { ...state, currentCoverTab: action.tab };
 
     default:
       return state;
@@ -97,6 +104,10 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
     return dispatch({ type: "SET_CURRENT_CONTENT_TAB", tab: tab });
   }, []);
 
+  const setCurrentCoverTab = useCallback((tab: string) => {
+    return dispatch({ type: "SET_CURRENT_COVER_TAB", tab: tab });
+  }, []);
+
   return (
     <PptSettingsUIContext.Provider
       value={{
@@ -104,6 +115,7 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
         setCurrentCategoryTab,
         setCurrentContentTab,
         setAccordionsOpen,
+        setCurrentCoverTab,
       }}
     >
       {children}
