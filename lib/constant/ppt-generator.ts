@@ -8,6 +8,7 @@ import {
 } from "../types";
 import { fontFaces } from "./font-face";
 
+export const DEFAULT_GROUPING_NAME = "default";
 export const DEFAULT_LINE_COUNT = 2;
 
 export const SETTING_FIELD_TYPE = {
@@ -360,6 +361,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldKey: "shadowOpacity",
     fieldDisplayName: "Opacity",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
+    defaultValue: 0.5,
     useProportionForm: true,
     groupingName: "shadow",
   },
