@@ -32,7 +32,7 @@ const ContentSettings = ({
     [],
   );
   const fieldNamePrefix =
-    SETTING_CATEGORY.CONTENT + "." + contentKey ? contentKey + "." : "";
+    SETTING_CATEGORY.CONTENT + "." + (contentKey ? contentKey + "." : "");
 
   return (
     <div className={cn("mr-0", className)}>
