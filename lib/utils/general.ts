@@ -28,8 +28,8 @@ export function toNormalCase(input: string): string {
   // Step 3: Lowercase the entire string except the first character
   result = result.toLowerCase();
 
-  // Step 4: Uppercase the first character of the result
-  result = result.charAt(0).toUpperCase() + result.slice(1);
+  // // Step 4: Uppercase the first character of the result
+  // result = result.charAt(0).toUpperCase() + result.slice(1);
 
   return result;
 }
