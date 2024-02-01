@@ -22,12 +22,17 @@ import {
 } from "../../ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
 import ContentSettings from "./ContentSettings";
+import CoverSettings from "./CoverSettings";
 import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
   const { getValues } = useFormContext();
-  const { settingsUIState, setCurrentCategoryTab, setCurrentContentTab } =
-    usePptSettingsUIContext();
+  const {
+    settingsUIState,
+    setCurrentCategoryTab,
+    setCurrentContentTab,
+    setCurrentCoverTab,
+  } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSettingSidebar = () => {
@@ -117,7 +122,29 @@ const PptGeneratorSetting = () => {
               </ScrollArea>
             </TabsContent>
             <TabsContent value={SETTING_CATEGORY.COVER}>
-              <ScrollArea className="h-[75vh] pl-3 pr-4">Cover</ScrollArea>
+              <Tabs
+                defaultValue={CONTENT_TYPE.MAIN}
+                value={settingsUIState.currentCoverTab}
+                onValueChange={setCurrentCoverTab}
+                className="w-full px-2"
+              >
+                <TabsList className="my-2 grid w-full grid-cols-2">
+                  <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
+                  <TabsTrigger value={CONTENT_TYPE.SECONDARY}>
+                    Secondary
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value={CONTENT_TYPE.MAIN}>
+                  <ScrollArea className="h-[72vh] pr-3">
+                    <CoverSettings contentKey={CONTENT_TYPE.MAIN} />
+                  </ScrollArea>
+                </TabsContent>
+                <TabsContent value={CONTENT_TYPE.SECONDARY}>
+                  <ScrollArea className="h-[72vh] pr-3">
+                    <CoverSettings contentKey={CONTENT_TYPE.SECONDARY} />
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
             </TabsContent>
             <TabsContent value={SETTING_CATEGORY.CONTENT}>
               <Tabs
