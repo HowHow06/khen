@@ -1,6 +1,10 @@
 "use client";
 // components/Sidebar.js
-import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
+import {
+  CONTENT_TYPE,
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+} from "@/lib/constant";
 import { cn } from "@/lib/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
@@ -117,10 +121,10 @@ const PptGeneratorSetting = () => {
                     <TabsTrigger value="secondary">Secondary</TabsTrigger>
                   </TabsList>
                   <TabsContent value="main">
-                    <ContentSettings contentKey="main" />
+                    <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
                   </TabsContent>
                   <TabsContent value="secondary">
-                    <ContentSettings contentKey="secondary" />
+                    <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </TabsContent>
                 </Tabs>
               </ScrollArea>
