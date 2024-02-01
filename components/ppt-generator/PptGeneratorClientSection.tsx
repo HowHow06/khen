@@ -1,9 +1,8 @@
 "use client";
-import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
+import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
 import { TextareaRefType } from "@/lib/types";
 import { generatePptSettingsInitialState } from "@/lib/utils";
-// import { zodResolver } from "@hookform/resolvers/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,7 +10,15 @@ import { z } from "zod";
 import { PptSettingsUIProvider } from "../context/PptSettingsUIContext";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
-import { Form } from "../ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
 import MainLyricSection from "./MainLyricSection";
 import SecondaryLyricSection from "./SecondaryLyricSection";
 import PptGeneratorSetting from "./settings/PptGeneratorSettings";
@@ -76,10 +83,46 @@ const PptGeneratorClientSection = (props: Props) => {
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               5. Generate PPT!
             </h2>
-            <div className="">
-              <Button variant="default" type="submit">
-                Generate
-              </Button>
+            <div className="mr-2 w-1/2">
+              <div className="pb-2">
+                {Object.entries(PPT_GENERATION_SETTINGS_META.file).map(
+                  ([key, value]) => {
+                    if (value.isHidden) {
+                      return;
+                    }
+                    return (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name={SETTING_CATEGORY.FILE + "." + value.fieldKey}
+                          key={SETTING_CATEGORY.FILE + "." + value.fieldKey}
+                          render={({ field }) => (
+                            <FormItem className="grid grid-cols-6 items-center gap-x-2">
+                              <FormLabel className="col-span-2 text-left text-sm">
+                                {value.fieldDisplayName}
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  className="col-span-3 text-sm"
+                                  type="text"
+                                />
+                              </FormControl>
+                              <FormMessage className="col-span-6 " />
+                            </FormItem>
+                          )}
+                        />
+                        {/* <Label htmlFor={value.fieldSlug}>{value.fieldDisplayName}</Label> */}
+                      </>
+                    );
+                  },
+                )}
+              </div>
+              <div>
+                <Button variant="default" type="submit">
+                  Generate
+                </Button>
+              </div>
             </div>
           </Container>
         </form>
