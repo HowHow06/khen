@@ -1,10 +1,12 @@
 import { z } from "zod";
 import {
   DEFAULT_GROUPING_NAME,
+  DEFAULT_LINE_COUNT,
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
   SHADOW_TYPE,
+  TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 import {
   BaseSettingItemMetaType,
@@ -118,6 +120,24 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
 
         contentSchema[groupingName][setting.fieldKey] = settingSchema;
       });
+
+      Array.from({ length: DEFAULT_LINE_COUNT }).forEach((_, index) => {
+        Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
+          if (setting.isHidden) {
+            return;
+          }
+
+          const settingSchema = createZodSchemaFromSettingItem(setting);
+          const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
+
+          if (!contentSchema[groupingName]) {
+            contentSchema[groupingName] = {};
+          }
+
+          contentSchema[groupingName][setting.fieldKey] = settingSchema;
+        });
+      });
+
       // Convert each groupingName object into a z.object and wrap the whole thing in z.record
       const contentZodSchema = Object.entries(contentSchema).reduce(
         (acc, [groupingName, fields]) => {
