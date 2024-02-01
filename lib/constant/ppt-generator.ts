@@ -215,6 +215,7 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
     fieldKey: "coverTitleFontSize",
     fieldDisplayName: "Font Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 80,
     groupingName: "style",
   },
   coverTitleFontColor: {
@@ -266,12 +267,14 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldKey: "fontSize",
     fieldDisplayName: "Font Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 60,
     groupingName: "text",
   },
   charSpacing: {
     fieldKey: "charSpacing",
     fieldDisplayName: "Character Spacing",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 2,
     groupingName: "text",
   },
   align: {
@@ -292,6 +295,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldKey: "glowSize",
     fieldDisplayName: "Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 4,
     groupingName: "glow",
   },
   glowColor: {
@@ -346,12 +350,14 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldKey: "shadowBlur",
     fieldDisplayName: "Blur",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 3,
     groupingName: "shadow",
   },
   shadowOffset: {
     fieldKey: "shadowOffset",
     fieldDisplayName: "Offset",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 3,
     groupingName: "shadow",
   },
   shadowAngle: {
@@ -359,6 +365,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Angle",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     rangeMax: 359,
+    defaultValue: 45,
     groupingName: "shadow",
   },
   shadowOpacity: {
