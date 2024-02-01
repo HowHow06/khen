@@ -10,6 +10,7 @@ import { fontFaces } from "./font-face";
 
 export const DEFAULT_GROUPING_NAME = "default";
 export const DEFAULT_LINE_COUNT = 2;
+export const TEXTBOX_GROUPING_PREFIX = "textboxLine";
 
 export const SETTING_FIELD_TYPE = {
   TEXT: "text",
