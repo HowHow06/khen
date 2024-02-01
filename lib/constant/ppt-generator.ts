@@ -201,6 +201,7 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
     fieldKey: "coverTitlePositionY",
     fieldDisplayName: "Position Y (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
+    defaultValue: 0,
     groupingName: "position",
   },
   coverTitleFont: {
