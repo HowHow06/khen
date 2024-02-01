@@ -364,7 +364,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldKey: "shadowAngle",
     fieldDisplayName: "Angle",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
-    rangeMax: 359,
+    rangeMax: 360,
     defaultValue: 45,
     groupingName: "shadow",
   },
