@@ -86,8 +86,18 @@ const ContentSettings = ({
                       <>
                         <FormField
                           control={control}
-                          name={fieldNamePrefix + value.fieldKey}
-                          key={fieldNamePrefix + value.fieldKey}
+                          name={
+                            fieldNamePrefix +
+                            groupingName +
+                            "." +
+                            value.fieldKey
+                          }
+                          key={
+                            fieldNamePrefix +
+                            groupingName +
+                            "." +
+                            value.fieldKey
+                          }
                           render={({ field }) => (
                             <FormItem className="grid grid-cols-6 items-center gap-x-3 gap-y-2 space-y-0 py-3">
                               <FormLabel className="col-span-4 text-left text-sm">
