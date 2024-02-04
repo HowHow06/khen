@@ -20,7 +20,7 @@ const fileTypeValidator = (file: File, validTypes: string[]) => {
 };
 
 const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
-  const getBaseZodSchema = (setting: BaseSettingItemMetaType) => {
+  const baseZodSchemaFactory = (setting: BaseSettingItemMetaType) => {
     switch (setting.fieldType) {
       case "text":
         return z.string().default(setting.defaultValue);
@@ -91,7 +91,7 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
     }
   };
 
-  const baseZodSchema = getBaseZodSchema(setting);
+  const baseZodSchema = baseZodSchemaFactory(setting);
 
   if (setting.isOptional) {
     return baseZodSchema.optional();
