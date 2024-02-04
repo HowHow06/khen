@@ -23,24 +23,26 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
   const getBaseZodSchema = (setting: BaseSettingItemMetaType) => {
     switch (setting.fieldType) {
       case "text":
-        return z.string().default(setting.defaultValue ?? "");
+        return z.string().default(setting.defaultValue);
       case "boolean":
-        return z.boolean().default(setting.defaultValue ?? false);
+        return z.boolean().default(setting.defaultValue);
       case "number":
-        return z.number().default(setting.defaultValue ?? 0);
+        return z.number().default(setting.defaultValue);
       case "image":
-        return z.custom<File>(
-          (file) => {
-            if (!(file instanceof File)) {
-              return false;
-            }
-            const validTypes = ["image/jpeg", "image/png"];
-            return fileTypeValidator(file, validTypes);
-          },
-          {
-            message: "Invalid image",
-          },
-        );
+        return z
+          .custom<File>(
+            (file) => {
+              if (!(file instanceof File)) {
+                return false;
+              }
+              const validTypes = ["image/jpeg", "image/png"];
+              return fileTypeValidator(file, validTypes);
+            },
+            {
+              message: "Invalid image",
+            },
+          )
+          .nullable();
       case "color":
         return z
           .string()

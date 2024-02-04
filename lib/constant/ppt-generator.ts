@@ -80,7 +80,7 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
     fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
     fieldType: SETTING_FIELD_TYPE.TEXT,
-    defaultValue: "Sample Presentation",
+    defaultValue: "",
     isOptional: true,
   },
   filenamePrefix: {
