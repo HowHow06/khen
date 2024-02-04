@@ -1,1 +1,1 @@
-export * from "./onsiteChinese";
+export * from "./ppt-generator";
