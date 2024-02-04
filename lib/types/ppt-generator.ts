@@ -10,51 +10,94 @@ export type HorizontalAlignSettingType =
 export type ShadowTypeSettingType =
   (typeof SHADOW_TYPE)[keyof typeof SHADOW_TYPE];
 export type TransitionSettingType = ""; // TODO: implement this
-export type FontFaceSettingType = string;
+
+type FieldTypeToTypeScriptType = {
+  [SETTING_FIELD_TYPE.TEXT]: string;
+  [SETTING_FIELD_TYPE.BOOLEAN]: boolean;
+  [SETTING_FIELD_TYPE.NUMBER]: number;
+  [SETTING_FIELD_TYPE.PERCENTAGE]: number;
+  [SETTING_FIELD_TYPE.IMAGE]: any;
+  [SETTING_FIELD_TYPE.COLOR]: string;
+  [SETTING_FIELD_TYPE.FONT]: string;
+  [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HorizontalAlignSettingType;
+  [SETTING_FIELD_TYPE.SHADOW_TYPE]: ShadowTypeSettingType;
+  [SETTING_FIELD_TYPE.TRANSITION]: TransitionSettingType;
+};
+
+export type InferTypeScriptTypeFromSettingFieldType<T> =
+  T extends keyof FieldTypeToTypeScriptType
+    ? FieldTypeToTypeScriptType[T]
+    : never;
 
 export type TextSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TEXT;
-  defaultValue: string;
-  placeholder?: string;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.TEXT
+  >;
+  placeholder?: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.TEXT
+  >;
 };
 export type BooleanSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.BOOLEAN;
-  defaultValue: boolean;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.BOOLEAN
+  >;
 };
 export type NumberSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.NUMBER;
-  defaultValue: number;
-  rangeMin?: number;
-  rangeMax?: number;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.NUMBER
+  >;
+  rangeMin?: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.NUMBER
+  >;
+  rangeMax?: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.NUMBER
+  >;
 };
 export type PercentageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;
-  defaultValue: number;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.PERCENTAGE
+  >;
   useProportionForm?: boolean; // if true, the range will be 0.0-1.0
 };
 export type ImageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
-  defaultValue: any; //TODO: change type for this
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.IMAGE
+  >; //TODO: change type for this
 };
 export type ColorSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.COLOR;
-  defaultValue: string;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.COLOR
+  >;
 };
 export type FontSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.FONT;
-  defaultValue: FontFaceSettingType;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.FONT
+  >;
 };
 export type HorizontalAlignSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN;
-  defaultValue: HorizontalAlignSettingType;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN
+  >;
 };
 export type ShadowTypeSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.SHADOW_TYPE;
-  defaultValue: ShadowTypeSettingType;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.SHADOW_TYPE
+  >;
 };
 export type TransitionTypeSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TRANSITION;
-  defaultValue: TransitionSettingType;
+  defaultValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.TRANSITION
+  >;
 };
 
 export type BaseSettingItemMetaType = {
