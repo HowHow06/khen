@@ -1,9 +1,11 @@
+import { CONTENT_TYPE, SETTING_CATEGORY } from "../constant";
+
 export const onsiteChinesePreset = {
-  file: {
+  [SETTING_CATEGORY.FILE]: {
     filenamePrefix: "",
     filenameSuffix: "",
   },
-  general: {
+  [SETTING_CATEGORY.GENERAL]: {
     mainBackgroundImage: null,
     mainBackgroundColor: "#000000",
     separateSectionsToFiles: false,
@@ -12,22 +14,22 @@ export const onsiteChinesePreset = {
     // ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
   },
-  cover: {
-    main: {
+  [SETTING_CATEGORY.COVER]: {
+    [CONTENT_TYPE.MAIN]: {
       coverTitlePositionY: 30,
       coverTitleFont: "Microsoft YaHei",
       coverTitleFontSize: 80,
       coverTitleFontColor: "#FFFFFF",
     },
-    secondary: {
+    [CONTENT_TYPE.SECONDARY]: {
       coverTitlePositionY: 50,
       coverTitleFont: "Ebrima",
       coverTitleFontSize: 48,
       coverTitleFontColor: "#FFFFFF",
     },
   },
-  content: {
-    main: {
+  [SETTING_CATEGORY.CONTENT]: {
+    [CONTENT_TYPE.MAIN]: {
       text: {
         bold: true,
         fontColor: "#FFFFFF",
@@ -64,7 +66,7 @@ export const onsiteChinesePreset = {
         textboxPositionY: 56,
       },
     },
-    secondary: {
+    [CONTENT_TYPE.SECONDARY]: {
       text: {
         bold: true,
         fontColor: "#ffffff",
