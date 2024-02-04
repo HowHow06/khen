@@ -78,15 +78,20 @@ const Header = (props: Props) => {
             </div>
 
             <div className="flex items-center space-x-2 pl-2 ">
-              <Link
-                href={`https://www.linkedin.com/in/howard-lim-3b79a21b8/`}
-                target="_blank"
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Contact Me"
+                asChild
               >
-                <Button variant="ghost" size="icon" aria-label="Contact Me">
+                <Link
+                  href={`https://www.linkedin.com/in/howard-lim-3b79a21b8/`}
+                  target="_blank"
+                >
                   <Linkedin className="h-6 w-6" />
                   <span className="sr-only">Contact Me</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <ThemeSwitcher />
               {/* auth to be implemented */}
               <Button

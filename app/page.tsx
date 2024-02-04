@@ -19,9 +19,9 @@ export default function Home() {
           <p className="text-base lg:text-xl">
             Hoho&apos;s all in one tool suite!
           </p>
-          <Link href="/ppt-generator">
-            <Button>PPT Generator</Button>
-          </Link>
+          <Button asChild>
+            <Link href="/ppt-generator">PPT Generator</Link>
+          </Button>
         </div>
       </Container>
     </main>
