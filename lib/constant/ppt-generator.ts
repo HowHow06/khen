@@ -80,16 +80,19 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
     fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    isOptional: true,
   },
   filenamePrefix: {
     fieldKey: "filenamePrefix",
     fieldDisplayName: "File Name Prefix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    isOptional: true,
   },
   filenameSuffix: {
     fieldKey: "filenameSuffix",
     fieldDisplayName: "File Name Suffix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    isOptional: true,
   },
 };
 
@@ -98,6 +101,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldKey: "mainBackgroundImage",
     fieldDisplayName: "Main Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
+    isOptional: true,
   },
   mainBackgroundColor: {
     fieldKey: "mainBackgroundColor",
@@ -181,6 +185,7 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
     fieldKey: "sectionBackgroundImage",
     fieldDisplayName: "Section Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
+    isOptional: true,
   },
   useMainBackgroundColor: {
     fieldKey: "useMainBackgroundColor",

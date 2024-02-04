@@ -20,14 +20,14 @@ const fileTypeValidator = (file: File, validTypes: string[]) => {
 };
 
 const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
-  switch (setting.fieldType) {
-    case "boolean":
-      return z.boolean().default(setting.defaultValue ?? false);
-    case "number":
-      return z.number().default(setting.defaultValue ?? 0);
-    case "image":
-      return z
-        .custom<File>(
+  const getBaseZodSchema = (setting: BaseSettingItemMetaType) => {
+    switch (setting.fieldType) {
+      case "boolean":
+        return z.boolean().default(setting.defaultValue ?? false);
+      case "number":
+        return z.number().default(setting.defaultValue ?? 0);
+      case "image":
+        return z.custom<File>(
           (file) => {
             if (!(file instanceof File)) {
               return false;
@@ -38,54 +38,62 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           {
             message: "Invalid image",
           },
-        )
-        .optional();
-    case "color":
-      return z
-        .string()
-        .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/, {
-          message: "Invalid hex color",
-        });
-    case "font":
-      return z.string();
-    case "horizontal-align":
-      return z.custom<string>(
-        (value) => {
-          return Object.values(HORIZONTAL_ALIGNMENT).includes(
-            value as HorizontalAlignSettingType,
-          );
-        },
-        {
-          message: "Invalid horizontal alignment",
-        },
-      );
-    case "shadow-type":
-      return z.custom<string>(
-        (value) => {
-          return Object.values(SHADOW_TYPE).includes(
-            value as ShadowTypeSettingType,
-          );
-        },
-        {
-          message: "Invalid shadow type",
-        },
-      );
-    case "percentage":
-      if (setting.useProportionForm) {
+        );
+      case "color":
+        return z
+          .string()
+          .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$|^#(?:[0-9a-fA-F]{4}){1,2}$/, {
+            message: "Invalid hex color",
+          });
+      case "font":
+        return z.string();
+      case "horizontal-align":
+        return z.custom<string>(
+          (value) => {
+            return Object.values(HORIZONTAL_ALIGNMENT).includes(
+              value as HorizontalAlignSettingType,
+            );
+          },
+          {
+            message: "Invalid horizontal alignment",
+          },
+        );
+      case "shadow-type":
+        return z.custom<string>(
+          (value) => {
+            return Object.values(SHADOW_TYPE).includes(
+              value as ShadowTypeSettingType,
+            );
+          },
+          {
+            message: "Invalid shadow type",
+          },
+        );
+      case "percentage":
+        if (setting.useProportionForm) {
+          return z
+            .number()
+            .min(0.0, { message: "Must be at least 0.0" })
+            .max(1.0, { message: "Must not exceed 1.0" });
+        }
         return z
           .number()
-          .min(0.0, { message: "Must be at least 0.0" })
-          .max(1.0, { message: "Must not exceed 1.0" });
-      }
-      return z
-        .number()
-        .min(0, "Percentage must be at least 0")
-        .max(100, "Percentage must not exceed 100");
+          .min(0, "Percentage must be at least 0")
+          .max(100, "Percentage must not exceed 100");
 
-    // TODO: Add cases for other field types
-    default:
-      return z.string().optional();
+      // TODO: Add cases for other field types
+      default:
+        return z.string();
+    }
+  };
+
+  const baseZodSchema = getBaseZodSchema(setting);
+
+  if (setting.isOptional) {
+    return baseZodSchema.optional();
   }
+
+  return baseZodSchema;
 };
 
 // TODO: refactor this function

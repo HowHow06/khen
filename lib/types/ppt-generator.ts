@@ -63,6 +63,7 @@ export type BaseSettingItemMetaType = {
   tips?: string;
   isHidden?: boolean; // hidden from user, this setting is not ready / disabled by admin
   groupingName?: string;
+  isOptional?: boolean;
 } & (
   | TextSettingItemMetaType
   | BooleanSettingItemMetaType
