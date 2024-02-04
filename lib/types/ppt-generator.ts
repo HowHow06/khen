@@ -14,7 +14,7 @@ export type FontFaceSettingType = string;
 
 export type TextSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TEXT;
-  defaultValue?: string;
+  defaultValue: string;
 };
 export type BooleanSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.BOOLEAN;
@@ -22,18 +22,18 @@ export type BooleanSettingItemMetaType = {
 };
 export type NumberSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.NUMBER;
-  defaultValue?: number;
+  defaultValue: number;
   rangeMin?: number;
   rangeMax?: number;
 };
 export type PercentageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;
-  defaultValue?: number;
+  defaultValue: number;
   useProportionForm?: boolean; // if true, the range will be 0.0-1.0
 };
 export type ImageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
-  defaultValue?: any; //TODO: change type for this
+  defaultValue: any; //TODO: change type for this
 };
 export type ColorSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.COLOR;
@@ -45,15 +45,15 @@ export type FontSettingItemMetaType = {
 };
 export type HorizontalAlignSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN;
-  defaultValue?: HorizontalAlignSettingType;
+  defaultValue: HorizontalAlignSettingType;
 };
 export type ShadowTypeSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.SHADOW_TYPE;
-  defaultValue?: ShadowTypeSettingType;
+  defaultValue: ShadowTypeSettingType;
 };
 export type TransitionTypeSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TRANSITION;
-  defaultValue?: TransitionSettingType;
+  defaultValue: TransitionSettingType;
 };
 
 export type BaseSettingItemMetaType = {

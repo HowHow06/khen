@@ -80,18 +80,21 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
     fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    defaultValue: "Sample Presentation",
     isOptional: true,
   },
   filenamePrefix: {
     fieldKey: "filenamePrefix",
     fieldDisplayName: "File Name Prefix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    defaultValue: "",
     isOptional: true,
   },
   filenameSuffix: {
     fieldKey: "filenameSuffix",
     fieldDisplayName: "File Name Suffix",
     fieldType: SETTING_FIELD_TYPE.TEXT,
+    defaultValue: "",
     isOptional: true,
   },
 };
@@ -101,6 +104,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldKey: "mainBackgroundImage",
     fieldDisplayName: "Main Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
+    defaultValue: null,
     isOptional: true,
   },
   mainBackgroundColor: {
@@ -158,6 +162,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Transition",
     fieldType: SETTING_FIELD_TYPE.TRANSITION,
     isHidden: true, // TODO: implement transition, KHEN-26
+    defaultValue: "",
   },
   sectionsAutoNumbering: {
     fieldKey: "sectionsAutoNumbering",
@@ -186,6 +191,7 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Section Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
     isOptional: true,
+    defaultValue: null,
   },
   useMainBackgroundColor: {
     fieldKey: "useMainBackgroundColor",
@@ -322,6 +328,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Weight",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "outline",
+    defaultValue: 1,
   },
   outlineColor: {
     fieldKey: "outlineColor",
