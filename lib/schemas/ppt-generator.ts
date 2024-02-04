@@ -84,7 +84,7 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
 
     // TODO: Add cases for other field types
     default:
-      return z.string();
+      return z.string().optional();
   }
 };
 
@@ -93,7 +93,10 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
   Object.entries(metaData).forEach(([category, settings]) => {
-    if (category == SETTING_CATEGORY.GENERAL) {
+    if (
+      category == SETTING_CATEGORY.GENERAL ||
+      category == SETTING_CATEGORY.FILE
+    ) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
         if (setting.isHidden) {
