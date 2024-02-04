@@ -2,13 +2,20 @@
 // components/Sidebar.js
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   CONTENT_TYPE,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
+import { onsiteChinesePreset } from "@/lib/presets";
 import { cn } from "@/lib/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { ChevronLeft } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
@@ -26,7 +33,7 @@ import CoverSettings from "./CoverSettings";
 import GeneralSettings from "./GeneralSettings";
 
 const PptGeneratorSetting = () => {
-  const { getValues } = useFormContext();
+  const { getValues, reset } = useFormContext();
   const {
     settingsUIState,
     setCurrentCategoryTab,
@@ -70,8 +77,25 @@ const PptGeneratorSetting = () => {
           setIsOpen={setIsOpen}
           className="w-1/4 sm:max-w-[50%]"
         >
-          <SheetHeader>
+          <SheetHeader className="flex-row items-center space-x-5">
             <SheetTitle>Settings</SheetTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  Presets
+                  <ChevronDown className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem
+                  onSelect={() => {
+                    reset(onsiteChinesePreset);
+                  }}
+                >
+                  Default Onsite Chinese
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {/* <SheetDescription>
               Make changes to your profile here. Click save when you&apos;re
               done.

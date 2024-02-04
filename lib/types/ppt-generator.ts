@@ -103,3 +103,5 @@ export type PptSettingsState = {
   // };
   // Add other categories as needed
 };
+
+export type PptSettingsPresetName = "onsite-chinese";
