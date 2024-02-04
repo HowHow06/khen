@@ -98,7 +98,7 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
     defaultValue: "",
     isOptional: true,
   },
-};
+} as const;
 
 const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
   mainBackgroundImage: {
@@ -180,7 +180,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     defaultValue: false,
     isHidden: true, // TODO: khen-29
   },
-};
+} as const;
 
 const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
   useMainBackgroundImage: {
@@ -208,7 +208,7 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
   },
-};
+} as const;
 
 const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   coverTitlePositionY: {
@@ -238,7 +238,7 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
     fieldType: SETTING_FIELD_TYPE.COLOR,
     defaultValue: "#000000",
   },
-};
+} as const;
 
 const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   textboxPositionX: {
@@ -253,7 +253,7 @@ const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     defaultValue: 0,
   },
-};
+} as const;
 
 const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
   bold: {
@@ -391,7 +391,7 @@ const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
     useProportionForm: true,
     groupingName: "shadow",
   },
-};
+} as const;
 
 // NOTE: this is metadata of the available settings for the users
 export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
@@ -401,7 +401,7 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.COVER]: PPT_GENERATION_COVER_SETTINGS,
   [SETTING_CATEGORY.CONTENT_TEXTBOX]: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
-};
+} as const;
 
 export const FONT_FACES_ITEMS: ComboboxItemsType = Object.entries(
   fontFaces,
