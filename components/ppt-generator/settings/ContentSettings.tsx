@@ -73,57 +73,49 @@ const ContentSettings = ({
       >
         {Object.entries(settingsMetaGrouped).map(([groupingName, settings]) => {
           return (
-            <>
-              <AccordionItem value={fieldNamePrefix + groupingName}>
-                <AccordionTrigger className="text-base font-bold capitalize">
-                  {toNormalCase(groupingName)}
-                </AccordionTrigger>
-                <AccordionContent className="mx-3 grid divide-y pb-2">
-                  {settings.map((value) => {
-                    if (value.isHidden) {
-                      return;
-                    }
-                    return (
-                      <>
-                        <FormField
-                          control={control}
-                          name={
-                            fieldNamePrefix +
-                            groupingName +
-                            "." +
-                            value.fieldKey
-                          }
-                          key={
-                            fieldNamePrefix +
-                            groupingName +
-                            "." +
-                            value.fieldKey
-                          }
-                          render={({ field }) => (
-                            <FormItem className="grid grid-cols-6 items-center gap-x-3 gap-y-2 space-y-0 py-3">
-                              <FormLabel className="col-span-4 text-left text-sm">
-                                {value.fieldDisplayName}
-                              </FormLabel>
-                              <FormControl>
-                                <SettingInputField
-                                  settingItemMeta={value}
-                                  field={field}
-                                />
-                              </FormControl>
-                              {/* <FormDescription className="col-span-6">
+            <AccordionItem
+              value={fieldNamePrefix + groupingName}
+              key={groupingName}
+            >
+              <AccordionTrigger className="text-base font-bold capitalize">
+                {toNormalCase(groupingName)}
+              </AccordionTrigger>
+              <AccordionContent className="mx-3 grid divide-y pb-2">
+                {settings.map((value) => {
+                  if (value.isHidden) {
+                    return;
+                  }
+                  return (
+                    <FormField
+                      control={control}
+                      name={
+                        fieldNamePrefix + groupingName + "." + value.fieldKey
+                      }
+                      key={
+                        fieldNamePrefix + groupingName + "." + value.fieldKey
+                      }
+                      render={({ field }) => (
+                        <FormItem className="grid grid-cols-6 items-center gap-x-3 gap-y-2 space-y-0 py-3">
+                          <FormLabel className="col-span-4 text-left text-sm">
+                            {value.fieldDisplayName}
+                          </FormLabel>
+                          <FormControl>
+                            <SettingInputField
+                              settingItemMeta={value}
+                              field={field}
+                            />
+                          </FormControl>
+                          {/* <FormDescription className="col-span-6">
                           This is description.
                         </FormDescription> */}
-                              <FormMessage className="col-span-6 " />
-                            </FormItem>
-                          )}
-                        />
-                        {/* <Label htmlFor={value.fieldSlug}>{value.fieldDisplayName}</Label> */}
-                      </>
-                    );
-                  })}
-                </AccordionContent>
-              </AccordionItem>
-            </>
+                          <FormMessage className="col-span-6 " />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                })}
+              </AccordionContent>
+            </AccordionItem>
           );
         })}
       </Accordion>

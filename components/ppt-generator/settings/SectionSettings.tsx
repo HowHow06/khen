@@ -27,31 +27,26 @@ const SectionSettings = ({}: SectionSettingsProps) => {
             return;
           }
           return (
-            <>
-              <FormField
-                control={control}
-                name={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
-                key={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
-                render={({ field }) => (
-                  <FormItem className="grid grid-cols-6 items-center gap-3">
-                    <FormLabel className="col-span-4 text-left text-sm">
-                      {value.fieldDisplayName}
-                    </FormLabel>
-                    <FormControl>
-                      <SettingInputField
-                        settingItemMeta={value}
-                        field={field}
-                      />
-                    </FormControl>
-                    {/* <FormDescription className="col-span-6">
+            <FormField
+              control={control}
+              name={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
+              key={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-6 items-center gap-3">
+                  <FormLabel className="col-span-4 text-left text-sm">
+                    {value.fieldDisplayName}
+                  </FormLabel>
+                  <FormControl>
+                    <SettingInputField settingItemMeta={value} field={field} />
+                  </FormControl>
+                  {/* <FormDescription className="col-span-6">
                       This is description.
                     </FormDescription> */}
-                    <FormMessage className="col-span-6 " />
-                    <Separator className="col-span-6 " />
-                  </FormItem>
-                )}
-              />
-            </>
+                  <FormMessage className="col-span-6 " />
+                  <Separator className="col-span-6 " />
+                </FormItem>
+              )}
+            />
           );
         },
       )}
