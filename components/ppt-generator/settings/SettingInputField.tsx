@@ -103,6 +103,8 @@ const renderInputField = (
       />
     );
   }
+
+  // TODO: add for text field when necessary
   return <></>;
 };
 
