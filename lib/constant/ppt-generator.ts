@@ -75,7 +75,7 @@ Object.entries(CUSTOM_PINYIN_MAP_SIMPLIFIED).map(([text, customPinyin]) => {
 
 export { CUSTOM_PINYIN_MAP };
 
-const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
   filename: {
     fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
@@ -100,7 +100,7 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
   mainBackgroundImage: {
     fieldKey: "mainBackgroundImage",
     fieldDisplayName: "Main Background Image",
@@ -182,7 +182,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
   useMainBackgroundImage: {
     fieldKey: "useMainBackgroundImage",
     fieldDisplayName: "Use Main Background Image",
@@ -210,7 +210,7 @@ const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   coverTitlePositionY: {
     fieldKey: "coverTitlePositionY",
     fieldDisplayName: "Position Y (%)",
@@ -240,7 +240,7 @@ const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   textboxPositionX: {
     fieldKey: "textboxPositionX",
     fieldDisplayName: "Position X (%)",
@@ -255,7 +255,7 @@ const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
   bold: {
     fieldKey: "bold",
     fieldDisplayName: "Bold",
