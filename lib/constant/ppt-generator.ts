@@ -144,6 +144,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
+    isHidden: true, // TODO: to implement
   },
   lineCountPerSlide: {
     fieldKey: "lineCountPerSlide",
@@ -157,6 +158,7 @@ const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
     fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: true, // TODO: to implement **
   },
   transition: {
     fieldKey: "transition",
