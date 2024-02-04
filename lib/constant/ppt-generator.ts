@@ -1,6 +1,5 @@
 import { convertToTraditional } from "../character-converter";
 import {
-  BaseSettingMetaType,
   ComboboxItemsType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
@@ -75,7 +74,7 @@ Object.entries(CUSTOM_PINYIN_MAP_SIMPLIFIED).map(([text, customPinyin]) => {
 
 export { CUSTOM_PINYIN_MAP };
 
-export const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_FILE_SETTINGS = {
   filename: {
     fieldKey: "filename",
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
@@ -100,7 +99,7 @@ export const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-export const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_GENERAL_SETTINGS = {
   mainBackgroundImage: {
     fieldKey: "mainBackgroundImage",
     fieldDisplayName: "Main Background Image",
@@ -182,7 +181,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-export const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_SECTION_SETTINGS = {
   useMainBackgroundImage: {
     fieldKey: "useMainBackgroundImage",
     fieldDisplayName: "Use Main Background Image",
@@ -210,7 +209,7 @@ export const PPT_GENERATION_SECTION_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-export const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_COVER_SETTINGS = {
   coverTitlePositionY: {
     fieldKey: "coverTitlePositionY",
     fieldDisplayName: "Position Y (%)",
@@ -240,7 +239,7 @@ export const PPT_GENERATION_COVER_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS = {
   textboxPositionX: {
     fieldKey: "textboxPositionX",
     fieldDisplayName: "Position X (%)",
@@ -255,7 +254,7 @@ export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS: BaseSettingMetaType = {
   },
 } as const;
 
-export const PPT_GENERATION_CONTENT_SETTINGS: BaseSettingMetaType = {
+export const PPT_GENERATION_CONTENT_SETTINGS = {
   bold: {
     fieldKey: "bold",
     fieldDisplayName: "Bold",
