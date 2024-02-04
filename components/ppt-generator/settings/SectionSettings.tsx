@@ -10,10 +10,7 @@ import {
 import { Separator } from "../../ui/separator";
 import SettingInputField from "./SettingInputField";
 
-type SectionSettingsProps = {
-  // settings: PptSettingsState;
-  // dispatch: React.Dispatch<PptSettingsAction>;
-};
+type SectionSettingsProps = {};
 
 // TODO: to implement
 const SectionSettings = ({}: SectionSettingsProps) => {

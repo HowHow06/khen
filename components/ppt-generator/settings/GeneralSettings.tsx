@@ -9,10 +9,7 @@ import {
 } from "../../ui/form";
 import SettingInputField from "./SettingInputField";
 
-type GeneralSettingsProps = {
-  // settings: PptSettingsState;
-  // dispatch: React.Dispatch<PptSettingsAction>;
-};
+type GeneralSettingsProps = {};
 
 const GeneralSettings = ({}: GeneralSettingsProps) => {
   const { control } = useFormContext();
