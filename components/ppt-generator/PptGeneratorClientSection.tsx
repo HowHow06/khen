@@ -1,5 +1,9 @@
 "use client";
-import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
+import {
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+  SETTING_FIELD_TYPE,
+} from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
 import { TextareaRefType } from "@/lib/types";
 import { generatePptSettingsInitialState } from "@/lib/utils";
@@ -91,29 +95,32 @@ const PptGeneratorClientSection = (props: Props) => {
                       return;
                     }
                     return (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name={SETTING_CATEGORY.FILE + "." + value.fieldKey}
-                          key={SETTING_CATEGORY.FILE + "." + value.fieldKey}
-                          render={({ field }) => (
-                            <FormItem className="grid grid-cols-6 items-center gap-x-2">
-                              <FormLabel className="col-span-2 text-left text-sm">
-                                {value.fieldDisplayName}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  className="col-span-3 text-sm"
-                                  type="text"
-                                />
-                              </FormControl>
-                              <FormMessage className="col-span-6 " />
-                            </FormItem>
-                          )}
-                        />
-                        {/* <Label htmlFor={value.fieldSlug}>{value.fieldDisplayName}</Label> */}
-                      </>
+                      <FormField
+                        control={form.control}
+                        name={SETTING_CATEGORY.FILE + "." + value.fieldKey}
+                        key={SETTING_CATEGORY.FILE + "." + value.fieldKey}
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-6 items-center gap-x-2">
+                            <FormLabel className="col-span-2 text-left text-sm">
+                              {value.fieldDisplayName}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="col-span-3 text-sm"
+                                type="text"
+                                placeholder={
+                                  value.fieldType === SETTING_FIELD_TYPE.TEXT &&
+                                  value.placeholder
+                                    ? value.placeholder
+                                    : undefined
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage className="col-span-6 " />
+                          </FormItem>
+                        )}
+                      />
                     );
                   },
                 )}
