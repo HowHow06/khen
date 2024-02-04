@@ -82,6 +82,7 @@ const PPT_GENERATION_FILE_SETTINGS: BaseSettingMetaType = {
     fieldType: SETTING_FIELD_TYPE.TEXT,
     defaultValue: "",
     isOptional: true,
+    placeholder: "Insert the file name here.",
   },
   filenamePrefix: {
     fieldKey: "filenamePrefix",

@@ -15,6 +15,7 @@ export type FontFaceSettingType = string;
 export type TextSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.TEXT;
   defaultValue: string;
+  placeholder?: string;
 };
 export type BooleanSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.BOOLEAN;
