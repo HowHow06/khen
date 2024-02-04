@@ -27,21 +27,19 @@ export const generatePptSettingsInitialState = (
           return;
         }
         if (setting.defaultValue !== undefined) {
-          initialState[category as keyof PptSettingsState][setting.fieldKey] =
-            setting.defaultValue;
+          initialState[category][setting.fieldKey] = setting.defaultValue;
         }
       });
     }
     if (category == SETTING_CATEGORY.CONTENT) {
       Object.values(CONTENT_TYPE).forEach((contentType) => {
-        const categoryName = category as keyof PptSettingsState;
+        const categoryName = category;
         initialState[categoryName][contentType] = {};
         Object.entries(settingsMeta).forEach(([key, setting]) => {
           if (setting.isHidden || setting.defaultValue === undefined) {
             return;
           }
-          const groupingName = (setting.groupingName ||
-            DEFAULT_GROUPING_NAME) as keyof PptSettingsState;
+          const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
           if (!initialState[categoryName][contentType][groupingName]) {
             initialState[categoryName][contentType][groupingName] = {};
           }
@@ -68,7 +66,7 @@ export const generatePptSettingsInitialState = (
     }
     if (category == SETTING_CATEGORY.COVER) {
       Object.values(CONTENT_TYPE).forEach((contentType) => {
-        const categoryName = category as keyof PptSettingsState;
+        const categoryName = category;
         initialState[categoryName][contentType] = {};
         Object.entries(settingsMeta).forEach(([key, setting]) => {
           if (setting.isHidden || setting.defaultValue === undefined) {
