@@ -169,6 +169,7 @@ export type GroupedSettingsValueType<
   >,
 > = {
   [Group in T[keyof T]["groupingName"]]?: {
+    // only take the Key whereby the groupingName is the same as the Group key, for example: bold should not exist in shadow grouping
     [Key in keyof T as T[Key] extends { groupingName: Group }
       ? Key
       : never]?: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
