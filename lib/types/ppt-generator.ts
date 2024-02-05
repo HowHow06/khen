@@ -1,5 +1,10 @@
 import {
+  CONTENT_TYPE,
   HORIZONTAL_ALIGNMENT,
+  PPT_GENERATION_CONTENT_SETTINGS,
+  PPT_GENERATION_COVER_SETTINGS,
+  PPT_GENERATION_FILE_SETTINGS,
+  PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
@@ -101,7 +106,7 @@ export type TransitionTypeSettingItemMetaType = {
 };
 
 export type BaseSettingItemMetaType = {
-  fieldKey: string; // TODO: revise if slug is needed
+  fieldKey: string; // TODO: revise if field key is needed, consider remove this and use the key instead
   fieldDisplayName?: string;
   remark?: string;
   tips?: string;
@@ -132,6 +137,7 @@ export type PptGenerationSettingMetaType = {
   [key in PptGenerationCategory]: BaseSettingMetaType;
 };
 
+// TODO: check if it is possible to switch to use PptSettingsFormValueType type instead
 export type PptSettingsItemState = {
   [key: string]: any; // Replace 'any' with a more specific type as needed
 };
@@ -148,3 +154,45 @@ export type PptSettingsState = {
 };
 
 export type PptSettingsPresetName = "onsite-chinese";
+
+export type SettingsValueType<
+  T extends Record<string, BaseSettingItemMetaType>,
+> = {
+  [K in keyof T]?: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
+};
+
+export type GroupedSettingsValueType<
+  T extends Record<
+    string,
+    BaseSettingItemMetaType &
+      Required<Pick<BaseSettingItemMetaType, "groupingName">> // make the groupingName required
+  >,
+> = {
+  [Group in T[keyof T]["groupingName"]]: {
+    // [Key in keyof T as T[Key] extends { groupingName: Group }
+    //   ? Key
+    //   : never]: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
+    [Key in keyof T]: InferTypeScriptTypeFromSettingFieldType<
+      T[Key]["fieldType"]
+    >;
+  };
+};
+
+export type PptSettingsFormValueType = {
+  [SETTING_CATEGORY.FILE]: SettingsValueType<
+    typeof PPT_GENERATION_FILE_SETTINGS
+  >;
+  [SETTING_CATEGORY.GENERAL]: SettingsValueType<
+    typeof PPT_GENERATION_GENERAL_SETTINGS
+  >;
+  [SETTING_CATEGORY.COVER]: {
+    [T in (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE]]: SettingsValueType<
+      typeof PPT_GENERATION_COVER_SETTINGS
+    >;
+  };
+  [SETTING_CATEGORY.CONTENT]: {
+    [T in (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE]]: GroupedSettingsValueType<
+      typeof PPT_GENERATION_CONTENT_SETTINGS
+    >;
+  };
+};
