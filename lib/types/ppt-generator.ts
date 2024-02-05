@@ -168,13 +168,10 @@ export type GroupedSettingsValueType<
       Required<Pick<BaseSettingItemMetaType, "groupingName">> // make the groupingName required
   >,
 > = {
-  [Group in T[keyof T]["groupingName"]]: {
-    // [Key in keyof T as T[Key] extends { groupingName: Group }
-    //   ? Key
-    //   : never]: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
-    [Key in keyof T]: InferTypeScriptTypeFromSettingFieldType<
-      T[Key]["fieldType"]
-    >;
+  [Group in T[keyof T]["groupingName"]]?: {
+    [Key in keyof T as T[Key] extends { groupingName: Group }
+      ? Key
+      : never]?: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
   };
 };
 
