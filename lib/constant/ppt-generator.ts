@@ -425,4 +425,4 @@ export const SHADOW_TYPE_ITEMS: ComboboxItemsType<ShadowTypeSettingType> =
 export const CONTENT_TYPE = {
   MAIN: "main",
   SECONDARY: "secondary",
-};
+} as const;
