@@ -143,7 +143,6 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isHidden: true, // TODO: to implement
   },
   lineCountPerSlide: {
     fieldKey: "lineCountPerSlide",
