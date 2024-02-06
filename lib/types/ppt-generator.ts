@@ -137,22 +137,6 @@ export type PptGenerationSettingMetaType = {
   [key in PptGenerationCategory]: BaseSettingMetaType;
 };
 
-// TODO: check if it is possible to switch to use PptSettingsFormValueType type instead
-export type PptSettingsItemState = {
-  [key: string]: any; // Replace 'any' with a more specific type as needed
-};
-
-export type PptSettingsState = {
-  [SETTING_CATEGORY.GENERAL]: PptSettingsItemState;
-  [SETTING_CATEGORY.CONTENT]: PptSettingsItemState;
-  [SETTING_CATEGORY.COVER]: PptSettingsItemState;
-  [SETTING_CATEGORY.FILE]: PptSettingsItemState;
-  // [SETTING_CATEGORY.SECTION]?: {
-  //   [sectionKey: string]: PptSettingsCategoryState;
-  // };
-  // Add other categories as needed
-};
-
 export type PptSettingsPresetName = "onsite-chinese";
 
 export type SettingsValueType<
@@ -176,7 +160,7 @@ export type GroupedSettingsValueType<
   };
 };
 
-export type PptSettingsFormValueType = {
+export type PptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: SettingsValueType<
     typeof PPT_GENERATION_FILE_SETTINGS
   >;
