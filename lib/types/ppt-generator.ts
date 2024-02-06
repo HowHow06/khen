@@ -144,7 +144,7 @@ export type SettingsValueType<
 > = {
   [K in keyof T as T[K]["isHidden"] extends true
     ? never
-    : K]?: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
+    : K]: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
 };
 
 export type GroupedSettingsValueType<
@@ -154,11 +154,11 @@ export type GroupedSettingsValueType<
       Required<Pick<BaseSettingItemMetaType, "groupingName">> // make the groupingName required
   >,
 > = {
-  [Group in T[keyof T]["groupingName"]]?: {
+  [Group in T[keyof T]["groupingName"]]: {
     // only take the Key whereby the groupingName is the same as the Group key, for example: bold should not exist in shadow grouping
     [Key in keyof T as T[Key] extends { groupingName: Group; isHidden?: false }
       ? Key
-      : never]?: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
+      : never]: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
   };
 };
 
