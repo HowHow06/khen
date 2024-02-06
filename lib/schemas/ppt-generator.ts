@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   DEFAULT_GROUPING_NAME,
-  DEFAULT_LINE_COUNT,
+  DEFAULT_LINE_COUNT_PER_SLIDE,
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
@@ -136,22 +136,24 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
         contentSchema[groupingName][setting.fieldKey] = settingSchema;
       });
 
-      Array.from({ length: DEFAULT_LINE_COUNT }).forEach((_, index) => {
-        Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
-          if (setting.isHidden) {
-            return;
-          }
+      Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
+        (_, index) => {
+          Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
+            if (setting.isHidden) {
+              return;
+            }
 
-          const settingSchema = createZodSchemaFromSettingItem(setting);
-          const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
+            const settingSchema = createZodSchemaFromSettingItem(setting);
+            const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
 
-          if (!contentSchema[groupingName]) {
-            contentSchema[groupingName] = {};
-          }
+            if (!contentSchema[groupingName]) {
+              contentSchema[groupingName] = {};
+            }
 
-          contentSchema[groupingName][setting.fieldKey] = settingSchema;
-        });
-      });
+            contentSchema[groupingName][setting.fieldKey] = settingSchema;
+          });
+        },
+      );
 
       // Convert each groupingName object into a z.object and wrap the whole thing in z.record
       const contentZodSchema = Object.entries(contentSchema).reduce(

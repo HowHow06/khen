@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  DEFAULT_LINE_COUNT,
+  DEFAULT_LINE_COUNT_PER_SLIDE,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
@@ -36,7 +36,7 @@ const ContentSettings = ({
   const { control } = useFormContext();
   const settingsMetaGrouped = useMemo(() => {
     const textBoxSettings = Array.from({
-      length: DEFAULT_LINE_COUNT,
+      length: DEFAULT_LINE_COUNT_PER_SLIDE,
     }).reduce<{}>((result, _, currentIndex) => {
       return {
         ...result,
