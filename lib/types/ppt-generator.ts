@@ -21,7 +21,7 @@ type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.BOOLEAN]: boolean;
   [SETTING_FIELD_TYPE.NUMBER]: number;
   [SETTING_FIELD_TYPE.PERCENTAGE]: number;
-  [SETTING_FIELD_TYPE.IMAGE]: any;
+  [SETTING_FIELD_TYPE.IMAGE]: File | null;
   [SETTING_FIELD_TYPE.COLOR]: string;
   [SETTING_FIELD_TYPE.FONT]: string;
   [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HorizontalAlignSettingType;
