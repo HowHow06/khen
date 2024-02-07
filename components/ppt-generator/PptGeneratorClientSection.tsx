@@ -39,6 +39,7 @@ const PptGeneratorClientSection = (props: Props) => {
   const [secondaryText, setSecondaryText] = useState<string>("");
 
   // console.log(`defaultSettingsValue: `, defaultSettingsValue); // TODO: remove this
+  // TODO: show errors if there is any error
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
