@@ -2,12 +2,14 @@ import {
   CONTENT_TYPE,
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_CONTENT_SETTINGS,
+  PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_FILE_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
+  TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 
 export type HorizontalAlignSettingType =
@@ -162,6 +164,18 @@ export type GroupedSettingsValueType<
   };
 };
 
+// Static part of the CONTENT category settings
+type ContentTextboxSettingsType = {
+  [key in `${typeof TEXTBOX_GROUPING_PREFIX}${number}`]: SettingsValueType<
+    typeof PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS
+  >;
+};
+
+export type ContentSettingsType = GroupedSettingsValueType<
+  typeof PPT_GENERATION_CONTENT_SETTINGS
+> &
+  ContentTextboxSettingsType;
+
 export type PptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: SettingsValueType<
     typeof PPT_GENERATION_FILE_SETTINGS
@@ -175,8 +189,6 @@ export type PptSettingsStateType = {
     >;
   };
   [SETTING_CATEGORY.CONTENT]: {
-    [T in (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE]]: GroupedSettingsValueType<
-      typeof PPT_GENERATION_CONTENT_SETTINGS
-    >;
+    [T in (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE]]: ContentSettingsType;
   };
 };
