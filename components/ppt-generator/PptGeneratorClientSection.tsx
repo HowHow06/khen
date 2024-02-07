@@ -5,8 +5,8 @@ import {
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
-import { TextareaRefType } from "@/lib/types";
-import { generatePptSettingsInitialState } from "@/lib/utils";
+import { PptSettingsStateType, TextareaRefType } from "@/lib/types";
+import { generatePpt, generatePptSettingsInitialState } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ const defaultSettingsValue = generatePptSettingsInitialState(
 
 const PptGeneratorClientSection = (props: Props) => {
   console.log("big chunk section render"); //TODO: remove this
-  const mainTextareaRef = useRef<TextareaRefType>(null);
+  const mainTextareaRef = useRef<TextareaRefType>(null); // TODO: optimize this by using a context
   const secondaryTextareaRef = useRef<TextareaRefType>(null);
   const [secondaryText, setSecondaryText] = useState<string>("");
 
@@ -50,6 +50,11 @@ const PptGeneratorClientSection = (props: Props) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log("SUBMITE:", values);
+    generatePpt({
+      settingValues: values as PptSettingsStateType,
+      primaryLyric: mainTextareaRef.current?.value || "",
+      secondaryLyric: secondaryText,
+    });
   }
   return (
     <>

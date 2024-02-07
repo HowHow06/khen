@@ -1,6 +1,7 @@
 import { CONTENT_TYPE, SETTING_CATEGORY } from "../constant";
+import { PptSettingsStateType } from "../types";
 
-export const onsiteChinesePreset = {
+export const onsiteChinesePreset: PptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: {
     filenamePrefix: "",
     filenameSuffix: "",
@@ -42,6 +43,7 @@ export const onsiteChinesePreset = {
         hasGlow: false,
         glowSize: 0,
         glowColor: "#000000",
+        glowOpacity: 0.25,
       },
       outline: {
         hasOutline: false,
@@ -79,6 +81,7 @@ export const onsiteChinesePreset = {
         hasGlow: false,
         glowSize: 0,
         glowColor: "#000000",
+        glowOpacity: 0.25,
       },
       outline: {
         hasOutline: false,
