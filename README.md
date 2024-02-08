@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # khen
 A web based tool suite. 
-=======
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -38,4 +37,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
->>>>>>> 06eb99f (Initial commit from Create Next App)
+
+---
+
+## Error faced in using jest
+- When using yarn v1 with jest, it might be fine on the first `yarn install`. However, when new dependencies are added, the `yarn test` will no longer works.
+- As workaround, the code below is added to the `package.json` file
+  ```
+  "resolutions": {
+    "wrap-ansi": "7.0.0",
+    "string-width": "4.2.3"
+  }
+  ```
+- OR another workaround is to use `npm` instead of yarn
+- OR another workaround is to delete the `yarn.lock` file
+- Refer to
+  - [\[Bug?\]: Error [ERR_REQUIRE_ESM]: require() of ES Module string-width/index.js](https://github.com/yarnpkg/yarn/issues/8994)
+  - [Jest fails to run after installing selenium-webdriver](https://stackoverflow.com/questions/77592704/jest-fails-to-run-after-installing-selenium-webdriver/77592734#77592734)
+  - [Error [ERR_REQUIRE_ESM]: require() of ES Module, node_modules\wrap-ansi\index.js not supported](https://stackoverflow.com/questions/77406363/error-err-require-esm-require-of-es-module-node-modules-wrap-ansi-index-js)
