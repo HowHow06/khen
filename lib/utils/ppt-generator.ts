@@ -145,7 +145,7 @@ export const generatePptSettingsInitialState = (
   return initialState;
 };
 
-const GetPptBackgroundProp = async ({
+const getPptBackgroundProp = async ({
   backgroundColor,
   backgroundImage,
 }: {
@@ -172,7 +172,7 @@ const GetPptBackgroundProp = async ({
   };
 };
 
-function createPresentation({
+function createPresentationInstance({
   author = DEFAULT_AUTHOR,
   subject = DEFAULT_SUBJECT,
   title = DEFAULT_TITLE,
@@ -201,26 +201,26 @@ function createPresentation({
 
   return pres;
 }
+
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,
   secondaryLinesArray,
-  isBackgroundColorWhenEmpty,
-  linePerRow,
-  hasSecondaryContent,
   settingValues,
 }: {
   pres: pptxgenjs;
   primaryLinesArray: string[];
   secondaryLinesArray: string[];
-  isBackgroundColorWhenEmpty: boolean;
-  linePerRow: number;
-  hasSecondaryContent: boolean;
   settingValues: PptSettingsStateType;
 }) {
   const {
-    content: { main: customPrimaryOption, secondary: customSecondaryOption },
+    general: { useBackgroundColorWhenEmpty, singleLineMode, ignoreSubcontent },
   } = settingValues;
+  const isBackgroundColorWhenEmpty =
+    useBackgroundColorWhenEmpty ??
+    PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue;
+  const linePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
+  const hasSecondaryContent = !ignoreSubcontent;
   let coverCount = 0;
   let pptSectionCount = 0;
   let mainSectionCount = 0;
@@ -294,10 +294,10 @@ function createSlidesFromLyrics({
 
     const isEmptyLine = currentLine.trim().length == 0;
 
-    let slide = GetWorkingSlide({
+    let slide = getWorkingSlide({
       pres,
       currentIndex,
-      linePerRow,
+      linePerSlide,
       isCover,
       isEmptyLine,
       isBackgroundColorWhenEmpty,
@@ -308,12 +308,12 @@ function createSlidesFromLyrics({
 
     const currentLyricPosition = isCover
       ? LYRIC_POSITION.COVER
-      : currentIndex % linePerRow == 0
+      : currentIndex % linePerSlide == 0
         ? LYRIC_POSITION.UPPER
         : LYRIC_POSITION.LOWER;
 
     // add primary content
-    AddTextLineToSlide({
+    addTextLineToSlide({
       slide,
       line: currentLine,
       type: LYRIC_TYPE.PRIMARY,
@@ -335,7 +335,7 @@ function createSlidesFromLyrics({
         }
       }
 
-      AddTextLineToSlide({
+      addTextLineToSlide({
         slide,
         line: secondaryLine,
         type: LYRIC_TYPE.SECONDARY,
@@ -358,10 +358,10 @@ function createSlidesFromLyrics({
   };
 }
 
-function GetWorkingSlide({
+function getWorkingSlide({
   pres,
   currentIndex,
-  linePerRow,
+  linePerSlide,
   isCover,
   currentSection,
   isEmptyLine,
@@ -370,7 +370,7 @@ function GetWorkingSlide({
 }: {
   pres: pptxgenjs;
   currentIndex: number;
-  linePerRow: number;
+  linePerSlide: number;
   isCover: boolean;
   currentSection: string;
   isEmptyLine: boolean;
@@ -379,7 +379,7 @@ function GetWorkingSlide({
 }): PptxGenJS.default.Slide {
   const isToCreateSlide = getIsToCreateNewSlide({
     currentIndex,
-    linePerRow,
+    linePerSlide,
     isCover,
   });
 
@@ -397,7 +397,7 @@ function GetWorkingSlide({
   return currentPresSlide;
 }
 
-function AddTextLineToSlide({
+function addTextLineToSlide({
   slide,
   line,
   type = LYRIC_TYPE.PRIMARY,
@@ -496,31 +496,47 @@ function AddTextLineToSlide({
     ...customOption,
   };
 
-  slide.addText(line, {
-    ...finalOption,
-    // ...(finalOption.shadow
-    //   ? {
-    //       shadow: {
-    //         ...finalOption.shadow,
-    //       },
-    //     }
-    //   : null),
-  });
+  slide.addText(line, finalOption);
 }
 
 function getIsToCreateNewSlide({
   currentIndex,
-  linePerRow,
+  linePerSlide,
   isCover = false,
 }: {
   currentIndex: number;
-  linePerRow: number;
+  linePerSlide: number;
   isCover: boolean;
 }) {
-  const remainder = currentIndex % linePerRow; //create new slide if remainder is 0
+  const remainder = currentIndex % linePerSlide; //create new slide if remainder is 0
   const isToCreateSlide = remainder === 0;
   return isToCreateSlide || isCover;
 }
+
+const parseFilename = ({
+  filename,
+  suffix,
+  prefix,
+}: {
+  filename: string | undefined;
+  suffix: string | undefined;
+  prefix: string | undefined;
+}) => {
+  const fileName = filename || DEFAULT_FILENAME;
+  const cleanFileName = fileName
+    .toString()
+    .replace(/\.pptx$/i, "")
+    .trim();
+  const fileNameSuffix = suffix ? suffix.trim() : "";
+  const fileNamePrefix = prefix ? prefix.trim() : "";
+
+  return {
+    fileName: fileNamePrefix + cleanFileName + fileNameSuffix + ".pptx",
+    cleanFileName,
+    fileNamePrefix,
+    fileNameSuffix,
+  };
+};
 
 export const generatePpt = async ({
   settingValues,
@@ -531,15 +547,8 @@ export const generatePpt = async ({
   primaryLyric: string;
   secondaryLyric: string;
 }) => {
-  const hasSecondaryContent = !settingValues.general.ignoreSubcontent;
-  const isOneLinePerSlide = settingValues.general.singleLineMode;
-  const isBackgroundColorWhenEmpty =
-    settingValues.general.useBackgroundColorWhenEmpty ||
-    PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue;
-  const isSavePptBySection = settingValues.general.separateSectionsToFiles;
-
-  const linePerSlide = isOneLinePerSlide ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
-
+  const { general } = settingValues;
+  const hasSecondaryContent = !general.ignoreSubcontent;
   const primaryLinesArray = primaryLyric.split("\n");
   const secondaryLinesArray = secondaryLyric.split("\n");
 
@@ -554,53 +563,46 @@ export const generatePpt = async ({
   }
 
   // 1. Get background prop for the presentation
-  const backgroundProp = await GetPptBackgroundProp({
+  const backgroundProp = await getPptBackgroundProp({
     backgroundColor:
-      settingValues.general.mainBackgroundColor ??
+      general.mainBackgroundColor ??
       PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue,
     backgroundImage:
-      settingValues.general.mainBackgroundImage ??
+      general.mainBackgroundImage ??
       PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue,
   });
 
   // 2. Create a new Presentation instance
-  let pres = createPresentation({ backgroundProp: backgroundProp });
+  const pres = createPresentationInstance({ backgroundProp: backgroundProp });
 
-  // 3 Get Options
-  const customPrimaryOption = settingValues.content.main;
-  const customSecondaryOption = settingValues.content.secondary;
-  const linePerRow = linePerSlide;
-  let fileName = settingValues.file.filename || DEFAULT_FILENAME;
-  const cleanFileName = fileName.toString().replace(/\.pptx$/i, "");
-  const fileNameSuffix = settingValues.file.filenameSuffix ?? "";
-  const fileNamePrefix = settingValues.file.filenamePrefix ?? "";
-
-  fileName = fileNamePrefix + cleanFileName + fileNameSuffix + ".pptx";
-
-  // 4. Create Slides in the Presentation
+  // 3. Create Slides in the Presentation
   const { sectionsInfo } = createSlidesFromLyrics({
     pres,
     primaryLinesArray,
     secondaryLinesArray,
-    isBackgroundColorWhenEmpty,
-    linePerRow,
-    hasSecondaryContent,
     settingValues,
   });
 
-  // 5. Save the Presentation
+  const { fileName, cleanFileName, fileNamePrefix, fileNameSuffix } =
+    parseFilename({
+      filename: settingValues.file.filename,
+      prefix: settingValues.file.filenamePrefix,
+      suffix: settingValues.file.filenameSuffix,
+    });
+  const isSavePptBySection = general.separateSectionsToFiles;
+  // 4. Save the Presentation
   if (!isSavePptBySection) {
     pres.writeFile({ fileName: fileName });
   }
 
-  // 6. If need to separate ppt by section, recreate each ppt and put into zip
+  // 5. If need to separate ppt by section, recreate each ppt and put into zip
   if (isSavePptBySection) {
     var zip = new jszip();
     const fileContent = await pres.write();
     zip.file(fileName, fileContent);
 
     for (const sectionInfo of sectionsInfo) {
-      let tempPres = createPresentation({ backgroundProp }); // for saving into zip file
+      let tempPres = createPresentationInstance({ backgroundProp }); // for saving into zip file
       const { sectionName, startLineIndex, endLineIndex } = sectionInfo;
       const tempPrimaryLinesArray = primaryLinesArray.filter(
         (line, index) => index >= startLineIndex && index <= endLineIndex,
@@ -613,9 +615,6 @@ export const generatePpt = async ({
         pres: tempPres,
         primaryLinesArray: tempPrimaryLinesArray,
         secondaryLinesArray: tempSecondaryLinesArray,
-        isBackgroundColorWhenEmpty,
-        linePerRow,
-        hasSecondaryContent,
         settingValues,
       });
 
