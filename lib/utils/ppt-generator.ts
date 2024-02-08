@@ -547,11 +547,19 @@ export const generatePpt = async ({
   primaryLyric: string;
   secondaryLyric: string;
 }) => {
-  const { general } = settingValues;
-  const hasSecondaryContent = !general.ignoreSubcontent;
+  const {
+    general: {
+      ignoreSubcontent,
+      separateSectionsToFiles,
+      mainBackgroundColor,
+      mainBackgroundImage,
+    },
+  } = settingValues;
+  const hasSecondaryContent = !ignoreSubcontent;
   const primaryLinesArray = primaryLyric.split("\n");
   const secondaryLinesArray = secondaryLyric.split("\n");
 
+  // 0. Perform length checking
   if (
     hasSecondaryContent &&
     primaryLinesArray.length !== secondaryLinesArray.length &&
@@ -565,10 +573,10 @@ export const generatePpt = async ({
   // 1. Get background prop for the presentation
   const backgroundProp = await getPptBackgroundProp({
     backgroundColor:
-      general.mainBackgroundColor ??
+      mainBackgroundColor ??
       PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue,
     backgroundImage:
-      general.mainBackgroundImage ??
+      mainBackgroundImage ??
       PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue,
   });
 
@@ -583,20 +591,19 @@ export const generatePpt = async ({
     settingValues,
   });
 
+  // 4. Save the Presentation
   const { fileName, cleanFileName, fileNamePrefix, fileNameSuffix } =
     parseFilename({
       filename: settingValues.file.filename,
       prefix: settingValues.file.filenamePrefix,
       suffix: settingValues.file.filenameSuffix,
     });
-  const isSavePptBySection = general.separateSectionsToFiles;
-  // 4. Save the Presentation
-  if (!isSavePptBySection) {
+  if (!separateSectionsToFiles) {
     pres.writeFile({ fileName: fileName });
   }
 
   // 5. If need to separate ppt by section, recreate each ppt and put into zip
-  if (isSavePptBySection) {
+  if (separateSectionsToFiles) {
     var zip = new jszip();
     const fileContent = await pres.write();
     zip.file(fileName, fileContent);
