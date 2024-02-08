@@ -12,6 +12,7 @@ import {
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
   LYRIC_POSITION,
+  LYRIC_SECTION,
   LYRIC_TYPE,
   PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
@@ -221,6 +222,7 @@ function createSlidesFromLyrics({
     PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue;
   const linePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
   const hasSecondaryContent = !ignoreSubcontent;
+
   let coverCount = 0;
   let pptSectionCount = 0;
   let mainSectionCount = 0;
@@ -232,9 +234,11 @@ function createSlidesFromLyrics({
   let currentSlide: PptxGenJS.default.Slide | undefined = undefined;
 
   primaryLinesArray.forEach((primaryLine, index) => {
-    const isCover = primaryLine.startsWith("# ");
-    const isSectionLine = primaryLine.startsWith("---- ");
-    const isSubSectionLine = primaryLine.startsWith("--- ");
+    const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
+    const isSectionLine = primaryLine.startsWith(`${LYRIC_SECTION.SECTION} `);
+    const isSubSectionLine = primaryLine.startsWith(
+      `${LYRIC_SECTION.SUBSECTION} `,
+    );
     const isLastLine = index == primaryLinesArray.length - 1;
     let currentLine = primaryLine;
     const currentIndex = index - coverCount - pptSectionCount;
@@ -242,7 +246,7 @@ function createSlidesFromLyrics({
     if (isSectionLine) {
       pptSectionCount++;
       subsectionCount = 0;
-      let sectionName = primaryLine.replace("---- ", "");
+      let sectionName = primaryLine.replace(`${LYRIC_SECTION.SECTION} `, "");
       const isStartWithNumbering = startsWithNumbering(sectionName);
       if (isStartWithNumbering) {
         mainSectionCount = extractNumber(sectionName);
