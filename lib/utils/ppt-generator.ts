@@ -1,6 +1,6 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
-import { getBase64 } from ".";
+import { extractNumber, getBase64, startsWithNumbering } from ".";
 import {
   CONTENT_TYPE,
   DEFAULT_AUTHOR,
@@ -201,17 +201,6 @@ function createPresentation({
 
   return pres;
 }
-
-function startsWithNumbering(str: string) {
-  const regex = /^[0-9]+\./;
-  return regex.test(str);
-}
-
-function extractNumber(str: string) {
-  const match = str.match(/^([0-9]+)\./);
-  return match ? Number(match[1]) : 0;
-}
-
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,

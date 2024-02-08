@@ -80,3 +80,13 @@ export function getBase64(file: File): Promise<string | ArrayBuffer | null> {
     reader.onerror = (error) => reject(error);
   });
 }
+
+export function startsWithNumbering(str: string) {
+  const regex = /^[0-9]+\./;
+  return regex.test(str);
+}
+
+export function extractNumber(str: string) {
+  const match = str.match(/^([0-9]+)\./);
+  return match ? Number(match[1]) : 0;
+}
