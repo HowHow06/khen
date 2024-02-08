@@ -18,7 +18,9 @@ import {
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 import {
+  BaseSettingMetaType,
   ContentSettingsType,
+  ContentTypeType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
   PptSettingsStateType,
@@ -29,6 +31,7 @@ export const generatePptSettingsInitialState = (
 ): PptSettingsStateType => {
   const initialState: PptSettingsStateType = {
     [SETTING_CATEGORY.GENERAL]: {},
+    [SETTING_CATEGORY.FILE]: {},
     [SETTING_CATEGORY.CONTENT]: {
       [CONTENT_TYPE.MAIN]: {},
       [CONTENT_TYPE.SECONDARY]: {},
@@ -37,99 +40,105 @@ export const generatePptSettingsInitialState = (
       [CONTENT_TYPE.MAIN]: {},
       [CONTENT_TYPE.SECONDARY]: {},
     },
-    [SETTING_CATEGORY.FILE]: {},
+  };
+
+  type CategoryWithContentType =
+    | typeof SETTING_CATEGORY.COVER
+    | typeof SETTING_CATEGORY.CONTENT;
+  const applySettings = ({
+    category,
+    settingsMeta,
+    contentType,
+    groupingName,
+  }: {
+    settingsMeta: BaseSettingMetaType;
+  } & (
+    | {
+        category: Exclude<keyof PptSettingsStateType, CategoryWithContentType>;
+        contentType?: never;
+        groupingName?: never;
+      }
+    | {
+        category: typeof SETTING_CATEGORY.COVER;
+        contentType: ContentTypeType;
+        groupingName?: never;
+      }
+    | {
+        category: typeof SETTING_CATEGORY.CONTENT;
+        contentType: ContentTypeType;
+        groupingName?: keyof ContentSettingsType;
+      }
+  )) => {
+    Object.entries(settingsMeta).forEach(([key, setting]) => {
+      if (setting.isHidden || setting.defaultValue === undefined) {
+        return;
+      }
+
+      // All category besides cover and content will go under this statement
+      if (
+        category != SETTING_CATEGORY.COVER &&
+        category != SETTING_CATEGORY.CONTENT
+      ) {
+        initialState[category] = {
+          ...initialState[category],
+          [setting.fieldKey]: setting.defaultValue,
+        };
+        return;
+      }
+
+      if (category == SETTING_CATEGORY.COVER) {
+        initialState[category][contentType] = {
+          ...initialState[category][contentType],
+          [setting.fieldKey]: setting.defaultValue,
+        };
+        return;
+      }
+
+      if (category == SETTING_CATEGORY.CONTENT) {
+        const grouping =
+          groupingName || setting.groupingName || DEFAULT_GROUPING_NAME;
+        const originalGroupingObject =
+          initialState[category][contentType][
+            grouping as keyof ContentSettingsType
+          ];
+        initialState[category][contentType] = {
+          ...initialState[category][contentType],
+          [grouping]: {
+            ...originalGroupingObject,
+            [setting.fieldKey]: setting.defaultValue,
+          },
+        };
+        return;
+      }
+    });
   };
 
   Object.entries(settings).forEach(([category, settingsMeta]) => {
-    if (
-      category == SETTING_CATEGORY.GENERAL ||
-      category == SETTING_CATEGORY.FILE
-    ) {
-      Object.entries(settingsMeta).forEach(([key, setting]) => {
-        if (setting.isHidden) {
-          return;
-        }
-        if (setting.defaultValue !== undefined) {
-          initialState[category] = {
-            ...initialState[category],
-            [setting.fieldKey]: setting.defaultValue,
-          };
-        }
-      });
-    }
-    if (category == SETTING_CATEGORY.CONTENT) {
-      Object.values(CONTENT_TYPE).forEach((contentType) => {
-        initialState[category][contentType] = {};
-        Object.entries(settingsMeta).forEach(([key, setting]) => {
-          if (setting.isHidden || setting.defaultValue === undefined) {
-            return;
-          }
-          const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
-          // // TODO: consider remove this checking
-          // if (!(groupingName in initialState[category][contentType])) {
-          //   initialState[category][contentType] = {
-          //     ...initialState[category][contentType],
-          //     [groupingName]: {},
-          //   };
-          // }
-          const originalGroupingObject =
-            initialState[category][contentType][
-              groupingName as keyof ContentSettingsType
-            ];
-          initialState[category][contentType] = {
-            ...initialState[category][contentType],
-            [groupingName]: {
-              ...originalGroupingObject,
-              [setting.fieldKey]: setting.defaultValue,
-            },
-          };
-        });
-        Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
-          (_, index) => {
-            Object.entries(settings.contentTextbox).forEach(
-              ([key, setting]) => {
-                if (setting.isHidden || setting.defaultValue === undefined) {
-                  return;
-                }
-
+    switch (category) {
+      case SETTING_CATEGORY.GENERAL:
+      case SETTING_CATEGORY.FILE:
+        applySettings({ category, settingsMeta });
+        break;
+      case SETTING_CATEGORY.CONTENT:
+      case SETTING_CATEGORY.COVER:
+        Object.values(CONTENT_TYPE).forEach((contentType) => {
+          applySettings({ category, settingsMeta, contentType });
+          if (category === SETTING_CATEGORY.CONTENT) {
+            Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
+              (_, index) => {
                 const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
-                // if (!initialState[category][contentType][groupingName]) {
-                //   initialState[category][contentType][groupingName] = {};
-                // }
-                const originalGroupingObject =
-                  initialState[category][contentType][
-                    groupingName as keyof ContentSettingsType
-                  ];
-                initialState[category][contentType] = {
-                  ...initialState[category][contentType],
-                  [groupingName]: {
-                    ...originalGroupingObject,
-                    [setting.fieldKey]: setting.defaultValue,
-                  },
-                };
+                applySettings({
+                  category,
+                  settingsMeta: settings.contentTextbox,
+                  contentType,
+                  groupingName: groupingName as keyof ContentSettingsType,
+                });
               },
             );
-          },
-        );
-      });
-    }
-    if (category == SETTING_CATEGORY.COVER) {
-      Object.values(CONTENT_TYPE).forEach((contentType) => {
-        const categoryName = category;
-        initialState[categoryName][contentType] = {};
-        Object.entries(settingsMeta).forEach(([key, setting]) => {
-          if (setting.isHidden || setting.defaultValue === undefined) {
-            return;
           }
-          initialState[categoryName][contentType] = {
-            ...initialState[categoryName][contentType],
-            [setting.fieldKey]: setting.defaultValue,
-          };
         });
-      });
+        break;
     }
-    // TODO: implement initial value for content
-    // TODO: define for other categories
   });
 
   return initialState;
