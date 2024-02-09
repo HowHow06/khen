@@ -12,6 +12,7 @@ import {
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
   LYRIC_SECTION,
+  PPT_GENERATION_CONTENT_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
@@ -423,22 +424,15 @@ function getWorkingSlide({
   return currentPresSlide;
 }
 
-function addTextLineToSlide({
-  slide,
-  line,
+function getTextOptionFromContentSettings({
   contentOption,
-  coverOption,
   textboxKey,
-  settingValues,
 }: {
-  slide: PptxGenJS.default.Slide;
-  line: string;
   contentOption: ContentSettingsType;
-  coverOption?: SettingsValueType<typeof PPT_GENERATION_COVER_SETTINGS>;
   textboxKey: keyof ContentTextboxSettingsType;
-  settingValues: PptSettingsStateType;
-}) {
+}): PptxGenJS.default.TextPropsOptions {
   const { text, glow, outline, shadow, [textboxKey]: textbox } = contentOption;
+
   let customOption: PptxGenJS.default.TextPropsOptions = {
     x: `${textbox.textboxPositionX || 0}%`,
     y: `${textbox.textboxPositionY || 0}%`,
@@ -447,6 +441,7 @@ function addTextLineToSlide({
     fontFace: text?.font ?? "Microsoft Yahei",
     fontSize: text?.fontSize ?? 50,
     charSpacing: text?.charSpacing ?? 2,
+    align: text?.align ?? PPT_GENERATION_CONTENT_SETTINGS.align.defaultValue,
   };
 
   if (glow?.hasGlow) {
@@ -482,13 +477,32 @@ function addTextLineToSlide({
       },
     };
   }
+  return customOption;
+}
 
-  // TODO: think how to handle the textboxLine1
-  let customValues: PptxGenJS.default.TextPropsOptions = {};
+function addTextLineToSlide({
+  slide,
+  line,
+  contentOption,
+  coverOption,
+  textboxKey,
+  settingValues,
+}: {
+  slide: PptxGenJS.default.Slide;
+  line: string;
+  contentOption: ContentSettingsType;
+  coverOption?: SettingsValueType<typeof PPT_GENERATION_COVER_SETTINGS>;
+  textboxKey: keyof ContentTextboxSettingsType;
+  settingValues: PptSettingsStateType;
+}) {
+  let textOption = getTextOptionFromContentSettings({
+    contentOption,
+    textboxKey,
+  });
 
   if (coverOption) {
-    customValues = {
-      ...customValues,
+    textOption = {
+      ...textOption,
       ...{
         y: `${coverOption.coverTitlePositionY || 0}%`,
         fontSize: coverOption.coverTitleFontSize,
@@ -498,13 +512,9 @@ function addTextLineToSlide({
     };
   }
 
-  customOption = {
-    ...customOption,
-    ...customValues,
-  };
   let finalOption: PptxGenJS.default.TextPropsOptions = {
     ...DEFAULT_BASE_OPTION,
-    ...customOption,
+    ...textOption,
   };
 
   slide.addText(line, finalOption);
