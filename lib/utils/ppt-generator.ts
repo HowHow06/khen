@@ -11,9 +11,8 @@ import {
   DEFAULT_PPT_LAYOUT,
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
-  LYRIC_POSITION,
   LYRIC_SECTION,
-  LYRIC_TYPE,
+  PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
@@ -22,11 +21,13 @@ import {
 import {
   BaseSettingMetaType,
   ContentSettingsType,
+  ContentTextboxSettingsType,
   ContentTypeType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
+  SettingsValueType,
 } from "../types";
 
 export const generatePptSettingsInitialState = (
@@ -303,7 +304,8 @@ function createSlidesFromLyrics({
       pres.addSection({ title: sectionName });
       return;
     }
-
+    // Get the current index before manipulating the cover count
+    const currentIndex = index - coverCount - pptSectionCount;
     let currentLine = primaryLine;
     // 2. check if is cover, update current line
     const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
@@ -319,7 +321,6 @@ function createSlidesFromLyrics({
       // here will only get the main title (not the secondary title)
     }
 
-    const currentIndex = index - coverCount - pptSectionCount;
     let slide = getWorkingSlide({
       pres,
       currentIndex,
@@ -332,18 +333,14 @@ function createSlidesFromLyrics({
     });
     currentSlide = slide; // update current slide
 
-    const currentLyricPosition = isCover
-      ? LYRIC_POSITION.COVER
-      : currentIndex % linePerSlide == 0
-        ? LYRIC_POSITION.UPPER
-        : LYRIC_POSITION.LOWER;
-
+    const textboxNumber = (currentIndex % linePerSlide) + 1;
     // add primary content
     addTextLineToSlide({
       slide,
       line: currentLine,
-      type: LYRIC_TYPE.PRIMARY,
-      lyricPosition: currentLyricPosition,
+      contentOption: settingValues.content.main,
+      coverOption: isCover ? settingValues.cover.main : undefined,
+      textboxKey: `textboxLine${textboxNumber}`,
       settingValues,
     });
 
@@ -364,8 +361,9 @@ function createSlidesFromLyrics({
       addTextLineToSlide({
         slide,
         line: secondaryLine,
-        type: LYRIC_TYPE.SECONDARY,
-        lyricPosition: currentLyricPosition,
+        contentOption: settingValues.content.secondary,
+        coverOption: isCover ? settingValues.cover.secondary : undefined,
+        textboxKey: `textboxLine${textboxNumber}`,
         settingValues,
       });
     }
@@ -428,69 +426,59 @@ function getWorkingSlide({
 function addTextLineToSlide({
   slide,
   line,
-  type = LYRIC_TYPE.PRIMARY,
-  lyricPosition = LYRIC_POSITION.UPPER,
+  contentOption,
+  coverOption,
+  textboxKey,
   settingValues,
 }: {
   slide: PptxGenJS.default.Slide;
   line: string;
-  type: (typeof LYRIC_TYPE)[keyof typeof LYRIC_TYPE];
-  lyricPosition: (typeof LYRIC_POSITION)[keyof typeof LYRIC_POSITION];
+  contentOption: ContentSettingsType;
+  coverOption?: SettingsValueType<typeof PPT_GENERATION_COVER_SETTINGS>;
+  textboxKey: keyof ContentTextboxSettingsType;
   settingValues: PptSettingsStateType;
 }) {
-  const isUpper = lyricPosition == LYRIC_POSITION.UPPER;
-  const isCover = lyricPosition == LYRIC_POSITION.COVER;
-  const isTypePrimary = type == LYRIC_TYPE.PRIMARY;
-  const isTypeSecondary = type == LYRIC_TYPE.SECONDARY;
-  const contentOptionToUse = isTypePrimary
-    ? settingValues.content.main
-    : settingValues.content.secondary;
+  const { text, glow, outline, shadow, [textboxKey]: textbox } = contentOption;
   let customOption: PptxGenJS.default.TextPropsOptions = {
-    x: isUpper
-      ? `${contentOptionToUse.textboxLine1.textboxPositionX || 0}%`
-      : `${contentOptionToUse.textboxLine2.textboxPositionX || 0}%`,
-    y: isUpper
-      ? `${contentOptionToUse.textboxLine1.textboxPositionY || 0}%`
-      : `${contentOptionToUse.textboxLine2.textboxPositionY || 0}%`,
-    bold: contentOptionToUse.text?.bold,
-    color: contentOptionToUse.text?.fontColor?.replace("#", "") ?? "FFFFFF",
-    fontFace: contentOptionToUse.text?.font ?? "Microsoft Yahei",
-    fontSize: contentOptionToUse.text?.fontSize ?? 50,
-    charSpacing: contentOptionToUse.text?.charSpacing ?? 2,
+    x: `${textbox.textboxPositionX || 0}%`,
+    y: `${textbox.textboxPositionY || 0}%`,
+    bold: text?.bold,
+    color: text?.fontColor?.replace("#", "") ?? "FFFFFF",
+    fontFace: text?.font ?? "Microsoft Yahei",
+    fontSize: text?.fontSize ?? 50,
+    charSpacing: text?.charSpacing ?? 2,
   };
 
-  if (contentOptionToUse.glow?.hasGlow) {
+  if (glow?.hasGlow) {
     customOption = {
       ...customOption,
       glow: {
-        size: contentOptionToUse.glow.glowSize ?? 5,
-        color: contentOptionToUse.glow.glowColor?.replace("#", "") ?? "FFFFFF",
-        opacity: contentOptionToUse.glow.glowOpacity ?? 0.25,
+        size: glow.glowSize ?? 5,
+        color: glow.glowColor?.replace("#", "") ?? "FFFFFF",
+        opacity: glow.glowOpacity ?? 0.25,
       },
     };
   }
-  if (contentOptionToUse.outline?.hasOutline) {
+  if (outline?.hasOutline) {
     customOption = {
       ...customOption,
       outline: {
-        size: contentOptionToUse.outline.outlineWeight ?? 1,
-        color:
-          contentOptionToUse.outline.outlineColor?.replace("#", "") ?? "FFFFFF",
+        size: outline.outlineWeight ?? 1,
+        color: outline.outlineColor?.replace("#", "") ?? "FFFFFF",
       },
     };
   }
 
-  if (contentOptionToUse.shadow?.hasShadow) {
+  if (shadow?.hasShadow) {
     customOption = {
       ...customOption,
       shadow: {
-        type: contentOptionToUse.shadow.shadowType ?? "outer",
-        color:
-          contentOptionToUse.shadow.shadowColor?.replace("#", "") ?? "000000",
-        blur: contentOptionToUse.shadow.shadowBlur ?? 3,
-        offset: contentOptionToUse.shadow.shadowOffset ?? 3,
-        angle: contentOptionToUse.shadow.shadowAngle ?? 45,
-        opacity: contentOptionToUse.shadow.shadowOpacity ?? 0.5,
+        type: shadow.shadowType ?? "outer",
+        color: shadow.shadowColor?.replace("#", "") ?? "000000",
+        blur: shadow.shadowBlur ?? 3,
+        offset: shadow.shadowOffset ?? 3,
+        angle: shadow.shadowAngle ?? 45,
+        opacity: shadow.shadowOpacity ?? 0.5,
       },
     };
   }
@@ -498,12 +486,7 @@ function addTextLineToSlide({
   // TODO: think how to handle the textboxLine1
   let customValues: PptxGenJS.default.TextPropsOptions = {};
 
-  const coverOption = isTypePrimary
-    ? settingValues.cover.main
-    : settingValues.cover.secondary;
-
-  // TODO: CONTINUE HERE
-  if (isCover) {
+  if (coverOption) {
     customValues = {
       ...customValues,
       ...{

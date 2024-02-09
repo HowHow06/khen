@@ -165,7 +165,7 @@ export type GroupedSettingsValueType<
 };
 
 // Static part of the CONTENT category settings
-type ContentTextboxSettingsType = {
+export type ContentTextboxSettingsType = {
   [key in `${typeof TEXTBOX_GROUPING_PREFIX}${number}`]: SettingsValueType<
     typeof PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS
   >;
