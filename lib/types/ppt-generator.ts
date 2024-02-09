@@ -194,3 +194,9 @@ export type PptSettingsStateType = {
     [T in ContentTypeType]: ContentSettingsType;
   };
 };
+
+export type PptMainSectionInfo = {
+  sectionName: string;
+  startLineIndex: number;
+  endLineIndex: number;
+};

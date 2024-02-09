@@ -25,6 +25,7 @@ import {
   ContentTypeType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
+  PptMainSectionInfo,
   PptSettingsStateType,
 } from "../types";
 
@@ -203,6 +204,19 @@ function createPresentationInstance({
   return pres;
 }
 
+const getIsNewSection = ({
+  latestMainSectionInfo,
+  sectionName,
+}: {
+  latestMainSectionInfo: PptMainSectionInfo;
+  sectionName: string;
+}): boolean => {
+  return (
+    !!latestMainSectionInfo.sectionName &&
+    latestMainSectionInfo.sectionName !== sectionName
+  );
+};
+
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,
@@ -228,42 +242,48 @@ function createSlidesFromLyrics({
   let mainSectionCount = 0;
   let subsectionCount = 0;
   let currentPptSectionName = "";
-  const mainSectionsInfo: { [key in string]: any }[] = []; // to save ppt by main section
-  let currentMainSectionInfo: { [key in string]: any } = {};
 
+  let currentMainSectionInfo: PptMainSectionInfo = {
+    sectionName: "",
+    startLineIndex: -1,
+    endLineIndex: -1,
+  };
+  const mainSectionsInfo: PptMainSectionInfo[] = [];
   let currentSlide: PptxGenJS.default.Slide | undefined = undefined;
 
   primaryLinesArray.forEach((primaryLine, index) => {
-    const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
-    const isSectionLine = primaryLine.startsWith(`${LYRIC_SECTION.SECTION} `);
-    const isSubSectionLine = primaryLine.startsWith(
-      `${LYRIC_SECTION.SUBSECTION} `,
-    );
-    const isLastLine = index == primaryLinesArray.length - 1;
-    let currentLine = primaryLine;
-    const currentIndex = index - coverCount - pptSectionCount;
-
-    if (isSectionLine) {
+    // 1. check if is main or sub section, just add the section to presentation instance
+    const isMainSection = primaryLine.startsWith(`${LYRIC_SECTION.SECTION} `);
+    const isSubSection = primaryLine.startsWith(`${LYRIC_SECTION.SUBSECTION} `);
+    if (isMainSection || isSubSection) {
       pptSectionCount++;
-      subsectionCount = 0;
-      let sectionName = primaryLine.replace(`${LYRIC_SECTION.SECTION} `, "");
-      const isStartWithNumbering = startsWithNumbering(sectionName);
-      if (isStartWithNumbering) {
+      subsectionCount = isMainSection ? 0 : subsectionCount + 1;
+      const identifier = isMainSection
+        ? LYRIC_SECTION.SECTION
+        : LYRIC_SECTION.SUBSECTION;
+      let sectionName = primaryLine.replace(`${identifier} `, "");
+      const hasNumbering = startsWithNumbering(sectionName);
+
+      if (hasNumbering && isMainSection) {
         mainSectionCount = extractNumber(sectionName);
-      } else {
-        mainSectionCount++;
       }
 
-      if (!isStartWithNumbering) {
+      if (!hasNumbering && isMainSection) {
+        mainSectionCount++;
         sectionName = `${mainSectionCount}. ${sectionName}`;
       }
-      currentPptSectionName = sectionName ?? "";
+
+      if (!hasNumbering && isSubSection) {
+        sectionName = `${mainSectionCount}.${subsectionCount} ${sectionName}`;
+      }
 
       if (
-        currentMainSectionInfo.sectionName &&
-        currentMainSectionInfo.sectionName !== sectionName
+        isMainSection &&
+        getIsNewSection({
+          latestMainSectionInfo: currentMainSectionInfo,
+          sectionName,
+        })
       ) {
-        // is new section, update the endLineIndex for last section
         currentMainSectionInfo = {
           ...currentMainSectionInfo,
           endLineIndex: index - 1,
@@ -271,39 +291,42 @@ function createSlidesFromLyrics({
         mainSectionsInfo.push(currentMainSectionInfo);
       }
 
-      currentMainSectionInfo = { sectionName, startLineIndex: index };
-      pres.addSection({ title: sectionName });
-      return;
-    }
-
-    if (isSubSectionLine) {
-      pptSectionCount++;
-      subsectionCount++;
-      let sectionName = primaryLine.replace("--- ", "");
-      if (!startsWithNumbering(sectionName)) {
-        sectionName = `${mainSectionCount}.${subsectionCount} ${sectionName}`;
+      if (isMainSection) {
+        currentMainSectionInfo = {
+          sectionName,
+          startLineIndex: index,
+          endLineIndex: -1,
+        };
       }
-      currentPptSectionName = sectionName ?? "";
 
+      currentPptSectionName = sectionName;
       pres.addSection({ title: sectionName });
       return;
     }
 
+    let currentLine = primaryLine;
+    // 2. check if is cover, update current line
+    const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
     if (isCover) {
       coverCount++;
       const regex = /^#[^#]*/;
       currentLine =
-        currentLine.match(regex)?.[0].replace("# ", "").trim() || currentLine;
+        currentLine
+          .match(regex)?.[0]
+          .replace(`${LYRIC_SECTION.MAINTITLE}`, "")
+          .trim() || currentLine;
+      // TODO: revise the algorithm here, in current case,
+      // here will only get the main title (not the secondary title)
     }
 
-    const isEmptyLine = currentLine.trim().length == 0;
+    const currentIndex = index - coverCount - pptSectionCount;
 
     let slide = getWorkingSlide({
       pres,
       currentIndex,
       linePerSlide,
       isCover,
-      isEmptyLine,
+      isEmptyLine: currentLine.trim().length == 0,
       isBackgroundColorWhenEmpty,
       currentSection: currentPptSectionName,
       currentPresSlide: currentSlide,
@@ -348,6 +371,7 @@ function createSlidesFromLyrics({
       });
     }
 
+    const isLastLine = index == primaryLinesArray.length - 1;
     if (isLastLine) {
       currentMainSectionInfo = {
         ...currentMainSectionInfo,
