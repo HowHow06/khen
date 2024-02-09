@@ -355,7 +355,7 @@ function createSlidesFromLyrics({
 
         secondaryLine = hasSecondaryTitle
           ? secondaryLine.substring(subCoverLineIndex + 3)
-          : secondaryLine.replace(`${LYRIC_SECTION.MAINTITLE} `, ""); // use the pinyin
+          : secondaryLine.replace(`${LYRIC_SECTION.MAINTITLE} `, ""); // use the pinyin if no secondary title
       }
 
       addTextLineToSlide({
