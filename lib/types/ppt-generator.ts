@@ -200,3 +200,8 @@ export type PptMainSectionInfo = {
   startLineIndex: number;
   endLineIndex: number;
 };
+
+export type PresetsType = {
+  presetDisplayName: string;
+  presetName: string;
+}[];

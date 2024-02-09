@@ -696,9 +696,7 @@ export const generatePpt = async ({
 export const getPreset = (
   presetName: string,
 ): PptSettingsStateType | undefined => {
-  console.log("presetName:", presetName);
   if (presetName === "onsiteChinesePreset") {
-    console.log("helooooooo");
     return onsiteChinesePreset;
   }
   return undefined;

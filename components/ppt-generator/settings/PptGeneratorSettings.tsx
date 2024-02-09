@@ -2,20 +2,14 @@
 // components/Sidebar.js
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   CONTENT_TYPE,
+  DEFAULT_PRESETS,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
-import { onsiteChinesePreset } from "@/lib/presets";
 import { cn } from "@/lib/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { ChevronDown, ChevronLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
@@ -31,6 +25,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
 import ContentSettings from "./ContentSettings";
 import CoverSettings from "./CoverSettings";
 import GeneralSettings from "./GeneralSettings";
+import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSetting = () => {
   const { getValues, reset } = useFormContext();
@@ -79,23 +74,7 @@ const PptGeneratorSetting = () => {
         >
           <SheetHeader className="flex-row items-center space-x-5">
             <SheetTitle>Settings</SheetTitle>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  Presets
-                  <ChevronDown className="ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem
-                  onSelect={() => {
-                    reset(onsiteChinesePreset);
-                  }}
-                >
-                  Default Onsite Chinese
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <PresetsDropdown formReset={reset} presets={DEFAULT_PRESETS} />
             {/* <SheetDescription>
               Make changes to your profile here. Click save when you&apos;re
               done.

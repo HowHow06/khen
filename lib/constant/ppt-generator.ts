@@ -3,6 +3,7 @@ import {
   ComboboxItemsType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
+  PresetsType,
   ShadowTypeSettingType,
 } from "../types";
 import { fontFaces } from "./font-face";
@@ -445,3 +446,10 @@ export const CONTENT_TYPE = {
   MAIN: "main",
   SECONDARY: "secondary",
 } as const;
+
+export const DEFAULT_PRESETS: PresetsType = [
+  {
+    presetDisplayName: "Default Onsite Chinese",
+    presetName: "onsiteChinesePreset",
+  },
+];
