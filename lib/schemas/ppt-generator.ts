@@ -30,18 +30,23 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
         return z.number().default(setting.defaultValue);
       case "image":
         return z
-          .custom<File>(
-            (file) => {
-              if (!(file instanceof File)) {
-                return false;
-              }
-              const validTypes = ["image/jpeg", "image/png"];
-              return fileTypeValidator(file, validTypes);
-            },
-            {
-              message: "Invalid image",
-            },
-          )
+          .union([
+            z.custom<File>(
+              (file) => {
+                if (!(file instanceof File)) {
+                  return false;
+                }
+                const validTypes = ["image/jpeg", "image/png"];
+                return fileTypeValidator(file, validTypes);
+              },
+              {
+                message: "Invalid image file",
+              },
+            ),
+            z.string().url({
+              message: "Invalid image path, must be a valid URL",
+            }),
+          ])
           .nullable();
       case "color":
         return z

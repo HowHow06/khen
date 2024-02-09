@@ -1,6 +1,6 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
-import { extractNumber, getBase64, startsWithNumbering } from ".";
+import { extractNumber, getBase64, getBlob, startsWithNumbering } from ".";
 import {
   CONTENT_TYPE,
   DEFAULT_AUTHOR,
@@ -151,6 +151,23 @@ export const generatePptSettingsInitialState = (
   return initialState;
 };
 
+export const getBase64FromImageField = async (
+  imageValue: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.IMAGE
+  >,
+): Promise<string | null> => {
+  if (imageValue === null) {
+    return null;
+  }
+
+  let image: string | File | Blob = imageValue;
+  if (typeof image === "string") {
+    image = await getBlob(image);
+  }
+
+  return await getBase64(image);
+};
+
 const getPptBackgroundProp = async ({
   backgroundColor,
   backgroundImage,
@@ -168,10 +185,7 @@ const getPptBackgroundProp = async ({
   if (!backgroundImage) {
     return backgroundProp;
   }
-  const imageBase64 = await getBase64(backgroundImage);
-  if (typeof imageBase64 !== "string") {
-    return backgroundProp;
-  }
+  const imageBase64 = await getBase64FromImageField(backgroundImage);
   return {
     ...backgroundProp,
     data: imageBase64 as string,

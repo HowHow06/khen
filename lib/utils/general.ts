@@ -72,11 +72,11 @@ export function groupBy<T, K extends keyof any>(
 }
 
 // to convert file to data url
-export function getBase64(file: File): Promise<string | ArrayBuffer | null> {
+export function getBase64(file: File | Blob): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => resolve(reader.result as string);
     reader.onerror = (error) => reject(error);
   });
 }
@@ -89,4 +89,11 @@ export function startsWithNumbering(str: string) {
 export function extractNumber(str: string) {
   const match = str.match(/^([0-9]+)\./);
   return match ? Number(match[1]) : 0;
+}
+
+export async function getBlob(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Network response was not ok");
+  const blob = await response.blob();
+  return blob;
 }

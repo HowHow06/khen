@@ -41,6 +41,7 @@ const renderInputField = (
       <ImageDropzoneComponent
         className="col-span-6 text-sm"
         onFilesSelected={(file) => field.onChange(file)}
+        value={field.value}
       />
     );
   }

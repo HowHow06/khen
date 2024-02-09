@@ -1,33 +1,43 @@
 "use client";
-import { IMAGE_FILE_TYPE } from "@/lib/constant";
+import { IMAGE_FILE_TYPE, SETTING_FIELD_TYPE } from "@/lib/constant";
+import { InferTypeScriptTypeFromSettingFieldType } from "@/lib/types";
+import { getBase64FromImageField } from "@/lib/utils";
 import Image from "next/image";
-import React, { HTMLAttributes, useState } from "react";
+import React, { HTMLAttributes, useCallback, useEffect, useState } from "react";
 import DropzoneComponent from "./dropzone-component";
 
 type ImageDropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
   onFilesSelected: (file: File) => void;
   description?: string;
+  value: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.IMAGE
+  >;
 };
 
 const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
   className,
   onFilesSelected,
   description = "Drag and drop an image here, or click to select an image.",
+  value,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleFilesSelected = (files: File[]) => {
+  const handleFilesSelected = async (files: File[]) => {
     if (files.length == 1) {
       const file = files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
       onFilesSelected(file);
       return;
     }
   };
+
+  const renderImage = useCallback(async (image: typeof value) => {
+    const imageDataUrl = await getBase64FromImageField(image);
+    setImagePreview(imageDataUrl);
+  }, []);
+
+  useEffect(() => {
+    renderImage(value);
+  }, [value, renderImage]);
 
   return (
     <div className={className}>
