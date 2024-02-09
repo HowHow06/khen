@@ -452,4 +452,16 @@ export const DEFAULT_PRESETS: PresetsType = [
     presetDisplayName: "Default Onsite Chinese",
     presetName: "onsiteChinesePreset",
   },
+  {
+    presetDisplayName: "Default Live Chinese",
+    presetName: "liveChinesePreset",
+  },
+  {
+    presetDisplayName: "Default Onsite English",
+    presetName: "onsiteEnglishPreset",
+  },
+  {
+    presetDisplayName: "Default Live English",
+    presetName: "liveEnglishPreset",
+  },
 ];

@@ -32,7 +32,7 @@ const PresetsDropdown = ({ formReset, presets }: Props) => {
               onSelect={() => {
                 const preset = getPreset(presetName);
                 if (preset) {
-                  formReset();
+                  formReset(preset);
                 }
               }}
             >
