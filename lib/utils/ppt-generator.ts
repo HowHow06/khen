@@ -320,7 +320,6 @@ function createSlidesFromLyrics({
     }
 
     const currentIndex = index - coverCount - pptSectionCount;
-
     let slide = getWorkingSlide({
       pres,
       currentIndex,
@@ -328,10 +327,10 @@ function createSlidesFromLyrics({
       isCover,
       isEmptyLine: currentLine.trim().length == 0,
       isBackgroundColorWhenEmpty,
-      currentSection: currentPptSectionName,
+      sectionName: currentPptSectionName,
       currentPresSlide: currentSlide,
     });
-    currentSlide = slide;
+    currentSlide = slide; // update current slide
 
     const currentLyricPosition = isCover
       ? LYRIC_POSITION.COVER
@@ -391,7 +390,7 @@ function getWorkingSlide({
   currentIndex,
   linePerSlide,
   isCover,
-  currentSection,
+  sectionName,
   isEmptyLine,
   isBackgroundColorWhenEmpty,
   currentPresSlide,
@@ -400,24 +399,25 @@ function getWorkingSlide({
   currentIndex: number;
   linePerSlide: number;
   isCover: boolean;
-  currentSection: string;
+  sectionName: string;
   isEmptyLine: boolean;
   isBackgroundColorWhenEmpty: boolean;
   currentPresSlide?: PptxGenJS.default.Slide;
 }): PptxGenJS.default.Slide {
-  const isToCreateSlide = getIsToCreateNewSlide({
-    currentIndex,
-    linePerSlide,
-    isCover,
-  });
+  const isToCreateSlide =
+    getIsToCreateNewSlide({
+      currentIndex,
+      linePerSlide,
+      isCover,
+    }) || currentPresSlide === undefined;
 
-  if (isToCreateSlide || !currentPresSlide) {
+  if (isToCreateSlide) {
     const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
     const newSlide = pres.addSlide({
       masterName: isUseBackgroundColor
         ? "MASTER_SLIDE_BACKGROUND_COLOR"
         : "MASTER_SLIDE_BACKGROUND_IMAGE",
-      ...(currentSection && { sectionTitle: currentSection }),
+      ...(sectionName && { sectionTitle: sectionName }),
     });
     return newSlide;
   }
