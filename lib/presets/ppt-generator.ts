@@ -116,7 +116,7 @@ export const liveChinesePreset: PptSettingsStateType = {
     filenameSuffix: "",
   },
   [SETTING_CATEGORY.GENERAL]: {
-    mainBackgroundImage: null, // TODO: pending solve
+    mainBackgroundImage: `/images/background/greenScreenWithBlackCover_v2.png`, // TODO: pending solve
     mainBackgroundColor: "#00FF00",
     separateSectionsToFiles: false,
     useBackgroundColorWhenEmpty: true,
@@ -334,7 +334,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
     filenameSuffix: "",
   },
   [SETTING_CATEGORY.GENERAL]: {
-    mainBackgroundImage: null, // TODO: pending solve
+    mainBackgroundImage: `/images/background/greenScreenWithBlackCover_v2.png`, // TODO: pending solve
     mainBackgroundColor: "#00FF00",
     separateSectionsToFiles: false,
     useBackgroundColorWhenEmpty: true,
