@@ -24,7 +24,7 @@ type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.NUMBER]: number;
   [SETTING_FIELD_TYPE.PERCENTAGE]: number;
   [SETTING_FIELD_TYPE.IMAGE]: File | null;
-  [SETTING_FIELD_TYPE.COLOR]: string;
+  [SETTING_FIELD_TYPE.COLOR]: `#${string}`;
   [SETTING_FIELD_TYPE.FONT]: string;
   [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HorizontalAlignSettingType;
   [SETTING_FIELD_TYPE.SHADOW_TYPE]: ShadowTypeSettingType;

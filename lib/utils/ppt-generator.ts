@@ -13,6 +13,7 @@ import {
   DEFAULT_TITLE,
   LYRIC_SECTION,
   PPT_GENERATION_CONTENT_SETTINGS,
+  PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
@@ -421,6 +422,26 @@ function getWorkingSlide({
   return currentPresSlide;
 }
 
+// Function overload signatures, to tell typescript that when hexColor is not undefined, the output must be string
+function getColorValue(
+  hexColor: InferTypeScriptTypeFromSettingFieldType<
+    typeof SETTING_FIELD_TYPE.COLOR
+  >,
+): string;
+function getColorValue(
+  hexColor:
+    | InferTypeScriptTypeFromSettingFieldType<typeof SETTING_FIELD_TYPE.COLOR>
+    | undefined,
+): string | undefined;
+function getColorValue(
+  hexColor:
+    | InferTypeScriptTypeFromSettingFieldType<typeof SETTING_FIELD_TYPE.COLOR>
+    | undefined,
+): string | undefined {
+  if (hexColor === undefined) return hexColor;
+  return hexColor.replace("#", "");
+}
+
 function getTextOptionFromContentSettings({
   contentOption,
   textboxKey,
@@ -429,24 +450,30 @@ function getTextOptionFromContentSettings({
   textboxKey: keyof ContentTextboxSettingsType;
 }): PptxGenJS.default.TextPropsOptions {
   const { text, glow, outline, shadow, [textboxKey]: textbox } = contentOption;
+  const defaultContent = PPT_GENERATION_CONTENT_SETTINGS;
+  const defaultTextbox = PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS;
 
   let customOption: PptxGenJS.default.TextPropsOptions = {
-    x: `${textbox.textboxPositionX || 0}%`,
-    y: `${textbox.textboxPositionY || 0}%`,
+    x: `${textbox.textboxPositionX || defaultTextbox.textboxPositionX.defaultValue}%`,
+    y: `${textbox.textboxPositionY || defaultTextbox.textboxPositionY.defaultValue}%`,
     bold: text?.bold,
-    color: text?.fontColor?.replace("#", "") ?? "FFFFFF",
-    fontFace: text?.font ?? "Microsoft Yahei",
-    fontSize: text?.fontSize ?? 50,
-    charSpacing: text?.charSpacing ?? 2,
-    align: text?.align ?? PPT_GENERATION_CONTENT_SETTINGS.align.defaultValue,
+    color:
+      getColorValue(text?.fontColor) ??
+      getColorValue(defaultContent.fontColor.defaultValue),
+    fontFace: text?.font ?? defaultContent.font.defaultValue,
+    fontSize: text?.fontSize ?? defaultContent.fontSize.defaultValue,
+    charSpacing: text?.charSpacing ?? defaultContent.charSpacing.defaultValue,
+    align: text?.align ?? defaultContent.align.defaultValue,
   };
 
   if (glow?.hasGlow) {
     customOption = {
       ...customOption,
       glow: {
-        size: glow.glowSize ?? 5,
-        color: glow.glowColor?.replace("#", "") ?? "FFFFFF",
+        size: glow.glowSize ?? defaultContent.glowSize.defaultValue,
+        color:
+          getColorValue(glow.glowColor) ??
+          getColorValue(defaultContent.glowColor.defaultValue),
         opacity: glow.glowOpacity ?? 0.25,
       },
     };
@@ -456,7 +483,9 @@ function getTextOptionFromContentSettings({
       ...customOption,
       outline: {
         size: outline.outlineWeight ?? 1,
-        color: outline.outlineColor?.replace("#", "") ?? "FFFFFF",
+        color:
+          getColorValue(outline.outlineColor) ??
+          getColorValue(defaultContent.outlineColor.defaultValue),
       },
     };
   }
@@ -466,7 +495,9 @@ function getTextOptionFromContentSettings({
       ...customOption,
       shadow: {
         type: shadow.shadowType ?? "outer",
-        color: shadow.shadowColor?.replace("#", "") ?? "000000",
+        color:
+          getColorValue(shadow.shadowColor) ??
+          getColorValue(defaultContent.shadowColor.defaultValue),
         blur: shadow.shadowBlur ?? 3,
         offset: shadow.shadowOffset ?? 3,
         angle: shadow.shadowAngle ?? 45,
