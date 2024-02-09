@@ -6,7 +6,11 @@ import {
 } from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType, TextareaRefType } from "@/lib/types";
-import { generatePpt, generatePptSettingsInitialState } from "@/lib/utils";
+import {
+  generatePpt,
+  generatePptSettingsInitialState,
+  getPreset,
+} from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,9 +32,9 @@ import SecondaryLyricSection from "./SecondaryLyricSection";
 import PptGeneratorSetting from "./settings/PptGeneratorSettings";
 type Props = {};
 
-const defaultSettingsValue = generatePptSettingsInitialState(
-  PPT_GENERATION_SETTINGS_META,
-);
+const defaultSettingsValue = process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING
+  ? getPreset(process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING)
+  : generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META);
 
 const PptGeneratorClientSection = (props: Props) => {
   console.log("big chunk section render"); //TODO: remove this

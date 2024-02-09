@@ -20,6 +20,7 @@ import {
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
+import { onsiteChinesePreset } from "../presets";
 import {
   BaseSettingMetaType,
   ContentSettingsType,
@@ -690,4 +691,15 @@ export const generatePpt = async ({
       link.click();
     });
   }
+};
+
+export const getPreset = (
+  presetName: string,
+): PptSettingsStateType | undefined => {
+  console.log("presetName:", presetName);
+  if (presetName === "onsiteChinesePreset") {
+    console.log("helooooooo");
+    return onsiteChinesePreset;
+  }
+  return undefined;
 };
