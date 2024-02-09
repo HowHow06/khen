@@ -266,7 +266,7 @@ function createSlidesFromLyrics({
       let sectionName = primaryLine.replace(`${identifier} `, "");
       const hasNumbering = startsWithNumbering(sectionName);
 
-      if (hasNumbering && isMainSection) {
+      if (hasNumbering) {
         mainSectionCount = extractNumber(sectionName);
       }
 
@@ -313,13 +313,11 @@ function createSlidesFromLyrics({
     if (isCover) {
       coverCount++;
       const regex = /^#[^#]*/;
-      currentLine =
-        currentLine
-          .match(regex)?.[0]
-          .replace(`${LYRIC_SECTION.MAINTITLE}`, "")
-          .trim() || currentLine;
-      // TODO: revise the algorithm here, in current case,
-      // here will only get the main title (not the secondary title)
+      const mainTitle = currentLine
+        .match(regex)?.[0]
+        .replace(`${LYRIC_SECTION.MAINTITLE}`, "")
+        .trim();
+      currentLine = mainTitle || currentLine;
     }
 
     let slide = getWorkingSlide({
@@ -346,17 +344,16 @@ function createSlidesFromLyrics({
     });
 
     if (hasSecondaryContent) {
-      //add secondary content
       let secondaryLine = secondaryLinesArray[index] ?? "";
       if (isCover) {
-        secondaryLine = secondaryLine.replace("# ", "");
+        const subCoverLineIndex = secondaryLine.indexOf(
+          `${LYRIC_SECTION.SECONDARYTITLE} `,
+        );
+        const hasSecondaryTitle = subCoverLineIndex != -1;
 
-        const subCoverLineIndex = secondaryLine.indexOf("## ");
-        const hasSubCoverLine = subCoverLineIndex != -1;
-
-        if (hasSubCoverLine) {
-          secondaryLine = secondaryLine.substring(subCoverLineIndex + 3);
-        }
+        secondaryLine = hasSecondaryTitle
+          ? secondaryLine.substring(subCoverLineIndex + 3)
+          : secondaryLine.replace(`${LYRIC_SECTION.MAINTITLE} `, ""); // use the pinyin
       }
 
       addTextLineToSlide({
