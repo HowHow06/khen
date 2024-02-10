@@ -50,7 +50,6 @@ const PptGeneratorClientSection = (props: Props) => {
   function onSubmit(values: z.infer<typeof settingsSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log("SUBMITE:", values);
     generatePpt({
       settingValues: values as PptSettingsStateType,
       primaryLyric: mainTextareaRef.current?.value || "",

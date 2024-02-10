@@ -16,8 +16,6 @@ const SecondaryLyricSection = ({
   secondaryText,
   setSecondaryText,
 }: SecondaryLyricSectionProps) => {
-  console.log("secondary render");
-
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSecondaryText(event.target.value);
   };
