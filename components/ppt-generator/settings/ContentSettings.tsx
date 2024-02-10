@@ -40,9 +40,8 @@ const ContentSettings = ({
     }).reduce<{}>((result, _, currentIndex) => {
       return {
         ...result,
-        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]: Object.values(
+        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]:
           PPT_GENERATION_SETTINGS_META.contentTextbox,
-        ),
       };
     }, {});
     return {
