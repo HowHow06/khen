@@ -74,8 +74,8 @@ export function groupBy<T, K extends keyof any>(
 function groupObjectItem<T, K extends keyof any>(
   item: T,
   keyOrFunc: ((item: T) => K) | K,
-  result: Record<K,  Record<string, T>>,
-  originalKey: string
+  result: Record<K, Record<string, T>>,
+  originalKey: string,
 ): void {
   let key =
     typeof keyOrFunc === "function"
@@ -88,19 +88,22 @@ function groupObjectItem<T, K extends keyof any>(
 
   result[key] = {
     ...result[key],
-    [originalKey]:item,
-  }
+    [originalKey]: item,
+  };
 }
 
 export function groupByAsObject<T, K extends keyof any>(
   object: Record<string, T>,
   keyOrFunc: ((item: T) => K) | K,
-): Record<K,  Record<string, T>> {
-  const result: Record<K,  Record<string, T>> = {} as Record<K,  Record<string, T>>;
+): Record<K, Record<string, T>> {
+  const result: Record<K, Record<string, T>> = {} as Record<
+    K,
+    Record<string, T>
+  >;
 
-    Object.entries(object).forEach(([originalKey,item]) =>
+  Object.entries(object).forEach(([originalKey, item]) =>
     groupObjectItem(item, keyOrFunc, result, originalKey),
-    );
+  );
 
   return result;
 }
@@ -130,4 +133,19 @@ export async function getBlob(url: string) {
   if (!response.ok) throw new Error("Network response was not ok");
   const blob = await response.blob();
   return blob;
+}
+
+export function getValueFromPath<T>(obj: any, path: string): T | undefined {
+  const segments = path.split(".");
+  let current: any = obj;
+
+  for (const segment of segments) {
+    // Check if the current level has the property
+    if (current[segment] === undefined) {
+      return undefined; // Return undefined if the path is broken at any point
+    }
+    current = current[segment];
+  }
+
+  return current as T;
 }

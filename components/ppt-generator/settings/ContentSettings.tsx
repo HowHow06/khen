@@ -12,6 +12,7 @@ import {
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
+import { PptSettingsStateType } from "@/lib/types";
 import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
@@ -26,7 +27,7 @@ const ContentSettings = ({
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
   const settingsMetaGrouped = useMemo(() => {
     const textBoxSettings = Array.from({
       length: DEFAULT_LINE_COUNT_PER_SLIDE,
@@ -76,7 +77,8 @@ const ContentSettings = ({
                 {Object.entries(settings).map(([key, value]) => {
                   return (
                     <SettingFormField
-                      control={control}
+                      zodControl={control}
+                      settingsState={getValues() as PptSettingsStateType}
                       name={fieldNamePrefix + groupingName + "." + key}
                       key={fieldNamePrefix + groupingName + "." + key}
                       settingField={value}

@@ -111,7 +111,10 @@ export type BaseSettingItemMetaType = {
   fieldDisplayName: string;
   remark?: string;
   tips?: string;
-  isNotAvailable?: boolean; // hidden from user, this setting is not ready / disabled by admin
+  isNotAvailable?: boolean; //this setting is not ready / disabled by admin
+  isHidden?:
+    | boolean
+    | ((settingsState: PptSettingsStateType, fieldName: string) => boolean); // not visible to user, but still exist in value
   groupingName?: string;
   isOptional?: boolean;
 } & (

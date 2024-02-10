@@ -4,31 +4,40 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { BaseSettingItemMetaType } from "@/lib/types";
+import { BaseSettingItemMetaType, PptSettingsStateType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Control, FieldValues } from "react-hook-form";
 import SettingInputField from "./SettingInputField";
 import SettingLabel from "./SettingLabel";
 
 type SettingFormFieldProps = {
-  control: Control<FieldValues, any, FieldValues>;
+  zodControl: Control<FieldValues, any, FieldValues>;
   name: string;
   settingField: BaseSettingItemMetaType;
+  settingsState: PptSettingsStateType;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 const SettingFormField = ({
-  control,
+  zodControl,
   name,
   settingField,
+  settingsState,
   className,
 }: SettingFormFieldProps) => {
+  if (
+    typeof settingField.isHidden === "function" &&
+    settingField.isHidden(settingsState, name)
+  ) {
+    return;
+  }
+
   if (settingField.isNotAvailable) {
     return;
   }
   return (
     <>
       <FormField
-        control={control}
+        control={zodControl}
         name={name}
         render={({ field }) => (
           <FormItem

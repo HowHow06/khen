@@ -1,4 +1,5 @@
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
+import { PptSettingsStateType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
 import SettingFormField from "./SettingFormField";
@@ -11,7 +12,7 @@ const CoverSettings = ({
   contentKey,
   className,
 }: CoverSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
-  const { control } = useFormContext();
+  const { control, getValues } = useFormContext();
 
   const fieldNamePrefix =
     SETTING_CATEGORY.COVER + "." + (contentKey ? contentKey + "." : "");
@@ -21,10 +22,11 @@ const CoverSettings = ({
         ([key, value]) => {
           return (
             <SettingFormField
-              control={control}
+              zodControl={control}
               name={fieldNamePrefix + key}
               key={fieldNamePrefix + key}
               settingField={value}
+              settingsState={getValues() as PptSettingsStateType}
             />
           );
         },

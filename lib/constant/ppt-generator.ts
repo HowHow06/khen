@@ -3,9 +3,11 @@ import {
   ComboboxItemsType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
+  PptSettingsStateType,
   PresetsType,
   ShadowTypeSettingType,
 } from "../types";
+import { getValueFromPath } from "../utils";
 import { fontFaces } from "./font-face";
 
 export const DEFAULT_GROUPING_NAME = "default" as const;
@@ -296,6 +298,11 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 4,
     groupingName: "glow",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean => {
+      const selector = fieldName.replace("glowSize", "hasGlow");
+      const hasGlow = getValueFromPath<boolean>(settings, selector);
+      return !hasGlow;
+    },
   },
   glowColor: {
     fieldDisplayName: "Color",
