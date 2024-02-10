@@ -12,7 +12,7 @@ import {
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
-import { cn, groupBy, toNormalCase } from "@/lib/utils";
+import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import {
@@ -47,7 +47,7 @@ const ContentSettings = ({
     }, {});
     return {
       ...textBoxSettings,
-      ...groupBy(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
+      ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
     };
   }, []);
 
@@ -81,19 +81,15 @@ const ContentSettings = ({
                 {toNormalCase(groupingName)}
               </AccordionTrigger>
               <AccordionContent className="mx-3 grid divide-y pb-2">
-                {settings.map((value) => {
+                {Object.entries(settings).map(([key, value]) => {
                   if (value.isHidden) {
                     return;
                   }
                   return (
                     <FormField
                       control={control}
-                      name={
-                        fieldNamePrefix + groupingName + "." + value.fieldKey
-                      }
-                      key={
-                        fieldNamePrefix + groupingName + "." + value.fieldKey
-                      }
+                      name={fieldNamePrefix + groupingName + "." + key}
+                      key={fieldNamePrefix + groupingName + "." + key}
                       render={({ field }) => (
                         <FormItem className="grid grid-cols-6 items-center gap-x-3 gap-y-2 space-y-0 py-3">
                           <FormLabel className="col-span-4 text-left text-sm">

@@ -32,8 +32,8 @@ const CoverSettings = ({
           return (
             <FormField
               control={control}
-              name={fieldNamePrefix + value.fieldKey}
-              key={fieldNamePrefix + value.fieldKey}
+              name={fieldNamePrefix + key}
+              key={fieldNamePrefix + key}
               render={({ field }) => (
                 <FormItem className="grid grid-cols-6 items-center gap-x-3 py-4">
                   <FormLabel className="col-span-4 text-left text-sm">

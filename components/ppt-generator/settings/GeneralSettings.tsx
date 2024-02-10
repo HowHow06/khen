@@ -24,8 +24,8 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
           return (
             <FormField
               control={control}
-              name={SETTING_CATEGORY.GENERAL + "." + value.fieldKey}
-              key={SETTING_CATEGORY.GENERAL + "." + value.fieldKey}
+              name={SETTING_CATEGORY.GENERAL + "." + key}
+              key={SETTING_CATEGORY.GENERAL + "." + key}
               render={({ field }) => (
                 <FormItem className="grid grid-cols-6 items-center gap-x-3 py-4">
                   <FormLabel className="col-span-4 text-left text-sm">

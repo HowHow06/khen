@@ -26,8 +26,8 @@ const SectionSettings = ({}: SectionSettingsProps) => {
           return (
             <FormField
               control={control}
-              name={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
-              key={SETTING_CATEGORY.SECTION + "." + value.fieldKey}
+              name={SETTING_CATEGORY.SECTION + "." + key}
+              key={SETTING_CATEGORY.SECTION + "." + key}
               render={({ field }) => (
                 <FormItem className="grid grid-cols-6 items-center gap-3">
                   <FormLabel className="col-span-4 text-left text-sm">

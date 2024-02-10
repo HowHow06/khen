@@ -88,7 +88,7 @@ export const generatePptSettingsInitialState = (
       ) {
         initialState[category] = {
           ...initialState[category],
-          [setting.fieldKey]: setting.defaultValue,
+          [key]: setting.defaultValue,
         };
         return;
       }
@@ -96,7 +96,7 @@ export const generatePptSettingsInitialState = (
       if (category == SETTING_CATEGORY.COVER) {
         initialState[category][contentType] = {
           ...initialState[category][contentType],
-          [setting.fieldKey]: setting.defaultValue,
+          [key]: setting.defaultValue,
         };
         return;
       }
@@ -112,7 +112,7 @@ export const generatePptSettingsInitialState = (
           ...initialState[category][contentType],
           [grouping]: {
             ...originalGroupingObject,
-            [setting.fieldKey]: setting.defaultValue,
+            [key]: setting.defaultValue,
           },
         };
         return;

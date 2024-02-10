@@ -107,8 +107,8 @@ const PptGeneratorClientSection = (props: Props) => {
                     return (
                       <FormField
                         control={form.control}
-                        name={SETTING_CATEGORY.FILE + "." + value.fieldKey}
-                        key={SETTING_CATEGORY.FILE + "." + value.fieldKey}
+                        name={SETTING_CATEGORY.FILE + "." + key}
+                        key={SETTING_CATEGORY.FILE + "." + key}
                         render={({ field }) => (
                           <FormItem className="grid grid-cols-6 items-center gap-x-2">
                             <FormLabel className="col-span-2 text-left text-sm">

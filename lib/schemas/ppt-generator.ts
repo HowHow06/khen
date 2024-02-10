@@ -43,9 +43,13 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
                 message: "Invalid image file",
               },
             ),
-            z.string().url({
-              message: "Invalid image path, must be a valid URL",
-            }),
+            z
+              .string()
+              .regex(/\.(jpeg|jpg|png)$/, {
+                // message: "Invalid image path, must end with .png, .jpg, or .jpeg",
+                message: "Invalid image path.",
+              })
+              .nullable(),
           ])
           .nullable();
       case "color":
@@ -119,8 +123,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
         if (setting.isHidden) {
           return;
         }
-        categorySchema[setting.fieldKey] =
-          createZodSchemaFromSettingItem(setting);
+        categorySchema[key] = createZodSchemaFromSettingItem(setting);
       });
       schemaObject[category] = z.object(categorySchema);
     }
@@ -138,7 +141,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
           contentSchema[groupingName] = {};
         }
 
-        contentSchema[groupingName][setting.fieldKey] = settingSchema;
+        contentSchema[groupingName][key] = settingSchema;
       });
 
       Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
@@ -155,7 +158,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
               contentSchema[groupingName] = {};
             }
 
-            contentSchema[groupingName][setting.fieldKey] = settingSchema;
+            contentSchema[groupingName][key] = settingSchema;
           });
         },
       );
@@ -181,7 +184,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
 
         const settingSchema = createZodSchemaFromSettingItem(setting);
 
-        contentSchema[setting.fieldKey] = settingSchema;
+        contentSchema[key] = settingSchema;
       });
 
       schemaObject[category] = z.record(z.object(contentSchema));

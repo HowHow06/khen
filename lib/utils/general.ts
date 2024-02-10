@@ -71,6 +71,40 @@ export function groupBy<T, K extends keyof any>(
   return result;
 }
 
+function groupObjectItem<T, K extends keyof any>(
+  item: T,
+  keyOrFunc: ((item: T) => K) | K,
+  result: Record<K,  Record<string, T>>,
+  originalKey: string
+): void {
+  let key =
+    typeof keyOrFunc === "function"
+      ? keyOrFunc(item)
+      : (item[keyOrFunc as unknown as keyof T] as K);
+
+  if (!key) {
+    key = DEFAULT_GROUPING_NAME as K;
+  }
+
+  result[key] = {
+    ...result[key],
+    [originalKey]:item,
+  }
+}
+
+export function groupByAsObject<T, K extends keyof any>(
+  object: Record<string, T>,
+  keyOrFunc: ((item: T) => K) | K,
+): Record<K,  Record<string, T>> {
+  const result: Record<K,  Record<string, T>> = {} as Record<K,  Record<string, T>>;
+
+    Object.entries(object).forEach(([originalKey,item]) =>
+    groupObjectItem(item, keyOrFunc, result, originalKey),
+    );
+
+  return result;
+}
+
 // to convert file to data url
 export function getBase64(file: File | Blob): Promise<string | null> {
   return new Promise((resolve, reject) => {

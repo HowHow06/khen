@@ -108,7 +108,6 @@ export type TransitionTypeSettingItemMetaType = {
 };
 
 export type BaseSettingItemMetaType = {
-  fieldKey: string; // TODO: revise if field key is needed, consider remove this and use the key instead
   fieldDisplayName?: string;
   remark?: string;
   tips?: string;
