@@ -30,7 +30,6 @@ const MainLyricSection = ({
   mainTextareaRef,
   updateSecondaryText,
 }: MainLyricSectionProps) => {
-  console.log("mainlyric render"); //TODO: remove this
   const [text, setText] = useState<string>("");
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 

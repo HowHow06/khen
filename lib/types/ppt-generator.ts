@@ -74,7 +74,7 @@ export type ImageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
   defaultValue: InferTypeScriptTypeFromSettingFieldType<
     typeof SETTING_FIELD_TYPE.IMAGE
-  >; //TODO: change type for this
+  >;
 };
 export type ColorSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.COLOR;

@@ -37,19 +37,15 @@ const defaultSettingsValue = process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING
   : generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META);
 
 const PptGeneratorClientSection = (props: Props) => {
-  console.log("big chunk section render"); //TODO: remove this
   const mainTextareaRef = useRef<TextareaRefType>(null); // TODO: optimize this by using a context
   const secondaryTextareaRef = useRef<TextareaRefType>(null);
   const [secondaryText, setSecondaryText] = useState<string>("");
 
-  // console.log(`defaultSettingsValue: `, defaultSettingsValue); // TODO: remove this
-  // TODO: show errors if there is any error
+  // TODO: show errors popup if there is any error, open corresponding panel if possible
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
   });
-  // console.log("FORM error: ", form.formState.errors); // TODO: remove this
-  // console.log("FORM values: ", form.getValues()); // TODO: remove this
 
   function onSubmit(values: z.infer<typeof settingsSchema>) {
     // Do something with the form values.

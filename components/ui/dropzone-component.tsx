@@ -20,7 +20,6 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
 }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      console.log("ACCEPTED FILE:", acceptedFiles); // TODO: remove this
       onFilesSelected(acceptedFiles); // Call the passed callback function
     },
     [onFilesSelected],

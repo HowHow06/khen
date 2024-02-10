@@ -21,7 +21,7 @@ export const DEFAULT_FILENAME = "Sample Presentation.pptx" as const;
 
 export const DEFAULT_BASE_OPTION = {
   w: "100%",
-  isTextBox: true, // TODO: pending experiment on this
+  isTextBox: true,
 } as const;
 
 export const SETTING_FIELD_TYPE = {
@@ -157,7 +157,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
-    isHidden: true, // TODO: to implement **
+    isHidden: true, // TODO: to implement **, khen-38
   },
   transition: {
     fieldDisplayName: "Transition",
@@ -174,7 +174,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isHidden: true, // TODO: khen-29
+    isHidden: true, // TODO: to implement khen-29
   },
 } as const;
 
