@@ -2,12 +2,14 @@
 import { IMAGE_FILE_TYPE, SETTING_FIELD_TYPE } from "@/lib/constant";
 import { InferTypeScriptTypeFromSettingFieldType } from "@/lib/types";
 import { getBase64FromImageField } from "@/lib/utils";
+import { XCircle } from "lucide-react";
 import Image from "next/image";
 import React, { HTMLAttributes, useCallback, useEffect, useState } from "react";
+import { Button } from "./button";
 import DropzoneComponent from "./dropzone-component";
 
 type ImageDropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
-  onFilesSelected: (file: File) => void;
+  onFilesSelected: (file: File | null) => void;
   description?: string;
   value: InferTypeScriptTypeFromSettingFieldType<
     typeof SETTING_FIELD_TYPE.IMAGE
@@ -39,10 +41,23 @@ const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
     renderImage(value);
   }, [value, renderImage]);
 
+  const removeImage = () => {
+    setImagePreview(null);
+    onFilesSelected(null);
+  };
+
   return (
     <div className={className}>
       {imagePreview && (
-        <div className="mb-3 flex w-full items-center justify-center">
+        <div className="relative mb-3 flex w-full items-center justify-center">
+          <Button
+            className="absolute right-0 top-0 rounded-full"
+            size="icon"
+            variant={"outline"}
+            onClick={removeImage}
+          >
+            <XCircle />
+          </Button>
           <Image
             src={imagePreview}
             alt="Preview"
