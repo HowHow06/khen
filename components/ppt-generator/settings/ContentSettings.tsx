@@ -57,6 +57,10 @@ const ContentSettings = ({
             ? settingsUIState.openAccordions[contentKey]
             : settingsUIState.openAccordions["base"]
         }
+        defaultValue={[
+          // `${fieldNamePrefix}textboxLine1`,
+          `${fieldNamePrefix}text`,
+        ]}
         onValueChange={(accordions) =>
           setAccordionsOpen({
             accordions: accordions,
