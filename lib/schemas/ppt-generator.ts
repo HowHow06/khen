@@ -27,7 +27,18 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
       case "boolean":
         return z.boolean().default(setting.defaultValue);
       case "number":
-        return z.number().default(setting.defaultValue);
+        let baseSchema = z.number();
+        if (setting.rangeMin) {
+          baseSchema = baseSchema.gte(setting.rangeMin, {
+            message: `The minimum value is ${setting.rangeMin}.`,
+          });
+        }
+        if (setting.rangeMax) {
+          baseSchema = baseSchema.lte(setting.rangeMax, {
+            message: `The maximum value is ${setting.rangeMax}.`,
+          });
+        }
+        return baseSchema.default(setting.defaultValue);
       case "image":
         return z
           .union([
@@ -43,13 +54,10 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
                 message: "Invalid image file",
               },
             ),
-            z
-              .string()
-              .regex(/\.(jpeg|jpg|png)$/, {
-                // message: "Invalid image path, must end with .png, .jpg, or .jpeg",
-                message: "Invalid image path.",
-              })
-              .nullable(),
+            z.string().regex(/\.(jpeg|jpg|png)$/, {
+              // message: "Invalid image path, must end with .png, .jpg, or .jpeg",
+              message: "Invalid image path.",
+            }),
           ])
           .nullable();
       case "color":

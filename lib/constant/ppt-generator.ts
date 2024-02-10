@@ -362,6 +362,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Angle",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     rangeMax: 360,
+    rangeMin: -360,
     defaultValue: 45,
     groupingName: "shadow",
   },
