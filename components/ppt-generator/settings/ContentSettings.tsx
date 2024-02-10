@@ -15,14 +15,7 @@ import {
 import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../ui/form";
-import SettingInputField from "./SettingInputField";
+import SettingFormField from "./SettingFormField";
 
 type ContentSettingsProps = {
   contentKey?: string;
@@ -85,27 +78,12 @@ const ContentSettings = ({
                     return;
                   }
                   return (
-                    <FormField
+                    <SettingFormField
                       control={control}
                       name={fieldNamePrefix + groupingName + "." + key}
                       key={fieldNamePrefix + groupingName + "." + key}
-                      render={({ field }) => (
-                        <FormItem className="grid grid-cols-6 items-center gap-x-3 gap-y-2 space-y-0 py-3">
-                          <FormLabel className="col-span-4 text-left text-sm">
-                            {value.fieldDisplayName}
-                          </FormLabel>
-                          <FormControl>
-                            <SettingInputField
-                              settingItemMeta={value}
-                              field={field}
-                            />
-                          </FormControl>
-                          {/* <FormDescription className="col-span-6">
-                          This is description.
-                        </FormDescription> */}
-                          <FormMessage className="col-span-6 " />
-                        </FormItem>
-                      )}
+                      settingField={value}
+                      className="gap-y-2 space-y-0 py-3"
                     />
                   );
                 })}

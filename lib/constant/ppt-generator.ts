@@ -125,11 +125,13 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Separate Sections Into Different Files",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
+    tips: "Separate sections into different files and download them as a zip file.",
   },
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    tips: "If unchecked, background image will be used for empty slides.",
   },
   ignoreSubcontent: {
     fieldDisplayName: "Ignore Secondary Content",
@@ -146,6 +148,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
+    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
   },
   lineCountPerSlide: {
     fieldDisplayName: "Line Count Per Slide",
@@ -169,6 +172,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Section Auto Numbering",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    tips: "Numbering (1., 1.1, 1.2 etc.) will be automatically added to the main sections and sub sections.",
   },
   useDifferentSettingForEachSection: {
     fieldDisplayName: "Use Different Setting for Each Section",
@@ -208,6 +212,7 @@ export const PPT_GENERATION_COVER_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     defaultValue: 0,
     groupingName: "position",
+    tips: "Percentage distance of the textbox from the slide’s top edge (e.g., 50 represents the middle of the slide).",
   },
   coverTitleFont: {
     fieldDisplayName: "Font",
@@ -233,11 +238,13 @@ export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS = {
     fieldDisplayName: "Position X (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     defaultValue: 0,
+    tips: "Percentage distance of the textbox from the slide’s top edge (e.g., 50 represents the middle of the slide).",
   },
   textboxPositionY: {
     fieldDisplayName: "Position Y (%)",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     defaultValue: 0,
+    tips: "Percentage distance of the textbox from the slide’s left edge (e.g., 50 represents the middle of the slide).",
   },
 } as const;
 

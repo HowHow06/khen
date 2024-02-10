@@ -56,6 +56,7 @@ const PptGeneratorClientSection = (props: Props) => {
       secondaryLyric: secondaryText,
     });
   }
+  console.log("FORM VALUE:", form.getValues());
   return (
     <>
       <Container>

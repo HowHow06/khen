@@ -1,14 +1,7 @@
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { cn } from "@/lib/utils";
 import { useFormContext } from "react-hook-form";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../ui/form";
-import SettingInputField from "./SettingInputField";
+import SettingFormField from "./SettingFormField";
 
 type CoverSettingsProps = {
   contentKey?: string;
@@ -30,24 +23,11 @@ const CoverSettings = ({
             return;
           }
           return (
-            <FormField
+            <SettingFormField
               control={control}
               name={fieldNamePrefix + key}
               key={fieldNamePrefix + key}
-              render={({ field }) => (
-                <FormItem className="grid grid-cols-6 items-center gap-x-3 py-4">
-                  <FormLabel className="col-span-4 text-left text-sm">
-                    {value.fieldDisplayName}
-                  </FormLabel>
-                  <FormControl>
-                    <SettingInputField settingItemMeta={value} field={field} />
-                  </FormControl>
-                  {/* <FormDescription className="col-span-6">
-                      This is description.
-                    </FormDescription> */}
-                  <FormMessage className="col-span-6 " />
-                </FormItem>
-              )}
+              settingField={value}
             />
           );
         },
