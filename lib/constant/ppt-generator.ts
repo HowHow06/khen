@@ -89,17 +89,6 @@ Object.entries(CUSTOM_PINYIN_MAP_SIMPLIFIED).map(([text, customPinyin]) => {
 
 export { CUSTOM_PINYIN_MAP };
 
-function getIsHiddenOnBoolean(
-  settings: PptSettingsStateType,
-  formFieldName: string,
-  fieldKey: string,
-  targetBooleanFieldKey: string,
-): boolean {
-  const selector = formFieldName.replace(fieldKey, targetBooleanFieldKey);
-  const isEnabled = getValueFromPath<boolean>(settings, selector);
-  return !isEnabled;
-}
-
 export const PPT_GENERATION_FILE_SETTINGS = {
   filename: {
     fieldDisplayName: "File Name", // TODO: change display name to special syntax to match internalization
@@ -310,7 +299,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: 4,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "glowSize", "hasGlow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("glowSize", "hasGlow"),
+      ),
   },
   glowColor: {
     fieldDisplayName: "Color",
@@ -318,7 +310,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: "#000000",
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "glowColor", "hasGlow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("glowColor", "hasGlow"),
+      ),
   },
   glowOpacity: {
     fieldDisplayName: "Opacity",
@@ -327,7 +322,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     useProportionForm: true,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "glowOpacity", "hasGlow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("glowOpacity", "hasGlow"),
+      ),
   },
   hasOutline: {
     fieldDisplayName: "Enable Outline",
@@ -341,7 +339,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     groupingName: "outline",
     defaultValue: 1,
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "outlineWeight", "hasOutline"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("outlineWeight", "hasOutline"),
+      ),
   },
   outlineColor: {
     fieldDisplayName: "Color",
@@ -349,7 +350,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: "#000000",
     groupingName: "outline",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "outlineColor", "hasOutline"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("outlineColor", "hasOutline"),
+      ),
   },
   hasShadow: {
     fieldDisplayName: "Enable Shadow",
@@ -363,7 +367,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: "outer",
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowType", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowType", "hasShadow"),
+      ),
   },
   shadowColor: {
     fieldDisplayName: "Color",
@@ -371,7 +378,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: "#000000",
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowColor", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowColor", "hasShadow"),
+      ),
   },
   shadowBlur: {
     fieldDisplayName: "Blur",
@@ -379,7 +389,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: 3,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowBlur", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowBlur", "hasShadow"),
+      ),
   },
   shadowOffset: {
     fieldDisplayName: "Offset",
@@ -387,7 +400,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: 3,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowOffset", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowOffset", "hasShadow"),
+      ),
   },
   shadowAngle: {
     fieldDisplayName: "Angle",
@@ -397,7 +413,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: 45,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowAngle", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowAngle", "hasShadow"),
+      ),
   },
   shadowOpacity: {
     fieldDisplayName: "Opacity",
@@ -406,7 +425,10 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     useProportionForm: true,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      getIsHiddenOnBoolean(settings, fieldName, "shadowOpacity", "hasShadow"),
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("shadowOpacity", "hasShadow"),
+      ),
   },
 } as const;
 
