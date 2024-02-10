@@ -128,7 +128,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     ) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isHidden) {
+        if (setting.isNotAvailable) {
           return;
         }
         categorySchema[key] = createZodSchemaFromSettingItem(setting);
@@ -138,7 +138,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     if (category == SETTING_CATEGORY.CONTENT) {
       let contentSchema: { [groupingName: string]: any } = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isHidden) {
+        if (setting.isNotAvailable) {
           return;
         }
 
@@ -155,7 +155,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
         (_, index) => {
           Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
-            if (setting.isHidden) {
+            if (setting.isNotAvailable) {
               return;
             }
 
@@ -186,7 +186,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     if (category == SETTING_CATEGORY.COVER) {
       const contentSchema: { [groupingName: string]: any } = {};
       Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isHidden) {
+        if (setting.isNotAvailable) {
           return;
         }
 

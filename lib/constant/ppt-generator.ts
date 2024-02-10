@@ -142,7 +142,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Use Single Textbox",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isHidden: true,
+    isNotAvailable: true,
   },
   singleLineMode: {
     fieldDisplayName: "Single Line Mode",
@@ -154,18 +154,18 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Line Count Per Slide",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
-    isHidden: true, // TODO: to implement
+    isNotAvailable: true, // TODO: to implement
   },
   ignoreSubcontentWhenIdentical: {
     fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
-    isHidden: true, // TODO: to implement **, khen-38
+    isNotAvailable: true, // TODO: to implement **, khen-38
   },
   transition: {
     fieldDisplayName: "Transition",
     fieldType: SETTING_FIELD_TYPE.TRANSITION,
-    isHidden: true, // TODO: implement transition, KHEN-26
+    isNotAvailable: true, // TODO: implement transition, KHEN-26
     defaultValue: "",
   },
   sectionsAutoNumbering: {
@@ -178,7 +178,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isHidden: true, // TODO: to implement khen-29
+    isNotAvailable: true, // TODO: to implement khen-29
   },
 } as const;
 

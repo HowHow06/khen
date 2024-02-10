@@ -20,7 +20,7 @@ const SectionSettings = ({}: SectionSettingsProps) => {
     <div className="mr-2 grid gap-3 py-4">
       {Object.entries(PPT_GENERATION_SETTINGS_META.section).map(
         ([key, value]) => {
-          if (value.isHidden) {
+          if (value.isNotAvailable) {
             return;
           }
           return (

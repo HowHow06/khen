@@ -111,7 +111,7 @@ export type BaseSettingItemMetaType = {
   fieldDisplayName: string;
   remark?: string;
   tips?: string;
-  isHidden?: boolean; // hidden from user, this setting is not ready / disabled by admin
+  isNotAvailable?: boolean; // hidden from user, this setting is not ready / disabled by admin
   groupingName?: string;
   isOptional?: boolean;
 } & (
@@ -143,7 +143,7 @@ export type PptSettingsPresetName = "onsite-chinese";
 export type SettingsValueType<
   T extends Record<string, BaseSettingItemMetaType>,
 > = {
-  [K in keyof T as T[K]["isHidden"] extends true
+  [K in keyof T as T[K]["isNotAvailable"] extends true
     ? never
     : K]?: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
 };
@@ -157,7 +157,10 @@ export type GroupedSettingsValueType<
 > = {
   [Group in T[keyof T]["groupingName"]]?: {
     // only take the Key whereby the groupingName is the same as the Group key, for example: bold should not exist in shadow grouping
-    [Key in keyof T as T[Key] extends { groupingName: Group; isHidden?: false }
+    [Key in keyof T as T[Key] extends {
+      groupingName: Group;
+      isNotAvailable?: false;
+    }
       ? Key
       : never]?: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
   };

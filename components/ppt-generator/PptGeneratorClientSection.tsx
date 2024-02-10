@@ -97,7 +97,7 @@ const PptGeneratorClientSection = (props: Props) => {
               <div className="pb-2">
                 {Object.entries(PPT_GENERATION_SETTINGS_META.file).map(
                   ([key, value]) => {
-                    if (value.isHidden) {
+                    if (value.isNotAvailable) {
                       return;
                     }
                     return (

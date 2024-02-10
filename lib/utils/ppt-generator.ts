@@ -77,7 +77,7 @@ export const generatePptSettingsInitialState = (
       }
   )) => {
     Object.entries(settingsMeta).forEach(([key, setting]) => {
-      if (setting.isHidden || setting.defaultValue === undefined) {
+      if (setting.isNotAvailable || setting.defaultValue === undefined) {
         return;
       }
 
