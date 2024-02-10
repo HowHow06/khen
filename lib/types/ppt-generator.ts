@@ -108,7 +108,7 @@ export type TransitionTypeSettingItemMetaType = {
 };
 
 export type BaseSettingItemMetaType = {
-  fieldDisplayName?: string;
+  fieldDisplayName: string;
   remark?: string;
   tips?: string;
   isHidden?: boolean; // hidden from user, this setting is not ready / disabled by admin
