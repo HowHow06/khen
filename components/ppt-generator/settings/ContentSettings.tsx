@@ -74,9 +74,6 @@ const ContentSettings = ({
               </AccordionTrigger>
               <AccordionContent className="mx-3 grid divide-y pb-2">
                 {Object.entries(settings).map(([key, value]) => {
-                  if (value.isHidden) {
-                    return;
-                  }
                   return (
                     <SettingFormField
                       control={control}

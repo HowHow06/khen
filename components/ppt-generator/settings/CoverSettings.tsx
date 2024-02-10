@@ -19,9 +19,6 @@ const CoverSettings = ({
     <div className={cn("mr-2 grid divide-y py-2", className)}>
       {Object.entries(PPT_GENERATION_SETTINGS_META.cover).map(
         ([key, value]) => {
-          if (value.isHidden) {
-            return;
-          }
           return (
             <SettingFormField
               control={control}

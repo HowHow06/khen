@@ -11,9 +11,6 @@ const GeneralSettings = ({}: GeneralSettingsProps) => {
     <div className="mr-2 grid divide-y py-2">
       {Object.entries(PPT_GENERATION_SETTINGS_META.general).map(
         ([key, value]) => {
-          if (value.isHidden) {
-            return;
-          }
           return (
             <SettingFormField
               control={control}

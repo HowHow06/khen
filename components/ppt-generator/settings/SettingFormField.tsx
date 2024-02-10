@@ -22,6 +22,9 @@ const SettingFormField = ({
   settingField,
   className,
 }: SettingFormFieldProps) => {
+  if (settingField.isHidden) {
+    return;
+  }
   return (
     <>
       <FormField
