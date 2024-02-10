@@ -1,10 +1,11 @@
 "use client";
 import { cn } from "@/lib/utils";
 import React, { HTMLAttributes, useCallback } from "react";
-import { Accept, useDropzone } from "react-dropzone";
+import { Accept, FileRejection, useDropzone } from "react-dropzone";
 
 type DropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
   onFilesSelected: (files: File[]) => void;
+  onFilesRejected?: (fileRejections: FileRejection[]) => void;
   acceptedFileTypes?: Accept;
   maxFiles?: number;
   description?: string;
@@ -13,6 +14,7 @@ type DropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
 const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
   className,
   onFilesSelected,
+  onFilesRejected,
   acceptedFileTypes,
   maxFiles,
   description = "Drag and drop your file here.",
@@ -24,10 +26,20 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
     },
     [onFilesSelected],
   );
+
+  const onDropRejected = useCallback(
+    (fileRejections: FileRejection[]) => {
+      if (onFilesRejected) {
+        onFilesRejected(fileRejections);
+      }
+    },
+    [onFilesRejected],
+  );
   // TODO: implement handler on error, for example: file not accepted, too many files etc.
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
+    onDropRejected,
     maxFiles,
     accept: acceptedFileTypes,
   });
