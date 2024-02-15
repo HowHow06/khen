@@ -226,6 +226,7 @@ export const PPT_GENERATION_COVER_SETTINGS = {
     fieldDisplayName: "Font Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 80,
+    rangeMin: 0,
     groupingName: "style",
   },
   coverTitleFontColor: {
@@ -273,6 +274,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Font Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 60,
+    rangeMin: 0,
     groupingName: "text",
   },
   charSpacing: {

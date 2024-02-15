@@ -32,6 +32,8 @@ const renderInputField = (
         {...field}
         className="col-span-2 text-sm"
         type="number"
+        min={settingItemMeta.rangeMin}
+        max={settingItemMeta.rangeMax}
         onChange={(event) => field.onChange(parseFloat(event.target.value))}
       />
     );
