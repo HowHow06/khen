@@ -77,7 +77,7 @@ const PptGeneratorClientSection = (props: Props) => {
         description: `${toNormalCase(fieldName)}: ${error.message}`,
         duration: 10 * 1000,
         closeButton: true,
-        // action: { // TODO: focus on the field with error when button is clicked
+        // action: { // TODO: focus on the field with error when button is clicked (khen-56)
         //   label: "Goto",
         //   onClick: () => {
         //   },
