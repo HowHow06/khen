@@ -1,7 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { DEFAULT_GROUPING_NAME } from "../constant";
-import { Collection } from "../types";
+import {
+  Collection,
+  ResultWithOptionalPath,
+  traverseAndCollectOption,
+} from "../types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -148,4 +152,43 @@ export function getValueFromPath<T>(obj: any, path: string): T | undefined {
   }
 
   return current as T;
+}
+
+export function traverseAndCollect<
+  TResultItem = any,
+  TGetPath extends boolean = false,
+>(
+  obj: {
+    [key: string]: any;
+  },
+  targetKey: string,
+  option?: traverseAndCollectOption,
+): ResultWithOptionalPath<TResultItem, TGetPath>[] {
+  const { getParentObject, getPath, result, currentPath = [] } = option ?? {};
+  const resultArray = result ?? [];
+
+  if (targetKey in obj) {
+    const itemToAdd = getParentObject ? obj : obj[targetKey];
+    if (getParentObject && getPath) {
+      resultArray.push({
+        ...itemToAdd,
+        path: currentPath.join("."),
+      });
+    } else {
+      resultArray.push(itemToAdd);
+    }
+  } else {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (typeof value === "object" && value !== null) {
+        traverseAndCollect(value, targetKey, {
+          getParentObject,
+          getPath,
+          result: resultArray,
+          currentPath: [...currentPath, key], // Append the current key to the path
+        });
+      }
+    });
+  }
+
+  return resultArray;
 }

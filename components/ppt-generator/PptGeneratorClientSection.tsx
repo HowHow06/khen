@@ -10,10 +10,13 @@ import {
   generatePpt,
   generatePptSettingsInitialState,
   getPreset,
+  toNormalCase,
+  traverseAndCollect,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldError, FieldErrors, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { PptSettingsUIProvider } from "../context/PptSettingsUIContext";
 import { Button } from "../ui/button";
@@ -48,15 +51,42 @@ const PptGeneratorClientSection = (props: Props) => {
   });
 
   function onSubmit(values: z.infer<typeof settingsSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     generatePpt({
       settingValues: values as PptSettingsStateType,
       primaryLyric: mainTextareaRef.current?.value || "",
       secondaryLyric: secondaryText,
     });
   }
-  console.log("FORM VALUE:", form.getValues());
+
+  function onInvalidSubmit(errorsObject: FieldErrors<PptSettingsStateType>) {
+    const errors = traverseAndCollect<FieldError, true>(
+      errorsObject,
+      "message",
+      {
+        getParentObject: true,
+        getPath: true,
+      },
+    );
+
+    errors.forEach((error) => {
+      const pathArray = error.path.split(".");
+      const category = pathArray[0];
+      const fieldName = pathArray[pathArray.length - 1];
+
+      toast.error(`Error in ${category} section.`, {
+        description: `${toNormalCase(fieldName)}: ${error.message}`,
+        duration: 10 * 1000,
+        closeButton: true,
+        // action: { // TODO: focus on the field with error when button is clicked
+        //   label: "Goto",
+        //   onClick: () => {
+        //   },
+        // },
+      });
+    });
+  }
+  // console.log("FORM VALUE:", form.getValues()); // TODO: remove this
+
   return (
     <>
       <Container>
@@ -80,7 +110,10 @@ const PptGeneratorClientSection = (props: Props) => {
         />
       </Container>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}
+          className="space-y-8"
+        >
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               4. Settings
