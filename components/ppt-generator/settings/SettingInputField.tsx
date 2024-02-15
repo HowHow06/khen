@@ -7,6 +7,7 @@ import {
 import { BaseSettingItemMetaType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
+import { toast } from "sonner";
 import ColorPicker from "../../ui/color-picker";
 import ImageDropzoneComponent from "../../ui/image-dropzone-component";
 import { Input } from "../../ui/input";
@@ -41,6 +42,16 @@ const renderInputField = (
       <ImageDropzoneComponent
         className="col-span-6 text-sm"
         onFilesSelected={(file) => field.onChange(file)}
+        onFilesRejected={(fileRejections) => {
+          fileRejections.forEach((fileRejection) => {
+            const message = fileRejection.errors.reduce((result, error) => {
+              return `${result}\n${error.message}`;
+            }, "");
+            toast.error("Failed to select image.", {
+              description: message,
+            });
+          });
+        }}
         value={field.value}
       />
     );

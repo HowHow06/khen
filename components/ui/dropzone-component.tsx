@@ -35,7 +35,6 @@ const DropzoneComponent: React.FC<DropzoneComponentProps> = ({
     },
     [onFilesRejected],
   );
-  // TODO: implement handler on error, for example: file not accepted, too many files etc.
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,

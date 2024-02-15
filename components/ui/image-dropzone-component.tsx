@@ -5,11 +5,13 @@ import { getBase64FromImageField } from "@/lib/utils";
 import { XCircle } from "lucide-react";
 import Image from "next/image";
 import React, { HTMLAttributes, useCallback, useEffect, useState } from "react";
+import { FileRejection } from "react-dropzone";
 import { Button } from "./button";
 import DropzoneComponent from "./dropzone-component";
 
 type ImageDropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
   onFilesSelected: (file: File | null) => void;
+  onFilesRejected?: (fileRejections: FileRejection[]) => void;
   description?: string;
   value: InferTypeScriptTypeFromSettingFieldType<
     typeof SETTING_FIELD_TYPE.IMAGE
@@ -19,6 +21,7 @@ type ImageDropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
 const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
   className,
   onFilesSelected,
+  onFilesRejected,
   description = "Drag and drop an image here, or click to select an image.",
   value,
 }) => {
@@ -72,6 +75,7 @@ const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
         acceptedFileTypes={IMAGE_FILE_TYPE}
         maxFiles={1}
         description={description}
+        onFilesRejected={onFilesRejected}
       />
     </div>
   );
