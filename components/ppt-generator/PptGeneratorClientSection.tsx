@@ -18,7 +18,6 @@ import { useRef, useState } from "react";
 import { FieldError, FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { PptSettingsUIProvider } from "../context/PptSettingsUIContext";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
 import {
@@ -89,91 +88,88 @@ const PptGeneratorClientSection = (props: Props) => {
 
   return (
     <>
-      <PptSettingsUIProvider>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}
-            className="space-y-8"
-          >
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                2. Insert Main Lyric
-              </h2>
-              {/* TODO: memoize so that it does not get rerender when secondary text change */}
-              <MainLyricSection
-                mainTextareaRef={mainTextareaRef}
-                updateSecondaryText={setSecondaryText}
-              />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                3. Insert Secondary Lyric
-              </h2>
-              <SecondaryLyricSection
-                secondaryTextareaRef={secondaryTextareaRef}
-                secondaryText={secondaryText}
-                setSecondaryText={setSecondaryText}
-              />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                4. Settings
-              </h2>
-              <PptGeneratorSetting />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                5. Generate PPT!
-              </h2>
-              <div className="mr-2 w-1/2">
-                <div className="pb-2">
-                  {Object.entries(PPT_GENERATION_SETTINGS_META.file).map(
-                    ([key, value]) => {
-                      if (value.isNotAvailable) {
-                        return;
-                      }
-                      return (
-                        <FormField
-                          control={form.control}
-                          name={SETTING_CATEGORY.FILE + "." + key}
-                          key={SETTING_CATEGORY.FILE + "." + key}
-                          render={({ field }) => (
-                            <FormItem className="grid grid-cols-6 items-center gap-x-2">
-                              <FormLabel className="col-span-2 text-left text-sm">
-                                {value.fieldDisplayName}
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  className="col-span-3 text-sm"
-                                  type="text"
-                                  placeholder={
-                                    value.fieldType ===
-                                      SETTING_FIELD_TYPE.TEXT &&
-                                    value.placeholder
-                                      ? value.placeholder
-                                      : undefined
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage className="col-span-6 " />
-                            </FormItem>
-                          )}
-                        />
-                      );
-                    },
-                  )}
-                </div>
-                <div>
-                  <Button variant="default" type="submit">
-                    Generate
-                  </Button>
-                </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}
+          className="space-y-8"
+        >
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              2. Insert Main Lyric
+            </h2>
+            {/* TODO: memoize so that it does not get rerender when secondary text change */}
+            <MainLyricSection
+              mainTextareaRef={mainTextareaRef}
+              updateSecondaryText={setSecondaryText}
+            />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              3. Insert Secondary Lyric
+            </h2>
+            <SecondaryLyricSection
+              secondaryTextareaRef={secondaryTextareaRef}
+              secondaryText={secondaryText}
+              setSecondaryText={setSecondaryText}
+            />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              4. Settings
+            </h2>
+            <PptGeneratorSetting />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              5. Generate PPT!
+            </h2>
+            <div className="mr-2 w-1/2">
+              <div className="pb-2">
+                {Object.entries(PPT_GENERATION_SETTINGS_META.file).map(
+                  ([key, value]) => {
+                    if (value.isNotAvailable) {
+                      return;
+                    }
+                    return (
+                      <FormField
+                        control={form.control}
+                        name={SETTING_CATEGORY.FILE + "." + key}
+                        key={SETTING_CATEGORY.FILE + "." + key}
+                        render={({ field }) => (
+                          <FormItem className="grid grid-cols-6 items-center gap-x-2">
+                            <FormLabel className="col-span-2 text-left text-sm">
+                              {value.fieldDisplayName}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                className="col-span-3 text-sm"
+                                type="text"
+                                placeholder={
+                                  value.fieldType === SETTING_FIELD_TYPE.TEXT &&
+                                  value.placeholder
+                                    ? value.placeholder
+                                    : undefined
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage className="col-span-6 " />
+                          </FormItem>
+                        )}
+                      />
+                    );
+                  },
+                )}
               </div>
-            </Container>
-          </form>
-        </Form>
-      </PptSettingsUIProvider>
+              <div>
+                <Button variant="default" type="submit">
+                  Generate
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </form>
+      </Form>
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
 import PptGeneratorClientSection from "@/components/ppt-generator/PptGeneratorClientSection";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
@@ -46,7 +47,9 @@ const PptGeneratorPage = (props: Props) => {
         </h2>
         <div className="">to be implemented...</div>
       </Container>
-      <PptGeneratorClientSection />
+      <PptSettingsUIProvider>
+        <PptGeneratorClientSection />
+      </PptSettingsUIProvider>
     </>
   );
 };

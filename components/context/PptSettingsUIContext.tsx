@@ -1,3 +1,4 @@
+"use client";
 import { CONTENT_TYPE, SETTING_CATEGORY } from "@/lib/constant";
 import React, {
   ReactNode,
