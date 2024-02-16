@@ -10,7 +10,6 @@ const CopyToClipboardButton = ({ text }: Props) => {
   const onCopyToClipboardClick = (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    event.preventDefault();
     if (text) {
       navigator.clipboard
         .writeText(text)
@@ -28,7 +27,7 @@ const CopyToClipboardButton = ({ text }: Props) => {
   };
   return (
     <>
-      <Button variant="outline" onClick={onCopyToClipboardClick}>
+      <Button variant="outline" onClick={onCopyToClipboardClick} type="button">
         Copy to clipboard
       </Button>
     </>

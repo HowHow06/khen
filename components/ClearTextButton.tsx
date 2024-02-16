@@ -8,7 +8,6 @@ type Props = {
 
 const ClearTextButton = ({ text, setText }: Props) => {
   const onClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
     const tempText = text;
     setText("");
     toast.success("Text cleared", {
@@ -20,7 +19,7 @@ const ClearTextButton = ({ text, setText }: Props) => {
     });
   };
   return (
-    <Button variant="outline" onClick={onClearClick}>
+    <Button variant="outline" onClick={onClearClick} type="button">
       Clear
     </Button>
   );
