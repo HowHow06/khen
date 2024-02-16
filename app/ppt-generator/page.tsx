@@ -1,6 +1,9 @@
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
-import PptGeneratorClientSection from "@/components/ppt-generator/PptGeneratorClientSection";
+import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
+import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
+import FileSettings from "@/components/ppt-generator/settings/FileSettings";
+import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 
@@ -50,7 +53,37 @@ const PptGeneratorPage = (props: Props) => {
       </Container>
       <PptSettingsUIProvider>
         <PptGeneratorFormProvider>
-          <PptGeneratorClientSection />
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              2. Insert Main Lyric
+            </h2>
+            <MainLyricSection />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              3. Insert Secondary Lyric
+            </h2>
+            <SecondaryLyricSection />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              4. Settings
+            </h2>
+            <PptGeneratorSetting />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              5. Generate PPT!
+            </h2>
+            <div className="mr-2 w-1/2">
+              <FileSettings />
+              <div>
+                <Button variant="default" type="submit">
+                  Generate
+                </Button>
+              </div>
+            </div>
+          </Container>
         </PptGeneratorFormProvider>
       </PptSettingsUIProvider>
     </>
