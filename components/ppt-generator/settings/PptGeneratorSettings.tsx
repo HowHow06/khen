@@ -51,7 +51,7 @@ const PptGeneratorSetting = () => {
       <Sheet modal={false} open={isOpen}>
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
-            Open Settings
+            {isOpen ? "Close" : "Open"} Settings
           </Button>
         </SheetTrigger>
         <SheetTrigger asChild>
