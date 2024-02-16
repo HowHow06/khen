@@ -7,7 +7,8 @@ type Props = {
 };
 
 const ClearTextButton = ({ text, setText }: Props) => {
-  const onClearClick = () => {
+  const onClearClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     const tempText = text;
     setText("");
     toast.success("Text cleared", {

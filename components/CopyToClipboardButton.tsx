@@ -1,17 +1,19 @@
-import { TextareaRefType } from "@/lib/types";
-import { MutableRefObject } from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 type Props = {
-  targetRef: MutableRefObject<TextareaRefType>;
+  text: string;
 };
 
-const CopyToClipboardButton = ({ targetRef }: Props) => {
-  const onCopyToClipboardClick = () => {
-    if (targetRef.current?.value) {
+const CopyToClipboardButton = ({ text }: Props) => {
+  const onCopyToClipboardClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+    if (text) {
       navigator.clipboard
-        .writeText(targetRef.current.value)
+        .writeText(text)
         .then(() => {
           toast.success("Text copied to clipboard");
         })
