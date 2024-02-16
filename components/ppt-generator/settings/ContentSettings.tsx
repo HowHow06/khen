@@ -29,9 +29,12 @@ const ContentSettings = ({
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
   const { form } = usePptGeneratorFormContext();
   const { control, getValues } = form;
+  const formValues = getValues() as PptSettingsStateType;
   const settingsMetaGrouped = useMemo(() => {
     const textBoxSettings = Array.from({
-      length: DEFAULT_LINE_COUNT_PER_SLIDE,
+      length: formValues.general.singleLineMode
+        ? 1
+        : DEFAULT_LINE_COUNT_PER_SLIDE,
     }).reduce<{}>((result, _, currentIndex) => {
       return {
         ...result,
@@ -43,7 +46,7 @@ const ContentSettings = ({
       ...textBoxSettings,
       ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
     };
-  }, []);
+  }, [formValues.general.singleLineMode]);
 
   const fieldNamePrefix =
     SETTING_CATEGORY.CONTENT + "." + (contentKey ? contentKey + "." : "");
@@ -83,7 +86,7 @@ const ContentSettings = ({
                   return (
                     <SettingFormField
                       zodControl={control}
-                      settingsState={getValues() as PptSettingsStateType}
+                      settingsState={formValues}
                       name={fieldNamePrefix + groupingName + "." + key}
                       key={fieldNamePrefix + groupingName + "." + key}
                       settingField={value}
