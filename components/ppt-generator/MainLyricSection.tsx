@@ -16,25 +16,22 @@ import { LYRIC_SECTION } from "@/lib/constant";
 import { getPinyin } from "@/lib/pinyin";
 import { LyricSectionType, TextareaRefType } from "@/lib/types";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { MutableRefObject, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
+import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 
-type MainLyricSectionProps = {
-  mainTextareaRef: MutableRefObject<TextareaRefType>;
-  updateSecondaryText: (text: string) => void;
-};
+type MainLyricSectionProps = {};
 
-const MainLyricSection = ({
-  mainTextareaRef,
-  updateSecondaryText,
-}: MainLyricSectionProps) => {
-  const [text, setText] = useState<string>("");
+const MainLyricSection = ({}: MainLyricSectionProps) => {
+  const { mainText, setMainText, setSecondaryText } =
+    usePptGeneratorFormContext();
+  const mainTextareaRef = useRef<TextareaRefType>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value);
+    setMainText(event.target.value);
     setCursorPosition(event.target.selectionStart);
   };
 
@@ -45,16 +42,16 @@ const MainLyricSection = ({
   const insertLyricSection = (section: LyricSectionType) => {
     if (mainTextareaRef.current) {
       const sectionValue =
-        text && cursorPosition != 0
+        mainText && cursorPosition != 0
           ? "\n" + LYRIC_SECTION[section]
           : LYRIC_SECTION[section];
       const sectionLength = sectionValue.length + 1;
 
       const newText =
-        text.slice(0, cursorPosition) +
+        mainText.slice(0, cursorPosition) +
         `${sectionValue} ` +
-        text.slice(cursorPosition);
-      setText(newText);
+        mainText.slice(cursorPosition);
+      setMainText(newText);
       setCursorPosition(cursorPosition + sectionLength);
 
       setTimeout(() => {
@@ -69,26 +66,26 @@ const MainLyricSection = ({
   };
 
   const onConvertToSimplifiedClick = () => {
-    const simplifiedText = convertToSimplified(text);
-    setText(simplifiedText);
+    const simplifiedText = convertToSimplified(mainText);
+    setMainText(simplifiedText);
     toast.success("Text converted.");
   };
 
   const onConvertToTraditionalClick = () => {
-    const convertedText = convertToTraditional(text);
-    setText(convertedText);
+    const convertedText = convertToTraditional(mainText);
+    setMainText(convertedText);
     toast.success("Text converted.");
   };
 
   const onReplaceCharacterClick = (toFind: string, toReplaceWith: string) => {
-    const replacedText = text.replaceAll(toFind, toReplaceWith);
-    setText(replacedText);
+    const replacedText = mainText.replaceAll(toFind, toReplaceWith);
+    setMainText(replacedText);
     toast.success("Text replaced.");
   };
 
   function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
-    const pinyinText = getPinyin({ text: text, hasTone: hasTone });
-    updateSecondaryText(pinyinText);
+    const pinyinText = getPinyin({ text: mainText, hasTone: hasTone });
+    setSecondaryText(pinyinText);
     toast.success(`Pinyin ${hasTone ? "with" : "without"} tone generated.`);
   }
 
@@ -177,14 +174,14 @@ const MainLyricSection = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <CopyToClipboardButton targetRef={mainTextareaRef} />
-        <ClearTextButton text={text} setText={setText} />
+        <CopyToClipboardButton text={mainText} />
+        <ClearTextButton text={mainText} setText={setMainText} />
       </div>
       <Textarea
         ref={mainTextareaRef}
         placeholder="Insert the main lyrics here."
         className="min-h-52 md:min-h-72"
-        value={text}
+        value={mainText}
         onChange={handleTextChange}
         onSelect={handleSelect}
       />

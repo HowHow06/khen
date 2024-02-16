@@ -5,7 +5,7 @@ import {
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
-import { PptSettingsStateType, TextareaRefType } from "@/lib/types";
+import { PptSettingsStateType } from "@/lib/types";
 import {
   generatePpt,
   generatePptSettingsInitialState,
@@ -14,10 +14,10 @@ import {
   traverseAndCollect,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
 import { FieldError, FieldErrors, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
 import {
@@ -39,9 +39,7 @@ const defaultSettingsValue = process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING
   : generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META);
 
 const PptGeneratorClientSection = (props: Props) => {
-  const mainTextareaRef = useRef<TextareaRefType>(null); // TODO: optimize this by using a context
-  const secondaryTextareaRef = useRef<TextareaRefType>(null);
-  const [secondaryText, setSecondaryText] = useState<string>("");
+  const { mainText, secondaryText } = usePptGeneratorFormContext();
 
   // TODO: show errors popup if there is any error, open corresponding panel if possible
   const form = useForm<z.infer<typeof settingsSchema>>({
@@ -52,7 +50,7 @@ const PptGeneratorClientSection = (props: Props) => {
   function onSubmit(values: z.infer<typeof settingsSchema>) {
     generatePpt({
       settingValues: values as PptSettingsStateType,
-      primaryLyric: mainTextareaRef.current?.value || "",
+      primaryLyric: mainText || "",
       secondaryLyric: secondaryText,
     });
   }
@@ -98,20 +96,13 @@ const PptGeneratorClientSection = (props: Props) => {
               2. Insert Main Lyric
             </h2>
             {/* TODO: memoize so that it does not get rerender when secondary text change */}
-            <MainLyricSection
-              mainTextareaRef={mainTextareaRef}
-              updateSecondaryText={setSecondaryText}
-            />
+            <MainLyricSection />
           </Container>
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               3. Insert Secondary Lyric
             </h2>
-            <SecondaryLyricSection
-              secondaryTextareaRef={secondaryTextareaRef}
-              secondaryText={secondaryText}
-              setSecondaryText={setSecondaryText}
-            />
+            <SecondaryLyricSection />
           </Container>
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">

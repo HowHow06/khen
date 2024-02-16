@@ -1,3 +1,4 @@
+import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
 import PptGeneratorClientSection from "@/components/ppt-generator/PptGeneratorClientSection";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,9 @@ const PptGeneratorPage = (props: Props) => {
         <div className="">to be implemented...</div>
       </Container>
       <PptSettingsUIProvider>
-        <PptGeneratorClientSection />
+        <PptGeneratorFormProvider>
+          <PptGeneratorClientSection />
+        </PptGeneratorFormProvider>
       </PptSettingsUIProvider>
     </>
   );
