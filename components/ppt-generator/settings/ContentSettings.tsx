@@ -1,4 +1,5 @@
 "use client";
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   Accordion,
@@ -15,7 +16,6 @@ import {
 import { PptSettingsStateType } from "@/lib/types";
 import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
-import { useFormContext } from "react-hook-form";
 import SettingFormField from "./SettingFormField";
 
 type ContentSettingsProps = {
@@ -27,7 +27,8 @@ const ContentSettings = ({
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
-  const { control, getValues } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { control, getValues } = form;
   const settingsMetaGrouped = useMemo(() => {
     const textBoxSettings = Array.from({
       length: DEFAULT_LINE_COUNT_PER_SLIDE,

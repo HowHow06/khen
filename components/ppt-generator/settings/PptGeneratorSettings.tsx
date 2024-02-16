@@ -1,5 +1,6 @@
 "use client";
 // components/Sidebar.js
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   CONTENT_TYPE,
@@ -11,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
 import { Button } from "../../ui/button";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
@@ -28,7 +28,8 @@ import GeneralSettings from "./GeneralSettings";
 import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSetting = () => {
-  const { getValues, reset } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { getValues, reset } = form;
   const {
     settingsUIState,
     setCurrentCategoryTab,

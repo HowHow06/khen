@@ -1,5 +1,5 @@
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
-import { useFormContext } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -14,7 +14,8 @@ type SectionSettingsProps = {};
 
 // TODO: to implement
 const SectionSettings = ({}: SectionSettingsProps) => {
-  const { control } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { control } = form;
 
   return (
     <div className="mr-2 grid gap-3 py-4">

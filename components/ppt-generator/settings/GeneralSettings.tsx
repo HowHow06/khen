@@ -1,12 +1,13 @@
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
-import { useFormContext } from "react-hook-form";
 import SettingFormField from "./SettingFormField";
 
 type GeneralSettingsProps = {};
 
 const GeneralSettings = ({}: GeneralSettingsProps) => {
-  const { control, getValues } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { control, getValues } = form;
 
   return (
     <div className="mr-2 grid divide-y py-2">

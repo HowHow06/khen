@@ -1,10 +1,10 @@
 "use client";
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import {
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
-import { useFormContext } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -17,7 +17,8 @@ import { Input } from "../../ui/input";
 type Props = {};
 
 const FileSettings = (props: Props) => {
-  const { control } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { control } = form;
 
   return (
     <div className="pb-2">

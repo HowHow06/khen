@@ -1,7 +1,7 @@
+import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { useFormContext } from "react-hook-form";
 import SettingFormField from "./SettingFormField";
 
 type CoverSettingsProps = {
@@ -12,7 +12,8 @@ const CoverSettings = ({
   contentKey,
   className,
 }: CoverSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
-  const { control, getValues } = useFormContext();
+  const { form } = usePptGeneratorFormContext();
+  const { control, getValues } = form;
 
   const fieldNamePrefix =
     SETTING_CATEGORY.COVER + "." + (contentKey ? contentKey + "." : "");

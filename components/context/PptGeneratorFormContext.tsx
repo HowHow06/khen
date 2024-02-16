@@ -11,7 +11,12 @@ import {
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { ReactNode, createContext, useContext, useState } from "react";
-import { FieldError, FieldErrors, useForm } from "react-hook-form";
+import {
+  FieldError,
+  FieldErrors,
+  UseFormReturn,
+  useForm,
+} from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form } from "../ui/form";
@@ -23,6 +28,7 @@ type PptGeneratorFormContextType = {
   // secondaryTextareaRef: MutableRefObject<TextareaRefType>;
   setMainText: (text: string) => void;
   setSecondaryText: (text: string) => void;
+  form: UseFormReturn<z.infer<typeof settingsSchema>>; // Include the entire form object from React Hook Form
 };
 
 const PptGeneratorFormContext = createContext<
@@ -42,7 +48,7 @@ export const PptGeneratorFormProvider: React.FC<
 > = ({ children }) => {
   const [mainText, setMainText] = useState("");
   const [secondaryText, setSecondaryText] = useState("");
-  // TODO: show errors popup if there is any error, open corresponding panel if possible
+
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
@@ -91,6 +97,7 @@ export const PptGeneratorFormProvider: React.FC<
         secondaryText,
         setMainText,
         setSecondaryText,
+        form,
       }}
     >
       <Form {...form}>
