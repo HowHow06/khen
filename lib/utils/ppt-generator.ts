@@ -167,7 +167,11 @@ export const getBase64FromImageField = async (
 
   let image: string | File | Blob = imageValue;
   if (typeof image === "string") {
-    image = await getBlobFromUrl(image);
+    try {
+      image = await getBlobFromUrl(image);
+    } catch (error) {
+      return null;
+    }
   }
 
   return await getBase64(image);
