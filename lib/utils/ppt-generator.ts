@@ -1,6 +1,11 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
-import { extractNumber, getBase64, getBlob, startsWithNumbering } from ".";
+import {
+  extractNumber,
+  getBase64,
+  getBlobFromUrl,
+  startsWithNumbering,
+} from ".";
 import {
   CONTENT_TYPE,
   DEFAULT_AUTHOR,
@@ -162,7 +167,7 @@ export const getBase64FromImageField = async (
 
   let image: string | File | Blob = imageValue;
   if (typeof image === "string") {
-    image = await getBlob(image);
+    image = await getBlobFromUrl(image);
   }
 
   return await getBase64(image);

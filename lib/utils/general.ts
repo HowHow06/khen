@@ -132,7 +132,7 @@ export function extractNumber(str: string) {
   return match ? Number(match[1]) : 0;
 }
 
-export async function getBlob(url: string) {
+export async function getBlobFromUrl(url: string) {
   const response = await fetch(url);
   if (!response.ok) throw new Error("Network response was not ok");
   const blob = await response.blob();
