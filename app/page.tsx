@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Khen | Ho2 Tool Suite",
+  description: "A web based tool suite. ",
+};
 
 export default function Home() {
   return (
