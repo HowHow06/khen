@@ -6,7 +6,12 @@ import FileSettings from "@/components/ppt-generator/settings/FileSettings";
 import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Khen | PPT Generator",
+  description: "A tool to generator PPT by inserting lyrics.",
+};
 type Props = {};
 
 const PptGeneratorPage = (props: Props) => {
