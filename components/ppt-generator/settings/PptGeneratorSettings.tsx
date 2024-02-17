@@ -1,5 +1,4 @@
 "use client";
-// components/Sidebar.js
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
@@ -9,7 +8,6 @@ import {
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { cn } from "@/lib/utils";
-import { TabsContent } from "@radix-ui/react-tabs";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../../ui/button";
@@ -21,11 +19,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../ui/sheet";
-import { Tabs, TabsList, TabsTrigger } from "../../ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import ContentSettings from "./ContentSettings";
 import CoverSettings from "./CoverSettings";
 import GeneralSettings from "./GeneralSettings";
 import PresetsDropdown from "./PresetsDropdown";
+import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
 const PptGeneratorSetting = () => {
   const { form } = usePptGeneratorFormContext();
@@ -76,6 +75,7 @@ const PptGeneratorSetting = () => {
           <SheetHeader className="flex-row items-center space-x-5">
             <SheetTitle>Settings</SheetTitle>
             <PresetsDropdown formReset={reset} presets={DEFAULT_PRESETS} />
+            <SettingsOptionsDropdown />
             {/* <SheetDescription>
               Make changes to your profile here. Click save when you&apos;re
               done.
