@@ -6,7 +6,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import useHasTouchSupport from "@/lib/hooks/useHasTouchSupport";
+import useHasTouchSupport from "@/lib/hooks/use-has-touch-support";
 import { cn } from "@/lib/utils";
 import { Info } from "lucide-react";
 import Image from "next/image";
