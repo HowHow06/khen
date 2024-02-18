@@ -1,6 +1,6 @@
 import { customPinyin, pinyin } from "pinyin-pro";
+import { CUSTOM_PINYIN_MAP } from "../constant";
 import { convertToSimplified } from "./character-converter";
-import { CUSTOM_PINYIN_MAP } from "./constant";
 
 customPinyin(CUSTOM_PINYIN_MAP);
 

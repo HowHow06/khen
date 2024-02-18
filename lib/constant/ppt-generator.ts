@@ -1,4 +1,3 @@
-import { convertToTraditional } from "../character-converter";
 import {
   ComboboxItemsType,
   HorizontalAlignSettingType,
@@ -8,6 +7,7 @@ import {
   ShadowTypeSettingType,
 } from "../types";
 import { getValueFromPath } from "../utils";
+import { convertToTraditional } from "../utils/character-converter";
 import { fontFaces } from "./font-face";
 
 export const DEFAULT_GROUPING_NAME = "default" as const;

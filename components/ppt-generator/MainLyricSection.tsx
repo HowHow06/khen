@@ -8,13 +8,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
+import { LYRIC_SECTION } from "@/lib/constant";
+import { LyricSectionType, TextareaRefType } from "@/lib/types";
 import {
   convertToSimplified,
   convertToTraditional,
-} from "@/lib/character-converter";
-import { LYRIC_SECTION } from "@/lib/constant";
-import { getPinyin } from "@/lib/pinyin";
-import { LyricSectionType, TextareaRefType } from "@/lib/types";
+} from "@/lib/utils/character-converter";
+import { getPinyin } from "@/lib/utils/pinyin";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
