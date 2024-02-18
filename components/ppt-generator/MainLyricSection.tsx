@@ -20,6 +20,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
+import FindAndReplaceButton from "../FindAndReplaceButton";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 
 type MainLyricSectionProps = {};
@@ -175,6 +176,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           </DropdownMenuContent>
         </DropdownMenu>
         <CopyToClipboardButton text={mainText} />
+        <FindAndReplaceButton text={mainText} setText={setMainText} />
         <ClearTextButton text={mainText} setText={setMainText} />
       </div>
       <Textarea
