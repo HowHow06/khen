@@ -9,6 +9,7 @@ import { PresetsType } from "@/lib/types";
 import { getPreset } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { FieldValues, UseFormReset } from "react-hook-form";
+import { toast } from "sonner";
 
 type Props = {
   formReset: UseFormReset<FieldValues>;
@@ -33,6 +34,7 @@ const PresetsDropdown = ({ formReset, presets }: Props) => {
                 const preset = getPreset(presetName);
                 if (preset) {
                   formReset(preset);
+                  toast.success("Preset applied.");
                 }
               }}
             >
