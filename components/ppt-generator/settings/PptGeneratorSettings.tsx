@@ -157,12 +157,12 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
@@ -182,12 +182,12 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
