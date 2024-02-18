@@ -10,7 +10,7 @@ import {
 import theme from "@/lib/tailwindTheme";
 import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
@@ -41,7 +41,21 @@ const PptGeneratorSetting = () => {
     setCurrentCoverTab,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
-  const isExtraSmallScreen = window.innerWidth < smBreakpoint; // Can use useEffect to trigger rerender on screen resize, but tradeoff is unnecessary rerender
+  const [isExtraSmallScreen, setIsExtraSmallScreen] = useState(false);
+
+  useEffect(() => {
+    // Function to check screen size and update state
+    const checkScreenSize = () => {
+      setIsExtraSmallScreen(window.innerWidth < smBreakpoint);
+    };
+
+    // Check immediately on mount and then on every window resize
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
