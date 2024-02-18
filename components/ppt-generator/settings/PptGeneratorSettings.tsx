@@ -53,7 +53,7 @@ const PptGeneratorSetting = () => {
     ) == true;
 
   return (
-    <div className="">
+    <div className="flex flex-row space-x-2">
       <Sheet modal={isExtraSmallScreen ? true : false} open={isOpen}>
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
