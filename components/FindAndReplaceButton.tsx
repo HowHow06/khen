@@ -57,6 +57,7 @@ const FindAndReplaceButton = ({ align = "center", text, setText }: Props) => {
                 <Input
                   id="find"
                   className="col-span-2 h-8 text-sm"
+                  value={findText}
                   onChange={handleFindTextChange}
                 />
               </div>
@@ -65,6 +66,7 @@ const FindAndReplaceButton = ({ align = "center", text, setText }: Props) => {
                 <Input
                   id="replace"
                   className="col-span-2 h-8"
+                  value={replaceText}
                   onChange={handleReplaceTextChange}
                 />
               </div>
