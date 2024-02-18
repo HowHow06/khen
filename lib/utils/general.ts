@@ -192,3 +192,15 @@ export function traverseAndCollect<
 
   return resultArray;
 }
+
+export function removeIdenticalWords(
+  targetString: string,
+  compareString: string,
+) {
+  const wordsA = compareString.split(" ");
+  const wordsB = targetString.split(" ");
+
+  const filteredWordsB = wordsB.filter((word, index) => word !== wordsA[index]);
+
+  return filteredWordsB.join(" ");
+}

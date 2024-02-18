@@ -4,6 +4,7 @@ import {
   extractNumber,
   getBase64,
   getBlobFromUrl,
+  removeIdenticalWords,
   startsWithNumbering,
 } from ".";
 import {
@@ -370,6 +371,9 @@ function createSlidesFromLyrics({
 
     if (hasSecondaryContent) {
       let secondaryLine = secondaryLinesArray[index] ?? "";
+      if (settingValues.general.ignoreSubcontentWhenIdentical) {
+        secondaryLine = removeIdenticalWords(secondaryLine, primaryLine);
+      }
       if (isCover) {
         const subCoverLineIndex = secondaryLine.indexOf(
           `${LYRIC_SECTION.SECONDARYTITLE} `,
@@ -633,6 +637,7 @@ export const generatePpt = async ({
   const secondaryLinesArray = secondaryLyric.split("\n");
 
   // 0. Perform length checking
+  // TODO: perform checking in frontend
   if (
     hasSecondaryContent &&
     primaryLinesArray.length !== secondaryLinesArray.length &&

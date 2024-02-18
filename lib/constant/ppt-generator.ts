@@ -162,7 +162,6 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
-    isNotAvailable: true, // TODO: to implement **, khen-38
   },
   transition: {
     fieldDisplayName: "Transition",
