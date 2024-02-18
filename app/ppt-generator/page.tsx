@@ -80,7 +80,7 @@ const PptGeneratorPage = (props: Props) => {
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               5. Generate PPT!
             </h2>
-            <div className="mr-2 w-1/2">
+            <div className="mr-2 w-full lg:w-1/2">
               <FileSettings />
               <div>
                 <Button variant="default" type="submit">
