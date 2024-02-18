@@ -7,6 +7,7 @@ import {
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
+import theme from "@/lib/tailwindTheme";
 import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
@@ -26,6 +27,10 @@ import GeneralSettings from "./GeneralSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
+const smBreakpointPx = theme.screens.sm;
+// Parse the numeric part of the breakpoint
+const smBreakpoint = parseInt(smBreakpointPx, 10);
+
 const PptGeneratorSetting = () => {
   const { form } = usePptGeneratorFormContext();
   const { getValues, reset } = form;
@@ -36,6 +41,7 @@ const PptGeneratorSetting = () => {
     setCurrentCoverTab,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
+  const isExtraSmallScreen = window.innerWidth < smBreakpoint; // Can use useEffect to trigger rerender on screen resize, but tradeoff is unnecessary rerender
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
@@ -48,29 +54,41 @@ const PptGeneratorSetting = () => {
 
   return (
     <div className="">
-      <Sheet modal={false} open={isOpen}>
+      <Sheet modal={isExtraSmallScreen ? true : false} open={isOpen}>
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
             {isOpen ? "Close" : "Open"} Settings
           </Button>
         </SheetTrigger>
-        <SheetTrigger asChild>
-          <Button
-            onClick={toggleSettingSidebar}
-            variant={"outline"}
-            className={`fixed top-1/2 flex -translate-y-1/2 transform items-center rounded-r-none px-0 py-10 transition-all ease-in-out ${
-              isOpen ? "right-[25%] duration-500" : "right-0 duration-300"
-            }`}
-          >
-            <ChevronLeft
-              className={`${isOpen ? "rotate-180 transform" : ""} transition-transform duration-700`}
-            />
-          </Button>
-        </SheetTrigger>
+        {!isExtraSmallScreen && (
+          <SheetTrigger asChild>
+            <Button
+              onClick={toggleSettingSidebar}
+              variant={"outline"}
+              className={`fixed top-1/2 flex -translate-y-1/2 transform items-center rounded-r-none px-0 py-10 transition-all ease-in-out ${
+                isOpen
+                  ? "right-1/2 duration-500 sm:right-96 xl:right-1/4"
+                  : "right-0 duration-300"
+              }`}
+            >
+              <ChevronLeft
+                className={`${isOpen ? "rotate-180 transform" : ""} transition-transform duration-700`}
+              />
+            </Button>
+          </SheetTrigger>
+        )}
         <SheetContent
-          onPointerDownOutside={(event) => event.preventDefault()}
+          onPointerDownOutside={
+            isExtraSmallScreen
+              ? () => setIsOpen(false)
+              : (event) => event.preventDefault()
+          }
           setIsOpen={setIsOpen}
-          className="w-1/4 sm:max-w-[50%]"
+          className={cn(
+            "w-100 h-4/5 sm:h-full sm:w-96 xl:w-1/4",
+            isExtraSmallScreen && "rounded-t-3xl shadow-md",
+          )}
+          side={isExtraSmallScreen ? "bottom" : "right"}
         >
           <SheetHeader className="flex-row items-center space-x-5">
             <SheetTitle>Settings</SheetTitle>
@@ -121,7 +139,7 @@ const PptGeneratorSetting = () => {
               </TabsList>
             </ScrollArea>
             <TabsContent value={SETTING_CATEGORY.GENERAL}>
-              <ScrollArea className="h-[75vh] pl-3 pr-4">
+              <ScrollArea className="h-[58vh] pl-3 pr-4 sm:h-[75vh]">
                 <GeneralSettings />
               </ScrollArea>
             </TabsContent>
@@ -139,12 +157,12 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[72vh] pr-3">
+                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[72vh] pr-3">
+                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
@@ -164,19 +182,19 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[72vh] pr-3">
+                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[72vh] pr-3">
+                  <ScrollArea className="h-[58vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
               </Tabs>
             </TabsContent>
             <TabsContent value={SETTING_CATEGORY.SECTION}>
-              <ScrollArea className="h-[75vh] pl-3 pr-4">
+              <ScrollArea className="h-[58vh] pl-3 pr-4 sm:h-[75vh]">
                 {/* <SectionSettings /> */}
               </ScrollArea>
             </TabsContent>
