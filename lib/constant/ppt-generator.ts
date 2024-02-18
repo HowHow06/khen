@@ -215,6 +215,7 @@ export const PPT_GENERATION_COVER_SETTINGS = {
     defaultValue: 0,
     groupingName: "position",
     tips: "Percentage distance of the textbox from the slide’s top edge (e.g., 50 represents the middle of the slide).",
+    tipsImagePath: "/images/tips/PositionYTips.png",
   },
   coverTitleFont: {
     fieldDisplayName: "Font",
@@ -248,6 +249,7 @@ export const PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
     defaultValue: 0,
     tips: "Percentage distance of the textbox from the slide’s left edge (e.g., 50 represents the middle of the slide).",
+    tipsImagePath: "/images/tips/PositionYTips.png",
   },
 } as const;
 
