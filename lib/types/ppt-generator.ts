@@ -111,6 +111,7 @@ export type BaseSettingItemMetaType = {
   fieldDisplayName: string;
   remark?: string;
   tips?: string;
+  tipsImagePath?: string;
   isNotAvailable?: boolean; //this setting is not ready / disabled by admin
   isHidden?:
     | boolean
