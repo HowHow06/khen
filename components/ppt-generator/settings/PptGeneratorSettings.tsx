@@ -206,6 +206,10 @@ const PptGeneratorSetting = () => {
                 </SheetFooter> */}
         </SheetContent>
       </Sheet>
+      {/* Add presets dropdown at mobile screen size to ease configuration process*/}
+      {isExtraSmallScreen && (
+        <PresetsDropdown formReset={reset} presets={DEFAULT_PRESETS} />
+      )}
     </div>
   );
 };
