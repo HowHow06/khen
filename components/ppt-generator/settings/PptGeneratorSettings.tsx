@@ -137,7 +137,7 @@ const PptGeneratorSetting = () => {
               </TabsList>
             </ScrollArea>
             <TabsContent value={SETTING_CATEGORY.GENERAL}>
-              <ScrollArea className="h-[58vh] pl-3 pr-4 sm:h-[75vh]">
+              <ScrollArea className="h-[54vh] pl-3 pr-4 sm:h-[75vh]">
                 <GeneralSettings />
               </ScrollArea>
             </TabsContent>
@@ -155,12 +155,12 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
                     <CoverSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
@@ -180,19 +180,19 @@ const PptGeneratorSetting = () => {
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
                   </ScrollArea>
                 </TabsContent>
                 <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[54vh] pr-3 sm:h-[72vh]">
+                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
                     <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
                   </ScrollArea>
                 </TabsContent>
               </Tabs>
             </TabsContent>
             <TabsContent value={SETTING_CATEGORY.SECTION}>
-              <ScrollArea className="h-[58vh] pl-3 pr-4 sm:h-[75vh]">
+              <ScrollArea className="h-[54vh] pl-3 pr-4 sm:h-[75vh]">
                 {/* <SectionSettings /> */}
               </ScrollArea>
             </TabsContent>
