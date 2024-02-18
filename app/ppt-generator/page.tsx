@@ -17,23 +17,22 @@ type Props = {};
 const PptGeneratorPage = (props: Props) => {
   return (
     <>
-      <Container>
-        <div className="mx-auto max-w-screen-xl px-4 py-8 text-center lg:px-12 lg:py-16">
-          <h1 className="text-primary-900 mb-4 text-3xl font-extrabold leading-none tracking-tight md:text-4xl lg:text-5xl">
-            Khen PPT Generator
-          </h1>
-          <p className="text-primary-500 mb-8 text-base font-normal sm:px-16 lg:text-xl xl:px-48">
-            Generate PPT Slides for your songs at ease!
-          </p>
-          <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0 lg:mb-8">
-            <Button
-              // variant="ghost"
-              variant="outline"
-              className="px-5 py-6"
-            >
-              Get Started!
-            </Button>
-            {/* <Button
+      <Container className="max-w-screen-xl py-8 text-center lg:py-16">
+        <h1 className="text-primary-900 mb-4 text-3xl font-extrabold leading-none tracking-tight md:text-4xl lg:text-5xl">
+          Khen PPT Generator
+        </h1>
+        <p className="text-primary-500 mb-8 text-base font-normal sm:px-16 lg:text-xl xl:px-48">
+          Generate PPT Slides for your songs at ease!
+        </p>
+        <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0 lg:mb-8">
+          <Button
+            // variant="ghost"
+            variant="outline"
+            className="px-5 py-6"
+          >
+            Get Started!
+          </Button>
+          {/* <Button
                 variant="outline"
                 className="px-5 py-6 text-center text-base font-medium"
               >
@@ -47,7 +46,6 @@ const PptGeneratorPage = (props: Props) => {
                 </svg>
                 Watch video
               </Button> */}
-          </div>
         </div>
       </Container>
       <Container>
