@@ -586,7 +586,7 @@ function getIsToCreateNewSlide({
   return isToCreateSlide || isCover;
 }
 
-const parseFilename = ({
+const parsePptFilename = ({
   filename,
   suffix,
   prefix,
@@ -666,7 +666,7 @@ export const generatePpt = async ({
 
   // 4. Save the Presentation
   const { fileName, cleanFileName, fileNamePrefix, fileNameSuffix } =
-    parseFilename({
+    parsePptFilename({
       filename: settingValues.file.filename,
       prefix: settingValues.file.filenamePrefix,
       suffix: settingValues.file.filenameSuffix,
