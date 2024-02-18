@@ -6,17 +6,19 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
   displayLabel: string;
   tips?: string;
+  tipsImagePath?: string;
 };
 
-const SettingLabel = ({ displayLabel, tips }: Props) => {
+const SettingLabel = ({ displayLabel, tips, tipsImagePath }: Props) => {
   return (
     <>
       <FormLabel className="text-left text-sm">{displayLabel}</FormLabel>
-      {tips && (
+      {(tips || tipsImagePath) && (
         <>
           <TooltipProvider>
             <Tooltip>
@@ -24,8 +26,17 @@ const SettingLabel = ({ displayLabel, tips }: Props) => {
                 <Info className="h-5 w-5 shrink-0" />
               </TooltipTrigger>
               <TooltipContent>
-                <div className="max-w-52">
-                  <p>{tips}</p>
+                <div className="flex max-w-52 flex-col">
+                  {tips && <p>{tips}</p>}
+                  {tipsImagePath && (
+                    <Image
+                      src={tipsImagePath}
+                      alt="tipsImage"
+                      className="self-center rounded border"
+                      width="250"
+                      height="250"
+                    />
+                  )}
                 </div>
               </TooltipContent>
             </Tooltip>

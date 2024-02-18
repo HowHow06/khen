@@ -50,6 +50,7 @@ const SettingFormField = ({
               <SettingLabel
                 displayLabel={settingField.fieldDisplayName}
                 tips={settingField.tips}
+                tipsImagePath={settingField.tipsImagePath}
               />
             </div>
             <FormControl>
