@@ -7,10 +7,11 @@ import {
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
-import theme from "@/lib/tailwindTheme";
+import { SCREEN_SIZE } from "@/lib/constant/general";
+import { useScreenSize } from "@/lib/hooks/useScreenSize";
 import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../../ui/button";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
@@ -27,10 +28,6 @@ import GeneralSettings from "./GeneralSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
-const smBreakpointPx = theme.screens.sm;
-// Parse the numeric part of the breakpoint
-const smBreakpoint = parseInt(smBreakpointPx, 10);
-
 const PptGeneratorSetting = () => {
   const { form } = usePptGeneratorFormContext();
   const { getValues, reset } = form;
@@ -41,21 +38,8 @@ const PptGeneratorSetting = () => {
     setCurrentCoverTab,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
-  const [isExtraSmallScreen, setIsExtraSmallScreen] = useState(false);
-
-  useEffect(() => {
-    // Function to check screen size and update state
-    const checkScreenSize = () => {
-      setIsExtraSmallScreen(window.innerWidth < smBreakpoint);
-    };
-
-    // Check immediately on mount and then on every window resize
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    // Cleanup listener on component unmount
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
