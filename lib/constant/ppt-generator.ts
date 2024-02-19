@@ -194,6 +194,11 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.IMAGE,
     isOptional: true,
     defaultValue: null,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundImage", "useMainBackgroundImage"),
+      ),
   },
   useMainBackgroundColor: {
     fieldDisplayName: "Use Main Background Color",
@@ -205,6 +210,51 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.COLOR,
     isOptional: true,
     defaultValue: "#000000",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundColor", "useMainBackgroundColor"),
+      ),
+  },
+  sectionUseBackgroundColorWhenEmpty: {
+    fieldDisplayName: "Section Use Background Color for Empty Slides",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+    tips: "If unchecked, background image will be used for empty slides.",
+  },
+  sectionIgnoreSubcontent: {
+    fieldDisplayName: "Section Ignore Secondary Content",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+  },
+  sectionUseSingleTextbox: {
+    fieldDisplayName: "Section Use Single Textbox",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+    isNotAvailable: true,
+  },
+  sectionSingleLineMode: {
+    fieldDisplayName: "Section Single Line Mode",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
+  },
+  sectionLineCountPerSlide: {
+    fieldDisplayName: "Section Line Count Per Slide",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 2,
+    isNotAvailable: true, // TODO: to implement
+  },
+  sectionIgnoreSubcontentWhenIdentical: {
+    fieldDisplayName: "Section Ignore Secondary Content when identical",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+  },
+  sectionTransition: {
+    fieldDisplayName: "Section Transition",
+    fieldType: SETTING_FIELD_TYPE.TRANSITION,
+    isNotAvailable: true, // TODO: implement transition, KHEN-26
+    defaultValue: "",
   },
 } as const;
 
