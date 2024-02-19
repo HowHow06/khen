@@ -19,7 +19,7 @@ import {
 import { ComboboxItemsType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-type ComboxBoxProps = {
+export type ComboxBoxProps = {
   items: ComboboxItemsType;
   selectedValue?: string;
   defaultLabel?: string;
