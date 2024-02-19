@@ -1,6 +1,7 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
 import {
+  deepMerge,
   extractNumber,
   getBase64,
   getBlobFromUrl,
@@ -22,6 +23,7 @@ import {
   PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
+  PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
@@ -711,7 +713,11 @@ export const getPreset = (
   pptPresets: { [key in string]: PptSettingsStateType },
 ): PptSettingsStateType | undefined => {
   if (presetName in pptPresets) {
-    return pptPresets[presetName];
+    const defaultInitialState = generatePptSettingsInitialState(
+      PPT_GENERATION_SETTINGS_META,
+    );
+    const resultPreset = deepMerge(defaultInitialState, pptPresets[presetName]);
+    return resultPreset;
   }
   return undefined;
 };
