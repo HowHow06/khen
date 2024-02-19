@@ -540,4 +540,4 @@ export const DEFAULT_PRESETS: PresetsType = [
   },
 ];
 
-export const MAIN_SECTION_NAME = "mainSection";
+export const MAIN_SECTION_NAME = "main-section";
