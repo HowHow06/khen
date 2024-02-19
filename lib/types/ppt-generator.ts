@@ -232,3 +232,12 @@ export type PresetsType = {
 export type CategoryWithContentType =
   | typeof SETTING_CATEGORY.COVER
   | typeof SETTING_CATEGORY.CONTENT;
+
+export type PptSettingsUIState = {
+  currentCategoryTab: string;
+  currentContentTab: string;
+  currentCoverTab: string;
+  openAccordions: {
+    [key: string]: string[];
+  };
+};

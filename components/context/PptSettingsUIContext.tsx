@@ -1,5 +1,6 @@
 "use client";
 import { CONTENT_TYPE, SETTING_CATEGORY } from "@/lib/constant";
+import { PptSettingsUIState } from "@/lib/types";
 import React, {
   ReactNode,
   createContext,
@@ -7,15 +8,6 @@ import React, {
   useContext,
   useReducer,
 } from "react";
-
-type PptSettingsUIState = {
-  currentCategoryTab: string;
-  currentContentTab: string;
-  currentCoverTab: string;
-  openAccordions: {
-    [key: string]: string[];
-  };
-};
 
 type PptSettingsUIAction =
   | { type: "SET_CURRENT_CATEGORY_TAB"; tab: string }
