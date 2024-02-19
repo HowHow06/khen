@@ -208,7 +208,9 @@ export type SectionSettingsType = {
     BasePptSettingsStateType,
     typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
   > & {
-    general: SettingsValueType<typeof PPT_GENERATION_SECTION_SETTINGS>;
+    [SETTING_CATEGORY.GENERAL]: SettingsValueType<
+      typeof PPT_GENERATION_SECTION_SETTINGS
+    >;
   };
 };
 
