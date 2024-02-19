@@ -204,9 +204,12 @@ type BasePptSettingsStateType = {
 };
 
 export type SectionSettingsType = {
-  [key in `${typeof SECTION_PREFIX}${number}`]: SettingsValueType<
-    typeof PPT_GENERATION_SECTION_SETTINGS
-  >;
+  [key in `${typeof SECTION_PREFIX}${number}`]: Omit<
+    BasePptSettingsStateType,
+    typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
+  > & {
+    general: SettingsValueType<typeof PPT_GENERATION_SECTION_SETTINGS>;
+  };
 };
 
 export type PptSettingsStateType = BasePptSettingsStateType & {
