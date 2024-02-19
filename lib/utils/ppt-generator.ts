@@ -626,27 +626,13 @@ export const generatePpt = async ({
 }) => {
   const {
     general: {
-      ignoreSubcontent,
       separateSectionsToFiles,
       mainBackgroundColor,
       mainBackgroundImage,
     },
   } = settingValues;
-  const hasSecondaryContent = !ignoreSubcontent;
   const primaryLinesArray = primaryLyric.split("\n");
   const secondaryLinesArray = secondaryLyric.split("\n");
-
-  // 0. Perform length checking
-  // TODO: perform checking in frontend
-  if (
-    hasSecondaryContent &&
-    primaryLinesArray.length !== secondaryLinesArray.length &&
-    !confirm(
-      `主内容有 ${primaryLinesArray.length} 行，而副内容有 ${secondaryLinesArray.length} 行，确定继续吗？`,
-    )
-  ) {
-    return;
-  }
 
   // 1. Get background prop for the presentation
   const backgroundProp = await getPptBackgroundProp({

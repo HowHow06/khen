@@ -1,5 +1,6 @@
 "use client";
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
+import { DIALOG_RESULT } from "@/lib/constant/general";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType } from "@/lib/types";
 import {
@@ -20,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form } from "../ui/form";
+import { useAlertDialog } from "./AlertDialogContext";
 
 type PptGeneratorFormContextType = {
   mainText: string;
@@ -48,13 +50,33 @@ export const PptGeneratorFormProvider: React.FC<
 > = ({ children }) => {
   const [mainText, setMainText] = useState("");
   const [secondaryText, setSecondaryText] = useState("");
+  const { showDialog } = useAlertDialog();
 
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
   });
 
-  function onSubmit(values: z.infer<typeof settingsSchema>) {
+  async function onSubmit(values: z.infer<typeof settingsSchema>) {
+    const {
+      general: { ignoreSubcontent },
+    } = values;
+    const hasSecondaryContent = !ignoreSubcontent;
+    const primaryLinesArray = mainText.split("\n");
+    const secondaryLinesArray = secondaryText.split("\n");
+
+    if (
+      hasSecondaryContent &&
+      primaryLinesArray.length !== secondaryLinesArray.length
+    ) {
+      const result = await showDialog("Are you sure?", {
+        description: `There are ${primaryLinesArray.length} line(s) in the main lyrics, but there is only ${secondaryLinesArray.length} line(s) in the secondary lyrics, is this the desired behavior?`,
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+    }
+
     generatePpt({
       settingValues: values as PptSettingsStateType,
       primaryLyric: mainText || "",
