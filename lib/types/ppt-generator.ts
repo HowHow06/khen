@@ -6,6 +6,8 @@ import {
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_FILE_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
+  PPT_GENERATION_SECTION_SETTINGS,
+  SECTION_PREFIX,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
@@ -198,6 +200,11 @@ export type PptSettingsStateType = {
   };
   [SETTING_CATEGORY.CONTENT]: {
     [T in ContentTypeType]: ContentSettingsType;
+  };
+  [SETTING_CATEGORY.SECTION]?: {
+    [key in `${typeof SECTION_PREFIX}${number}`]: SettingsValueType<
+      typeof PPT_GENERATION_SECTION_SETTINGS
+    >;
   };
 };
 
