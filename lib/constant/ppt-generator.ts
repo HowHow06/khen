@@ -539,3 +539,5 @@ export const DEFAULT_PRESETS: PresetsType = [
     presetName: "liveEnglishPreset",
   },
 ];
+
+export const MAIN_SECTION_NAME = "mainSection";
