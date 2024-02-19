@@ -41,7 +41,9 @@ const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
   }, []);
 
   useEffect(() => {
-    renderImage(value);
+    if (value) {
+      renderImage(value);
+    }
   }, [value, renderImage]);
 
   const removeImage = () => {

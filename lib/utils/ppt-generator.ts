@@ -163,7 +163,7 @@ export const getBase64FromImageField = async (
     typeof SETTING_FIELD_TYPE.IMAGE
   >,
 ): Promise<string | null> => {
-  if (imageValue === null) {
+  if (!imageValue) {
     return null;
   }
 
