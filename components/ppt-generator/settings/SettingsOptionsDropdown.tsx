@@ -81,13 +81,13 @@ const SettingsOptionsDropdown = ({}: Props) => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="flex flex-grow flex-row">
+        <div className="flex flex-grow flex-row">
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="ml-auto" size={"icon"}>
               <MoreHorizontal className="h-5" />
             </Button>
-          </div>
-        </DropdownMenuTrigger>
+          </DropdownMenuTrigger>
+        </div>
         <DropdownMenuContent align="end" className="z-50">
           {/* Hidden file input for importing settings */}
           <input
