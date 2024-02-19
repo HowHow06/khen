@@ -229,3 +229,11 @@ export const deepMerge = <T extends { [key in string]: any }>(
 
   return tempResult;
 };
+
+export function getLinesStartingWith(inputString: string, find: string) {
+  const lines = inputString.split("\n");
+
+  const findRegex = new RegExp(`^${find}`, "m");
+
+  return lines.filter((line) => findRegex.test(line));
+}
