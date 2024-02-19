@@ -13,6 +13,7 @@ import { fontFaces } from "./font-face";
 export const DEFAULT_GROUPING_NAME = "default" as const;
 export const DEFAULT_LINE_COUNT_PER_SLIDE = 2 as const;
 export const TEXTBOX_GROUPING_PREFIX = "textboxLine" as const;
+export const SECTION_PREFIX = "section" as const;
 export const DEFAULT_AUTHOR = "Khen Ho2" as const;
 
 export const DEFAULT_SUBJECT =
@@ -179,7 +180,6 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isNotAvailable: true, // TODO: to implement khen-29
   },
 } as const;
 
@@ -203,6 +203,7 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
   sectionBackgroundColor: {
     fieldDisplayName: "Section Background Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
+    isOptional: true,
     defaultValue: "#000000",
   },
 } as const;

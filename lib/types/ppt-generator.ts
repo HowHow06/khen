@@ -192,7 +192,7 @@ export type SectionSettingsType = {
 
 export type ContentTypeType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 
-export type PptSettingsStateType = {
+type BasePptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: SettingsValueType<
     typeof PPT_GENERATION_FILE_SETTINGS
   >;
@@ -207,6 +207,9 @@ export type PptSettingsStateType = {
   [SETTING_CATEGORY.CONTENT]: {
     [T in ContentTypeType]: ContentSettingsType;
   };
+};
+
+export type PptSettingsStateType = BasePptSettingsStateType & {
   [SETTING_CATEGORY.SECTION]?: SectionSettingsType;
 };
 
