@@ -1,3 +1,4 @@
+import { AlertDialogProvider } from "@/components/context/AlertDialogContext";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -22,10 +23,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
-          {children}
-          <Toaster expand={true} />
-          <Footer />
+          <AlertDialogProvider>
+            <Header />
+            {children}
+            <Toaster expand={true} />
+            <Footer />
+          </AlertDialogProvider>
         </ThemeProvider>
       </body>
     </html>
