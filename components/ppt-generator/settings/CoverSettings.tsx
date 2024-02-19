@@ -9,6 +9,7 @@ type CoverSettingsProps = {
   contentKey?: string;
 };
 
+// TODO: remove this component
 const CoverSettings = ({
   contentKey,
   className,

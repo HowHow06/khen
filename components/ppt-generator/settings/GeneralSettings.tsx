@@ -6,6 +6,7 @@ import SettingFormField from "./SettingFormField";
 
 type GeneralSettingsProps = {};
 
+// TODO: remove this component
 const GeneralSettings = ({}: GeneralSettingsProps) => {
   const { form } = usePptGeneratorFormContext();
   const { control, getValues } = form;
