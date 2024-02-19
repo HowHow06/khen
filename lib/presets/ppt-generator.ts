@@ -113,7 +113,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
 export const liveChinesePreset: PptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: {
     filenamePrefix: "",
-    filenameSuffix: "",
+    filenameSuffix: "(live)",
   },
   [SETTING_CATEGORY.GENERAL]: {
     mainBackgroundImage: `/images/background/greenScreenWithBlackCover_v2.png`,
@@ -331,7 +331,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
 export const liveEnglishPreset: PptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: {
     filenamePrefix: "",
-    filenameSuffix: "",
+    filenameSuffix: "(live)",
   },
   [SETTING_CATEGORY.GENERAL]: {
     mainBackgroundImage: `/images/background/greenScreenWithBlackCover_v2.png`,
