@@ -60,7 +60,8 @@ export const PptGeneratorFormProvider: React.FC<
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
     if (process.env.NODE_ENV == "development") {
-      console.log("Submitted Value:", values);
+      const submittedValue = values as PptSettingsStateType;
+      console.log("Submitted Value:", submittedValue);
     }
     const {
       general: { ignoreSubcontent },
