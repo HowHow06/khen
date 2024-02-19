@@ -184,12 +184,6 @@ export type ContentSettingsType = GroupedSettingsValueType<
 > &
   ContentTextboxSettingsType;
 
-export type SectionSettingsType = {
-  [key in `${typeof SECTION_PREFIX}${number}`]: SettingsValueType<
-    typeof PPT_GENERATION_SECTION_SETTINGS
-  >;
-};
-
 export type ContentTypeType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 
 type BasePptSettingsStateType = {
@@ -207,6 +201,12 @@ type BasePptSettingsStateType = {
   [SETTING_CATEGORY.CONTENT]: {
     [T in ContentTypeType]: ContentSettingsType;
   };
+};
+
+export type SectionSettingsType = {
+  [key in `${typeof SECTION_PREFIX}${number}`]: SettingsValueType<
+    typeof PPT_GENERATION_SECTION_SETTINGS
+  >;
 };
 
 export type PptSettingsStateType = BasePptSettingsStateType & {
