@@ -204,3 +204,28 @@ export function removeIdenticalWords(
 
   return filteredWordsB.join(" ");
 }
+
+export const deepMerge = <T extends { [key in string]: any }>(
+  target: T,
+  source: T,
+) => {
+  let tempResult = {
+    ...target,
+  };
+
+  Object.entries(source).forEach(([key, value]) => {
+    if (key in target && typeof value === "object" && value !== null) {
+      tempResult = {
+        ...tempResult,
+        [key]: deepMerge(target[key], value),
+      } as T;
+    } else {
+      tempResult = {
+        ...tempResult,
+        [key]: value,
+      } as T;
+    }
+  });
+
+  return tempResult;
+};
