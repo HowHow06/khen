@@ -26,7 +26,6 @@ import {
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
-import { pptPresets } from "../presets";
 import {
   BaseSettingMetaType,
   ContentSettingsType,
@@ -709,6 +708,7 @@ export const generatePpt = async ({
 
 export const getPreset = (
   presetName: string,
+  pptPresets: { [key in string]: PptSettingsStateType },
 ): PptSettingsStateType | undefined => {
   if (presetName in pptPresets) {
     return pptPresets[presetName];

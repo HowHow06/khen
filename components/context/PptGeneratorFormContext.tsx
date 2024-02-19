@@ -1,6 +1,7 @@
 "use client";
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType } from "@/lib/types";
 import {
@@ -38,7 +39,7 @@ const PptGeneratorFormContext = createContext<
 >(undefined);
 
 const defaultSettingsValue = process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING
-  ? getPreset(process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING)
+  ? getPreset(process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING, pptPresets)
   : generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META);
 
 type PptGeneratorFormProviderProps = {

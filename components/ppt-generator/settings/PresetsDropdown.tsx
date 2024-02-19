@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { pptPresets } from "@/lib/presets";
 import { PresetsType } from "@/lib/types";
 import { getPreset } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -31,7 +32,7 @@ const PresetsDropdown = ({ formReset, presets }: Props) => {
             <DropdownMenuItem
               key={index}
               onSelect={() => {
-                const preset = getPreset(presetName);
+                const preset = getPreset(presetName, pptPresets);
                 if (preset) {
                   formReset(preset);
                   toast.success("Preset applied.");
