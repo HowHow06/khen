@@ -59,6 +59,9 @@ export const PptGeneratorFormProvider: React.FC<
   });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
+    if (process.env.NODE_ENV == "development") {
+      console.log("Submitted Value:", values);
+    }
     const {
       general: { ignoreSubcontent },
     } = values;
@@ -86,6 +89,9 @@ export const PptGeneratorFormProvider: React.FC<
   }
 
   function onInvalidSubmit(errorsObject: FieldErrors<PptSettingsStateType>) {
+    if (process.env.NODE_ENV == "development") {
+      console.log("Errors:", errorsObject);
+    }
     const errors = traverseAndCollect<FieldError, true>(
       errorsObject,
       "message",
