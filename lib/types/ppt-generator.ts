@@ -218,3 +218,7 @@ export type PresetsType = {
   presetDisplayName: string;
   presetName: string;
 }[];
+
+export type CategoryWithContentType =
+  | typeof SETTING_CATEGORY.COVER
+  | typeof SETTING_CATEGORY.CONTENT;

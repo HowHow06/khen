@@ -30,6 +30,7 @@ import {
 } from "../constant";
 import {
   BaseSettingMetaType,
+  CategoryWithContentType,
   ContentSettingsType,
   ContentTextboxSettingsType,
   ContentTypeType,
@@ -56,9 +57,6 @@ export const generatePptSettingsInitialState = (
     },
   };
 
-  type CategoryWithContentType =
-    | typeof SETTING_CATEGORY.COVER
-    | typeof SETTING_CATEGORY.CONTENT;
   const applySettings = ({
     category,
     settingsMeta,
