@@ -1,3 +1,4 @@
+"use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
