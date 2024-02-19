@@ -6,3 +6,8 @@ export const SCREEN_SIZE = {
   XL: "XL",
   "2XL": "2XL",
 } as const;
+
+export const DIALOG_RESULT = {
+  CONTINUE: "CONTINUE",
+  CANCEL: "CANCEL",
+} as const;
