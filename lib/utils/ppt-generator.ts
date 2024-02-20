@@ -156,7 +156,7 @@ export const generatePptSettingsInitialState = (
   return initialState;
 };
 
-const getInitialValueFromSettings = ({
+export const getInitialValueFromSettings = ({
   settingsMeta,
   hasGrouping = false,
 }: {
@@ -189,6 +189,20 @@ const getInitialValueFromSettings = ({
   });
 
   return resultValues;
+};
+
+export const getTextboxSettingsInitialState = (
+  textboxSettings: BaseSettingMetaType,
+  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
+): ContentTextboxSettingsType => {
+  const textBoxInitialState: ContentTextboxSettingsType = {};
+  Array.from({ length: textboxCount }).forEach((_, index) => {
+    textBoxInitialState[`${TEXTBOX_GROUPING_PREFIX}${index + 1}`] =
+      getInitialValueFromSettings({
+        settingsMeta: textboxSettings,
+      });
+  });
+  return textBoxInitialState;
 };
 
 export const generatePptSettingsInitialStateOptimized = (
@@ -225,22 +239,18 @@ export const generatePptSettingsInitialStateOptimized = (
         break;
       case SETTING_CATEGORY.CONTENT:
         Object.values(CONTENT_TYPE).forEach((contentType) => {
-          initialState[category][contentType] = getInitialValueFromSettings({
-            settingsMeta,
-            hasGrouping: true,
-          });
-          Array.from({ length: textboxCount }).forEach((_, index) => {
-            initialState[category][contentType][
-              `${TEXTBOX_GROUPING_PREFIX}${index + 1}`
-            ] = getInitialValueFromSettings({
-              settingsMeta: settings.contentTextbox,
-            });
-          });
+          initialState[category][contentType] = {
+            ...getInitialValueFromSettings({
+              settingsMeta,
+              hasGrouping: true,
+            }),
+            ...getTextboxSettingsInitialState(
+              settings.contentTextbox,
+              textboxCount,
+            ),
+          };
         });
         break;
-      // case SETTING_CATEGORY.SECTION:
-      //   applySettings({ category, settingsMeta });
-      //   break;
     }
   });
 
