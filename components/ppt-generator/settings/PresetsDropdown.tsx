@@ -6,15 +6,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { pptPresets } from "@/lib/presets";
-import { PresetsType } from "@/lib/types";
+import { PptSettingsStateType, PresetsType } from "@/lib/types";
 import { getPreset } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { FieldValues, UseFormReset } from "react-hook-form";
+import { UseFormReset } from "react-hook-form";
 import { toast } from "sonner";
 
 type Props = {
-  formReset: UseFormReset<FieldValues>;
+  formReset: UseFormReset<PptSettingsStateType>;
   presets: PresetsType;
   useIcon?: boolean;
   title?: string;
