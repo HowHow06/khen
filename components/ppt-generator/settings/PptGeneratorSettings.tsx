@@ -254,26 +254,46 @@ const PptGeneratorSetting = () => {
       },
     ];
 
+    const originalSettingValues = getValues();
     const sectionInitialValue: {
       [key in SectionSettingsKeyType]: SectionSettingsType;
-    } = {};
+    } = { ...originalSettingValues[SETTING_CATEGORY.SECTION] };
+
     sections.forEach((sectionName, currentIndex) => {
-      sectionInitialValue[`${SECTION_PREFIX}${currentIndex + 1}`] =
-        getSectionSettingsInitialValue({
-          settings: PPT_GENERATION_SETTINGS_META,
-        });
+      const currentSectionNumber = currentIndex + 1;
+      if (!sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`]) {
+        sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`] =
+          getSectionSettingsInitialValue({
+            settings: PPT_GENERATION_SETTINGS_META,
+          });
+      }
       newSectionItems.push({
-        value: `${SECTION_PREFIX}${currentIndex + 1}`,
+        value: `${SECTION_PREFIX}${currentSectionNumber}`,
         label: `${sectionName.replace(LYRIC_SECTION.SECTION, "")}`,
       });
     });
+
+    if (sections.length < sectionItems.length - 1) {
+      // delete excess sections
+      const difference = sectionItems.length - 1 - sections.length;
+      Array.from({ length: difference }).forEach((_, index) => {
+        const sectionNumber = sections.length + 1 + index;
+        delete sectionInitialValue[`${SECTION_PREFIX}${sectionNumber}`];
+      });
+    }
+
     setSectionItems(newSectionItems);
-    const originalSettingValues = getValues();
     reset({
       ...originalSettingValues,
       [SETTING_CATEGORY.SECTION]: sectionInitialValue,
     });
-  }, [mainText, isDifferentSettingsBySection, getValues, reset]);
+  }, [
+    mainText,
+    isDifferentSettingsBySection,
+    getValues,
+    reset,
+    sectionItems.length,
+  ]);
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
