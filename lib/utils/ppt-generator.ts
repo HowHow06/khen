@@ -19,11 +19,14 @@ import {
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
   LYRIC_SECTION,
+  MASTER_SLIDE_BACKGROUND_COLOR,
+  MASTER_SLIDE_BACKGROUND_IMAGE,
   PPT_GENERATION_CONTENT_SETTINGS,
   PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
+  SECTION_PREFIX,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
@@ -353,18 +356,28 @@ const getPptBackgroundProp = async ({
   };
 };
 
+function getSectionImageSlideMasterTitle(sectionNumber: number) {
+  return `${SECTION_PREFIX}${sectionNumber}_IMAGE`;
+}
+
+function getSectionColorSlideMasterTitle(sectionNumber: number) {
+  return `${SECTION_PREFIX}${sectionNumber}_COLOR`;
+}
+
 function createPresentationInstance({
   author = DEFAULT_AUTHOR,
   subject = DEFAULT_SUBJECT,
   title = DEFAULT_TITLE,
   layout = DEFAULT_PPT_LAYOUT,
   backgroundProp,
+  sectionsBackgroundProp,
 }: {
   author?: string;
   subject?: string;
   title?: string;
   layout?: string;
   backgroundProp: PptxGenJS.default.BackgroundProps;
+  sectionsBackgroundProp?: PptxGenJS.default.BackgroundProps[];
 }) {
   let pres = new pptxgenjs();
   pres.author = author;
@@ -372,13 +385,25 @@ function createPresentationInstance({
   pres.title = title;
   pres.layout = layout;
   pres.defineSlideMaster({
-    title: "MASTER_SLIDE_BACKGROUND_IMAGE",
+    title: MASTER_SLIDE_BACKGROUND_IMAGE,
     background: backgroundProp,
   });
   pres.defineSlideMaster({
-    title: "MASTER_SLIDE_BACKGROUND_COLOR",
+    title: MASTER_SLIDE_BACKGROUND_COLOR,
     background: { color: backgroundProp.color },
   });
+  if (sectionsBackgroundProp) {
+    sectionsBackgroundProp.forEach((prop, index) => {
+      pres.defineSlideMaster({
+        title: getSectionImageSlideMasterTitle(index + 1),
+        background: prop,
+      });
+      pres.defineSlideMaster({
+        title: getSectionColorSlideMasterTitle(index + 1),
+        background: { color: prop.color },
+      });
+    });
+  }
 
   return pres;
 }
@@ -408,16 +433,23 @@ function createSlidesFromLyrics({
   settingValues: PptSettingsStateType;
 }) {
   const {
-    general: { useBackgroundColorWhenEmpty, singleLineMode, ignoreSubcontent },
+    general: {
+      useBackgroundColorWhenEmpty,
+      singleLineMode,
+      ignoreSubcontent,
+      useDifferentSettingForEachSection,
+    },
+    section,
   } = settingValues;
-  const isBackgroundColorWhenEmpty =
+  const mainIsBackgroundColorWhenEmpty =
     useBackgroundColorWhenEmpty ??
     PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue;
-  const linePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
-  const hasSecondaryContent = !ignoreSubcontent;
+  const mainLinePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
+  const mainHasSecondaryContent = !ignoreSubcontent;
 
   let coverCount = 0;
   let pptSectionCount = 0;
+  let mainSectionDisplayNumber = 0;
   let mainSectionCount = 0;
   let subsectionCount = 0;
   let currentPptSectionName = "";
@@ -427,8 +459,12 @@ function createSlidesFromLyrics({
     startLineIndex: -1,
     endLineIndex: -1,
   };
+
   const mainSectionsInfo: PptMainSectionInfo[] = [];
   let currentSlide: PptxGenJS.default.Slide | undefined = undefined;
+
+  let currentSectionCoverCount = 0;
+  let currentSectionPptSectionCount = 0;
 
   primaryLinesArray.forEach((primaryLine, index) => {
     // 1. check if is main or sub section, just add the section to presentation instance
@@ -444,16 +480,16 @@ function createSlidesFromLyrics({
       const hasNumbering = startsWithNumbering(sectionName);
 
       if (hasNumbering) {
-        mainSectionCount = extractNumber(sectionName);
+        mainSectionDisplayNumber = extractNumber(sectionName);
       }
 
       if (!hasNumbering && isMainSection) {
-        mainSectionCount++;
-        sectionName = `${mainSectionCount}. ${sectionName}`;
+        mainSectionDisplayNumber++;
+        sectionName = `${mainSectionDisplayNumber}. ${sectionName}`;
       }
 
       if (!hasNumbering && isSubSection) {
-        sectionName = `${mainSectionCount}.${subsectionCount} ${sectionName}`;
+        sectionName = `${mainSectionDisplayNumber}.${subsectionCount} ${sectionName}`;
       }
 
       if (
@@ -476,19 +512,52 @@ function createSlidesFromLyrics({
           startLineIndex: index,
           endLineIndex: -1,
         };
+        mainSectionCount++;
+        currentSectionPptSectionCount = 0;
+        currentSectionCoverCount = 0;
       }
 
+      currentSectionPptSectionCount++;
       currentPptSectionName = sectionName;
       pres.addSection({ title: sectionName });
       return;
     }
+
+    const currentSectionSetting =
+      section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
+    const isUseSectionSettings =
+      useDifferentSettingForEachSection &&
+      currentSectionSetting &&
+      !currentSectionSetting.general?.useMainSectionSettings;
+
+    const isBackgroundColorWhenEmpty = isUseSectionSettings
+      ? currentSectionSetting.general?.sectionUseBackgroundColorWhenEmpty ??
+        PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue
+      : mainIsBackgroundColorWhenEmpty;
+    const linePerSlide = isUseSectionSettings
+      ? currentSectionSetting.general?.sectionSingleLineMode
+        ? 1
+        : DEFAULT_LINE_COUNT_PER_SLIDE
+      : mainLinePerSlide;
+    const hasSecondaryContent = isUseSectionSettings
+      ? !currentSectionSetting.general?.sectionIgnoreSubcontent
+      : mainHasSecondaryContent;
+
     // Get the current index before manipulating the cover count
-    const currentIndex = index - coverCount - pptSectionCount;
-    let currentLine = primaryLine;
+    const currentIndex =
+      index -
+      currentSectionCoverCount -
+      currentSectionPptSectionCount -
+      (mainSectionsInfo.length > 0
+        ? mainSectionsInfo[mainSectionsInfo.length - 1].endLineIndex + 1 // +1 because index starts from 0
+        : 0);
+    let currentLine = primaryLine.trim();
+
     // 2. check if is cover, update current line
     const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
     if (isCover) {
       coverCount++;
+      currentSectionCoverCount++;
       const regex = /^#[^#]*/;
       const mainTitle = currentLine
         .match(regex)?.[0]
@@ -506,23 +575,39 @@ function createSlidesFromLyrics({
       isBackgroundColorWhenEmpty,
       sectionName: currentPptSectionName,
       currentPresSlide: currentSlide,
+      isUseSectionColor:
+        !!isUseSectionSettings &&
+        !currentSectionSetting.general?.useMainBackgroundColor,
+      isUseSectionImage:
+        !!isUseSectionSettings &&
+        !currentSectionSetting.general?.useMainBackgroundImage,
+      currentSectionNumber: mainSectionCount,
     });
     currentSlide = slide; // update current slide
 
     const textboxNumber = (currentIndex % linePerSlide) + 1;
+    const mainContentOption = isUseSectionSettings
+      ? currentSectionSetting.content.main
+      : settingValues.content.main;
+    const mainCoverOption = isUseSectionSettings
+      ? currentSectionSetting.cover.main
+      : settingValues.cover.main;
     // add primary content
     addTextLineToSlide({
       slide,
       line: currentLine,
-      contentOption: settingValues.content.main,
-      coverOption: isCover ? settingValues.cover.main : undefined,
+      contentOption: mainContentOption,
+      coverOption: isCover ? mainCoverOption : undefined,
       textboxKey: `textboxLine${textboxNumber}`,
       settingValues,
     });
 
     if (hasSecondaryContent) {
-      let secondaryLine = secondaryLinesArray[index] ?? "";
-      if (settingValues.general.ignoreSubcontentWhenIdentical) {
+      let secondaryLine = secondaryLinesArray[index]?.trim() ?? "";
+      const toRemoveIdenticalWords = isUseSectionSettings
+        ? currentSectionSetting.general?.sectionIgnoreSubcontentWhenIdentical
+        : settingValues.general.ignoreSubcontentWhenIdentical;
+      if (toRemoveIdenticalWords) {
         secondaryLine = removeIdenticalWords(secondaryLine, primaryLine);
       }
       if (isCover) {
@@ -535,12 +620,17 @@ function createSlidesFromLyrics({
           ? secondaryLine.substring(subCoverLineIndex + 3)
           : secondaryLine.replace(`${LYRIC_SECTION.MAINTITLE} `, ""); // use the pinyin if no secondary title
       }
-
+      const secondaryContentOption = isUseSectionSettings
+        ? currentSectionSetting.content.secondary
+        : settingValues.content.secondary;
+      const secondaryCoverOption = isUseSectionSettings
+        ? currentSectionSetting.cover.secondary
+        : settingValues.cover.secondary;
       addTextLineToSlide({
         slide,
         line: secondaryLine,
-        contentOption: settingValues.content.secondary,
-        coverOption: isCover ? settingValues.cover.secondary : undefined,
+        contentOption: secondaryContentOption,
+        coverOption: isCover ? secondaryCoverOption : undefined,
         textboxKey: `textboxLine${textboxNumber}`,
         settingValues,
       });
@@ -570,6 +660,9 @@ function getWorkingSlide({
   isEmptyLine,
   isBackgroundColorWhenEmpty,
   currentPresSlide,
+  isUseSectionColor,
+  isUseSectionImage,
+  currentSectionNumber,
 }: {
   pres: pptxgenjs;
   currentIndex: number;
@@ -579,6 +672,9 @@ function getWorkingSlide({
   isEmptyLine: boolean;
   isBackgroundColorWhenEmpty: boolean;
   currentPresSlide?: PptxGenJS.default.Slide;
+  isUseSectionColor: boolean;
+  isUseSectionImage: boolean;
+  currentSectionNumber: number;
 }): PptxGenJS.default.Slide {
   const isToCreateSlide =
     getIsToCreateNewSlide({
@@ -589,10 +685,17 @@ function getWorkingSlide({
 
   if (isToCreateSlide) {
     const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
+    const colorMasterSlideToUse = isUseSectionColor
+      ? getSectionColorSlideMasterTitle(currentSectionNumber)
+      : MASTER_SLIDE_BACKGROUND_COLOR;
+    const imageMasterSlideToUse = isUseSectionImage
+      ? getSectionImageSlideMasterTitle(currentSectionNumber)
+      : MASTER_SLIDE_BACKGROUND_IMAGE;
+
     const newSlide = pres.addSlide({
       masterName: isUseBackgroundColor
-        ? "MASTER_SLIDE_BACKGROUND_COLOR"
-        : "MASTER_SLIDE_BACKGROUND_IMAGE",
+        ? colorMasterSlideToUse
+        : imageMasterSlideToUse,
       ...(sectionName && { sectionTitle: sectionName }),
     });
     return newSlide;
@@ -780,23 +883,53 @@ export const generatePpt = async ({
       separateSectionsToFiles,
       mainBackgroundColor,
       mainBackgroundImage,
+      useDifferentSettingForEachSection,
     },
+    section,
   } = settingValues;
   const primaryLinesArray = primaryLyric.split("\n");
   const secondaryLinesArray = secondaryLyric.split("\n");
 
+  const mainBackgroundColorToUse =
+    mainBackgroundColor ??
+    PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
+  const mainBackgroundImageToUse =
+    mainBackgroundImage ??
+    PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
   // 1. Get background prop for the presentation
-  const backgroundProp = await getPptBackgroundProp({
-    backgroundColor:
-      mainBackgroundColor ??
-      PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue,
-    backgroundImage:
-      mainBackgroundImage ??
-      PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue,
+  const mainBackgroundProp = await getPptBackgroundProp({
+    backgroundColor: mainBackgroundColorToUse,
+    backgroundImage: mainBackgroundImageToUse,
   });
 
+  // 1.1 Get background props for all sections
+  const sectionsBackgroundProp: PptxGenJS.default.BackgroundProps[] = [];
+  if (useDifferentSettingForEachSection && section) {
+    for (const [sectionName, sectionSetting] of Object.entries(section)) {
+      const sectionBackgroundColor =
+        sectionSetting.general?.sectionBackgroundColor ??
+        PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
+      const sectionBackgroundImage =
+        sectionSetting.general?.sectionBackgroundImage ??
+        PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
+
+      const backgroundProp = await getPptBackgroundProp({
+        backgroundColor: sectionSetting.general?.useMainBackgroundColor
+          ? mainBackgroundColorToUse
+          : sectionBackgroundColor,
+        backgroundImage: sectionSetting.general?.useMainBackgroundImage
+          ? mainBackgroundImageToUse
+          : sectionBackgroundImage,
+      });
+      sectionsBackgroundProp.push(backgroundProp);
+    }
+  }
+
   // 2. Create a new Presentation instance
-  const pres = createPresentationInstance({ backgroundProp: backgroundProp });
+  const pres = createPresentationInstance({
+    backgroundProp: mainBackgroundProp,
+    sectionsBackgroundProp: sectionsBackgroundProp,
+  });
 
   // 3. Create Slides in the Presentation
   const { sectionsInfo } = createSlidesFromLyrics({
@@ -824,7 +957,10 @@ export const generatePpt = async ({
     zip.file(fileName, fileContent);
 
     for (const sectionInfo of sectionsInfo) {
-      let tempPres = createPresentationInstance({ backgroundProp }); // for saving into zip file
+      let tempPres = createPresentationInstance({
+        backgroundProp: mainBackgroundProp,
+        sectionsBackgroundProp: sectionsBackgroundProp,
+      }); // for saving into zip file
       const { sectionName, startLineIndex, endLineIndex } = sectionInfo;
       const tempPrimaryLinesArray = primaryLinesArray.filter(
         (line, index) => index >= startLineIndex && index <= endLineIndex,
@@ -883,10 +1019,12 @@ export const getSectionSettingsFromPreset = (
       sectionBackgroundImage: presetGeneralSetting.mainBackgroundImage,
       useMainBackgroundColor: false,
       sectionBackgroundColor: presetGeneralSetting.mainBackgroundColor,
-      sectionUseBackgroundColorWhenEmpty: presetGeneralSetting.useBackgroundColorWhenEmpty,
+      sectionUseBackgroundColorWhenEmpty:
+        presetGeneralSetting.useBackgroundColorWhenEmpty,
       sectionIgnoreSubcontent: presetGeneralSetting.ignoreSubcontent,
-      sectionIgnoreSubcontentWhenIdentical: presetGeneralSetting.ignoreSubcontentWhenIdentical,
-      sectionSingleLineMode: presetGeneralSetting.singleLineMode
+      sectionIgnoreSubcontentWhenIdentical:
+        presetGeneralSetting.ignoreSubcontentWhenIdentical,
+      sectionSingleLineMode: presetGeneralSetting.singleLineMode,
     },
     [SETTING_CATEGORY.COVER]: preset.cover,
     [SETTING_CATEGORY.CONTENT]: preset.content,
