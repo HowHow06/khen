@@ -184,10 +184,20 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
 } as const;
 
 export const PPT_GENERATION_SECTION_SETTINGS = {
+  useMainSectionSettings: {
+    fieldDisplayName: "Use Main Section Settings",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+  },
   useMainBackgroundImage: {
     fieldDisplayName: "Use Main Background Image",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("useMainBackgroundImage", "useMainSectionSettings"),
+      ),
   },
   sectionBackgroundImage: {
     fieldDisplayName: "Section Background Image",
@@ -195,7 +205,7 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     isOptional: true,
     defaultValue: null,
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !getValueFromPath<boolean>(
+      !!getValueFromPath<boolean>(
         settings,
         fieldName.replace("sectionBackgroundImage", "useMainBackgroundImage"),
       ),
@@ -204,6 +214,11 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     fieldDisplayName: "Use Main Background Color",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("useMainBackgroundColor", "useMainSectionSettings"),
+      ),
   },
   sectionBackgroundColor: {
     fieldDisplayName: "Section Background Color",
@@ -211,7 +226,7 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     isOptional: true,
     defaultValue: "#000000",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !getValueFromPath<boolean>(
+      !!getValueFromPath<boolean>(
         settings,
         fieldName.replace("sectionBackgroundColor", "useMainBackgroundColor"),
       ),
@@ -221,40 +236,81 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
     tips: "If unchecked, background image will be used for empty slides.",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace(
+          "sectionUseBackgroundColorWhenEmpty",
+          "useMainSectionSettings",
+        ),
+      ),
   },
   sectionIgnoreSubcontent: {
     fieldDisplayName: "Section Ignore Secondary Content",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionIgnoreSubcontent", "useMainSectionSettings"),
+      ),
   },
   sectionUseSingleTextbox: {
     fieldDisplayName: "Section Use Single Textbox",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     isNotAvailable: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionUseSingleTextbox", "useMainSectionSettings"),
+      ),
   },
   sectionSingleLineMode: {
     fieldDisplayName: "Section Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionSingleLineMode", "useMainSectionSettings"),
+      ),
   },
   sectionLineCountPerSlide: {
     fieldDisplayName: "Section Line Count Per Slide",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
     isNotAvailable: true, // TODO: to implement
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionLineCountPerSlide", "useMainSectionSettings"),
+      ),
   },
   sectionIgnoreSubcontentWhenIdentical: {
     fieldDisplayName: "Section Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace(
+          "sectionIgnoreSubcontentWhenIdentical",
+          "useMainSectionSettings",
+        ),
+      ),
   },
   sectionTransition: {
     fieldDisplayName: "Section Transition",
     fieldType: SETTING_FIELD_TYPE.TRANSITION,
     isNotAvailable: true, // TODO: implement transition, KHEN-26
     defaultValue: "",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionTransition", "useMainSectionSettings"),
+      ),
   },
 } as const;
 
