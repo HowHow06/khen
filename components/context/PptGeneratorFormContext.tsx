@@ -61,14 +61,15 @@ export const PptGeneratorFormProvider: React.FC<
       console.log("Submitted Value:", submittedValue);
     }
     const {
-      general: { ignoreSubcontent },
+      general: { ignoreSubcontent, useDifferentSettingForEachSection },
     } = values;
-    const hasSecondaryContent = !ignoreSubcontent;
     const primaryLinesArray = mainText.split("\n");
     const secondaryLinesArray = secondaryText.split("\n");
+    const shouldIgnoreSubcontent =
+      ignoreSubcontent && !useDifferentSettingForEachSection;
 
     if (
-      hasSecondaryContent &&
+      !shouldIgnoreSubcontent &&
       primaryLinesArray.length !== secondaryLinesArray.length
     ) {
       const result = await showDialog("Are you sure?", {
