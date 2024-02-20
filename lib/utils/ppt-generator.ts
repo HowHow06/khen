@@ -470,7 +470,8 @@ function createSlidesFromLyrics({
       currentLine = "";
     }
 
-    const isFillSlide = primaryLine.startsWith(`${LYRIC_SECTION.FILL_SLIDE}`);
+    const isFillSlide =
+      primaryLine.startsWith(`${LYRIC_SECTION.FILL_SLIDE}`) && !isEmptySlide;
     if (isFillSlide) {
       const remainder = currentIndex % linePerSlide;
       currentSectionFillSlideWeight =
