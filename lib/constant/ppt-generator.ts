@@ -83,7 +83,7 @@ const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
 
 Object.entries(CUSTOM_PINYIN_MAP_SIMPLIFIED).map(([text, customPinyin]) => {
   const traditionalText = convertToTraditional(text);
-  if (traditionalText != text) {
+  if (traditionalText !== text) {
     CUSTOM_PINYIN_MAP[traditionalText] = customPinyin;
   }
 });

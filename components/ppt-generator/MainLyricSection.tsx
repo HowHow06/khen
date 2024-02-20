@@ -43,7 +43,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const insertLyricSection = (section: LyricSectionType) => {
     if (mainTextareaRef.current) {
       const sectionValue =
-        mainText && cursorPosition != 0
+        mainText && cursorPosition !== 0
           ? "\n" + LYRIC_SECTION[section]
           : LYRIC_SECTION[section];
       const sectionLength = sectionValue.length + 1;
