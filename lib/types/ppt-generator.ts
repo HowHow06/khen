@@ -203,19 +203,21 @@ type BasePptSettingsStateType = {
   };
 };
 
-export type SectionSettingsType = {
-  [key in `${typeof SECTION_PREFIX}${number}`]: Omit<
-    BasePptSettingsStateType,
-    typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
-  > & {
-    [SETTING_CATEGORY.GENERAL]: SettingsValueType<
-      typeof PPT_GENERATION_SECTION_SETTINGS
-    >;
-  };
+export type SectionSettingsKeyType = `${typeof SECTION_PREFIX}${number}`;
+
+export type SectionSettingsType = Omit<
+  BasePptSettingsStateType,
+  typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
+> & {
+  [SETTING_CATEGORY.GENERAL]?: SettingsValueType<
+    typeof PPT_GENERATION_SECTION_SETTINGS
+  >;
 };
 
 export type PptSettingsStateType = BasePptSettingsStateType & {
-  [SETTING_CATEGORY.SECTION]?: SectionSettingsType;
+  [SETTING_CATEGORY.SECTION]?: {
+    [key in SectionSettingsKeyType]: SectionSettingsType;
+  };
 };
 
 export type PptMainSectionInfo = {

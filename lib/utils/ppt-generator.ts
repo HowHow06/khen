@@ -38,6 +38,7 @@ import {
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
+  SectionSettingsType,
   SettingsValueType,
 } from "../types";
 
@@ -156,13 +157,13 @@ export const generatePptSettingsInitialState = (
   return initialState;
 };
 
-export const getInitialValueFromSettings = ({
+export const getInitialValueFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
   hasGrouping = false,
 }: {
   settingsMeta: BaseSettingMetaType;
   hasGrouping?: boolean;
-}): { [key in string]: any } => {
+}): T => {
   let resultValues: any = {};
   Object.entries(settingsMeta).forEach(([key, setting]) => {
     if (setting.isNotAvailable || setting.defaultValue === undefined) {
@@ -258,6 +259,50 @@ export const generatePptSettingsInitialStateOptimized = (
   });
 
   return initialState;
+};
+
+export const generateSectionSettingsInitialValue = (
+  settings: PptGenerationSettingMetaType,
+  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
+) => {
+  const sectionInitialState: SectionSettingsType = {
+    [SETTING_CATEGORY.GENERAL]: {},
+    [SETTING_CATEGORY.COVER]: {
+      [CONTENT_TYPE.MAIN]: {},
+      [CONTENT_TYPE.SECONDARY]: {},
+    },
+    [SETTING_CATEGORY.CONTENT]: {
+      [CONTENT_TYPE.MAIN]: {},
+      [CONTENT_TYPE.SECONDARY]: {},
+    },
+  };
+  const sectionGeneralSettings = settings.section;
+  const coverSettings = settings.cover;
+  const contentSettings = settings.content;
+  const contentBoxSettings = settings.contentTextbox;
+
+  sectionInitialState[SETTING_CATEGORY.GENERAL] = getInitialValueFromSettings({
+    settingsMeta: sectionGeneralSettings,
+  });
+
+  Object.values(CONTENT_TYPE).forEach((contentType) => {
+    sectionInitialState[SETTING_CATEGORY.COVER][contentType] =
+      getInitialValueFromSettings({
+        settingsMeta: coverSettings,
+      });
+    sectionInitialState[SETTING_CATEGORY.CONTENT][contentType] = {
+      ...getInitialValueFromSettings({
+        settingsMeta: contentSettings,
+        hasGrouping: true,
+      }),
+      ...getTextboxSettingsInitialValue({
+        textboxSettings: contentBoxSettings,
+        textboxCount,
+      }),
+    };
+  });
+
+  return sectionInitialState;
 };
 
 export const getBase64FromImageField = async (
