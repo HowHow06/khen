@@ -66,6 +66,7 @@ export const LYRIC_SECTION = {
   MAINTITLE: "#",
   SECONDARYTITLE: "##",
   EMPTYSLIDE: "***",
+  FILL_SLIDE: "**",
 } as const;
 
 export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {

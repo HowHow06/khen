@@ -126,6 +126,9 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             <DropdownMenuItem onSelect={() => insertLyricSection("EMPTYSLIDE")}>
               Empty Slide
             </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => insertLyricSection("FILL_SLIDE")}>
+              Fill Slide
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
