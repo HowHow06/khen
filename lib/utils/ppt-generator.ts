@@ -261,7 +261,7 @@ export const generatePptSettingsInitialStateOptimized = (
   return initialState;
 };
 
-export const generateSectionSettingsInitialValue = (
+export const getSectionSettingsInitialValue = (
   settings: PptGenerationSettingMetaType,
   textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
 ) => {
