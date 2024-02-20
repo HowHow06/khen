@@ -28,7 +28,7 @@ const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleFilesSelected = async (files: File[]) => {
-    if (files.length == 1) {
+    if (files.length === 1) {
       const file = files[0];
       onFilesSelected(file);
       return;

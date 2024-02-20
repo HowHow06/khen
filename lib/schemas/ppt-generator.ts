@@ -123,8 +123,8 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
 
   Object.entries(metaData).forEach(([category, settings]) => {
     if (
-      category == SETTING_CATEGORY.GENERAL ||
-      category == SETTING_CATEGORY.FILE
+      category === SETTING_CATEGORY.GENERAL ||
+      category === SETTING_CATEGORY.FILE
     ) {
       let categorySchema: any = {};
       Object.entries(settings).forEach(([key, setting]) => {
@@ -136,7 +136,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       schemaObject[category] = z.object(categorySchema);
     }
 
-    if (category == SETTING_CATEGORY.CONTENT) {
+    if (category === SETTING_CATEGORY.CONTENT) {
       let contentSchema: { [groupingName: string]: any } = {};
       Object.entries(settings).forEach(([key, setting]) => {
         if (setting.isNotAvailable) {
@@ -185,7 +185,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       schemaObject[category] = z.record(z.object(contentZodSchema));
     }
 
-    if (category == SETTING_CATEGORY.COVER) {
+    if (category === SETTING_CATEGORY.COVER) {
       const contentSchema: { [key in string]: any } = {};
       Object.entries(settings).forEach(([key, setting]) => {
         if (setting.isNotAvailable) {
@@ -200,7 +200,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       schemaObject[category] = z.record(z.object(contentSchema));
     }
 
-    if (category == SETTING_CATEGORY.SECTION) {
+    if (category === SETTING_CATEGORY.SECTION) {
       const sectionSchema: { [key in string]: any } = {};
       // General section schema-------------------
       const generalSchema: any = {};

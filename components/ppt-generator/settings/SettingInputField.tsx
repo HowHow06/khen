@@ -22,11 +22,11 @@ const renderInputField = (
   settingItemMeta: BaseSettingItemMetaType,
   field: ControllerRenderProps<FieldValues, string>,
 ): ReactNode => {
-  if (settingItemMeta.fieldType == "boolean") {
+  if (settingItemMeta.fieldType === "boolean") {
     return <Switch checked={field.value} onCheckedChange={field.onChange} />;
   }
 
-  if (settingItemMeta.fieldType == "number") {
+  if (settingItemMeta.fieldType === "number") {
     return (
       <Input
         {...field}
@@ -39,7 +39,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "image") {
+  if (settingItemMeta.fieldType === "image") {
     return (
       <ImageDropzoneComponent
         className="col-span-6 text-sm"
@@ -59,7 +59,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "color") {
+  if (settingItemMeta.fieldType === "color") {
     return (
       <div className="col-span-6 ml-4 flex flex-col items-center">
         <ColorPicker color={field.value} onChange={field.onChange} />
@@ -67,7 +67,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "font") {
+  if (settingItemMeta.fieldType === "font") {
     return (
       <Combobox
         items={FONT_FACES_ITEMS}
@@ -80,7 +80,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "horizontal-align") {
+  if (settingItemMeta.fieldType === "horizontal-align") {
     return (
       <Combobox
         items={HORIZONTAL_ALIGNMENT_ITEMS}
@@ -92,7 +92,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "shadow-type") {
+  if (settingItemMeta.fieldType === "shadow-type") {
     return (
       <Combobox
         items={SHADOW_TYPE_ITEMS}
@@ -104,7 +104,7 @@ const renderInputField = (
     );
   }
 
-  if (settingItemMeta.fieldType == "percentage") {
+  if (settingItemMeta.fieldType === "percentage") {
     return (
       <Input
         {...field}

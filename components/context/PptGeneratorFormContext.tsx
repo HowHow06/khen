@@ -56,7 +56,7 @@ export const PptGeneratorFormProvider: React.FC<
   });
 
   async function onSubmit(values: PptSettingsStateType) {
-    if (process.env.NODE_ENV == "development") {
+    if (process.env.NODE_ENV === "development") {
       const submittedValue = values as PptSettingsStateType;
       console.log("Submitted Value:", submittedValue);
     }
@@ -88,7 +88,7 @@ export const PptGeneratorFormProvider: React.FC<
   }
 
   function onInvalidSubmit(errorsObject: FieldErrors<PptSettingsStateType>) {
-    if (process.env.NODE_ENV == "development") {
+    if (process.env.NODE_ENV === "development") {
       console.log("Errors:", errorsObject);
     }
     const errors = traverseAndCollect<FieldError, true>(
