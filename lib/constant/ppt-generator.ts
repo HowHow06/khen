@@ -207,6 +207,10 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !!getValueFromPath<boolean>(
         settings,
+        fieldName.replace("sectionBackgroundImage", "useMainSectionSettings"),
+      ) ||
+      !!getValueFromPath<boolean>(
+        settings,
         fieldName.replace("sectionBackgroundImage", "useMainBackgroundImage"),
       ),
   },
@@ -226,6 +230,10 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
     isOptional: true,
     defaultValue: "#000000",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundColor", "useMainSectionSettings"),
+      ) ||
       !!getValueFromPath<boolean>(
         settings,
         fieldName.replace("sectionBackgroundColor", "useMainBackgroundColor"),
