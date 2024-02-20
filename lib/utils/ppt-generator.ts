@@ -86,10 +86,10 @@ export const generatePptSettingsInitialState = (
         return;
       }
 
-      // All category besides cover and content will go under this statement
+      // All category besides cover, content, section will go under this statement
       if (
-        category != SETTING_CATEGORY.COVER &&
-        category != SETTING_CATEGORY.CONTENT
+        category !== SETTING_CATEGORY.COVER &&
+        category !== SETTING_CATEGORY.CONTENT
       ) {
         initialState[category] = {
           ...initialState[category],
@@ -98,7 +98,7 @@ export const generatePptSettingsInitialState = (
         return;
       }
 
-      if (category == SETTING_CATEGORY.COVER) {
+      if (category === SETTING_CATEGORY.COVER) {
         initialState[category][contentType] = {
           ...initialState[category][contentType],
           [key]: setting.defaultValue,
@@ -106,7 +106,7 @@ export const generatePptSettingsInitialState = (
         return;
       }
 
-      if (category == SETTING_CATEGORY.CONTENT) {
+      if (category === SETTING_CATEGORY.CONTENT) {
         const grouping =
           groupingName || setting.groupingName || DEFAULT_GROUPING_NAME;
         const originalGroupingObject =
@@ -150,6 +150,97 @@ export const generatePptSettingsInitialState = (
           }
         });
         break;
+    }
+  });
+
+  return initialState;
+};
+
+const getInitialValueFromSettings = ({
+  settingsMeta,
+  hasGrouping = false,
+}: {
+  settingsMeta: BaseSettingMetaType;
+  hasGrouping?: boolean;
+}): { [key in string]: any } => {
+  let resultValues: any = {};
+  Object.entries(settingsMeta).forEach(([key, setting]) => {
+    if (setting.isNotAvailable || setting.defaultValue === undefined) {
+      return;
+    }
+
+    if (hasGrouping) {
+      const grouping = setting.groupingName || DEFAULT_GROUPING_NAME;
+
+      const originalGroupingObject = resultValues[grouping];
+      resultValues[grouping] = {
+        ...originalGroupingObject,
+        [key]: setting.defaultValue,
+      };
+      return;
+    }
+
+    resultValues = {
+      ...resultValues,
+      [key]: setting.defaultValue,
+    };
+
+    return;
+  });
+
+  return resultValues;
+};
+
+export const generatePptSettingsInitialStateOptimized = (
+  settings: PptGenerationSettingMetaType,
+  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
+): PptSettingsStateType => {
+  const initialState: PptSettingsStateType = {
+    [SETTING_CATEGORY.GENERAL]: {},
+    [SETTING_CATEGORY.FILE]: {},
+    [SETTING_CATEGORY.CONTENT]: {
+      [CONTENT_TYPE.MAIN]: {},
+      [CONTENT_TYPE.SECONDARY]: {},
+    },
+    [SETTING_CATEGORY.COVER]: {
+      [CONTENT_TYPE.MAIN]: {},
+      [CONTENT_TYPE.SECONDARY]: {},
+    },
+  };
+
+  Object.entries(settings).forEach(([category, settingsMeta]) => {
+    switch (category) {
+      case SETTING_CATEGORY.GENERAL:
+      case SETTING_CATEGORY.FILE:
+        initialState[category] = getInitialValueFromSettings({
+          settingsMeta,
+        });
+        break;
+      case SETTING_CATEGORY.COVER:
+        Object.values(CONTENT_TYPE).forEach((contentType) => {
+          initialState[category][contentType] = getInitialValueFromSettings({
+            settingsMeta,
+          });
+        });
+        break;
+      case SETTING_CATEGORY.CONTENT:
+        Object.values(CONTENT_TYPE).forEach((contentType) => {
+          initialState[category][contentType] = getInitialValueFromSettings({
+            settingsMeta,
+            hasGrouping: true,
+          });
+          Array.from({ length: textboxCount }).forEach((_, index) => {
+            initialState[category][contentType][
+              `${TEXTBOX_GROUPING_PREFIX}${index + 1}`
+            ] = getInitialValueFromSettings({
+              settingsMeta: settings.contentTextbox,
+            });
+          });
+        });
+        break;
+      // case SETTING_CATEGORY.SECTION:
+      //   applySettings({ category, settingsMeta });
+      //   break;
     }
   });
 
@@ -350,7 +441,7 @@ function createSlidesFromLyrics({
       currentIndex,
       linePerSlide,
       isCover,
-      isEmptyLine: currentLine.trim().length == 0,
+      isEmptyLine: currentLine.trim().length === 0,
       isBackgroundColorWhenEmpty,
       sectionName: currentPptSectionName,
       currentPresSlide: currentSlide,
@@ -377,7 +468,7 @@ function createSlidesFromLyrics({
         const subCoverLineIndex = secondaryLine.indexOf(
           `${LYRIC_SECTION.SECONDARYTITLE} `,
         );
-        const hasSecondaryTitle = subCoverLineIndex != -1;
+        const hasSecondaryTitle = subCoverLineIndex !== -1;
 
         secondaryLine = hasSecondaryTitle
           ? secondaryLine.substring(subCoverLineIndex + 3)
@@ -394,7 +485,7 @@ function createSlidesFromLyrics({
       });
     }
 
-    const isLastLine = index == primaryLinesArray.length - 1;
+    const isLastLine = index === primaryLinesArray.length - 1;
     if (isLastLine) {
       currentMainSectionInfo = {
         ...currentMainSectionInfo,
