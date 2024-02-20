@@ -20,6 +20,7 @@ import {
   useForm,
 } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Form } from "../ui/form";
 import { useAlertDialog } from "./AlertDialogContext";
 
@@ -28,7 +29,7 @@ type PptGeneratorFormContextType = {
   secondaryText: string;
   setMainText: (text: string) => void;
   setSecondaryText: (text: string) => void;
-  form: UseFormReturn<PptSettingsStateType>;
+  form: UseFormReturn<z.infer<typeof settingsSchema>>;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -50,12 +51,12 @@ export const PptGeneratorFormProvider: React.FC<
   const [secondaryText, setSecondaryText] = useState("");
   const { showDialog } = useAlertDialog();
 
-  const form = useForm<PptSettingsStateType>({
+  const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
   });
 
-  async function onSubmit(values: PptSettingsStateType) {
+  async function onSubmit(values: z.infer<typeof settingsSchema>) {
     if (process.env.NODE_ENV === "development") {
       const submittedValue = values as PptSettingsStateType;
       console.log("Submitted Value:", submittedValue);
