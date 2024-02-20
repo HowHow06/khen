@@ -263,7 +263,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       );
 
       // add schema to schema object----------------
-      schemaObject[category] = z.record(z.object(sectionSchema));
+      schemaObject[category] = z.record(z.object(sectionSchema)).optional();
     }
   });
   return z.object(schemaObject);
