@@ -27,11 +27,9 @@ import { useAlertDialog } from "./AlertDialogContext";
 type PptGeneratorFormContextType = {
   mainText: string;
   secondaryText: string;
-  // mainTextareaRef: MutableRefObject<TextareaRefType>;
-  // secondaryTextareaRef: MutableRefObject<TextareaRefType>;
   setMainText: (text: string) => void;
   setSecondaryText: (text: string) => void;
-  form: UseFormReturn<z.infer<typeof settingsSchema>>; // Include the entire form object from React Hook Form
+  form: UseFormReturn<z.infer<typeof settingsSchema>>;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -59,15 +57,20 @@ export const PptGeneratorFormProvider: React.FC<
   });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
+    if (process.env.NODE_ENV === "development") {
+      const submittedValue = values as PptSettingsStateType;
+      console.log("Submitted Value:", submittedValue);
+    }
     const {
-      general: { ignoreSubcontent },
+      general: { ignoreSubcontent, useDifferentSettingForEachSection },
     } = values;
-    const hasSecondaryContent = !ignoreSubcontent;
     const primaryLinesArray = mainText.split("\n");
     const secondaryLinesArray = secondaryText.split("\n");
+    const shouldIgnoreSubcontent =
+      ignoreSubcontent && !useDifferentSettingForEachSection;
 
     if (
-      hasSecondaryContent &&
+      !shouldIgnoreSubcontent &&
       primaryLinesArray.length !== secondaryLinesArray.length
     ) {
       const result = await showDialog("Are you sure?", {
@@ -86,6 +89,9 @@ export const PptGeneratorFormProvider: React.FC<
   }
 
   function onInvalidSubmit(errorsObject: FieldErrors<PptSettingsStateType>) {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Errors:", errorsObject);
+    }
     const errors = traverseAndCollect<FieldError, true>(
       errorsObject,
       "message",

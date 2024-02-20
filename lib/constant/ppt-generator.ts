@@ -13,6 +13,7 @@ import { fontFaces } from "./font-face";
 export const DEFAULT_GROUPING_NAME = "default" as const;
 export const DEFAULT_LINE_COUNT_PER_SLIDE = 2 as const;
 export const TEXTBOX_GROUPING_PREFIX = "textboxLine" as const;
+export const SECTION_PREFIX = "section" as const;
 export const DEFAULT_AUTHOR = "Khen Ho2" as const;
 
 export const DEFAULT_SUBJECT =
@@ -82,7 +83,7 @@ const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
 
 Object.entries(CUSTOM_PINYIN_MAP_SIMPLIFIED).map(([text, customPinyin]) => {
   const traditionalText = convertToTraditional(text);
-  if (traditionalText != text) {
+  if (traditionalText !== text) {
     CUSTOM_PINYIN_MAP[traditionalText] = customPinyin;
   }
 });
@@ -179,31 +180,145 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldDisplayName: "Use Different Setting for Each Section",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isNotAvailable: true, // TODO: to implement khen-29
   },
 } as const;
 
 export const PPT_GENERATION_SECTION_SETTINGS = {
+  useMainSectionSettings: {
+    fieldDisplayName: "Use Main Section Settings",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+  },
   useMainBackgroundImage: {
     fieldDisplayName: "Use Main Background Image",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("useMainBackgroundImage", "useMainSectionSettings"),
+      ),
   },
   sectionBackgroundImage: {
     fieldDisplayName: "Section Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
     isOptional: true,
     defaultValue: null,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundImage", "useMainSectionSettings"),
+      ) ||
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundImage", "useMainBackgroundImage"),
+      ),
   },
   useMainBackgroundColor: {
     fieldDisplayName: "Use Main Background Color",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("useMainBackgroundColor", "useMainSectionSettings"),
+      ),
   },
   sectionBackgroundColor: {
     fieldDisplayName: "Section Background Color",
     fieldType: SETTING_FIELD_TYPE.COLOR,
+    isOptional: true,
     defaultValue: "#000000",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundColor", "useMainSectionSettings"),
+      ) ||
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionBackgroundColor", "useMainBackgroundColor"),
+      ),
+  },
+  sectionUseBackgroundColorWhenEmpty: {
+    fieldDisplayName: "Section Use Background Color for Empty Slides",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+    tips: "If unchecked, background image will be used for empty slides.",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace(
+          "sectionUseBackgroundColorWhenEmpty",
+          "useMainSectionSettings",
+        ),
+      ),
+  },
+  sectionIgnoreSubcontent: {
+    fieldDisplayName: "Section Ignore Secondary Content",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionIgnoreSubcontent", "useMainSectionSettings"),
+      ),
+  },
+  sectionUseSingleTextbox: {
+    fieldDisplayName: "Section Use Single Textbox",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+    isNotAvailable: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionUseSingleTextbox", "useMainSectionSettings"),
+      ),
+  },
+  sectionSingleLineMode: {
+    fieldDisplayName: "Section Single Line Mode",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionSingleLineMode", "useMainSectionSettings"),
+      ),
+  },
+  sectionLineCountPerSlide: {
+    fieldDisplayName: "Section Line Count Per Slide",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 2,
+    isNotAvailable: true, // TODO: to implement
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionLineCountPerSlide", "useMainSectionSettings"),
+      ),
+  },
+  sectionIgnoreSubcontentWhenIdentical: {
+    fieldDisplayName: "Section Ignore Secondary Content when identical",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: true,
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace(
+          "sectionIgnoreSubcontentWhenIdentical",
+          "useMainSectionSettings",
+        ),
+      ),
+  },
+  sectionTransition: {
+    fieldDisplayName: "Section Transition",
+    fieldType: SETTING_FIELD_TYPE.TRANSITION,
+    isNotAvailable: true, // TODO: implement transition, KHEN-26
+    defaultValue: "",
+    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
+      !!getValueFromPath<boolean>(
+        settings,
+        fieldName.replace("sectionTransition", "useMainSectionSettings"),
+      ),
   },
 } as const;
 
@@ -488,3 +603,8 @@ export const DEFAULT_PRESETS: PresetsType = [
     presetName: "liveEnglishPreset",
   },
 ];
+
+export const MAIN_SECTION_NAME = "main-section";
+
+export const MASTER_SLIDE_BACKGROUND_COLOR = "MASTER_SLIDE_BACKGROUND_COLOR";
+export const MASTER_SLIDE_BACKGROUND_IMAGE = "MASTER_SLIDE_BACKGROUND_IMAGE";

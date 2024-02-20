@@ -14,7 +14,7 @@ import { ZodError } from "zod";
 
 type Props = {};
 
-const SettingsOptionsDropdown = (props: Props) => {
+const SettingsOptionsDropdown = ({}: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { form } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
@@ -80,23 +80,23 @@ const SettingsOptionsDropdown = (props: Props) => {
 
   return (
     <>
-      {/* Hidden file input for importing settings */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        style={{ display: "none" }}
-        accept=".json"
-      />
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="flex flex-grow flex-row">
+        <div className="flex flex-grow flex-row">
+          <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="ml-auto" size={"icon"}>
               <MoreHorizontal className="h-5" />
             </Button>
-          </div>
-        </DropdownMenuTrigger>
+          </DropdownMenuTrigger>
+        </div>
         <DropdownMenuContent align="end" className="z-50">
+          {/* Hidden file input for importing settings */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+            accept=".json"
+          />
           <DropdownMenuItem onSelect={handleImportClick}>
             Import Settings
           </DropdownMenuItem>

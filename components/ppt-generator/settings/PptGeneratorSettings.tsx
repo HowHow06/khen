@@ -4,14 +4,28 @@ import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIConte
 import {
   CONTENT_TYPE,
   DEFAULT_PRESETS,
+  LYRIC_SECTION,
+  MAIN_SECTION_NAME,
   PPT_GENERATION_SETTINGS_META,
+  SECTION_PREFIX,
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import { cn } from "@/lib/utils";
+import {
+  ComboboxItemsType,
+  PptSettingsStateType,
+  PptSettingsUIState,
+  SectionSettingsKeyType,
+  SectionSettingsType,
+} from "@/lib/types";
+import {
+  cn,
+  getLinesStartingWith,
+  getSectionSettingsInitialValue,
+} from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
@@ -22,14 +36,185 @@ import {
   SheetTrigger,
 } from "../../ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import BaseSettings from "./BaseSettings";
 import ContentSettings from "./ContentSettings";
-import CoverSettings from "./CoverSettings";
-import GeneralSettings from "./GeneralSettings";
 import PresetsDropdown from "./PresetsDropdown";
+import SectionsCombobox from "./SectionsCombobox";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
+const PptSettingsTabLists = () => {
+  return (
+    <ScrollArea className="w-full pb-3">
+      <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
+        <TabsTrigger value={SETTING_CATEGORY.GENERAL} className="min-w-20">
+          General
+        </TabsTrigger>
+        <TabsTrigger value={SETTING_CATEGORY.COVER} className="min-w-20">
+          Cover
+        </TabsTrigger>
+        <TabsTrigger value={SETTING_CATEGORY.CONTENT} className="min-w-20">
+          Content
+        </TabsTrigger>
+        <ScrollBar orientation="horizontal" />
+      </TabsList>
+    </ScrollArea>
+  );
+};
+
+const GeneralSettingsTabContent = ({
+  isUseSectionSettings = true,
+  isSectionGeneral = false,
+  sectionValue,
+}: {
+  isUseSectionSettings?: boolean;
+  isSectionGeneral?: boolean;
+  sectionValue?: string;
+}) => {
+  return (
+    <TabsContent value={SETTING_CATEGORY.GENERAL}>
+      <ScrollArea
+        className={cn(
+          "h-[54vh] pl-3 pr-4 sm:h-[75vh]",
+          isUseSectionSettings && "h-[47vh] sm:h-[68vh]",
+        )}
+      >
+        <BaseSettings
+          settingsMeta={
+            isSectionGeneral
+              ? PPT_GENERATION_SETTINGS_META.section
+              : PPT_GENERATION_SETTINGS_META.general
+          }
+          keyPrefix={
+            isSectionGeneral
+              ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.GENERAL}.`
+              : SETTING_CATEGORY.GENERAL + "."
+          }
+        />
+      </ScrollArea>
+    </TabsContent>
+  );
+};
+
+const CoverSettingsTabContent = ({
+  settingsUIState,
+  setCurrentCoverTab,
+  isUseSectionSettings = true,
+  isSectionGeneral = false,
+  sectionValue,
+}: {
+  settingsUIState?: PptSettingsUIState;
+  setCurrentCoverTab?: (tab: string) => void;
+  isUseSectionSettings?: boolean;
+  isSectionGeneral?: boolean;
+  sectionValue?: string;
+}) => {
+  const prefix = isSectionGeneral
+    ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.COVER}.`
+    : SETTING_CATEGORY.COVER + ".";
+  return (
+    <TabsContent value={SETTING_CATEGORY.COVER}>
+      <Tabs
+        defaultValue={CONTENT_TYPE.MAIN}
+        value={settingsUIState?.currentCoverTab || undefined}
+        onValueChange={setCurrentCoverTab}
+        className="w-full px-2"
+      >
+        <TabsList className="my-2 grid w-full grid-cols-2">
+          <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
+          <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
+        </TabsList>
+        <TabsContent value={CONTENT_TYPE.MAIN}>
+          <ScrollArea
+            className={cn(
+              "h-[50vh] pr-3 sm:h-[72vh]",
+              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
+            )}
+          >
+            <BaseSettings
+              settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
+              keyPrefix={prefix + CONTENT_TYPE.MAIN + "."}
+            />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value={CONTENT_TYPE.SECONDARY}>
+          <ScrollArea
+            className={cn(
+              "h-[50vh] pr-3 sm:h-[72vh]",
+              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
+            )}
+          >
+            <BaseSettings
+              settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
+              keyPrefix={prefix + CONTENT_TYPE.SECONDARY + "."}
+            />
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
+    </TabsContent>
+  );
+};
+
+const ContentSettingsTabContent = ({
+  settingsUIState,
+  setCurrentContentTab,
+  isUseSectionSettings = true,
+  isSectionGeneral = false,
+  sectionValue,
+}: {
+  settingsUIState?: PptSettingsUIState;
+  setCurrentContentTab?: (tab: string) => void;
+  isUseSectionSettings?: boolean;
+  isSectionGeneral?: boolean;
+  sectionValue?: string;
+}) => {
+  const prefix = isSectionGeneral
+    ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.CONTENT}`
+    : SETTING_CATEGORY.CONTENT;
+  return (
+    <TabsContent value={SETTING_CATEGORY.CONTENT}>
+      <Tabs
+        defaultValue={CONTENT_TYPE.MAIN}
+        value={settingsUIState?.currentContentTab || undefined}
+        onValueChange={setCurrentContentTab}
+        className="w-full px-2"
+      >
+        <TabsList className="my-2 grid w-full grid-cols-2">
+          <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
+          <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
+        </TabsList>
+        <TabsContent value={CONTENT_TYPE.MAIN}>
+          <ScrollArea
+            className={cn(
+              "h-[50vh] pr-3 sm:h-[72vh]",
+              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
+            )}
+          >
+            <ContentSettings
+              keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
+              contentKey={CONTENT_TYPE.MAIN}
+            />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value={CONTENT_TYPE.SECONDARY}>
+          <ScrollArea
+            className={cn(
+              "h-[50vh] pr-3 sm:h-[72vh]",
+              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
+            )}
+          >
+            <ContentSettings
+              keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
+              contentKey={CONTENT_TYPE.SECONDARY}
+            />
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
+    </TabsContent>
+  );
+};
+
 const PptGeneratorSetting = () => {
-  const { form } = usePptGeneratorFormContext();
+  const { form, mainText } = usePptGeneratorFormContext();
   const { getValues, reset } = form;
   const {
     settingsUIState,
@@ -38,17 +223,87 @@ const PptGeneratorSetting = () => {
     setCurrentCoverTab,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
+  const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
+  const [sectionItems, setSectionItems] = useState<ComboboxItemsType>([
+    {
+      value: MAIN_SECTION_NAME,
+      label: "Main Section",
+    },
+  ]);
+  const settingsValues = getValues() as PptSettingsStateType;
+  const isDifferentSettingsBySection =
+    settingsValues.general.useDifferentSettingForEachSection === true;
+
+  if (
+    sectionItems.find(({ value }) => value === currentSection) === undefined
+  ) {
+    setCurrentSection(MAIN_SECTION_NAME);
+  }
+
+  useEffect(() => {
+    if (!isDifferentSettingsBySection) {
+      return;
+    }
+    const sections = getLinesStartingWith(mainText, LYRIC_SECTION.SECTION);
+    const newSectionItems = [
+      {
+        value: MAIN_SECTION_NAME,
+        label: "Main Section",
+      },
+    ];
+
+    const originalSettingValues = getValues();
+    const sectionInitialValue: {
+      [key in SectionSettingsKeyType]: SectionSettingsType;
+    } = { ...originalSettingValues[SETTING_CATEGORY.SECTION] };
+
+    sections.forEach((sectionName, currentIndex) => {
+      const currentSectionNumber = currentIndex + 1;
+      if (!sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`]) {
+        sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`] =
+          getSectionSettingsInitialValue({
+            settings: PPT_GENERATION_SETTINGS_META,
+          });
+      }
+      newSectionItems.push({
+        value: `${SECTION_PREFIX}${currentSectionNumber}`,
+        label: `${sectionName.replace(LYRIC_SECTION.SECTION, "")}`,
+      });
+    });
+
+    if (sections.length < sectionItems.length - 1) {
+      // delete excess sections
+      const difference = sectionItems.length - 1 - sections.length;
+      Array.from({ length: difference }).forEach((_, index) => {
+        const sectionNumber = sections.length + 1 + index;
+        delete sectionInitialValue[`${SECTION_PREFIX}${sectionNumber}`];
+      });
+    }
+
+    setSectionItems(newSectionItems);
+    reset({
+      ...originalSettingValues,
+      [SETTING_CATEGORY.SECTION]: sectionInitialValue,
+    });
+  }, [
+    mainText,
+    isDifferentSettingsBySection,
+    getValues,
+    reset,
+    sectionItems.length,
+  ]);
 
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const isUseSectionSettings =
-    getValues(
-      `${SETTING_CATEGORY.GENERAL}.${PPT_GENERATION_SETTINGS_META.general.useDifferentSettingForEachSection}`,
-    ) == true;
+  const isUseMainSectionSettings =
+    isDifferentSettingsBySection &&
+    currentSection !== MAIN_SECTION_NAME &&
+    settingsValues.section?.[currentSection as SectionSettingsKeyType]?.general
+      ?.useMainSectionSettings;
 
   return (
     <div className="flex flex-row space-x-2">
@@ -75,6 +330,7 @@ const PptGeneratorSetting = () => {
             </Button>
           </SheetTrigger>
         )}
+
         <SheetContent
           onPointerDownOutside={
             isExtraSmallScreen
@@ -88,125 +344,100 @@ const PptGeneratorSetting = () => {
           )}
           side={isExtraSmallScreen ? "bottom" : "right"}
         >
-          <SheetHeader className="flex-row items-center space-x-5">
-            <SheetTitle>Settings</SheetTitle>
-            <PresetsDropdown formReset={reset} presets={DEFAULT_PRESETS} />
-            <SettingsOptionsDropdown />
-            {/* <SheetDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </SheetDescription> */}
+          <SheetHeader>
+            <div className="flex flex-row items-center space-x-5">
+              <SheetTitle>Settings</SheetTitle>
+              <PresetsDropdown
+                isSectionPreset={isDifferentSettingsBySection}
+                sectionName={currentSection}
+                presets={DEFAULT_PRESETS}
+              />
+              <SettingsOptionsDropdown />
+            </div>
+            {isDifferentSettingsBySection && (
+              <SectionsCombobox
+                items={sectionItems}
+                selectedValue={currentSection}
+                onItemSelect={(value) => setCurrentSection(value)}
+              />
+            )}
           </SheetHeader>
-          <Tabs
-            defaultValue={SETTING_CATEGORY.GENERAL}
-            className="mt-2 w-full"
-            value={settingsUIState.currentCategoryTab}
-            onValueChange={setCurrentCategoryTab}
-          >
-            <ScrollArea className="w-full pb-3">
-              <TabsList
-                className={cn(
-                  "grid w-max min-w-full",
-                  isUseSectionSettings ? "grid-cols-4" : "grid-cols-3",
-                )}
-              >
-                <TabsTrigger
-                  value={SETTING_CATEGORY.GENERAL}
-                  className="min-w-20"
-                >
-                  General
-                </TabsTrigger>
-                <TabsTrigger
-                  value={SETTING_CATEGORY.COVER}
-                  className="min-w-20"
-                >
-                  Cover
-                </TabsTrigger>
-                <TabsTrigger
-                  value={SETTING_CATEGORY.CONTENT}
-                  className="min-w-20"
-                >
-                  Content
-                </TabsTrigger>
-                {/* {isUseSectionSettings ? (
-                <TabsTrigger value={SETTING_CATEGORY.SECTION} className="min-w-20">Section</TabsTrigger>
-              ) : (
-                <></>
-              )} */}
-                <ScrollBar orientation="horizontal" />
-              </TabsList>
-            </ScrollArea>
-            <TabsContent value={SETTING_CATEGORY.GENERAL}>
-              <ScrollArea className="h-[54vh] pl-3 pr-4 sm:h-[75vh]">
-                <GeneralSettings />
-              </ScrollArea>
-            </TabsContent>
-            <TabsContent value={SETTING_CATEGORY.COVER}>
-              <Tabs
-                defaultValue={CONTENT_TYPE.MAIN}
-                value={settingsUIState.currentCoverTab}
-                onValueChange={setCurrentCoverTab}
-                className="w-full px-2"
-              >
-                <TabsList className="my-2 grid w-full grid-cols-2">
-                  <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-                  <TabsTrigger value={CONTENT_TYPE.SECONDARY}>
-                    Secondary
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
-                    <CoverSettings contentKey={CONTENT_TYPE.MAIN} />
-                  </ScrollArea>
-                </TabsContent>
-                <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
-                    <CoverSettings contentKey={CONTENT_TYPE.SECONDARY} />
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-            <TabsContent value={SETTING_CATEGORY.CONTENT}>
-              <Tabs
-                defaultValue={CONTENT_TYPE.MAIN}
-                value={settingsUIState.currentContentTab}
-                onValueChange={setCurrentContentTab}
-                className="w-full px-2"
-              >
-                <TabsList className="my-2 grid w-full grid-cols-2">
-                  <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-                  <TabsTrigger value={CONTENT_TYPE.SECONDARY}>
-                    Secondary
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value={CONTENT_TYPE.MAIN}>
-                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
-                    <ContentSettings contentKey={CONTENT_TYPE.MAIN} />
-                  </ScrollArea>
-                </TabsContent>
-                <TabsContent value={CONTENT_TYPE.SECONDARY}>
-                  <ScrollArea className="h-[50vh] pr-3 sm:h-[72vh]">
-                    <ContentSettings contentKey={CONTENT_TYPE.SECONDARY} />
-                  </ScrollArea>
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-            <TabsContent value={SETTING_CATEGORY.SECTION}>
-              <ScrollArea className="h-[54vh] pl-3 pr-4 sm:h-[75vh]">
-                {/* <SectionSettings /> */}
-              </ScrollArea>
-            </TabsContent>
-          </Tabs>
-          {/* <SheetFooter>
-                  <SheetClose asChild>
-                    <Button type="submit">Save changes</Button>
-                  </SheetClose>
-                </SheetFooter> */}
+          {isDifferentSettingsBySection &&
+          currentSection !== MAIN_SECTION_NAME ? (
+            <Tabs
+              defaultValue={SETTING_CATEGORY.GENERAL}
+              className="mt-2 w-full"
+            >
+              {!isUseMainSectionSettings && (
+                <ScrollArea className="w-full pb-3">
+                  <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
+                    <TabsTrigger
+                      value={SETTING_CATEGORY.GENERAL}
+                      className="min-w-20"
+                    >
+                      General
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value={SETTING_CATEGORY.COVER}
+                      className="min-w-20"
+                    >
+                      Cover
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value={SETTING_CATEGORY.CONTENT}
+                      className="min-w-20"
+                    >
+                      Content
+                    </TabsTrigger>
+                    <ScrollBar orientation="horizontal" />
+                  </TabsList>
+                </ScrollArea>
+              )}
+              <GeneralSettingsTabContent
+                isSectionGeneral={true}
+                sectionValue={currentSection}
+              />
+              <CoverSettingsTabContent
+                isSectionGeneral={true}
+                sectionValue={currentSection}
+              />
+              <ContentSettingsTabContent
+                isSectionGeneral={true}
+                sectionValue={currentSection}
+              />
+            </Tabs>
+          ) : (
+            <Tabs
+              defaultValue={SETTING_CATEGORY.GENERAL}
+              className="mt-2 w-full"
+              value={settingsUIState.currentCategoryTab}
+              onValueChange={setCurrentCategoryTab}
+            >
+              <PptSettingsTabLists />
+              <GeneralSettingsTabContent
+                isUseSectionSettings={isDifferentSettingsBySection}
+              />
+              <CoverSettingsTabContent
+                settingsUIState={settingsUIState}
+                setCurrentCoverTab={setCurrentCoverTab}
+                isUseSectionSettings={isDifferentSettingsBySection}
+              />
+              <ContentSettingsTabContent
+                settingsUIState={settingsUIState}
+                setCurrentContentTab={setCurrentContentTab}
+                isUseSectionSettings={isDifferentSettingsBySection}
+              />
+            </Tabs>
+          )}
         </SheetContent>
       </Sheet>
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
-        <PresetsDropdown formReset={reset} presets={DEFAULT_PRESETS} />
+        <PresetsDropdown
+          isSectionPreset={isDifferentSettingsBySection}
+          sectionName={currentSection}
+          presets={DEFAULT_PRESETS}
+        />
       )}
     </div>
   );

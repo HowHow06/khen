@@ -19,7 +19,7 @@ import {
 import { ComboboxItemsType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-type ComboxBoxProps = {
+export type ComboxBoxProps = {
   items: ComboboxItemsType;
   selectedValue?: string;
   defaultLabel?: string;
@@ -27,6 +27,7 @@ type ComboxBoxProps = {
   className?: string;
   hasNoSearch?: boolean;
   onItemSelect?: (value: string) => void;
+  allowDeselect?: boolean;
 };
 
 export function Combobox({
@@ -37,6 +38,7 @@ export function Combobox({
   className,
   hasNoSearch = false,
   onItemSelect = () => {},
+  allowDeselect = false,
 }: ComboxBoxProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -72,16 +74,22 @@ export function Combobox({
                 key={item.value}
                 value={item.value}
                 onSelect={(currentValue) => {
-                  onItemSelect(
-                    currentValue === selectedValue ? "" : currentValue,
-                  );
+                  if (allowDeselect) {
+                    onItemSelect(
+                      currentValue === selectedValue ? "" : currentValue,
+                    );
+                  } else {
+                    onItemSelect(currentValue);
+                  }
                   setOpen(false);
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    selectedValue === item.value ? "opacity-100" : "opacity-0",
+                    selectedValue.toLowerCase() === item.value.toLowerCase()
+                      ? "opacity-100"
+                      : "opacity-0",
                   )}
                 />
                 {item.label}

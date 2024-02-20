@@ -10,7 +10,6 @@ import {
 import {
   DEFAULT_LINE_COUNT_PER_SLIDE,
   PPT_GENERATION_SETTINGS_META,
-  SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
@@ -20,10 +19,12 @@ import SettingFormField from "./SettingFormField";
 
 type ContentSettingsProps = {
   contentKey?: string;
+  keyPrefix: string;
 };
 
 const ContentSettings = ({
   contentKey,
+  keyPrefix,
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
@@ -48,9 +49,6 @@ const ContentSettings = ({
     };
   }, [formValues.general.singleLineMode]);
 
-  const fieldNamePrefix =
-    SETTING_CATEGORY.CONTENT + "." + (contentKey ? contentKey + "." : "");
-
   return (
     <div className={cn("mr-0", className)}>
       <Accordion
@@ -62,8 +60,8 @@ const ContentSettings = ({
             : settingsUIState.openAccordions["base"]
         }
         defaultValue={[
-          // `${fieldNamePrefix}textboxLine1`,
-          `${fieldNamePrefix}text`,
+          // `${keyPrefix}textboxLine1`,
+          `${keyPrefix}text`,
         ]}
         onValueChange={(accordions) =>
           setAccordionsOpen({
@@ -74,10 +72,7 @@ const ContentSettings = ({
       >
         {Object.entries(settingsMetaGrouped).map(([groupingName, settings]) => {
           return (
-            <AccordionItem
-              value={fieldNamePrefix + groupingName}
-              key={groupingName}
-            >
+            <AccordionItem value={keyPrefix + groupingName} key={groupingName}>
               <AccordionTrigger className="text-base font-bold capitalize">
                 {toNormalCase(groupingName)}
               </AccordionTrigger>
@@ -87,8 +82,8 @@ const ContentSettings = ({
                     <SettingFormField
                       zodControl={control}
                       settingsState={formValues}
-                      name={fieldNamePrefix + groupingName + "." + key}
-                      key={fieldNamePrefix + groupingName + "." + key}
+                      name={keyPrefix + groupingName + "." + key}
+                      key={keyPrefix + groupingName + "." + key}
                       settingField={value}
                       className="gap-y-2 space-y-0 py-3"
                     />

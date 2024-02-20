@@ -13,7 +13,7 @@ const breakpoints = {
 };
 
 export function useScreenSize(): ScreenSizeType {
-  const [screenSize, setScreenSize] = useState<ScreenSizeType>(SCREEN_SIZE.XS);
+  const [screenSize, setScreenSize] = useState<ScreenSizeType>(SCREEN_SIZE.XL);
 
   useEffect(() => {
     const updateScreenSize = () => {

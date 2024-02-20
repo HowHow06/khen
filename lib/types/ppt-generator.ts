@@ -6,6 +6,8 @@ import {
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_FILE_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
+  PPT_GENERATION_SECTION_SETTINGS,
+  SECTION_PREFIX,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
@@ -184,7 +186,7 @@ export type ContentSettingsType = GroupedSettingsValueType<
 
 export type ContentTypeType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 
-export type PptSettingsStateType = {
+type BasePptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: SettingsValueType<
     typeof PPT_GENERATION_FILE_SETTINGS
   >;
@@ -201,6 +203,23 @@ export type PptSettingsStateType = {
   };
 };
 
+export type SectionSettingsKeyType = `${typeof SECTION_PREFIX}${number}`;
+
+export type SectionSettingsType = Omit<
+  BasePptSettingsStateType,
+  typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
+> & {
+  [SETTING_CATEGORY.GENERAL]?: SettingsValueType<
+    typeof PPT_GENERATION_SECTION_SETTINGS
+  >;
+};
+
+export type PptSettingsStateType = BasePptSettingsStateType & {
+  [SETTING_CATEGORY.SECTION]?: {
+    [key in SectionSettingsKeyType]: SectionSettingsType;
+  };
+};
+
 export type PptMainSectionInfo = {
   sectionName: string;
   startLineIndex: number;
@@ -211,3 +230,12 @@ export type PresetsType = {
   presetDisplayName: string;
   presetName: string;
 }[];
+
+export type PptSettingsUIState = {
+  currentCategoryTab: string;
+  currentContentTab: string;
+  currentCoverTab: string;
+  openAccordions: {
+    [key: string]: string[];
+  };
+};
