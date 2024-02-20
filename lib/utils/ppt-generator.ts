@@ -349,6 +349,7 @@ function createSlidesFromLyrics({
   let currentSectionCoverCount = 0;
   let currentSectionPptSectionCount = 0;
   let currentSectionEmptySlideWeight = 0;
+  let currentSectionFillSlideWeight = 0;
 
   primaryLinesArray.forEach((primaryLine, index) => {
     // 1. check if is main or sub section, just add the section to presentation instance
@@ -400,6 +401,7 @@ function createSlidesFromLyrics({
         currentSectionPptSectionCount = 0;
         currentSectionCoverCount = 0;
         currentSectionEmptySlideWeight = 0;
+        currentSectionFillSlideWeight = 0;
       }
 
       currentSectionPptSectionCount++;
@@ -436,13 +438,15 @@ function createSlidesFromLyrics({
       (mainSectionsInfo.length > 0
         ? mainSectionsInfo[mainSectionsInfo.length - 1].endLineIndex + 1 // +1 because index starts from 0
         : 0) +
-      currentSectionEmptySlideWeight;
+      currentSectionEmptySlideWeight +
+      currentSectionFillSlideWeight;
     let currentLine = primaryLine.trim();
     // console.log({
     //   currentIndex,
     //   linePerSlide,
     //   currentLine,
     //   currentSectionEmptySlideWeight,
+    //   currentSectionFillSlideWeight,
     // });
 
     // 2. check if is cover, update current line
@@ -466,6 +470,15 @@ function createSlidesFromLyrics({
       currentLine = "";
     }
 
+    const isFillSlide = primaryLine.startsWith(`${LYRIC_SECTION.FILL_SLIDE}`);
+    if (isFillSlide) {
+      const remainder = currentIndex % linePerSlide;
+      currentSectionFillSlideWeight =
+        currentSectionFillSlideWeight + remainder - 1;
+      // weightage of each fill slide should be equal to remainder from previous slide - 1 (the 1 is the default increment of index)
+      currentLine = "";
+    }
+
     let slide = getWorkingSlide({
       pres,
       currentIndex,
@@ -482,7 +495,8 @@ function createSlidesFromLyrics({
         !!isUseSectionSettings &&
         !currentSectionSetting.general?.useMainBackgroundImage,
       currentSectionNumber: mainSectionCount,
-      isEmptySlide,
+      isEmptySlideNotation: isEmptySlide,
+      isFillSlideNotation: isFillSlide,
     });
     currentSlide = slide; // update current slide
 
@@ -564,7 +578,8 @@ function getWorkingSlide({
   isUseSectionColor,
   isUseSectionImage,
   currentSectionNumber,
-  isEmptySlide = false,
+  isEmptySlideNotation = false,
+  isFillSlideNotation = false,
 }: {
   pres: pptxgenjs;
   currentIndex: number;
@@ -577,7 +592,8 @@ function getWorkingSlide({
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
-  isEmptySlide?: boolean;
+  isEmptySlideNotation?: boolean;
+  isFillSlideNotation?: boolean;
 }): PptxGenJS.default.Slide {
   const isToCreateSlide =
     getIsToCreateNewSlide({
@@ -586,7 +602,17 @@ function getWorkingSlide({
       isCover,
     }) ||
     currentPresSlide === undefined ||
-    isEmptySlide;
+    isEmptySlideNotation;
+
+  if (
+    isToCreateSlide &&
+    isFillSlideNotation &&
+    currentPresSlide !== undefined
+  ) {
+    // When it is fill slide, but naturally it should create a new slide
+    // as result, do not create new slide
+    return currentPresSlide;
+  }
 
   if (isToCreateSlide) {
     const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
