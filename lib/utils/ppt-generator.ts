@@ -435,9 +435,15 @@ function createSlidesFromLyrics({
       currentSectionPptSectionCount -
       (mainSectionsInfo.length > 0
         ? mainSectionsInfo[mainSectionsInfo.length - 1].endLineIndex + 1 // +1 because index starts from 0
-        : 0) -
+        : 0) +
       currentSectionEmptySlideWeight;
     let currentLine = primaryLine.trim();
+    // console.log({
+    //   currentIndex,
+    //   linePerSlide,
+    //   currentLine,
+    //   currentSectionEmptySlideWeight,
+    // });
 
     // 2. check if is cover, update current line
     const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
@@ -453,8 +459,10 @@ function createSlidesFromLyrics({
     }
     const isEmptySlide = primaryLine.startsWith(`${LYRIC_SECTION.EMPTYSLIDE}`);
     if (isEmptySlide) {
+      const remainder = currentIndex % linePerSlide;
       currentSectionEmptySlideWeight =
-        currentSectionEmptySlideWeight + linePerSlide; // weightage of empty slide should be equal to line per slide
+        currentSectionEmptySlideWeight + linePerSlide + remainder - 1;
+      // weightage of each empty slide should be equal to line per slide + remainder from previous slide - 1 (the 1 is the default increment of index)
       currentLine = "";
     }
 
