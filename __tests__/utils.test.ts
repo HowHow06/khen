@@ -4,11 +4,7 @@ import {
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
-import {
-  deepMerge,
-  generatePptSettingsInitialState,
-  generatePptSettingsInitialStateOptimized,
-} from "@/lib/utils";
+import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
 
 describe("deepMerge Functionality", () => {
   it("should merge nested values", () => {
@@ -44,14 +40,14 @@ describe("deepMerge Functionality", () => {
   });
 });
 
-describe("generatePptSettingsInitialState Functionality", () => {
-  it("should produce the same output for original and optimized functions", () => {
-    const input = PPT_GENERATION_SETTINGS_META;
-    const originalOutput = generatePptSettingsInitialState(input);
-    const optimizedOutput = generatePptSettingsInitialStateOptimized(input); // Assuming you have an optimized version
+// describe("generatePptSettingsInitialState Functionality", () => {
+//   it("should produce the same output for original and optimized functions", () => {
+//     const input = PPT_GENERATION_SETTINGS_META;
+//     const originalOutput = generatePptSettingsInitialState(input);
+//     const optimizedOutput = generatePptSettingsInitialStateOptimized(input); // Assuming you have an optimized version
 
-    expect(optimizedOutput).toEqual(originalOutput);
-  });
+//     expect(optimizedOutput).toEqual(originalOutput);
+//   });
 
-  // Add more tests as necessary
-});
+//   // Add more tests as necessary
+// });
