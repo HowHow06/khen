@@ -871,3 +871,26 @@ export const getPreset = (
   }
   return undefined;
 };
+
+export const getSectionSettingsFromPreset = (
+  preset: PptSettingsStateType,
+): SectionSettingsType => {
+  const presetGeneralSetting = preset[SETTING_CATEGORY.GENERAL];
+  const sectionValues: SectionSettingsType = {
+    [SETTING_CATEGORY.GENERAL]: {
+      useMainSectionSettings: false,
+      useMainBackgroundImage: false,
+      sectionBackgroundImage: presetGeneralSetting.mainBackgroundImage,
+      useMainBackgroundColor: false,
+      sectionBackgroundColor: presetGeneralSetting.mainBackgroundColor,
+      sectionUseBackgroundColorWhenEmpty: presetGeneralSetting.useBackgroundColorWhenEmpty,
+      sectionIgnoreSubcontent: presetGeneralSetting.ignoreSubcontent,
+      sectionIgnoreSubcontentWhenIdentical: presetGeneralSetting.ignoreSubcontentWhenIdentical,
+      sectionSingleLineMode: presetGeneralSetting.singleLineMode
+    },
+    [SETTING_CATEGORY.COVER]: preset.cover,
+    [SETTING_CATEGORY.CONTENT]: preset.content,
+  };
+
+  return sectionValues;
+};
