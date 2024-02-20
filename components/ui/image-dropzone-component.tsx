@@ -43,6 +43,8 @@ const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({
   useEffect(() => {
     if (value) {
       renderImage(value);
+    } else {
+      setImagePreview(null);
     }
   }, [value, renderImage]);
 
