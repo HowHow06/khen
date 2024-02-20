@@ -191,10 +191,13 @@ export const getInitialValueFromSettings = ({
   return resultValues;
 };
 
-export const getTextboxSettingsInitialState = (
-  textboxSettings: BaseSettingMetaType,
-  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
-): ContentTextboxSettingsType => {
+export const getTextboxSettingsInitialValue = ({
+  textboxSettings,
+  textboxCount = DEFAULT_LINE_COUNT_PER_SLIDE,
+}: {
+  textboxSettings: BaseSettingMetaType;
+  textboxCount: number;
+}): ContentTextboxSettingsType => {
   const textBoxInitialState: ContentTextboxSettingsType = {};
   Array.from({ length: textboxCount }).forEach((_, index) => {
     textBoxInitialState[`${TEXTBOX_GROUPING_PREFIX}${index + 1}`] =
@@ -244,10 +247,10 @@ export const generatePptSettingsInitialStateOptimized = (
               settingsMeta,
               hasGrouping: true,
             }),
-            ...getTextboxSettingsInitialState(
-              settings.contentTextbox,
+            ...getTextboxSettingsInitialValue({
+              textboxSettings: settings.contentTextbox,
               textboxCount,
-            ),
+            }),
           };
         });
         break;
