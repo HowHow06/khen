@@ -33,10 +33,8 @@ import {
 } from "../constant";
 import {
   BaseSettingMetaType,
-  CategoryWithContentType,
   ContentSettingsType,
   ContentTextboxSettingsType,
-  ContentTypeType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
@@ -44,121 +42,6 @@ import {
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
-
-export const generatePptSettingsInitialState = (
-  settings: PptGenerationSettingMetaType,
-): PptSettingsStateType => {
-  const initialState: PptSettingsStateType = {
-    [SETTING_CATEGORY.GENERAL]: {},
-    [SETTING_CATEGORY.FILE]: {},
-    [SETTING_CATEGORY.CONTENT]: {
-      [CONTENT_TYPE.MAIN]: {},
-      [CONTENT_TYPE.SECONDARY]: {},
-    },
-    [SETTING_CATEGORY.COVER]: {
-      [CONTENT_TYPE.MAIN]: {},
-      [CONTENT_TYPE.SECONDARY]: {},
-    },
-  };
-
-  const applySettings = ({
-    category,
-    settingsMeta,
-    contentType,
-    groupingName,
-  }: {
-    settingsMeta: BaseSettingMetaType;
-  } & (
-    | {
-        category: Exclude<keyof PptSettingsStateType, CategoryWithContentType>;
-        contentType?: never;
-        groupingName?: never;
-      }
-    | {
-        category: typeof SETTING_CATEGORY.COVER;
-        contentType: ContentTypeType;
-        groupingName?: never;
-      }
-    | {
-        category: typeof SETTING_CATEGORY.CONTENT;
-        contentType: ContentTypeType;
-        groupingName?: keyof ContentSettingsType;
-      }
-  )) => {
-    Object.entries(settingsMeta).forEach(([key, setting]) => {
-      if (setting.isNotAvailable || setting.defaultValue === undefined) {
-        return;
-      }
-
-      // All category besides cover, content, section will go under this statement
-      if (
-        category !== SETTING_CATEGORY.COVER &&
-        category !== SETTING_CATEGORY.CONTENT
-      ) {
-        initialState[category] = {
-          ...initialState[category],
-          [key]: setting.defaultValue,
-        };
-        return;
-      }
-
-      if (category === SETTING_CATEGORY.COVER) {
-        initialState[category][contentType] = {
-          ...initialState[category][contentType],
-          [key]: setting.defaultValue,
-        };
-        return;
-      }
-
-      if (category === SETTING_CATEGORY.CONTENT) {
-        const grouping =
-          groupingName || setting.groupingName || DEFAULT_GROUPING_NAME;
-        const originalGroupingObject =
-          initialState[category][contentType][
-            grouping as keyof ContentSettingsType
-          ];
-        initialState[category][contentType] = {
-          ...initialState[category][contentType],
-          [grouping]: {
-            ...originalGroupingObject,
-            [key]: setting.defaultValue,
-          },
-        };
-        return;
-      }
-    });
-  };
-
-  Object.entries(settings).forEach(([category, settingsMeta]) => {
-    switch (category) {
-      case SETTING_CATEGORY.GENERAL:
-      case SETTING_CATEGORY.FILE:
-        applySettings({ category, settingsMeta });
-        break;
-      case SETTING_CATEGORY.CONTENT:
-      case SETTING_CATEGORY.COVER:
-        Object.values(CONTENT_TYPE).forEach((contentType) => {
-          applySettings({ category, settingsMeta, contentType });
-          if (category === SETTING_CATEGORY.CONTENT) {
-            Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
-              (_, index) => {
-                const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
-                applySettings({
-                  category,
-                  settingsMeta: settings.contentTextbox,
-                  contentType,
-                  groupingName: groupingName as keyof ContentSettingsType,
-                });
-              },
-            );
-          }
-        });
-        break;
-    }
-  });
-
-  return initialState;
-};
 
 export const getInitialValueFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
@@ -212,7 +95,7 @@ export const getTextboxSettingsInitialValue = ({
   return textBoxInitialState;
 };
 
-export const generatePptSettingsInitialStateOptimized = (
+export const generatePptSettingsInitialState = (
   settings: PptGenerationSettingMetaType,
   textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
 ): PptSettingsStateType => {
