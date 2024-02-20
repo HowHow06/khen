@@ -348,6 +348,7 @@ function createSlidesFromLyrics({
 
   let currentSectionCoverCount = 0;
   let currentSectionPptSectionCount = 0;
+  let currentSectionEmptySlideWeight = 0;
 
   primaryLinesArray.forEach((primaryLine, index) => {
     // 1. check if is main or sub section, just add the section to presentation instance
@@ -398,6 +399,7 @@ function createSlidesFromLyrics({
         mainSectionCount++;
         currentSectionPptSectionCount = 0;
         currentSectionCoverCount = 0;
+        currentSectionEmptySlideWeight = 0;
       }
 
       currentSectionPptSectionCount++;
@@ -433,7 +435,8 @@ function createSlidesFromLyrics({
       currentSectionPptSectionCount -
       (mainSectionsInfo.length > 0
         ? mainSectionsInfo[mainSectionsInfo.length - 1].endLineIndex + 1 // +1 because index starts from 0
-        : 0);
+        : 0) -
+      currentSectionEmptySlideWeight;
     let currentLine = primaryLine.trim();
 
     // 2. check if is cover, update current line
@@ -447,6 +450,12 @@ function createSlidesFromLyrics({
         .replace(`${LYRIC_SECTION.MAINTITLE}`, "")
         .trim();
       currentLine = mainTitle || currentLine;
+    }
+    const isEmptySlide = primaryLine.startsWith(`${LYRIC_SECTION.EMPTYSLIDE}`);
+    if (isEmptySlide) {
+      currentSectionEmptySlideWeight =
+        currentSectionEmptySlideWeight + linePerSlide; // weightage of empty slide should be equal to line per slide
+      currentLine = "";
     }
 
     let slide = getWorkingSlide({
@@ -465,6 +474,7 @@ function createSlidesFromLyrics({
         !!isUseSectionSettings &&
         !currentSectionSetting.general?.useMainBackgroundImage,
       currentSectionNumber: mainSectionCount,
+      isEmptySlide,
     });
     currentSlide = slide; // update current slide
 
@@ -546,6 +556,7 @@ function getWorkingSlide({
   isUseSectionColor,
   isUseSectionImage,
   currentSectionNumber,
+  isEmptySlide = false,
 }: {
   pres: pptxgenjs;
   currentIndex: number;
@@ -558,13 +569,16 @@ function getWorkingSlide({
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
+  isEmptySlide?: boolean;
 }): PptxGenJS.default.Slide {
   const isToCreateSlide =
     getIsToCreateNewSlide({
       currentIndex,
       linePerSlide,
       isCover,
-    }) || currentPresSlide === undefined;
+    }) ||
+    currentPresSlide === undefined ||
+    isEmptySlide;
 
   if (isToCreateSlide) {
     const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
