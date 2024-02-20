@@ -4,7 +4,11 @@ import {
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
-import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
+import {
+  deepMerge,
+  generatePptSettingsInitialState,
+  generatePptSettingsInitialStateOptimized,
+} from "@/lib/utils";
 
 describe("deepMerge Functionality", () => {
   it("should merge nested values", () => {
@@ -38,4 +42,16 @@ describe("deepMerge Functionality", () => {
     expect(result.general.mainBackgroundColor).toEqual("#F12345");
     expect(result.general.sectionsAutoNumbering).toEqual(false);
   });
+});
+
+describe("generatePptSettingsInitialState Functionality", () => {
+  it("should produce the same output for original and optimized functions", () => {
+    const input = PPT_GENERATION_SETTINGS_META;
+    const originalOutput = generatePptSettingsInitialState(input);
+    const optimizedOutput = generatePptSettingsInitialStateOptimized(input); // Assuming you have an optimized version
+
+    expect(optimizedOutput).toEqual(originalOutput);
+  });
+
+  // Add more tests as necessary
 });
