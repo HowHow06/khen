@@ -261,10 +261,13 @@ export const generatePptSettingsInitialStateOptimized = (
   return initialState;
 };
 
-export const getSectionSettingsInitialValue = (
-  settings: PptGenerationSettingMetaType,
-  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
-) => {
+export const getSectionSettingsInitialValue = ({
+  settings,
+  textboxCount = DEFAULT_LINE_COUNT_PER_SLIDE,
+}: {
+  settings: PptGenerationSettingMetaType;
+  textboxCount?: number;
+}) => {
   const sectionInitialState: SectionSettingsType = {
     [SETTING_CATEGORY.GENERAL]: {},
     [SETTING_CATEGORY.COVER]: {
