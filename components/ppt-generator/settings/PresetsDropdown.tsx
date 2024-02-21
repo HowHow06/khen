@@ -46,10 +46,9 @@ const PresetsDropdown = ({
   ) => {
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
-      const currentValues = getValues() as PptSettingsStateType;
       const finalValues = generateFullSettings({
         newSettings: combineWithDefaultSettings(preset),
-        originalSettings: currentValues,
+        originalSettings: getValues() as PptSettingsStateType,
         targetSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,
         isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,

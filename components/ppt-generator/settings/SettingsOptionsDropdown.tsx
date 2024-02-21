@@ -63,9 +63,8 @@ const SettingsOptionsDropdown = ({
     isPreserveUseDifferentSetting: boolean;
     isToPreserveExistingSectionSetting: boolean;
   }) => {
-    const newSettings = combineWithDefaultSettings(settingValues);
     const finalSettingsValue = generateFullSettings({
-      newSettings,
+      newSettings: combineWithDefaultSettings(settingValues),
       originalSettings: getValues() as PptSettingsStateType,
       isApplyToSection,
       isPreserveUseDifferentSetting,
