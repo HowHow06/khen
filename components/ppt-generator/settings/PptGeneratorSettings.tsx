@@ -89,6 +89,7 @@ const GeneralSettingsTabContent = ({
               ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.GENERAL}.`
               : SETTING_CATEGORY.GENERAL + "."
           }
+          className="pb-5 xl:pb-10"
         />
       </ScrollArea>
     </TabsContent>
@@ -133,6 +134,7 @@ const CoverSettingsTabContent = ({
             <BaseSettings
               settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
               keyPrefix={prefix + CONTENT_TYPE.MAIN + "."}
+              className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
@@ -146,6 +148,7 @@ const CoverSettingsTabContent = ({
             <BaseSettings
               settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
               keyPrefix={prefix + CONTENT_TYPE.SECONDARY + "."}
+              className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
@@ -192,6 +195,7 @@ const ContentSettingsTabContent = ({
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
               contentKey={CONTENT_TYPE.MAIN}
+              className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
@@ -205,6 +209,7 @@ const ContentSettingsTabContent = ({
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
               contentKey={CONTENT_TYPE.SECONDARY}
+              className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
@@ -348,8 +353,8 @@ const PptGeneratorSetting = () => {
             <div className="flex flex-row items-center space-x-5">
               <SheetTitle>Settings</SheetTitle>
               <PresetsDropdown
-                isSectionPreset={isDifferentSettingsBySection}
-                sectionName={currentSection}
+                hasSectionSettings={isDifferentSettingsBySection}
+                currentSectionName={currentSection}
                 presets={DEFAULT_PRESETS}
               />
               <SettingsOptionsDropdown />
@@ -434,8 +439,8 @@ const PptGeneratorSetting = () => {
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
-          isSectionPreset={isDifferentSettingsBySection}
-          sectionName={currentSection}
+          hasSectionSettings={isDifferentSettingsBySection}
+          currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />
       )}

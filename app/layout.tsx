@@ -1,4 +1,5 @@
 import { AlertDialogProvider } from "@/components/context/AlertDialogContext";
+import { OptionsDialogProvider } from "@/components/context/OptionsDialogContext";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -24,10 +25,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AlertDialogProvider>
-            <Header />
-            {children}
-            <Toaster expand={true} />
-            <Footer />
+            <OptionsDialogProvider>
+              <Header />
+              {children}
+              <Toaster expand={true} />
+              <Footer />
+            </OptionsDialogProvider>
           </AlertDialogProvider>
         </ThemeProvider>
       </body>
