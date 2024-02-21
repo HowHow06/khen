@@ -55,10 +55,14 @@ const PresetsDropdown = ({
               onSelect={() => {
                 const preset = getPreset(presetName, pptPresets);
                 if (preset) {
+                  const currentValues = getValues();
+                  preset[SETTING_CATEGORY.FILE] = {
+                    ...preset[SETTING_CATEGORY.FILE],
+                    filename: currentValues.file.filename,
+                  };
                   if (isSectionPreset && sectionName !== MAIN_SECTION_NAME) {
                     const sectionSettings =
                       getSectionSettingsFromPreset(preset);
-                    const currentValues = getValues();
                     const currentSectionValues =
                       currentValues[SETTING_CATEGORY.SECTION];
 
