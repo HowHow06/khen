@@ -1,3 +1,4 @@
+import { useAlertDialog } from "@/components/context/AlertDialogContext";
 import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
 import {
   MAIN_SECTION_NAME,
@@ -7,6 +8,7 @@ import { DIALOG_RESULT } from "../constant/general";
 
 const usePromptImportSettings = () => {
   const { showOptionsDialog } = useOptionsDialog();
+  const { showDialog: showAlertDialog } = useAlertDialog();
   const promptToGetFullSettingsImportOptions = async ({
     hasSectionSettings,
     currentSectionName,
@@ -93,6 +95,13 @@ const usePromptImportSettings = () => {
     hasSectionSettings: boolean;
     currentSectionName: string;
   }) => {
+    const result = await showAlertDialog("Please be informed.", {
+      description: "The background image will not be exported.",
+    });
+    if (result === DIALOG_RESULT.CANCEL) {
+      return;
+    }
+
     let isIncludeSectionSettings = false;
     let isExportSectionSettings = false;
 

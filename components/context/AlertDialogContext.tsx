@@ -1,5 +1,6 @@
 "use client";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import { AlertDialogResult } from "@/lib/types";
 import React, {
   ReactNode,
   createContext,
@@ -24,7 +25,7 @@ type AlertDialogContextType = {
     option?: {
       description?: string;
     },
-  ) => Promise<string | null>;
+  ) => Promise<AlertDialogResult | null>;
   hideDialog: () => void;
   // onContinue: () => void;
 };
@@ -54,7 +55,7 @@ export const AlertDialogProvider: React.FC<AlertDialogProviderProps> = ({
 
   const showDialog = useCallback(
     (message: string, options?: { description?: string }) => {
-      return new Promise<string | null>((resolve) => {
+      return new Promise<AlertDialogResult | null>((resolve) => {
         setResolvePromise(() => resolve); // pass the resolve handler to resolvePromise state
 
         setMessage(message);
