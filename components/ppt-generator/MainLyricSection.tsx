@@ -10,17 +10,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { LYRIC_SECTION } from "@/lib/constant";
 import { LyricSectionType, TextareaRefType } from "@/lib/types";
-import {
-  convertToSimplified,
-  convertToTraditional,
-} from "@/lib/utils/character-converter";
 import { getPinyin } from "@/lib/utils/pinyin";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
+import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 
 type MainLyricSectionProps = {};
@@ -64,24 +61,6 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         }
       }, 0);
     }
-  };
-
-  const onConvertToSimplifiedClick = () => {
-    const simplifiedText = convertToSimplified(mainText);
-    setMainText(simplifiedText);
-    toast.success("Text converted.");
-  };
-
-  const onConvertToTraditionalClick = () => {
-    const convertedText = convertToTraditional(mainText);
-    setMainText(convertedText);
-    toast.success("Text converted.");
-  };
-
-  const onReplaceCharacterClick = (toFind: string, toReplaceWith: string) => {
-    const replacedText = mainText.replaceAll(toFind, toReplaceWith);
-    setMainText(replacedText);
-    toast.success("Text replaced.");
   };
 
   function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
@@ -131,33 +110,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Chinese Character Conversion
-              <ChevronDown className="ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem onSelect={onConvertToSimplifiedClick}>
-              Convert to Simplified
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={onConvertToTraditionalClick}>
-              Convert to Traditional
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => onReplaceCharacterClick("你", "祢")}
-            >
-              你 <ArrowRight /> 祢
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => onReplaceCharacterClick("他", "祂")}
-            >
-              他<ArrowRight />祂
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
+        <TextTransformDropdown text={mainText} setText={setMainText} />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

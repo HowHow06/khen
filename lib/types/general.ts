@@ -1,5 +1,5 @@
 import { LYRIC_SECTION } from "../constant";
-import { SCREEN_SIZE } from "../constant/general";
+import { SCREEN_SIZE, TEXT_TRANSFORM } from "../constant/general";
 
 export type LyricSectionType = keyof typeof LYRIC_SECTION;
 export type TextareaRefType = HTMLTextAreaElement | null;
@@ -22,3 +22,6 @@ export type ResultWithOptionalPath<
 > = TGetPath extends true ? T & { path: string } : T;
 
 export type ScreenSizeType = (typeof SCREEN_SIZE)[keyof typeof SCREEN_SIZE];
+
+export type TextTransformType =
+  (typeof TEXT_TRANSFORM)[keyof typeof TEXT_TRANSFORM];
