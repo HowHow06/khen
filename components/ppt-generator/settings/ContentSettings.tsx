@@ -15,7 +15,7 @@ import {
 import { PptSettingsStateType } from "@/lib/types";
 import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
 import { useMemo } from "react";
-import SettingFormField from "./SettingFormField";
+import BaseSettings from "./BaseSettings";
 
 type ContentSettingsProps = {
   accordionKey: string;
@@ -29,7 +29,7 @@ const ContentSettings = ({
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
   const { form } = usePptGeneratorFormContext();
-  const { control, getValues } = form;
+  const { getValues } = form;
   const formValues = getValues() as PptSettingsStateType;
   const settingsMetaGrouped = useMemo(() => {
     const textBoxSettings = Array.from({
@@ -55,10 +55,7 @@ const ContentSettings = ({
         type="multiple"
         className="w-full"
         value={settingsUIState.openAccordions[accordionKey]}
-        defaultValue={[
-          // `${keyPrefix}textboxLine1`,
-          `${keyPrefix}text`,
-        ]}
+        defaultValue={[`${keyPrefix}text`]}
         onValueChange={(accordions) =>
           setAccordionsOpen({
             accordions: accordions,
@@ -72,19 +69,13 @@ const ContentSettings = ({
               <AccordionTrigger className="text-base font-bold capitalize">
                 {toNormalCase(groupingName)}
               </AccordionTrigger>
-              <AccordionContent className="mx-3 grid divide-y pb-2">
-                {Object.entries(settings).map(([key, value]) => {
-                  return (
-                    <SettingFormField
-                      zodControl={control}
-                      settingsState={formValues}
-                      name={keyPrefix + groupingName + "." + key}
-                      key={keyPrefix + groupingName + "." + key}
-                      settingField={value}
-                      className="gap-y-2 space-y-0 py-3"
-                    />
-                  );
-                })}
+              <AccordionContent>
+                <BaseSettings
+                  keyPrefix={keyPrefix + groupingName + "."}
+                  settingsMeta={settings}
+                  className="mx-3 pb-2"
+                  formFieldClassName="gap-y-2 space-y-0 py-3"
+                />
               </AccordionContent>
             </AccordionItem>
           );

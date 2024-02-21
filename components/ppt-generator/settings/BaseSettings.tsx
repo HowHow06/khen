@@ -8,12 +8,14 @@ type BaseSettingsProps = {
   settingsMeta: BaseSettingMetaType;
   keyPrefix: string;
   className?: string;
+  formFieldClassName?: string;
 };
 
 const BaseSettings = ({
   settingsMeta,
   keyPrefix,
   className,
+  formFieldClassName,
 }: BaseSettingsProps) => {
   const { form } = usePptGeneratorFormContext();
   const { control, getValues } = form;
@@ -28,6 +30,7 @@ const BaseSettings = ({
             key={keyPrefix + key}
             settingField={value}
             settingsState={getValues() as PptSettingsStateType}
+            className={cn(formFieldClassName)}
           />
         );
       })}
