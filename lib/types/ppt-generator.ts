@@ -1,6 +1,7 @@
 import {
   CONTENT_TYPE,
   HORIZONTAL_ALIGNMENT,
+  IMPORTED_SETTING_TYPE,
   PPT_GENERATION_CONTENT_SETTINGS,
   PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
@@ -239,3 +240,6 @@ export type PptSettingsUIState = {
     [key: string]: string[];
   };
 };
+
+export type ImportedSettingType =
+  (typeof IMPORTED_SETTING_TYPE)[keyof typeof IMPORTED_SETTING_TYPE];
