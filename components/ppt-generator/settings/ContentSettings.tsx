@@ -1,5 +1,4 @@
 "use client";
-import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   Accordion,
@@ -7,50 +6,25 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  DEFAULT_LINE_COUNT_PER_SLIDE,
-  PPT_GENERATION_SETTINGS_META,
-  TEXTBOX_GROUPING_PREFIX,
-} from "@/lib/constant";
-import { PptSettingsStateType } from "@/lib/types";
-import { cn, groupByAsObject, toNormalCase } from "@/lib/utils";
-import { useMemo } from "react";
+import { BaseSettingItemMetaType } from "@/lib/types";
+import { cn, toNormalCase } from "@/lib/utils";
 import BaseSettings from "./BaseSettings";
 
 type ContentSettingsProps = {
   accordionKey: string;
   keyPrefix: string;
+  groupedSettingsMeta: {
+    [key in string]: Record<string, BaseSettingItemMetaType>;
+  };
 };
 
 const ContentSettings = ({
   accordionKey,
   keyPrefix,
+  groupedSettingsMeta,
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
-  const { form } = usePptGeneratorFormContext();
-  const { getValues } = form;
-  const formValues = getValues() as PptSettingsStateType;
-  const settingsMetaGrouped = useMemo(() => {
-    const textBoxCount = formValues.general.singleLineMode
-      ? 1
-      : DEFAULT_LINE_COUNT_PER_SLIDE;
-
-    const textBoxSettings = Array.from({
-      length: textBoxCount,
-    }).reduce<{}>((result, _, currentIndex) => {
-      return {
-        ...result,
-        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]:
-          PPT_GENERATION_SETTINGS_META.contentTextbox,
-      };
-    }, {});
-
-    return {
-      ...textBoxSettings,
-      ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
-    };
-  }, [formValues.general.singleLineMode]);
 
   return (
     <div className={cn("mr-0", className)}>
@@ -66,7 +40,7 @@ const ContentSettings = ({
           })
         }
       >
-        {Object.entries(settingsMetaGrouped).map(([groupingName, settings]) => {
+        {Object.entries(groupedSettingsMeta).map(([groupingName, settings]) => {
           return (
             <AccordionItem value={keyPrefix + groupingName} key={groupingName}>
               <AccordionTrigger className="text-base font-bold capitalize">

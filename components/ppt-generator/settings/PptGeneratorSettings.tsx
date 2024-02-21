@@ -3,12 +3,14 @@ import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFor
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import {
   CONTENT_TYPE,
+  DEFAULT_LINE_COUNT_PER_SLIDE,
   DEFAULT_PRESETS,
   LYRIC_SECTION,
   MAIN_SECTION_NAME,
   PPT_GENERATION_SETTINGS_META,
   SECTION_PREFIX,
   SETTING_CATEGORY,
+  TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
@@ -23,9 +25,10 @@ import {
   cn,
   getLinesStartingWith,
   getSectionSettingsInitialValue,
+  groupByAsObject,
 } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../ui/button";
 import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
 import {
@@ -163,16 +166,38 @@ const ContentSettingsTabContent = ({
   isUseSectionSettings = true,
   isSectionGeneral = false,
   sectionValue,
+  settingsValues,
 }: {
   settingsUIState?: PptSettingsUIState;
   setCurrentContentTab?: (tab: string) => void;
   isUseSectionSettings?: boolean;
   isSectionGeneral?: boolean;
   sectionValue?: string;
+  settingsValues: PptSettingsStateType;
 }) => {
   const prefix = isSectionGeneral
     ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.CONTENT}`
     : SETTING_CATEGORY.CONTENT;
+  const settingsMetaGrouped = useMemo(() => {
+    const textBoxCount = settingsValues.general.singleLineMode
+      ? 1
+      : DEFAULT_LINE_COUNT_PER_SLIDE;
+
+    const textBoxSettings = Array.from({
+      length: textBoxCount,
+    }).reduce<{}>((result, _, currentIndex) => {
+      return {
+        ...result,
+        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]:
+          PPT_GENERATION_SETTINGS_META.contentTextbox,
+      };
+    }, {});
+    return {
+      ...textBoxSettings,
+      ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
+    };
+  }, [settingsValues.general.singleLineMode]);
+
   return (
     <TabsContent value={SETTING_CATEGORY.CONTENT}>
       <Tabs
@@ -195,6 +220,7 @@ const ContentSettingsTabContent = ({
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
               accordionKey={CONTENT_TYPE.MAIN}
+              groupedSettingsMeta={settingsMetaGrouped}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
@@ -209,6 +235,7 @@ const ContentSettingsTabContent = ({
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
               accordionKey={CONTENT_TYPE.SECONDARY}
+              groupedSettingsMeta={settingsMetaGrouped}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
@@ -412,6 +439,7 @@ const PptGeneratorSetting = () => {
               <ContentSettingsTabContent
                 isSectionGeneral={true}
                 sectionValue={currentSection}
+                settingsValues={settingsValues}
               />
             </Tabs>
           ) : (
@@ -434,6 +462,7 @@ const PptGeneratorSetting = () => {
                 settingsUIState={settingsUIState}
                 setCurrentContentTab={setCurrentContentTab}
                 isUseSectionSettings={isDifferentSettingsBySection}
+                settingsValues={settingsValues}
               />
             </Tabs>
           )}
