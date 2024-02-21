@@ -161,6 +161,7 @@ const SettingsOptionsDropdown = ({
       isPreserveUseDifferentSetting,
       isToPreserveExistingSectionSetting,
     });
+    toast.success("Setting Imported.");
   };
 
   const handleSectionSettingImport = async ({ json }: { json: JSON }) => {
@@ -169,6 +170,7 @@ const SettingsOptionsDropdown = ({
       sectionSettings: sectionSettings,
       targetSectionName: currentSectionName as SectionSettingsKeyType,
     });
+    toast.success("Setting Imported.");
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -190,7 +192,6 @@ const SettingsOptionsDropdown = ({
 
     if (settingType === IMPORTED_SETTING_TYPE.FULL_SETTING) {
       await handleFullSettingImport({ json });
-      toast.success("Setting Imported.");
     }
 
     if (
@@ -198,7 +199,6 @@ const SettingsOptionsDropdown = ({
       currentSectionName !== MAIN_SECTION_NAME
     ) {
       await handleSectionSettingImport({ json });
-      toast.success("Setting Imported.");
     }
 
     if (
