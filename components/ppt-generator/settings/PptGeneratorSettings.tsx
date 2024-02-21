@@ -194,7 +194,7 @@ const ContentSettingsTabContent = ({
           >
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
-              contentKey={CONTENT_TYPE.MAIN}
+              accordionKey={CONTENT_TYPE.MAIN}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
@@ -208,7 +208,7 @@ const ContentSettingsTabContent = ({
           >
             <ContentSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
-              contentKey={CONTENT_TYPE.SECONDARY}
+              accordionKey={CONTENT_TYPE.SECONDARY}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>

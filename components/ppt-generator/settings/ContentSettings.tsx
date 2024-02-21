@@ -18,12 +18,12 @@ import { useMemo } from "react";
 import SettingFormField from "./SettingFormField";
 
 type ContentSettingsProps = {
-  contentKey?: string;
+  accordionKey: string;
   keyPrefix: string;
 };
 
 const ContentSettings = ({
-  contentKey,
+  accordionKey,
   keyPrefix,
   className,
 }: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
@@ -54,11 +54,7 @@ const ContentSettings = ({
       <Accordion
         type="multiple"
         className="w-full"
-        value={
-          contentKey
-            ? settingsUIState.openAccordions[contentKey]
-            : settingsUIState.openAccordions["base"]
-        }
+        value={settingsUIState.openAccordions[accordionKey]}
         defaultValue={[
           // `${keyPrefix}textboxLine1`,
           `${keyPrefix}text`,
@@ -66,7 +62,7 @@ const ContentSettings = ({
         onValueChange={(accordions) =>
           setAccordionsOpen({
             accordions: accordions,
-            grouping: contentKey,
+            grouping: accordionKey,
           })
         }
       >
