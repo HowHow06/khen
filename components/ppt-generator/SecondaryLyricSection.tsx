@@ -2,6 +2,7 @@
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
+import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import { Textarea } from "../ui/textarea";
 
@@ -18,6 +19,10 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
       <div className="">
         <div className="my-2 flex flex-wrap gap-2">
           <CopyToClipboardButton text={secondaryText} />
+          <TextTransformDropdown
+            text={secondaryText}
+            setText={setSecondaryText}
+          />
           <FindAndReplaceButton
             text={secondaryText}
             setText={setSecondaryText}

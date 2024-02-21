@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { DEFAULT_GROUPING_NAME } from "../constant";
+import { SPECIAL_WORDS_TO_CAPITALIZE } from "../constant/general";
 import {
   Collection,
   ResultWithOptionalPath,
@@ -236,4 +237,24 @@ export function getLinesStartingWith(inputString: string, find: string) {
   const findRegex = new RegExp(`^${find}`, "m");
 
   return lines.filter((line) => findRegex.test(line));
+}
+
+export function capitalizeSpecificWords(inputString: string) {
+  // Create a case-insensitive regex pattern from the keys of SPECIAL_WORDS_TO_CAPITALIZE
+  const pattern = Object.keys(SPECIAL_WORDS_TO_CAPITALIZE)
+    .map(
+      (word) => word.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), // Escape special regex characters
+    )
+    .join("|");
+
+  const regex = new RegExp(`\\b(${pattern})\\b`, "gi");
+
+  // Replace each occurrence with its capitalized version from the object
+  const result = inputString.replace(regex, (match) => {
+    // Use the match in lowercase as a key to find the capitalized version
+    const key = match.toLowerCase();
+    return SPECIAL_WORDS_TO_CAPITALIZE[key] || match; // Return the capitalized word, fallback to original match
+  });
+
+  return result;
 }
