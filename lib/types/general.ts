@@ -1,5 +1,9 @@
 import { LYRIC_SECTION } from "../constant";
-import { SCREEN_SIZE, TEXT_TRANSFORM } from "../constant/general";
+import {
+  DIALOG_RESULT,
+  SCREEN_SIZE,
+  TEXT_TRANSFORM,
+} from "../constant/general";
 
 export type LyricSectionType = keyof typeof LYRIC_SECTION;
 export type TextareaRefType = HTMLTextAreaElement | null;
@@ -25,3 +29,6 @@ export type ScreenSizeType = (typeof SCREEN_SIZE)[keyof typeof SCREEN_SIZE];
 
 export type TextTransformType =
   (typeof TEXT_TRANSFORM)[keyof typeof TEXT_TRANSFORM];
+
+export type AlertDialogResult =
+  (typeof DIALOG_RESULT)[keyof typeof DIALOG_RESULT];

@@ -1,4 +1,3 @@
-import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +41,7 @@ const SettingsOptionsDropdown = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { form } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
-  const { showOptionsDialog } = useOptionsDialog();
+
   const {
     promptToGetFullSettingsImportOptions,
     promptToGetSettingsExportOptions,
