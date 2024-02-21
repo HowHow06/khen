@@ -937,11 +937,7 @@ export const getPreset = (
   pptPresets: { [key in string]: PptSettingsStateType },
 ): PptSettingsStateType | undefined => {
   if (presetName in pptPresets) {
-    const defaultInitialState = generatePptSettingsInitialState(
-      PPT_GENERATION_SETTINGS_META,
-    );
-    const resultPreset = deepMerge(defaultInitialState, pptPresets[presetName]);
-    return resultPreset;
+    return pptPresets[presetName];
   }
   return undefined;
 };

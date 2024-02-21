@@ -10,7 +10,11 @@ import {
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import { pptPresets } from "@/lib/presets";
 import { PptSettingsStateType, PresetsType } from "@/lib/types";
-import { generateFullSettings, getPreset } from "@/lib/utils";
+import {
+  combineWithDefaultSettings,
+  generateFullSettings,
+  getPreset,
+} from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -44,7 +48,7 @@ const PresetsDropdown = ({
     if (preset) {
       const currentValues = getValues() as PptSettingsStateType;
       const finalValues = generateFullSettings({
-        newSettings: preset,
+        newSettings: combineWithDefaultSettings(preset),
         originalSettings: currentValues,
         targetSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,

@@ -5,6 +5,7 @@ import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType } from "@/lib/types";
 import {
+  combineWithDefaultSettings,
   generatePpt,
   generatePptSettingsInitialState,
   getPreset,
@@ -36,9 +37,19 @@ const PptGeneratorFormContext = createContext<
   PptGeneratorFormContextType | undefined
 >(undefined);
 
-const defaultSettingsValue = process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING
-  ? getPreset(process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING, pptPresets)
-  : generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META);
+let defaultSettingsValue = generatePptSettingsInitialState(
+  PPT_GENERATION_SETTINGS_META,
+);
+
+if (process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING) {
+  const preset = getPreset(
+    process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING,
+    pptPresets,
+  );
+  if (preset) {
+    defaultSettingsValue = combineWithDefaultSettings(preset);
+  }
+}
 
 type PptGeneratorFormProviderProps = {
   children: ReactNode;
