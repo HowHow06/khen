@@ -49,7 +49,7 @@ const SettingsOptionsDropdown = ({
     fileInputRef.current?.click();
   };
 
-  const importSettings = ({
+  const applyFullSettings = ({
     settingValues,
     isApplyToSection = false,
     isPreserveUseDifferentSetting = false,
@@ -75,6 +75,24 @@ const SettingsOptionsDropdown = ({
       isToPreserveExistingSectionSetting,
       currentSectionName,
     });
+    reset(finalSettingsValue);
+  };
+
+  const applySectionSettings = ({
+    sectionSettings,
+    targetSectionName,
+  }: {
+    sectionSettings: SectionSettingsType;
+    targetSectionName: SectionSettingsKeyType;
+  }) => {
+    const originalSettings = getValues() as PptSettingsStateType;
+    const finalSettingsValue = {
+      ...originalSettings,
+      [SETTING_CATEGORY.SECTION]: {
+        ...originalSettings[SETTING_CATEGORY.SECTION],
+        [targetSectionName]: sectionSettings,
+      },
+    };
     reset(finalSettingsValue);
   };
 
@@ -145,11 +163,19 @@ const SettingsOptionsDropdown = ({
       isToPreserveExistingSectionSetting = result === "yes";
     }
 
-    importSettings({
+    applyFullSettings({
       settingValues: json as unknown as PptSettingsStateType,
       isApplyToSection,
       isPreserveUseDifferentSetting,
       isToPreserveExistingSectionSetting,
+    });
+  };
+
+  const handleSectionSettingImport = async ({ json }: { json: JSON }) => {
+    const sectionSettings = json as unknown as SectionSettingsType;
+    applySectionSettings({
+      sectionSettings: sectionSettings,
+      targetSectionName: currentSectionName as SectionSettingsKeyType,
     });
   };
 
@@ -173,8 +199,21 @@ const SettingsOptionsDropdown = ({
     if (settingType === IMPORTED_SETTING_TYPE.FULL_SETTING) {
       await handleFullSettingImport({ json });
       toast.success("Setting Imported.");
-    } else {
-      toast.info("Import of this setting type is not supported yet.");
+    }
+
+    if (
+      settingType === IMPORTED_SETTING_TYPE.SECTION &&
+      currentSectionName !== MAIN_SECTION_NAME
+    ) {
+      await handleSectionSettingImport({ json });
+      toast.success("Setting Imported.");
+    }
+
+    if (
+      settingType === IMPORTED_SETTING_TYPE.SECTION &&
+      currentSectionName === MAIN_SECTION_NAME
+    ) {
+      toast.warning("Invalid settings.");
     }
 
     event.target.value = "";
