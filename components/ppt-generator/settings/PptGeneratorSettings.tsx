@@ -40,7 +40,7 @@ import {
 } from "../../ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import BaseSettings from "./BaseSettings";
-import ContentSettings from "./ContentSettings";
+import GroupedBaseSettings from "./GroupedBaseSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SectionsCombobox from "./SectionsCombobox";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
@@ -217,7 +217,7 @@ const ContentSettingsTabContent = ({
               isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
             )}
           >
-            <ContentSettings
+            <GroupedBaseSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
               accordionKey={CONTENT_TYPE.MAIN}
               groupedSettingsMeta={settingsMetaGrouped}
@@ -232,7 +232,7 @@ const ContentSettingsTabContent = ({
               isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
             )}
           >
-            <ContentSettings
+            <GroupedBaseSettings
               keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
               accordionKey={CONTENT_TYPE.SECONDARY}
               groupedSettingsMeta={settingsMetaGrouped}

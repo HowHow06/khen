@@ -10,7 +10,7 @@ import { BaseSettingItemMetaType } from "@/lib/types";
 import { cn, toNormalCase } from "@/lib/utils";
 import BaseSettings from "./BaseSettings";
 
-type ContentSettingsProps = {
+type Props = {
   accordionKey: string;
   keyPrefix: string;
   groupedSettingsMeta: {
@@ -18,12 +18,12 @@ type ContentSettingsProps = {
   };
 };
 
-const ContentSettings = ({
+const GroupedBaseSettings = ({
   accordionKey,
   keyPrefix,
   groupedSettingsMeta,
   className,
-}: ContentSettingsProps & React.HTMLAttributes<HTMLDivElement>) => {
+}: Props & React.HTMLAttributes<HTMLDivElement>) => {
   const { settingsUIState, setAccordionsOpen } = usePptSettingsUIContext();
 
   return (
@@ -62,4 +62,4 @@ const ContentSettings = ({
   );
 };
 
-export default ContentSettings;
+export default GroupedBaseSettings;
