@@ -1091,15 +1091,13 @@ export const getSettingTypeFromJSON = ({
   json,
 }: {
   json: JSON;
-}): Promise<ImportedSettingType | null> => {
-  return new Promise((resolve, reject) => {
-    if (getIsValidToSchema(json, settingsSchema)) {
-      resolve(IMPORTED_SETTING_TYPE.FULL_SETTING);
-    } else if (getIsValidToSchema(json, sectionSettingSchema)) {
-      resolve(IMPORTED_SETTING_TYPE.SECTION);
-    }
-    resolve(null);
-  });
+}): ImportedSettingType | null => {
+  if (getIsValidToSchema(json, settingsSchema)) {
+    return IMPORTED_SETTING_TYPE.FULL_SETTING;
+  } else if (getIsValidToSchema(json, sectionSettingSchema)) {
+    return IMPORTED_SETTING_TYPE.SECTION;
+  }
+  return null;
 };
 
 export const combineWithDefaultSettings = (

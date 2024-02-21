@@ -141,7 +141,7 @@ const SettingsOptionsDropdown = ({
       return;
     }
 
-    const settingType = await getSettingTypeFromJSON({ json });
+    const settingType = getSettingTypeFromJSON({ json });
     if (settingType === null) {
       toast.error("Invalid file format.");
       return;
