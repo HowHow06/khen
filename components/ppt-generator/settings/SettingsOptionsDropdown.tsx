@@ -6,7 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { settingsSchema } from "@/lib/schemas";
+import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { ChangeEvent, useRef } from "react";
 import { toast } from "sonner";
@@ -32,7 +34,10 @@ const SettingsOptionsDropdown = ({}: Props) => {
         try {
           const json = result ? JSON.parse(result.toString()) : null;
           const pptSettings = settingsSchema.parse(json);
-          reset(pptSettings);
+          const defaultInitialState = generatePptSettingsInitialState(
+            PPT_GENERATION_SETTINGS_META,
+          );
+          reset(deepMerge(defaultInitialState, pptSettings));
           toast.success("Settings imported.");
         } catch (error) {
           if (error instanceof ZodError) {
