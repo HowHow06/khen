@@ -258,3 +258,38 @@ export function capitalizeSpecificWords(inputString: string) {
 
   return result;
 }
+
+export const getJSONFromFile = ({
+  file,
+}: {
+  file: File;
+}): Promise<JSON | null> => {
+  return new Promise((resolve, reject) => {
+    if (file.type === "application/json") {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (!result) {
+          resolve(null);
+        }
+        try {
+          const json = result ? JSON.parse(result.toString()) : null;
+          resolve(json);
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          reject(error); // Reject the promise on error
+        }
+      };
+
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        reject(error); // Reject the promise on read error
+      };
+
+      reader.readAsText(file);
+    } else {
+      resolve(null); // Resolve with null immediately if file type is not application/json
+    }
+  });
+};

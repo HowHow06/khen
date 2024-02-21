@@ -1,5 +1,6 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
+import { ZodError, ZodSchema } from "zod";
 import {
   deepMerge,
   extractNumber,
@@ -18,7 +19,9 @@ import {
   DEFAULT_PPT_LAYOUT,
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
+  IMPORTED_SETTING_TYPE,
   LYRIC_SECTION,
+  MAIN_SECTION_NAME,
   MASTER_SLIDE_BACKGROUND_COLOR,
   MASTER_SLIDE_BACKGROUND_IMAGE,
   PPT_GENERATION_CONTENT_SETTINGS,
@@ -31,14 +34,17 @@ import {
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
+import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
   BaseSettingMetaType,
   ContentSettingsType,
   ContentTextboxSettingsType,
+  ImportedSettingType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
+  SectionSettingsKeyType,
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
@@ -940,7 +946,7 @@ export const getPreset = (
   return undefined;
 };
 
-export const getSectionSettingsFromPreset = (
+export const getSectionSettingsFromSettings = (
   preset: PptSettingsStateType,
 ): SectionSettingsType => {
   const presetGeneralSetting = preset[SETTING_CATEGORY.GENERAL];
@@ -963,4 +969,97 @@ export const getSectionSettingsFromPreset = (
   };
 
   return sectionValues;
+};
+
+export const getSettingValueToApply = ({
+  newSettings,
+  originalSettings,
+  isApplyToSection = false,
+  isPreserveUseDifferentSetting = false,
+  isToPreserveExistingSectionSetting = true,
+  currentSectionName,
+}: {
+  newSettings: PptSettingsStateType;
+  originalSettings: PptSettingsStateType;
+  isApplyToSection: boolean;
+  isPreserveUseDifferentSetting: boolean;
+  isToPreserveExistingSectionSetting: boolean;
+  currentSectionName: string;
+}) => {
+  let settingsToUse = newSettings;
+  settingsToUse[SETTING_CATEGORY.FILE] = {
+    ...settingsToUse[SETTING_CATEGORY.FILE],
+    filename: originalSettings.file.filename,
+  };
+
+  if (!isApplyToSection && isToPreserveExistingSectionSetting) {
+    // preserve section values
+    settingsToUse[SETTING_CATEGORY.SECTION] = {
+      ...originalSettings[SETTING_CATEGORY.SECTION],
+    };
+  } else if (originalSettings[SETTING_CATEGORY.SECTION] !== undefined) {
+    // reset section values
+    const sectionInitialValue = getSectionSettingsInitialValue({
+      settings: PPT_GENERATION_SETTINGS_META,
+    });
+    const sectionSettings = originalSettings[SETTING_CATEGORY.SECTION] as {
+      [key in SectionSettingsKeyType]: SectionSettingsType;
+    };
+    Object.entries(sectionSettings).forEach(([key, value]) => {
+      settingsToUse[SETTING_CATEGORY.SECTION] = {
+        ...settingsToUse[SETTING_CATEGORY.SECTION],
+        [key]: sectionInitialValue,
+      };
+    });
+  }
+
+  if (!isApplyToSection && isPreserveUseDifferentSetting) {
+    settingsToUse[SETTING_CATEGORY.GENERAL] = {
+      ...settingsToUse[SETTING_CATEGORY.GENERAL],
+      useDifferentSettingForEachSection:
+        originalSettings.general.useDifferentSettingForEachSection,
+    };
+  }
+
+  if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
+    const sectionSettings = getSectionSettingsFromSettings(newSettings);
+    const currentSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
+
+    settingsToUse = {
+      ...originalSettings,
+      [SETTING_CATEGORY.SECTION]: {
+        ...currentSectionValues,
+        [currentSectionName as SectionSettingsKeyType]: sectionSettings,
+      },
+    } as PptSettingsStateType;
+  }
+
+  return settingsToUse;
+};
+
+export const getIsValidToSchema = (json: JSON, schema: ZodSchema): boolean => {
+  try {
+    schema.parse(json);
+    return true;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return false;
+    }
+  }
+  return false;
+};
+
+export const getImportedSettingTypeFromJSON = ({
+  json,
+}: {
+  json: JSON;
+}): Promise<ImportedSettingType | null> => {
+  return new Promise((resolve, reject) => {
+    if (getIsValidToSchema(json, settingsSchema)) {
+      resolve(IMPORTED_SETTING_TYPE.FULL_SETTING);
+    } else if (getIsValidToSchema(json, sectionSettingSchema)) {
+      resolve(IMPORTED_SETTING_TYPE.SECTION);
+    }
+    resolve(null);
+  });
 };

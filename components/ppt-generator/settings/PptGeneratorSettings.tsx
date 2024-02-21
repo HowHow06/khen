@@ -357,7 +357,10 @@ const PptGeneratorSetting = () => {
                 currentSectionName={currentSection}
                 presets={DEFAULT_PRESETS}
               />
-              <SettingsOptionsDropdown />
+              <SettingsOptionsDropdown
+                hasSectionSettings={isDifferentSettingsBySection}
+                currentSectionName={currentSection}
+              />
             </div>
             {isDifferentSettingsBySection && (
               <SectionsCombobox

@@ -11,16 +11,11 @@ import {
 import {
   MAIN_SECTION_NAME,
   PPT_GENERATION_GENERAL_SETTINGS,
-  SETTING_CATEGORY,
 } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import { pptPresets } from "@/lib/presets";
-import {
-  PptSettingsStateType,
-  PresetsType,
-  SectionSettingsKeyType,
-} from "@/lib/types";
-import { getPreset, getSectionSettingsFromPreset } from "@/lib/utils";
+import { PptSettingsStateType, PresetsType } from "@/lib/types";
+import { getPreset, getSettingValueToApply } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -28,16 +23,9 @@ import { toast } from "sonner";
 type Props = {
   presets: PresetsType;
   useIcon?: boolean;
-} & (
-  | {
-      hasSectionSettings?: false;
-      currentSectionName?: string;
-    }
-  | {
-      hasSectionSettings: true;
-      currentSectionName: string;
-    }
-);
+  hasSectionSettings: boolean;
+  currentSectionName: string;
+};
 
 const PresetsDropdown = ({
   presets,
@@ -55,36 +43,19 @@ const PresetsDropdown = ({
     presetName: string,
     isApplyToSection: boolean = false,
     isPreserveUseDifferentSetting: boolean = false,
+    isToPreserveExistingSectionSetting: boolean = true,
   ) => {
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
-      const currentValues = getValues();
-      let presetToUse = preset;
-      presetToUse[SETTING_CATEGORY.FILE] = {
-        ...presetToUse[SETTING_CATEGORY.FILE],
-        filename: currentValues.file.filename,
-      };
-
-      if (isPreserveUseDifferentSetting) {
-        presetToUse[SETTING_CATEGORY.GENERAL] = {
-          ...presetToUse[SETTING_CATEGORY.GENERAL],
-          useDifferentSettingForEachSection:
-            currentValues.general.useDifferentSettingForEachSection,
-        };
-      }
-
-      if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
-        const sectionSettings = getSectionSettingsFromPreset(preset);
-        const currentSectionValues = currentValues[SETTING_CATEGORY.SECTION];
-
-        presetToUse = {
-          ...currentValues,
-          [SETTING_CATEGORY.SECTION]: {
-            ...currentSectionValues,
-            [currentSectionName as SectionSettingsKeyType]: sectionSettings,
-          },
-        } as PptSettingsStateType;
-      }
+      const currentValues = getValues() as PptSettingsStateType;
+      const presetToUse = getSettingValueToApply({
+        newSettings: preset,
+        originalSettings: currentValues,
+        currentSectionName: currentSectionName,
+        isApplyToSection: isApplyToSection,
+        isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,
+        isToPreserveExistingSectionSetting,
+      });
 
       formReset(presetToUse);
       toast.success("Preset applied.");
@@ -94,27 +65,7 @@ const PresetsDropdown = ({
   const onPresetClick = async (presetName: string) => {
     let isApplyToSection = false;
     let isPreserveUseDifferentSetting = true;
-    if (hasSectionSettings && currentSectionName == MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog(
-        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isPreserveUseDifferentSetting = result === "no";
-    }
+    let isToPreserveExistingSectionSetting = true;
 
     if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
       const result = await showOptionsDialog("Apply presets to:", {
@@ -135,7 +86,54 @@ const PresetsDropdown = ({
       isApplyToSection = result === "current-section";
     }
 
-    applyPreset(presetName, isApplyToSection, isPreserveUseDifferentSetting);
+    if (
+      hasSectionSettings &&
+      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
+    ) {
+      let result = await showOptionsDialog(
+        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
+        {
+          optionItems: [
+            {
+              text: "Yes",
+              value: "yes",
+            },
+            {
+              text: `No`,
+              value: "no",
+            },
+          ],
+        },
+      );
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isPreserveUseDifferentSetting = result === "no";
+
+      result = await showOptionsDialog(`Preserve section settings values?`, {
+        optionItems: [
+          {
+            text: "Yes",
+            value: "yes",
+          },
+          {
+            text: `No`,
+            value: "no",
+          },
+        ],
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isToPreserveExistingSectionSetting = result === "yes";
+    }
+
+    applyPreset(
+      presetName,
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    );
   };
 
   return (

@@ -117,6 +117,75 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
   return baseZodSchema;
 };
 
+export const generatSectionSettingZodSchema = (
+  settingsMeta: PptGenerationSettingMetaType,
+) => {
+  const sectionSettingsMeta = settingsMeta.section;
+  const sectionSchema: { [key in string]: any } = {};
+  // General section schema-------------------
+  const generalSchema: any = {};
+  Object.entries(sectionSettingsMeta).forEach(([key, setting]) => {
+    if (setting.isNotAvailable) {
+      return;
+    }
+    generalSchema[key] = createZodSchemaFromSettingItem(setting);
+  });
+  sectionSchema[SETTING_CATEGORY.GENERAL] = z.object(generalSchema);
+
+  // Cover section schema--------------------
+  const coverSchema: any = {}; // reset
+  Object.entries(settingsMeta.cover).forEach(([key, setting]) => {
+    if (setting.isNotAvailable) {
+      return;
+    }
+    coverSchema[key] = createZodSchemaFromSettingItem(setting);
+  });
+  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
+
+  // Content section schema-------------------
+  const contentSchema: { [groupingName: string]: any } = {};
+  Object.entries(settingsMeta.content).forEach(([key, setting]) => {
+    if (setting.isNotAvailable) {
+      return;
+    }
+    const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
+    if (!contentSchema[groupingName]) {
+      contentSchema[groupingName] = {};
+    }
+    contentSchema[groupingName][key] = createZodSchemaFromSettingItem(setting);
+  });
+  Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach((_, index) => {
+    Object.entries(settingsMeta.contentTextbox).forEach(([key, setting]) => {
+      if (setting.isNotAvailable) {
+        return;
+      }
+      const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
+      if (!contentSchema[groupingName]) {
+        contentSchema[groupingName] = {};
+      }
+      contentSchema[groupingName][key] =
+        createZodSchemaFromSettingItem(setting);
+    });
+  });
+  const contentZodSchema = Object.entries(contentSchema).reduce(
+    (acc, [groupingName, fields]) => {
+      // fields here is object of {fieldKey: zodSchema}
+      acc[groupingName] = z.object(fields);
+      return acc;
+    },
+    {} as { [groupingName: string]: any },
+  );
+  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(
+    z.object(contentZodSchema),
+  );
+
+  return z.object(sectionSchema);
+};
+
+export const sectionSettingSchema = generatSectionSettingZodSchema(
+  PPT_GENERATION_SETTINGS_META,
+);
+
 // TODO: refactor this function
 const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
@@ -201,69 +270,7 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     }
 
     if (category === SETTING_CATEGORY.SECTION) {
-      const sectionSchema: { [key in string]: any } = {};
-      // General section schema-------------------
-      const generalSchema: any = {};
-      Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-        generalSchema[key] = createZodSchemaFromSettingItem(setting);
-      });
-      sectionSchema[SETTING_CATEGORY.GENERAL] = z.object(generalSchema);
-
-      // Cover section schema--------------------
-      const coverSchema: any = {}; // reset
-      Object.entries(metaData.cover).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-        coverSchema[key] = createZodSchemaFromSettingItem(setting);
-      });
-      sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
-
-      // Content section schema-------------------
-      const contentSchema: { [groupingName: string]: any } = {};
-      Object.entries(metaData.content).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-        const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
-        if (!contentSchema[groupingName]) {
-          contentSchema[groupingName] = {};
-        }
-        contentSchema[groupingName][key] =
-          createZodSchemaFromSettingItem(setting);
-      });
-      Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
-        (_, index) => {
-          Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
-            if (setting.isNotAvailable) {
-              return;
-            }
-            const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
-            if (!contentSchema[groupingName]) {
-              contentSchema[groupingName] = {};
-            }
-            contentSchema[groupingName][key] =
-              createZodSchemaFromSettingItem(setting);
-          });
-        },
-      );
-      const contentZodSchema = Object.entries(contentSchema).reduce(
-        (acc, [groupingName, fields]) => {
-          // fields here is object of {fieldKey: zodSchema}
-          acc[groupingName] = z.object(fields);
-          return acc;
-        },
-        {} as { [groupingName: string]: any },
-      );
-      sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(
-        z.object(contentZodSchema),
-      );
-
-      // add schema to schema object----------------
-      schemaObject[category] = z.record(z.object(sectionSchema)).optional();
+      schemaObject[category] = z.record(sectionSettingSchema).optional();
     }
   });
   return z.object(schemaObject);
