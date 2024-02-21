@@ -1154,6 +1154,34 @@ export const exportFullSettings = ({
     delete settingsValue[SETTING_CATEGORY.SECTION];
   }
 
+  // remove background image
+  settingsValue[SETTING_CATEGORY.GENERAL] = {
+    ...settingsValue[SETTING_CATEGORY.GENERAL],
+    mainBackgroundImage: null,
+  };
+
+  if (isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
+    const sectionSettings = {
+      ...settingsValue[SETTING_CATEGORY.SECTION],
+    } as Record<SectionSettingsKeyType, SectionSettingsType>;
+
+    // remove background image in sections
+    Object.entries(sectionSettings).forEach(
+      ([sectionKey, sectionSettingValue]) => {
+        const newSectionValue = sectionSettingValue;
+        newSectionValue[SETTING_CATEGORY.GENERAL] = {
+          ...newSectionValue[SETTING_CATEGORY.GENERAL],
+          sectionBackgroundImage: null,
+        };
+
+        settingsValue[SETTING_CATEGORY.SECTION] = {
+          ...sectionSettings,
+          [sectionKey]: newSectionValue,
+        };
+      },
+    );
+  }
+
   exportObjectToJsonFile({
     obj: settingsValue,
     document: document,
@@ -1174,6 +1202,12 @@ export const exportSectionSettings = ({
   if (!originalTargetSectionValues) {
     return;
   }
+
+  // remove background image in section
+  originalTargetSectionValues[SETTING_CATEGORY.GENERAL] = {
+    ...originalTargetSectionValues[SETTING_CATEGORY.GENERAL],
+    sectionBackgroundImage: null,
+  };
 
   exportObjectToJsonFile({
     obj: originalTargetSectionValues,
