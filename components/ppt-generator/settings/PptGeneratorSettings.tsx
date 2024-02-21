@@ -348,8 +348,8 @@ const PptGeneratorSetting = () => {
             <div className="flex flex-row items-center space-x-5">
               <SheetTitle>Settings</SheetTitle>
               <PresetsDropdown
-                isSectionPreset={isDifferentSettingsBySection}
-                sectionName={currentSection}
+                hasSectionSettings={isDifferentSettingsBySection}
+                currentSectionName={currentSection}
                 presets={DEFAULT_PRESETS}
               />
               <SettingsOptionsDropdown />
@@ -434,8 +434,8 @@ const PptGeneratorSetting = () => {
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
-          isSectionPreset={isDifferentSettingsBySection}
-          sectionName={currentSection}
+          hasSectionSettings={isDifferentSettingsBySection}
+          currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />
       )}
