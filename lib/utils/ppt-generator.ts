@@ -19,6 +19,7 @@ import {
   DEFAULT_PPT_LAYOUT,
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
+  IMPORTED_SETTING_TYPE,
   LYRIC_SECTION,
   MAIN_SECTION_NAME,
   MASTER_SLIDE_BACKGROUND_COLOR,
@@ -33,10 +34,12 @@ import {
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
+import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
   BaseSettingMetaType,
   ContentSettingsType,
   ContentTextboxSettingsType,
+  ImportedSettingType,
   InferTypeScriptTypeFromSettingFieldType,
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
@@ -1044,4 +1047,19 @@ export const getIsValidToSchema = (json: JSON, schema: ZodSchema): boolean => {
     }
   }
   return false;
+};
+
+export const getImportedSettingTypeFromJSON = ({
+  json,
+}: {
+  json: JSON;
+}): Promise<ImportedSettingType | null> => {
+  return new Promise((resolve, reject) => {
+    if (getIsValidToSchema(json, settingsSchema)) {
+      resolve(IMPORTED_SETTING_TYPE.FULL_SETTING);
+    } else if (getIsValidToSchema(json, sectionSettingSchema)) {
+      resolve(IMPORTED_SETTING_TYPE.SECTION);
+    }
+    resolve(null);
+  });
 };

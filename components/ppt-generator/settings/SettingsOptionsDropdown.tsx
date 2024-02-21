@@ -8,33 +8,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  IMPORTED_SETTING_TYPE,
   MAIN_SECTION_NAME,
+  PPT_GENERATION_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
-import { settingsSchema } from "@/lib/schemas";
 import {
   PptSettingsStateType,
   SectionSettingsKeyType,
   SectionSettingsType,
 } from "@/lib/types";
-import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
+import {
+  deepMerge,
+  generatePptSettingsInitialState,
+  getImportedSettingTypeFromJSON,
+  getJSONFromFile,
+  getSettingValueToApply,
+} from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { ChangeEvent, useRef } from "react";
 import { toast } from "sonner";
-import { ZodError } from "zod";
 
-type Props = {} & (
-  | {
-      hasSectionSettings?: false;
-      currentSectionName?: string;
-    }
-  | {
-      hasSectionSettings: true;
-      currentSectionName: string;
-    }
-);
+type Props = {
+  hasSectionSettings: boolean;
+  currentSectionName: string;
+};
 
 const SettingsOptionsDropdown = ({
   hasSectionSettings,
@@ -49,37 +49,135 @@ const SettingsOptionsDropdown = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    if (file && file.type === "application/json") {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result;
-        try {
-          const json = result ? JSON.parse(result.toString()) : null;
-          const pptSettings = settingsSchema.parse(json);
-          const defaultInitialState = generatePptSettingsInitialState(
-            PPT_GENERATION_SETTINGS_META,
-          );
-          reset(deepMerge(defaultInitialState, pptSettings));
-          toast.success("Settings imported.");
-        } catch (error) {
-          if (error instanceof ZodError) {
-            toast.error("Invalid settings:");
-            console.error("Invalid settings:", error);
-          } else {
-            toast.error("Error parsing JSON:");
-            console.error("Error parsing JSON:", error);
-          }
-        } finally {
-          event.target.value = "";
-        }
-      };
-      reader.readAsText(file);
-    } else {
-      toast.error("Please select a valid JSON file.");
-      // Handle invalid file type
+  const importSettings = ({
+    settingValues,
+    isApplyToSection = false,
+    isPreserveUseDifferentSetting = false,
+    isToPreserveExistingSectionSetting = true,
+  }: {
+    settingValues: PptSettingsStateType;
+    isApplyToSection: boolean;
+    isPreserveUseDifferentSetting: boolean;
+    isToPreserveExistingSectionSetting: boolean;
+  }) => {
+    const defaultInitialState = generatePptSettingsInitialState(
+      PPT_GENERATION_SETTINGS_META,
+    );
+    const newSettings = deepMerge(
+      defaultInitialState,
+      settingValues,
+    ) as PptSettingsStateType;
+    const finalSettingsValue = getSettingValueToApply({
+      newSettings,
+      originalSettings: getValues() as PptSettingsStateType,
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+      currentSectionName,
+    });
+    reset(finalSettingsValue);
+  };
+
+  // TODO: refactor this together with presetsdropdown component
+  const handleFullSettingImport = async ({ json }: { json: JSON }) => {
+    let isApplyToSection = false;
+    let isPreserveUseDifferentSetting = true;
+    let isToPreserveExistingSectionSetting = true;
+
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
+      const result = await showOptionsDialog("Apply settings to:", {
+        optionItems: [
+          {
+            text: "Main Section",
+            value: "main-section",
+          },
+          {
+            text: `Current Section`,
+            value: "current-section",
+          },
+        ],
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isApplyToSection = result === "current-section";
     }
+
+    if (
+      hasSectionSettings &&
+      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
+    ) {
+      let result = await showOptionsDialog(
+        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
+        {
+          optionItems: [
+            {
+              text: "Yes",
+              value: "yes",
+            },
+            {
+              text: `No`,
+              value: "no",
+            },
+          ],
+        },
+      );
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isPreserveUseDifferentSetting = result === "no";
+
+      result = await showOptionsDialog(`Preserve section settings values?`, {
+        optionItems: [
+          {
+            text: "Yes",
+            value: "yes",
+          },
+          {
+            text: `No`,
+            value: "no",
+          },
+        ],
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isToPreserveExistingSectionSetting = result === "yes";
+    }
+
+    importSettings({
+      settingValues: json as unknown as PptSettingsStateType,
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    });
+  };
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) {
+      return;
+    }
+    const json = await getJSONFromFile({ file });
+    if (json === null) {
+      toast.error("Error in reading the JSON file");
+      return;
+    }
+
+    const settingType = await getImportedSettingTypeFromJSON({ json });
+    if (settingType === null) {
+      toast.error("Invalid file format.");
+      return;
+    }
+
+    if (settingType === IMPORTED_SETTING_TYPE.FULL_SETTING) {
+      await handleFullSettingImport({ json });
+      toast.success("Setting Imported.");
+    } else {
+      toast.info("Import of this setting type is not supported yet.");
+    }
+
+    event.target.value = "";
   };
 
   const exportSettings = ({
@@ -200,14 +298,6 @@ const SettingsOptionsDropdown = ({
           </DropdownMenuTrigger>
         </div>
         <DropdownMenuContent align="end" className="z-50">
-          {/* Hidden file input for importing settings */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-            accept=".json"
-          />
           <DropdownMenuItem onSelect={handleImportClick}>
             Import Settings
           </DropdownMenuItem>
@@ -215,6 +305,14 @@ const SettingsOptionsDropdown = ({
             Export Settings
           </DropdownMenuItem>
         </DropdownMenuContent>
+        {/* Hidden file input for importing settings */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+          accept=".json"
+        />
       </DropdownMenu>
     </>
   );
