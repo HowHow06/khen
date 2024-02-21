@@ -1,5 +1,6 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
+import { ZodError, ZodSchema } from "zod";
 import {
   deepMerge,
   extractNumber,
@@ -1031,4 +1032,16 @@ export const getSettingValueToApply = ({
   }
 
   return settingsToUse;
+};
+
+export const getIsValidToSchema = (json: JSON, schema: ZodSchema): boolean => {
+  try {
+    schema.parse(json);
+    return true;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return false;
+    }
+  }
+  return false;
 };
