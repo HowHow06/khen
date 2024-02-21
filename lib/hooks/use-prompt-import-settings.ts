@@ -86,7 +86,75 @@ const usePromptImportSettings = () => {
     };
   };
 
-  return { promptToGetFullSettingsImportOptions };
+  const promptToGetSettingsExportOptions = async ({
+    hasSectionSettings,
+    currentSectionName,
+  }: {
+    hasSectionSettings: boolean;
+    currentSectionName: string;
+  }) => {
+    let isIncludeSectionSettings = false;
+    let isExportSectionSettings = false;
+
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
+      const result = await showOptionsDialog(
+        `Export which of the following? `,
+        {
+          optionItems: [
+            {
+              text: "Main Section",
+              value: "main-section",
+            },
+            {
+              text: `Current Section`,
+              value: "current-section",
+            },
+          ],
+        },
+      );
+
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isExportSectionSettings = result === "current-section";
+    }
+
+    if (
+      hasSectionSettings &&
+      (currentSectionName === MAIN_SECTION_NAME ||
+        (currentSectionName !== MAIN_SECTION_NAME && !isExportSectionSettings))
+    ) {
+      const result = await showOptionsDialog(
+        `To include sections settings in the export?`,
+        {
+          optionItems: [
+            {
+              text: "Yes",
+              value: "yes",
+            },
+            {
+              text: `No`,
+              value: "no",
+            },
+          ],
+        },
+      );
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isIncludeSectionSettings = result === "yes";
+    }
+
+    return {
+      isIncludeSectionSettings,
+      isExportSectionSettings,
+    };
+  };
+
+  return {
+    promptToGetFullSettingsImportOptions,
+    promptToGetSettingsExportOptions,
+  };
 };
 
 export default usePromptImportSettings;

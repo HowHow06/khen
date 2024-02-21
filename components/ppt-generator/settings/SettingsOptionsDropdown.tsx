@@ -12,7 +12,6 @@ import {
   MAIN_SECTION_NAME,
   SETTING_CATEGORY,
 } from "@/lib/constant";
-import { DIALOG_RESULT } from "@/lib/constant/general";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import {
   PptSettingsStateType,
@@ -42,7 +41,10 @@ const SettingsOptionsDropdown = ({
   const { form } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
   const { showOptionsDialog } = useOptionsDialog();
-  const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
+  const {
+    promptToGetFullSettingsImportOptions,
+    promptToGetSettingsExportOptions,
+  } = usePromptImportSettings();
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -216,57 +218,16 @@ const SettingsOptionsDropdown = ({
   };
 
   const handleExportClick = async () => {
-    let isIncludeSectionSettings = false;
-    let isExportSectionSettings = false;
-
-    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog(
-        `Export which of the following? `,
-        {
-          optionItems: [
-            {
-              text: "Main Section",
-              value: "main-section",
-            },
-            {
-              text: `Current Section`,
-              value: "current-section",
-            },
-          ],
-        },
-      );
-
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isExportSectionSettings = result === "current-section";
+    const options = await promptToGetSettingsExportOptions({
+      hasSectionSettings,
+      currentSectionName,
+    });
+    if (options === undefined) {
+      // user clicked cancel
+      return;
     }
 
-    if (
-      hasSectionSettings &&
-      (currentSectionName === MAIN_SECTION_NAME ||
-        (currentSectionName !== MAIN_SECTION_NAME && !isExportSectionSettings))
-    ) {
-      const result = await showOptionsDialog(
-        `To include sections settings in the export?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isIncludeSectionSettings = result === "yes";
-    }
+    const { isExportSectionSettings, isIncludeSectionSettings } = options;
 
     exportSettings({ isExportSectionSettings, isIncludeSectionSettings });
   };
