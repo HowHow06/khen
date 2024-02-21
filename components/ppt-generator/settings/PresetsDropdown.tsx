@@ -15,7 +15,7 @@ import {
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import { pptPresets } from "@/lib/presets";
 import { PptSettingsStateType, PresetsType } from "@/lib/types";
-import { getPreset, getSettingValueToApply } from "@/lib/utils";
+import { generateFullSettings, getPreset } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -48,15 +48,14 @@ const PresetsDropdown = ({
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
       const currentValues = getValues() as PptSettingsStateType;
-      const finalValues = getSettingValueToApply({
+      const finalValues = generateFullSettings({
         newSettings: preset,
         originalSettings: currentValues,
-        currentSectionName: currentSectionName,
+        targetSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,
         isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,
-        isToPreserveExistingSectionSetting,
+        isPreserveExistingSectionSetting: isToPreserveExistingSectionSetting,
       });
-
       formReset(finalValues);
       toast.success("Preset applied.");
     }

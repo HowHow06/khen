@@ -11,7 +11,6 @@ import {
   IMPORTED_SETTING_TYPE,
   MAIN_SECTION_NAME,
   PPT_GENERATION_GENERAL_SETTINGS,
-  PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
@@ -21,11 +20,10 @@ import {
   SectionSettingsType,
 } from "@/lib/types";
 import {
-  deepMerge,
-  generatePptSettingsInitialState,
+  combineWithDefaultSettings,
+  generateFullSettings,
   getJSONFromFile,
   getSettingTypeFromJSON,
-  getSettingValueToApply,
 } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { ChangeEvent, useRef } from "react";
@@ -60,20 +58,14 @@ const SettingsOptionsDropdown = ({
     isPreserveUseDifferentSetting: boolean;
     isToPreserveExistingSectionSetting: boolean;
   }) => {
-    const defaultInitialState = generatePptSettingsInitialState(
-      PPT_GENERATION_SETTINGS_META,
-    );
-    const newSettings = deepMerge(
-      defaultInitialState,
-      settingValues,
-    ) as PptSettingsStateType;
-    const finalSettingsValue = getSettingValueToApply({
+    const newSettings = combineWithDefaultSettings(settingValues);
+    const finalSettingsValue = generateFullSettings({
       newSettings,
       originalSettings: getValues() as PptSettingsStateType,
       isApplyToSection,
       isPreserveUseDifferentSetting,
-      isToPreserveExistingSectionSetting,
-      currentSectionName,
+      isPreserveExistingSectionSetting: isToPreserveExistingSectionSetting,
+      targetSectionName: currentSectionName,
     });
     reset(finalSettingsValue);
   };
