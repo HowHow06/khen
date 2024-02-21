@@ -32,10 +32,12 @@ const ContentSettings = ({
   const { getValues } = form;
   const formValues = getValues() as PptSettingsStateType;
   const settingsMetaGrouped = useMemo(() => {
+    const textBoxCount = formValues.general.singleLineMode
+      ? 1
+      : DEFAULT_LINE_COUNT_PER_SLIDE;
+
     const textBoxSettings = Array.from({
-      length: formValues.general.singleLineMode
-        ? 1
-        : DEFAULT_LINE_COUNT_PER_SLIDE,
+      length: textBoxCount,
     }).reduce<{}>((result, _, currentIndex) => {
       return {
         ...result,
@@ -43,6 +45,7 @@ const ContentSettings = ({
           PPT_GENERATION_SETTINGS_META.contentTextbox,
       };
     }, {});
+
     return {
       ...textBoxSettings,
       ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
