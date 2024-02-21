@@ -30,6 +30,9 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
       if (actionType === TEXT_TRANSFORM.LOWER) {
         resultText += textLine.toLowerCase();
       }
+      if (actionType === TEXT_TRANSFORM.UPPER) {
+        resultText += textLine.toUpperCase();
+      }
       if (actionType === TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER) {
         const searchIndex = textLine.search(/[a-zA-Z]/);
         const firstLetterIndex = searchIndex === -1 ? 0 : searchIndex;
@@ -127,7 +130,12 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
           <DropdownMenuItem
             onSelect={() => transformText({ actionType: TEXT_TRANSFORM.LOWER })}
           >
-            For each line: To Lowercase
+            To Lowercase
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => transformText({ actionType: TEXT_TRANSFORM.UPPER })}
+          >
+            To Uppercase
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
