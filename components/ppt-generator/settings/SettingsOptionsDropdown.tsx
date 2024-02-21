@@ -20,6 +20,8 @@ import {
 } from "@/lib/types";
 import {
   combineWithDefaultSettings,
+  exportFullSettings,
+  exportSectionSettings,
   generateFullSettings,
   getJSONFromFile,
   getSettingTypeFromJSON,
@@ -173,48 +175,19 @@ const SettingsOptionsDropdown = ({
     isIncludeSectionSettings?: boolean;
     isExportSectionSettings?: boolean;
   }) => {
-    let fileName = `KhenPptGeneratorSettings_${new Date().getTime()}.json`;
-    // Retrieve current form values
-    let currentSettings: PptSettingsStateType | SectionSettingsType =
-      getValues() as PptSettingsStateType;
-    if (
-      !isIncludeSectionSettings &&
-      !isExportSectionSettings &&
-      currentSettings[SETTING_CATEGORY.SECTION]
-    ) {
-      delete currentSettings[SETTING_CATEGORY.SECTION];
-    } else if (
-      isExportSectionSettings &&
-      hasSectionSettings &&
-      currentSettings[SETTING_CATEGORY.SECTION]?.[
-        currentSectionName as SectionSettingsKeyType
-      ]
-    ) {
-      currentSettings = currentSettings[SETTING_CATEGORY.SECTION]?.[
-        currentSectionName as SectionSettingsKeyType
-      ] as SectionSettingsType;
-      fileName = `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`;
+    const currentValues = getValues() as PptSettingsStateType;
+    if (isExportSectionSettings) {
+      exportSectionSettings({
+        settingsValue: currentValues,
+        targetSectionName: currentSectionName as SectionSettingsKeyType,
+      });
+      return;
     }
 
-    // Convert the settings to a JSON string
-    const settingsJson = JSON.stringify(currentSettings, null, 2); // Pretty print JSON
-
-    // Create a Blob from the JSON string
-    const blob = new Blob([settingsJson], { type: "application/json" });
-
-    // Create a URL for the Blob
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary anchor element and trigger the download
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName; // Filename for the downloaded file
-    document.body.appendChild(a); // Append to body to ensure it can be clicked
-    a.click(); // Trigger click to download
-
-    // Clean up by revoking the Blob URL and removing the anchor element
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    exportFullSettings({
+      settingsValue: currentValues,
+      isIncludeSectionSettings,
+    });
   };
 
   const handleExportClick = async () => {

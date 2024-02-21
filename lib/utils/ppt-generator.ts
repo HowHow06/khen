@@ -1114,3 +1114,72 @@ export const combineWithDefaultSettings = (
   ) as PptSettingsStateType;
   return result;
 };
+
+export const exportObjectToJsonFile = ({
+  obj,
+  document,
+  fileName,
+}: {
+  obj: any;
+  document: Document;
+  fileName: string;
+}) => {
+  // Convert the settings to a JSON string
+  const settingsJson = JSON.stringify(obj, null, 2); // Pretty print JSON
+
+  // Create a Blob from the JSON string
+  const blob = new Blob([settingsJson], { type: "application/json" });
+
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary anchor element and trigger the download
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName; // Filename for the downloaded file
+  document.body.appendChild(a); // Append to body to ensure it can be clicked
+  a.click(); // Trigger click to download
+
+  // Clean up by revoking the Blob URL and removing the anchor element
+  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
+
+export const exportFullSettings = ({
+  settingsValue,
+  isIncludeSectionSettings,
+}: {
+  settingsValue: PptSettingsStateType;
+  isIncludeSectionSettings: boolean;
+}) => {
+  if (!isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
+    delete settingsValue[SETTING_CATEGORY.SECTION];
+  }
+
+  exportObjectToJsonFile({
+    obj: settingsValue,
+    document: document,
+    fileName: `KhenPptGeneratorSettings_${new Date().getTime()}.json`,
+  });
+};
+
+export const exportSectionSettings = ({
+  settingsValue,
+  targetSectionName,
+}: {
+  settingsValue: PptSettingsStateType;
+  targetSectionName: SectionSettingsKeyType;
+}) => {
+  const originalTargetSectionValues =
+    settingsValue[SETTING_CATEGORY.SECTION]?.[targetSectionName];
+
+  if (!originalTargetSectionValues) {
+    return;
+  }
+
+  exportObjectToJsonFile({
+    obj: originalTargetSectionValues,
+    document: document,
+    fileName: `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`,
+  });
+};
