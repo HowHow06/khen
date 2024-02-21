@@ -1,5 +1,4 @@
 "use client";
-import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,7 +32,6 @@ const PresetsDropdown = ({
   Pick<DropdownMenuContentProps, "side" | "sideOffset" | "alignOffset">) => {
   const { form } = usePptGeneratorFormContext();
   const { reset: formReset, getValues } = form;
-  const { showOptionsDialog } = useOptionsDialog();
   const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
 
   const applyPreset = (
