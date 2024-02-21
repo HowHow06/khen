@@ -11,16 +11,11 @@ import {
 import {
   MAIN_SECTION_NAME,
   PPT_GENERATION_GENERAL_SETTINGS,
-  SETTING_CATEGORY,
 } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import { pptPresets } from "@/lib/presets";
-import {
-  PptSettingsStateType,
-  PresetsType,
-  SectionSettingsKeyType,
-} from "@/lib/types";
-import { getPreset, getSectionSettingsFromSettings } from "@/lib/utils";
+import { PptSettingsStateType, PresetsType } from "@/lib/types";
+import { getPreset, getSettingValueToApply } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -28,16 +23,9 @@ import { toast } from "sonner";
 type Props = {
   presets: PresetsType;
   useIcon?: boolean;
-} & (
-  | {
-      hasSectionSettings?: false;
-      currentSectionName?: string;
-    }
-  | {
-      hasSectionSettings: true;
-      currentSectionName: string;
-    }
-);
+  hasSectionSettings: boolean;
+  currentSectionName: string;
+};
 
 const PresetsDropdown = ({
   presets,
@@ -58,33 +46,14 @@ const PresetsDropdown = ({
   ) => {
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
-      const currentValues = getValues();
-      let presetToUse = preset;
-      presetToUse[SETTING_CATEGORY.FILE] = {
-        ...presetToUse[SETTING_CATEGORY.FILE],
-        filename: currentValues.file.filename,
-      };
-
-      if (isPreserveUseDifferentSetting) {
-        presetToUse[SETTING_CATEGORY.GENERAL] = {
-          ...presetToUse[SETTING_CATEGORY.GENERAL],
-          useDifferentSettingForEachSection:
-            currentValues.general.useDifferentSettingForEachSection,
-        };
-      }
-
-      if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
-        const sectionSettings = getSectionSettingsFromSettings(preset);
-        const currentSectionValues = currentValues[SETTING_CATEGORY.SECTION];
-
-        presetToUse = {
-          ...currentValues,
-          [SETTING_CATEGORY.SECTION]: {
-            ...currentSectionValues,
-            [currentSectionName as SectionSettingsKeyType]: sectionSettings,
-          },
-        } as PptSettingsStateType;
-      }
+      const currentValues = getValues() as PptSettingsStateType;
+      const presetToUse = getSettingValueToApply({
+        newSettings: preset,
+        originalSettings: currentValues,
+        currentSectionName: currentSectionName,
+        isApplyToSection: isApplyToSection,
+        isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,
+      });
 
       formReset(presetToUse);
       toast.success("Preset applied.");
@@ -94,7 +63,30 @@ const PresetsDropdown = ({
   const onPresetClick = async (presetName: string) => {
     let isApplyToSection = false;
     let isPreserveUseDifferentSetting = true;
-    if (hasSectionSettings && currentSectionName == MAIN_SECTION_NAME) {
+
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
+      const result = await showOptionsDialog("Apply presets to:", {
+        optionItems: [
+          {
+            text: "Main Section",
+            value: "main-section",
+          },
+          {
+            text: `Current Section`,
+            value: "current-section",
+          },
+        ],
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isApplyToSection = result === "current-section";
+    }
+
+    if (
+      hasSectionSettings &&
+      (currentSectionName == MAIN_SECTION_NAME || !isApplyToSection)
+    ) {
       const result = await showOptionsDialog(
         `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
         {
@@ -114,25 +106,6 @@ const PresetsDropdown = ({
         return;
       }
       isPreserveUseDifferentSetting = result === "no";
-    }
-
-    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog("Apply presets to:", {
-        optionItems: [
-          {
-            text: "Main Section",
-            value: "main-section",
-          },
-          {
-            text: `Current Section`,
-            value: "current-section",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isApplyToSection = result === "current-section";
     }
 
     applyPreset(presetName, isApplyToSection, isPreserveUseDifferentSetting);

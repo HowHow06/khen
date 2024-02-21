@@ -19,6 +19,7 @@ import {
   DEFAULT_SUBJECT,
   DEFAULT_TITLE,
   LYRIC_SECTION,
+  MAIN_SECTION_NAME,
   MASTER_SLIDE_BACKGROUND_COLOR,
   MASTER_SLIDE_BACKGROUND_IMAGE,
   PPT_GENERATION_CONTENT_SETTINGS,
@@ -39,6 +40,7 @@ import {
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
+  SectionSettingsKeyType,
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
@@ -963,4 +965,47 @@ export const getSectionSettingsFromSettings = (
   };
 
   return sectionValues;
+};
+
+export const getSettingValueToApply = ({
+  newSettings,
+  originalSettings,
+  isApplyToSection = false,
+  isPreserveUseDifferentSetting = false,
+  currentSectionName,
+}: {
+  newSettings: PptSettingsStateType;
+  originalSettings: PptSettingsStateType;
+  isApplyToSection: boolean;
+  isPreserveUseDifferentSetting: boolean;
+  currentSectionName: string;
+}) => {
+  let settingsToUse = newSettings;
+  settingsToUse[SETTING_CATEGORY.FILE] = {
+    ...settingsToUse[SETTING_CATEGORY.FILE],
+    filename: originalSettings.file.filename,
+  };
+
+  if (!isApplyToSection && isPreserveUseDifferentSetting) {
+    settingsToUse[SETTING_CATEGORY.GENERAL] = {
+      ...settingsToUse[SETTING_CATEGORY.GENERAL],
+      useDifferentSettingForEachSection:
+        originalSettings.general.useDifferentSettingForEachSection,
+    };
+  }
+
+  if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
+    const sectionSettings = getSectionSettingsFromSettings(newSettings);
+    const currentSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
+
+    settingsToUse = {
+      ...originalSettings,
+      [SETTING_CATEGORY.SECTION]: {
+        ...currentSectionValues,
+        [currentSectionName as SectionSettingsKeyType]: sectionSettings,
+      },
+    } as PptSettingsStateType;
+  }
+
+  return settingsToUse;
 };
