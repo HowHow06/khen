@@ -10,10 +10,10 @@ import {
 import {
   IMPORTED_SETTING_TYPE,
   MAIN_SECTION_NAME,
-  PPT_GENERATION_GENERAL_SETTINGS,
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import {
   PptSettingsStateType,
   SectionSettingsKeyType,
@@ -42,6 +42,7 @@ const SettingsOptionsDropdown = ({
   const { form } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
   const { showOptionsDialog } = useOptionsDialog();
+  const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -90,70 +91,21 @@ const SettingsOptionsDropdown = ({
 
   // TODO: refactor this together with presetsdropdown component
   const handleFullSettingImport = async ({ json }: { json: JSON }) => {
-    let isApplyToSection = false;
-    let isPreserveUseDifferentSetting = true;
-    let isToPreserveExistingSectionSetting = true;
+    const options = await promptToGetFullSettingsImportOptions({
+      hasSectionSettings,
+      currentSectionName,
+    });
 
-    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog("Apply settings to:", {
-        optionItems: [
-          {
-            text: "Main Section",
-            value: "main-section",
-          },
-          {
-            text: `Current Section`,
-            value: "current-section",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isApplyToSection = result === "current-section";
+    if (options === undefined) {
+      // user clicked cancel
+      return;
     }
 
-    if (
-      hasSectionSettings &&
-      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
-    ) {
-      let result = await showOptionsDialog(
-        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isPreserveUseDifferentSetting = result === "no";
-
-      result = await showOptionsDialog(`Preserve section settings values?`, {
-        optionItems: [
-          {
-            text: "Yes",
-            value: "yes",
-          },
-          {
-            text: `No`,
-            value: "no",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isToPreserveExistingSectionSetting = result === "yes";
-    }
+    const {
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    } = options;
 
     applyFullSettings({
       settingValues: json as unknown as PptSettingsStateType,
@@ -161,6 +113,7 @@ const SettingsOptionsDropdown = ({
       isPreserveUseDifferentSetting,
       isToPreserveExistingSectionSetting,
     });
+
     toast.success("Setting Imported.");
   };
 

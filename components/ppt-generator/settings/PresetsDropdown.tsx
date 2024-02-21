@@ -8,11 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MAIN_SECTION_NAME,
-  PPT_GENERATION_GENERAL_SETTINGS,
-} from "@/lib/constant";
-import { DIALOG_RESULT } from "@/lib/constant/general";
+import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import { pptPresets } from "@/lib/presets";
 import { PptSettingsStateType, PresetsType } from "@/lib/types";
 import { generateFullSettings, getPreset } from "@/lib/utils";
@@ -38,6 +34,7 @@ const PresetsDropdown = ({
   const { form } = usePptGeneratorFormContext();
   const { reset: formReset, getValues } = form;
   const { showOptionsDialog } = useOptionsDialog();
+  const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
 
   const applyPreset = (
     presetName: string,
@@ -62,70 +59,21 @@ const PresetsDropdown = ({
   };
 
   const onPresetClick = async (presetName: string) => {
-    let isApplyToSection = false;
-    let isPreserveUseDifferentSetting = true;
-    let isToPreserveExistingSectionSetting = true;
+    const options = await promptToGetFullSettingsImportOptions({
+      hasSectionSettings,
+      currentSectionName,
+    });
 
-    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog("Apply presets to:", {
-        optionItems: [
-          {
-            text: "Main Section",
-            value: "main-section",
-          },
-          {
-            text: `Current Section`,
-            value: "current-section",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isApplyToSection = result === "current-section";
+    if (options === undefined) {
+      // user clicked cancel
+      return;
     }
 
-    if (
-      hasSectionSettings &&
-      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
-    ) {
-      let result = await showOptionsDialog(
-        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isPreserveUseDifferentSetting = result === "no";
-
-      result = await showOptionsDialog(`Preserve section settings values?`, {
-        optionItems: [
-          {
-            text: "Yes",
-            value: "yes",
-          },
-          {
-            text: `No`,
-            value: "no",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isToPreserveExistingSectionSetting = result === "yes";
-    }
+    const {
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    } = options;
 
     applyPreset(
       presetName,
