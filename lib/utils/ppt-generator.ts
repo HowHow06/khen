@@ -940,7 +940,7 @@ export const getPreset = (
   return undefined;
 };
 
-export const getSectionSettingsFromPreset = (
+export const getSectionSettingsFromSettings = (
   preset: PptSettingsStateType,
 ): SectionSettingsType => {
   const presetGeneralSetting = preset[SETTING_CATEGORY.GENERAL];

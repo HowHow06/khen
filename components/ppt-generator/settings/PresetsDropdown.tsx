@@ -20,7 +20,7 @@ import {
   PresetsType,
   SectionSettingsKeyType,
 } from "@/lib/types";
-import { getPreset, getSectionSettingsFromPreset } from "@/lib/utils";
+import { getPreset, getSectionSettingsFromSettings } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -74,7 +74,7 @@ const PresetsDropdown = ({
       }
 
       if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
-        const sectionSettings = getSectionSettingsFromPreset(preset);
+        const sectionSettings = getSectionSettingsFromSettings(preset);
         const currentSectionValues = currentValues[SETTING_CATEGORY.SECTION];
 
         presetToUse = {
