@@ -12,6 +12,7 @@ import BaseSettings from "./BaseSettings";
 
 type Props = {
   accordionKey: string;
+  defaultAccordionValue?: string[];
   keyPrefix: string;
   groupedSettingsMeta: {
     [key in string]: Record<string, BaseSettingItemMetaType>;
@@ -20,6 +21,7 @@ type Props = {
 
 const GroupedBaseSettings = ({
   accordionKey,
+  defaultAccordionValue,
   keyPrefix,
   groupedSettingsMeta,
   className,
@@ -32,7 +34,7 @@ const GroupedBaseSettings = ({
         type="multiple"
         className="w-full"
         value={settingsUIState.openAccordions[accordionKey]}
-        defaultValue={[`${keyPrefix}text`]}
+        defaultValue={defaultAccordionValue}
         onValueChange={(accordions) =>
           setAccordionsOpen({
             accordions: accordions,
@@ -42,7 +44,7 @@ const GroupedBaseSettings = ({
       >
         {Object.entries(groupedSettingsMeta).map(([groupingName, settings]) => {
           return (
-            <AccordionItem value={keyPrefix + groupingName} key={groupingName}>
+            <AccordionItem value={groupingName} key={groupingName}>
               <AccordionTrigger className="text-base font-bold capitalize">
                 {toNormalCase(groupingName)}
               </AccordionTrigger>

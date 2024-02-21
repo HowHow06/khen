@@ -221,6 +221,7 @@ const ContentSettingsTabContent = ({
               keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
               accordionKey={CONTENT_TYPE.MAIN}
               groupedSettingsMeta={settingsMetaGrouped}
+              defaultAccordionValue={[`text`]}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
@@ -236,6 +237,7 @@ const ContentSettingsTabContent = ({
               keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
               accordionKey={CONTENT_TYPE.SECONDARY}
               groupedSettingsMeta={settingsMetaGrouped}
+              defaultAccordionValue={[`text`]}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
