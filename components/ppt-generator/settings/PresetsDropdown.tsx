@@ -48,7 +48,7 @@ const PresetsDropdown = ({
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
       const currentValues = getValues() as PptSettingsStateType;
-      const presetToUse = getSettingValueToApply({
+      const finalValues = getSettingValueToApply({
         newSettings: preset,
         originalSettings: currentValues,
         currentSectionName: currentSectionName,
@@ -57,7 +57,7 @@ const PresetsDropdown = ({
         isToPreserveExistingSectionSetting,
       });
 
-      formReset(presetToUse);
+      formReset(finalValues);
       toast.success("Preset applied.");
     }
   };

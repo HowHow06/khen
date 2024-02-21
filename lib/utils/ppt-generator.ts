@@ -946,10 +946,10 @@ export const getPreset = (
   return undefined;
 };
 
-export const getSectionSettingsFromSettings = (
-  preset: PptSettingsStateType,
+export const generateSectionSettingsFromFullSettings = (
+  settings: PptSettingsStateType,
 ): SectionSettingsType => {
-  const presetGeneralSetting = preset[SETTING_CATEGORY.GENERAL];
+  const presetGeneralSetting = settings[SETTING_CATEGORY.GENERAL];
   const sectionValues: SectionSettingsType = {
     [SETTING_CATEGORY.GENERAL]: {
       useMainSectionSettings: false,
@@ -964,8 +964,8 @@ export const getSectionSettingsFromSettings = (
         presetGeneralSetting.ignoreSubcontentWhenIdentical,
       sectionSingleLineMode: presetGeneralSetting.singleLineMode,
     },
-    [SETTING_CATEGORY.COVER]: preset.cover,
-    [SETTING_CATEGORY.CONTENT]: preset.content,
+    [SETTING_CATEGORY.COVER]: settings.cover,
+    [SETTING_CATEGORY.CONTENT]: settings.content,
   };
 
   return sectionValues;
@@ -1022,7 +1022,8 @@ export const getSettingValueToApply = ({
   }
 
   if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
-    const sectionSettings = getSectionSettingsFromSettings(newSettings);
+    const sectionSettings =
+      generateSectionSettingsFromFullSettings(newSettings);
     const currentSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
 
     settingsToUse = {
