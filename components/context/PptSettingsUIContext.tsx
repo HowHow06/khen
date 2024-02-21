@@ -16,7 +16,7 @@ type PptSettingsUIAction =
   | {
       type: "SET_ACCORDION_OPEN";
       accordions: string[];
-      grouping?: string;
+      grouping: string;
     };
 
 type PptSettingsUIContextType = {
@@ -27,7 +27,7 @@ type PptSettingsUIContextType = {
   setCurrentCoverTab: (tab: string) => void;
   setAccordionsOpen: (props: {
     accordions: string[];
-    grouping?: string;
+    grouping: string;
   }) => void;
 };
 
@@ -49,7 +49,7 @@ const pptSettingsUIReducer = (
       return { ...state, currentCategoryTab: action.tab };
 
     case "SET_ACCORDION_OPEN":
-      const groupingKey = action.grouping || "base";
+      const groupingKey = action.grouping;
       const tempOpenAccordions = state.openAccordions;
       tempOpenAccordions[groupingKey] = action.accordions;
       return { ...state, openAccordions: tempOpenAccordions };
@@ -83,7 +83,7 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
   }, []);
 
   const setAccordionsOpen = useCallback(
-    ({ accordions, grouping }: { accordions: string[]; grouping?: string }) => {
+    ({ accordions, grouping }: { accordions: string[]; grouping: string }) => {
       return dispatch({
         type: "SET_ACCORDION_OPEN",
         accordions: accordions,
