@@ -93,10 +93,10 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
           onCloseAutoFocus={(event) => event.preventDefault()} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
         >
           <DropdownMenuItem onSelect={onConvertToSimplifiedClick}>
-            Convert to Simplified
+            Convert to Simplified Chinese
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={onConvertToTraditionalClick}>
-            Convert to Traditional
+            Convert to Traditional Chinese
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => onReplaceCharacterClick("你", "祢")}
