@@ -1,3 +1,4 @@
+import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,20 +7,43 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
+import {
+  MAIN_SECTION_NAME,
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+} from "@/lib/constant";
+import { DIALOG_RESULT } from "@/lib/constant/general";
 import { settingsSchema } from "@/lib/schemas";
+import {
+  PptSettingsStateType,
+  SectionSettingsKeyType,
+  SectionSettingsType,
+} from "@/lib/types";
 import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { ChangeEvent, useRef } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 
-type Props = {};
+type Props = {} & (
+  | {
+      hasSectionSettings?: false;
+      currentSectionName?: string;
+    }
+  | {
+      hasSectionSettings: true;
+      currentSectionName: string;
+    }
+);
 
-const SettingsOptionsDropdown = ({}: Props) => {
+const SettingsOptionsDropdown = ({
+  hasSectionSettings,
+  currentSectionName,
+}: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { form } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
+  const { showOptionsDialog } = useOptionsDialog();
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -58,9 +82,35 @@ const SettingsOptionsDropdown = ({}: Props) => {
     }
   };
 
-  const handleExportClick = () => {
+  const exportSettings = ({
+    isIncludeSectionSettings = false,
+    isExportSectionSettings = false,
+  }: {
+    isIncludeSectionSettings?: boolean;
+    isExportSectionSettings?: boolean;
+  }) => {
+    let fileName = `KhenPptGeneratorSettings_${new Date().getTime()}.json`;
     // Retrieve current form values
-    const currentSettings = getValues();
+    let currentSettings: PptSettingsStateType | SectionSettingsType =
+      getValues() as PptSettingsStateType;
+    if (
+      !isIncludeSectionSettings &&
+      !isExportSectionSettings &&
+      currentSettings[SETTING_CATEGORY.SECTION]
+    ) {
+      delete currentSettings[SETTING_CATEGORY.SECTION];
+    } else if (
+      isExportSectionSettings &&
+      hasSectionSettings &&
+      currentSettings[SETTING_CATEGORY.SECTION]?.[
+        currentSectionName as SectionSettingsKeyType
+      ]
+    ) {
+      currentSettings = currentSettings[SETTING_CATEGORY.SECTION]?.[
+        currentSectionName as SectionSettingsKeyType
+      ] as SectionSettingsType;
+      fileName = `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`;
+    }
 
     // Convert the settings to a JSON string
     const settingsJson = JSON.stringify(currentSettings, null, 2); // Pretty print JSON
@@ -74,13 +124,69 @@ const SettingsOptionsDropdown = ({}: Props) => {
     // Create a temporary anchor element and trigger the download
     const a = document.createElement("a");
     a.href = url;
-    a.download = `KhenPptGeneratorSettings_${new Date().getTime()}.json`; // Filename for the downloaded file
+    a.download = fileName; // Filename for the downloaded file
     document.body.appendChild(a); // Append to body to ensure it can be clicked
     a.click(); // Trigger click to download
 
     // Clean up by revoking the Blob URL and removing the anchor element
     URL.revokeObjectURL(url);
     document.body.removeChild(a);
+  };
+
+  const handleExportClick = async () => {
+    let isIncludeSectionSettings = false;
+    let isExportSectionSettings = false;
+
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
+      const result = await showOptionsDialog(
+        `Export which of the following? `,
+        {
+          optionItems: [
+            {
+              text: "Main Section",
+              value: "main-section",
+            },
+            {
+              text: `Current Section`,
+              value: "current-section",
+            },
+          ],
+        },
+      );
+
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isExportSectionSettings = result === "current-section";
+    }
+
+    if (
+      hasSectionSettings &&
+      (currentSectionName === MAIN_SECTION_NAME ||
+        (currentSectionName !== MAIN_SECTION_NAME && !isExportSectionSettings))
+    ) {
+      const result = await showOptionsDialog(
+        `To include sections settings in the export?`,
+        {
+          optionItems: [
+            {
+              text: "Yes",
+              value: "yes",
+            },
+            {
+              text: `No`,
+              value: "no",
+            },
+          ],
+        },
+      );
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isIncludeSectionSettings = result === "yes";
+    }
+
+    exportSettings({ isExportSectionSettings, isIncludeSectionSettings });
   };
 
   return (
