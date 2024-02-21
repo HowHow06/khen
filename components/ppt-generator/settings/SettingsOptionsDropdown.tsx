@@ -116,7 +116,6 @@ const SettingsOptionsDropdown = ({
       isPreserveUseDifferentSetting,
       isToPreserveExistingSectionSetting,
     });
-
     toast.success("Setting Imported.");
   };
 
