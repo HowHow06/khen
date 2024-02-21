@@ -43,6 +43,7 @@ const PresetsDropdown = ({
     presetName: string,
     isApplyToSection: boolean = false,
     isPreserveUseDifferentSetting: boolean = false,
+    isToPreserveExistingSectionSetting: boolean = true,
   ) => {
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
@@ -53,6 +54,7 @@ const PresetsDropdown = ({
         currentSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,
         isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,
+        isToPreserveExistingSectionSetting,
       });
 
       formReset(presetToUse);
@@ -63,6 +65,7 @@ const PresetsDropdown = ({
   const onPresetClick = async (presetName: string) => {
     let isApplyToSection = false;
     let isPreserveUseDifferentSetting = true;
+    let isToPreserveExistingSectionSetting = true;
 
     if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
       const result = await showOptionsDialog("Apply presets to:", {
@@ -85,9 +88,9 @@ const PresetsDropdown = ({
 
     if (
       hasSectionSettings &&
-      (currentSectionName == MAIN_SECTION_NAME || !isApplyToSection)
+      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
     ) {
-      const result = await showOptionsDialog(
+      let result = await showOptionsDialog(
         `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
         {
           optionItems: [
@@ -106,9 +109,31 @@ const PresetsDropdown = ({
         return;
       }
       isPreserveUseDifferentSetting = result === "no";
+
+      result = await showOptionsDialog(`Preserve section settings values?`, {
+        optionItems: [
+          {
+            text: "Yes",
+            value: "yes",
+          },
+          {
+            text: `No`,
+            value: "no",
+          },
+        ],
+      });
+      if (result === DIALOG_RESULT.CANCEL) {
+        return;
+      }
+      isToPreserveExistingSectionSetting = result === "yes";
     }
 
-    applyPreset(presetName, isApplyToSection, isPreserveUseDifferentSetting);
+    applyPreset(
+      presetName,
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    );
   };
 
   return (

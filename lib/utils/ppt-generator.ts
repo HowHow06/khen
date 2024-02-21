@@ -972,12 +972,14 @@ export const getSettingValueToApply = ({
   originalSettings,
   isApplyToSection = false,
   isPreserveUseDifferentSetting = false,
+  isToPreserveExistingSectionSetting = true,
   currentSectionName,
 }: {
   newSettings: PptSettingsStateType;
   originalSettings: PptSettingsStateType;
   isApplyToSection: boolean;
   isPreserveUseDifferentSetting: boolean;
+  isToPreserveExistingSectionSetting: boolean;
   currentSectionName: string;
 }) => {
   let settingsToUse = newSettings;
@@ -985,6 +987,27 @@ export const getSettingValueToApply = ({
     ...settingsToUse[SETTING_CATEGORY.FILE],
     filename: originalSettings.file.filename,
   };
+
+  if (!isApplyToSection && isToPreserveExistingSectionSetting) {
+    // preserve section values
+    settingsToUse[SETTING_CATEGORY.SECTION] = {
+      ...originalSettings[SETTING_CATEGORY.SECTION],
+    };
+  } else if (originalSettings[SETTING_CATEGORY.SECTION] !== undefined) {
+    // reset section values
+    const sectionInitialValue = getSectionSettingsInitialValue({
+      settings: PPT_GENERATION_SETTINGS_META,
+    });
+    const sectionSettings = originalSettings[SETTING_CATEGORY.SECTION] as {
+      [key in SectionSettingsKeyType]: SectionSettingsType;
+    };
+    Object.entries(sectionSettings).forEach(([key, value]) => {
+      settingsToUse[SETTING_CATEGORY.SECTION] = {
+        ...settingsToUse[SETTING_CATEGORY.SECTION],
+        [key]: sectionInitialValue,
+      };
+    });
+  }
 
   if (!isApplyToSection && isPreserveUseDifferentSetting) {
     settingsToUse[SETTING_CATEGORY.GENERAL] = {
