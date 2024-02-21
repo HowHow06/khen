@@ -1,5 +1,4 @@
 "use client";
-import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,14 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  MAIN_SECTION_NAME,
-  PPT_GENERATION_GENERAL_SETTINGS,
-} from "@/lib/constant";
-import { DIALOG_RESULT } from "@/lib/constant/general";
+import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import { pptPresets } from "@/lib/presets";
 import { PptSettingsStateType, PresetsType } from "@/lib/types";
-import { getPreset, getSettingValueToApply } from "@/lib/utils";
+import {
+  combineWithDefaultSettings,
+  generateFullSettings,
+  getPreset,
+} from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -37,7 +36,7 @@ const PresetsDropdown = ({
   Pick<DropdownMenuContentProps, "side" | "sideOffset" | "alignOffset">) => {
   const { form } = usePptGeneratorFormContext();
   const { reset: formReset, getValues } = form;
-  const { showOptionsDialog } = useOptionsDialog();
+  const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
 
   const applyPreset = (
     presetName: string,
@@ -47,86 +46,35 @@ const PresetsDropdown = ({
   ) => {
     const preset = getPreset(presetName, pptPresets);
     if (preset) {
-      const currentValues = getValues() as PptSettingsStateType;
-      const presetToUse = getSettingValueToApply({
-        newSettings: preset,
-        originalSettings: currentValues,
-        currentSectionName: currentSectionName,
+      const finalValues = generateFullSettings({
+        newSettings: combineWithDefaultSettings(preset),
+        originalSettings: getValues() as PptSettingsStateType,
+        targetSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,
         isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,
-        isToPreserveExistingSectionSetting,
+        isPreserveExistingSectionSetting: isToPreserveExistingSectionSetting,
       });
-
-      formReset(presetToUse);
+      formReset(finalValues);
       toast.success("Preset applied.");
     }
   };
 
   const onPresetClick = async (presetName: string) => {
-    let isApplyToSection = false;
-    let isPreserveUseDifferentSetting = true;
-    let isToPreserveExistingSectionSetting = true;
+    const options = await promptToGetFullSettingsImportOptions({
+      hasSectionSettings,
+      currentSectionName,
+    });
 
-    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
-      const result = await showOptionsDialog("Apply presets to:", {
-        optionItems: [
-          {
-            text: "Main Section",
-            value: "main-section",
-          },
-          {
-            text: `Current Section`,
-            value: "current-section",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isApplyToSection = result === "current-section";
+    if (options === undefined) {
+      // user clicked cancel
+      return;
     }
 
-    if (
-      hasSectionSettings &&
-      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
-    ) {
-      let result = await showOptionsDialog(
-        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isPreserveUseDifferentSetting = result === "no";
-
-      result = await showOptionsDialog(`Preserve section settings values?`, {
-        optionItems: [
-          {
-            text: "Yes",
-            value: "yes",
-          },
-          {
-            text: `No`,
-            value: "no",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isToPreserveExistingSectionSetting = result === "yes";
-    }
+    const {
+      isApplyToSection,
+      isPreserveUseDifferentSetting,
+      isToPreserveExistingSectionSetting,
+    } = options;
 
     applyPreset(
       presetName,

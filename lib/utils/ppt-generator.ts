@@ -937,19 +937,15 @@ export const getPreset = (
   pptPresets: { [key in string]: PptSettingsStateType },
 ): PptSettingsStateType | undefined => {
   if (presetName in pptPresets) {
-    const defaultInitialState = generatePptSettingsInitialState(
-      PPT_GENERATION_SETTINGS_META,
-    );
-    const resultPreset = deepMerge(defaultInitialState, pptPresets[presetName]);
-    return resultPreset;
+    return pptPresets[presetName];
   }
   return undefined;
 };
 
-export const getSectionSettingsFromSettings = (
-  preset: PptSettingsStateType,
+export const generateSectionSettingsFromFullSettings = (
+  settings: PptSettingsStateType,
 ): SectionSettingsType => {
-  const presetGeneralSetting = preset[SETTING_CATEGORY.GENERAL];
+  const presetGeneralSetting = settings[SETTING_CATEGORY.GENERAL];
   const sectionValues: SectionSettingsType = {
     [SETTING_CATEGORY.GENERAL]: {
       useMainSectionSettings: false,
@@ -964,41 +960,61 @@ export const getSectionSettingsFromSettings = (
         presetGeneralSetting.ignoreSubcontentWhenIdentical,
       sectionSingleLineMode: presetGeneralSetting.singleLineMode,
     },
-    [SETTING_CATEGORY.COVER]: preset.cover,
-    [SETTING_CATEGORY.CONTENT]: preset.content,
+    [SETTING_CATEGORY.COVER]: settings.cover,
+    [SETTING_CATEGORY.CONTENT]: settings.content,
   };
 
   return sectionValues;
 };
 
-export const getSettingValueToApply = ({
+export const generateFullSettingsForSectionApplication = ({
   newSettings,
   originalSettings,
-  isApplyToSection = false,
-  isPreserveUseDifferentSetting = false,
-  isToPreserveExistingSectionSetting = true,
-  currentSectionName,
+  targetSectionName,
 }: {
   newSettings: PptSettingsStateType;
   originalSettings: PptSettingsStateType;
-  isApplyToSection: boolean;
+  targetSectionName: SectionSettingsKeyType;
+}) => {
+  const sectionSettings = generateSectionSettingsFromFullSettings(newSettings);
+  const originalSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
+  const outputSettings = {
+    ...originalSettings,
+    [SETTING_CATEGORY.SECTION]: {
+      ...originalSectionValues,
+      [targetSectionName as SectionSettingsKeyType]: sectionSettings,
+    },
+  } as PptSettingsStateType;
+
+  return outputSettings;
+};
+
+export const generateFullSettingsForMainApplication = ({
+  newSettings,
+  originalSettings,
+  isPreserveUseDifferentSetting = false,
+  isPreserveExistingSectionSetting = true,
+}: {
+  newSettings: PptSettingsStateType;
+  originalSettings: PptSettingsStateType;
   isPreserveUseDifferentSetting: boolean;
-  isToPreserveExistingSectionSetting: boolean;
-  currentSectionName: string;
+  isPreserveExistingSectionSetting: boolean;
 }) => {
   let settingsToUse = newSettings;
+  // 1. Preserve filename
   settingsToUse[SETTING_CATEGORY.FILE] = {
     ...settingsToUse[SETTING_CATEGORY.FILE],
     filename: originalSettings.file.filename,
   };
 
-  if (!isApplyToSection && isToPreserveExistingSectionSetting) {
+  // 2. Preserve / Reset section settings
+  if (isPreserveExistingSectionSetting) {
     // preserve section values
     settingsToUse[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
     };
   } else if (originalSettings[SETTING_CATEGORY.SECTION] !== undefined) {
-    // reset section values
+    // reset section values if section settings exist
     const sectionInitialValue = getSectionSettingsInitialValue({
       settings: PPT_GENERATION_SETTINGS_META,
     });
@@ -1013,7 +1029,8 @@ export const getSettingValueToApply = ({
     });
   }
 
-  if (!isApplyToSection && isPreserveUseDifferentSetting) {
+  // 3. Preserve use different setting
+  if (isPreserveUseDifferentSetting) {
     settingsToUse[SETTING_CATEGORY.GENERAL] = {
       ...settingsToUse[SETTING_CATEGORY.GENERAL],
       useDifferentSettingForEachSection:
@@ -1021,18 +1038,39 @@ export const getSettingValueToApply = ({
     };
   }
 
-  if (isApplyToSection && currentSectionName !== MAIN_SECTION_NAME) {
-    const sectionSettings = getSectionSettingsFromSettings(newSettings);
-    const currentSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
+  return settingsToUse;
+};
 
-    settingsToUse = {
-      ...originalSettings,
-      [SETTING_CATEGORY.SECTION]: {
-        ...currentSectionValues,
-        [currentSectionName as SectionSettingsKeyType]: sectionSettings,
-      },
-    } as PptSettingsStateType;
+export const generateFullSettings = ({
+  newSettings,
+  originalSettings,
+  isApplyToSection = false,
+  isPreserveUseDifferentSetting = false,
+  isPreserveExistingSectionSetting = true,
+  targetSectionName,
+}: {
+  newSettings: PptSettingsStateType;
+  originalSettings: PptSettingsStateType;
+  isApplyToSection: boolean;
+  isPreserveUseDifferentSetting: boolean;
+  isPreserveExistingSectionSetting: boolean;
+  targetSectionName: string;
+}): PptSettingsStateType => {
+  if (isApplyToSection && targetSectionName !== MAIN_SECTION_NAME) {
+    const resultSettings = generateFullSettingsForSectionApplication({
+      newSettings,
+      originalSettings,
+      targetSectionName: targetSectionName as SectionSettingsKeyType,
+    });
+    return resultSettings;
   }
+
+  const settingsToUse = generateFullSettingsForMainApplication({
+    newSettings,
+    originalSettings,
+    isPreserveExistingSectionSetting,
+    isPreserveUseDifferentSetting,
+  });
 
   return settingsToUse;
 };
@@ -1049,17 +1087,97 @@ export const getIsValidToSchema = (json: JSON, schema: ZodSchema): boolean => {
   return false;
 };
 
-export const getImportedSettingTypeFromJSON = ({
+export const getSettingTypeFromJSON = ({
   json,
 }: {
   json: JSON;
-}): Promise<ImportedSettingType | null> => {
-  return new Promise((resolve, reject) => {
-    if (getIsValidToSchema(json, settingsSchema)) {
-      resolve(IMPORTED_SETTING_TYPE.FULL_SETTING);
-    } else if (getIsValidToSchema(json, sectionSettingSchema)) {
-      resolve(IMPORTED_SETTING_TYPE.SECTION);
-    }
-    resolve(null);
+}): ImportedSettingType | null => {
+  if (getIsValidToSchema(json, settingsSchema)) {
+    return IMPORTED_SETTING_TYPE.FULL_SETTING;
+  } else if (getIsValidToSchema(json, sectionSettingSchema)) {
+    return IMPORTED_SETTING_TYPE.SECTION;
+  }
+  return null;
+};
+
+export const combineWithDefaultSettings = (
+  settingsValue: PptSettingsStateType,
+): PptSettingsStateType => {
+  const defaultInitialState = generatePptSettingsInitialState(
+    PPT_GENERATION_SETTINGS_META,
+  );
+  const result = deepMerge(
+    defaultInitialState,
+    settingsValue,
+  ) as PptSettingsStateType;
+  return result;
+};
+
+export const exportObjectToJsonFile = ({
+  obj,
+  document,
+  fileName,
+}: {
+  obj: any;
+  document: Document;
+  fileName: string;
+}) => {
+  // Convert the settings to a JSON string
+  const settingsJson = JSON.stringify(obj, null, 2); // Pretty print JSON
+
+  // Create a Blob from the JSON string
+  const blob = new Blob([settingsJson], { type: "application/json" });
+
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary anchor element and trigger the download
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName; // Filename for the downloaded file
+  document.body.appendChild(a); // Append to body to ensure it can be clicked
+  a.click(); // Trigger click to download
+
+  // Clean up by revoking the Blob URL and removing the anchor element
+  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
+
+export const exportFullSettings = ({
+  settingsValue,
+  isIncludeSectionSettings,
+}: {
+  settingsValue: PptSettingsStateType;
+  isIncludeSectionSettings: boolean;
+}) => {
+  if (!isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
+    delete settingsValue[SETTING_CATEGORY.SECTION];
+  }
+
+  exportObjectToJsonFile({
+    obj: settingsValue,
+    document: document,
+    fileName: `KhenPptGeneratorSettings_${new Date().getTime()}.json`,
+  });
+};
+
+export const exportSectionSettings = ({
+  settingsValue,
+  targetSectionName,
+}: {
+  settingsValue: PptSettingsStateType;
+  targetSectionName: SectionSettingsKeyType;
+}) => {
+  const originalTargetSectionValues =
+    settingsValue[SETTING_CATEGORY.SECTION]?.[targetSectionName];
+
+  if (!originalTargetSectionValues) {
+    return;
+  }
+
+  exportObjectToJsonFile({
+    obj: originalTargetSectionValues,
+    document: document,
+    fileName: `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`,
   });
 };
