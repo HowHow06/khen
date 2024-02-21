@@ -23,8 +23,8 @@ import {
 import {
   deepMerge,
   generatePptSettingsInitialState,
-  getImportedSettingTypeFromJSON,
   getJSONFromFile,
+  getSettingTypeFromJSON,
   getSettingValueToApply,
 } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
@@ -190,7 +190,7 @@ const SettingsOptionsDropdown = ({
       return;
     }
 
-    const settingType = await getImportedSettingTypeFromJSON({ json });
+    const settingType = await getSettingTypeFromJSON({ json });
     if (settingType === null) {
       toast.error("Invalid file format.");
       return;

@@ -1050,7 +1050,7 @@ export const getIsValidToSchema = (json: JSON, schema: ZodSchema): boolean => {
   return false;
 };
 
-export const getImportedSettingTypeFromJSON = ({
+export const getSettingTypeFromJSON = ({
   json,
 }: {
   json: JSON;
