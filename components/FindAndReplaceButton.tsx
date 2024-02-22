@@ -1,4 +1,5 @@
 import { PopoverClose } from "@radix-ui/react-popover";
+import { Replace } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -9,9 +10,15 @@ type Props = {
   align?: "start" | "center" | "end";
   text: string;
   setText: (text: string) => void;
+  isIconButton?: boolean;
 };
 
-const FindAndReplaceButton = ({ align = "center", text, setText }: Props) => {
+const FindAndReplaceButton = ({
+  align = "center",
+  text,
+  setText,
+  isIconButton = true,
+}: Props) => {
   const [findText, setFindText] = useState("");
   const [replaceText, setReplaceText] = useState("");
 
@@ -38,7 +45,13 @@ const FindAndReplaceButton = ({ align = "center", text, setText }: Props) => {
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline">Find & Replace</Button>
+          <Button
+            variant="outline"
+            type="button"
+            size={isIconButton ? "icon" : "default"}
+          >
+            {isIconButton ? <Replace /> : "Find & Replace"}
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           className="w-80"

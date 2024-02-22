@@ -1,12 +1,14 @@
+import { ClipboardCopy } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 type Props = {
   text: string;
+  isIconButton?: boolean;
 };
 
-const CopyToClipboardButton = ({ text }: Props) => {
+const CopyToClipboardButton = ({ text, isIconButton = true }: Props) => {
   const onCopyToClipboardClick = (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -27,8 +29,13 @@ const CopyToClipboardButton = ({ text }: Props) => {
   };
   return (
     <>
-      <Button variant="outline" onClick={onCopyToClipboardClick} type="button">
-        Copy to clipboard
+      <Button
+        variant="outline"
+        onClick={onCopyToClipboardClick}
+        type="button"
+        size={isIconButton ? "icon" : "default"}
+      >
+        {isIconButton ? <ClipboardCopy /> : "Copy to clipboard"}
       </Button>
     </>
   );

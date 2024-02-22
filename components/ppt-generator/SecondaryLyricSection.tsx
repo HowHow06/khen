@@ -18,7 +18,6 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
     <>
       <div className="">
         <div className="my-2 flex flex-wrap gap-2">
-          <CopyToClipboardButton text={secondaryText} />
           <TextTransformDropdown
             text={secondaryText}
             setText={setSecondaryText}
@@ -28,6 +27,7 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
             setText={setSecondaryText}
             align="start"
           />
+          <CopyToClipboardButton text={secondaryText} />
           <ClearTextButton text={secondaryText} setText={setSecondaryText} />
         </div>
         <Textarea

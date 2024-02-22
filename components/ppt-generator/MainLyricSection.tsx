@@ -131,8 +131,8 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <CopyToClipboardButton text={mainText} />
         <FindAndReplaceButton text={mainText} setText={setMainText} />
+        <CopyToClipboardButton text={mainText} />
         <ClearTextButton text={mainText} setText={setMainText} />
       </div>
       <Textarea
