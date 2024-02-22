@@ -1,6 +1,6 @@
 import { XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
+import TooltipButton from "./ui/tooltip-button";
 
 type Props = {
   text: string;
@@ -21,14 +21,15 @@ const ClearTextButton = ({ text, setText, isIconButton = true }: Props) => {
     });
   };
   return (
-    <Button
+    <TooltipButton
       variant="outline"
       onClick={onClearClick}
       type="button"
       size={isIconButton ? "icon" : "default"}
+      tooltipText="Clear Text"
     >
       {isIconButton ? <XCircle /> : "Clear"}
-    </Button>
+    </TooltipButton>
   );
 };
 

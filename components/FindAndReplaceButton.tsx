@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import TooltipButton from "./ui/tooltip-button";
 
 type Props = {
   align?: "start" | "center" | "end";
@@ -45,13 +46,14 @@ const FindAndReplaceButton = ({
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <Button
+          <TooltipButton
             variant="outline"
             type="button"
             size={isIconButton ? "icon" : "default"}
+            tooltipText={"Find & Replace"}
           >
             {isIconButton ? <Replace /> : "Find & Replace"}
-          </Button>
+          </TooltipButton>
         </PopoverTrigger>
         <PopoverContent
           className="w-80"
