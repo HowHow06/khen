@@ -114,7 +114,7 @@ export const PPT_GENERATION_FILE_SETTINGS = {
   },
 } as const;
 
-export const PPT_GENERATION_GENERAL_SETTINGS = {
+const PPT_GENERATION_GENERAL_SETTINGS = {
   mainBackgroundImage: {
     fieldDisplayName: "Main Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
@@ -145,7 +145,7 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
   },
 } as const;
 
-export const PPT_GENERATION_SECTION_SETTINGS = {
+const PPT_GENERATION_SECTION_SETTINGS = {
   useMainSectionSettings: {
     fieldDisplayName: "Use Main Section Settings",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
@@ -203,7 +203,7 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
   },
 } as const;
 
-export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
+const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
