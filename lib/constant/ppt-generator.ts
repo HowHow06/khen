@@ -1,5 +1,6 @@
 import {
   ComboboxItemsType,
+  DropdownImagesType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
   PptSettingsStateType,
@@ -614,3 +615,10 @@ export const IMPORTED_SETTING_TYPE = {
   SECTION: "SECTION",
   FULL_SETTING: "FULL_SETTING",
 } as const;
+
+export const DEFAULT_IMAGES: DropdownImagesType = [
+  {
+    displayName: "Greenscreen Background",
+    path: "/images/background/greenScreenWithBlackCover_v2.png",
+  },
+];

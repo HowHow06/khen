@@ -1,5 +1,6 @@
 import { Combobox } from "@/components/ui/combo-box";
 import {
+  DEFAULT_IMAGES,
   FONT_FACES_ITEMS,
   HORIZONTAL_ALIGNMENT_ITEMS,
   SHADOW_TYPE_ITEMS,
@@ -12,6 +13,7 @@ import ColorPicker from "../../ui/color-picker";
 import ImageDropzoneComponent from "../../ui/image-dropzone-component";
 import { Input } from "../../ui/input";
 import { Switch } from "../../ui/switch";
+import ImageSelectDropdown from "./ImageSelectDropdown";
 
 type SettingInputFieldProps = {
   settingItemMeta: BaseSettingItemMetaType;
@@ -41,21 +43,30 @@ const renderInputField = (
 
   if (settingItemMeta.fieldType === "image") {
     return (
-      <ImageDropzoneComponent
-        className="col-span-6 text-sm"
-        onFilesSelected={(file) => field.onChange(file)}
-        onFilesRejected={(fileRejections) => {
-          fileRejections.forEach((fileRejection) => {
-            const message = fileRejection.errors.reduce((result, error) => {
-              return `${result}\n${error.message}`;
-            }, "");
-            toast.error("Failed to select image.", {
-              description: message,
+      <>
+        <div className="col-span-2 ml-auto">
+          <ImageSelectDropdown
+            images={DEFAULT_IMAGES}
+            align={"end"}
+            onImageClick={(imagePath) => field.onChange(imagePath)}
+          />
+        </div>
+        <ImageDropzoneComponent
+          className="col-span-6 text-sm"
+          onFilesSelected={(file) => field.onChange(file)}
+          onFilesRejected={(fileRejections) => {
+            fileRejections.forEach((fileRejection) => {
+              const message = fileRejection.errors.reduce((result, error) => {
+                return `${result}\n${error.message}`;
+              }, "");
+              toast.error("Failed to select image.", {
+                description: message,
+              });
             });
-          });
-        }}
-        value={field.value}
-      />
+          }}
+          value={field.value}
+        />
+      </>
     );
   }
 
