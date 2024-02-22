@@ -243,3 +243,8 @@ export type PptSettingsUIState = {
 
 export type ImportedSettingType =
   (typeof IMPORTED_SETTING_TYPE)[keyof typeof IMPORTED_SETTING_TYPE];
+
+export type DropdownImagesType = {
+  displayName: string;
+  path: string;
+}[];
