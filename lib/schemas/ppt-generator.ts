@@ -117,41 +117,6 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
   return baseZodSchema;
 };
 
-export const generatSectionSettingZodSchema = (
-  settingsMeta: PptGenerationSettingMetaType,
-) => {
-  const sectionSchema: { [key in string]: any } = {};
-  // General section schema-------------------
-  const generalSchema = generateZodSchemaObjectFromSettings({
-    settings: settingsMeta.section,
-  });
-  sectionSchema[SETTING_CATEGORY.GENERAL] = z.object(generalSchema);
-
-  // Cover section schema--------------------
-  const coverSchema = generateZodSchemaObjectFromSettings({
-    settings: settingsMeta.cover,
-  });
-  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
-
-  // Content section schema-------------------
-  const contentSchema = generateZodSchemaObjectFromSettings({
-    settings: settingsMeta.content,
-    hasGrouping: true,
-  });
-  const textBoxSchema = generateZodSchemaObjectFromSettings({
-    settings: settingsMeta.contentTextbox,
-  });
-
-  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
-  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.object(contentSchema));
-
-  return z.object(sectionSchema);
-};
-
-export const sectionSettingSchema = generatSectionSettingZodSchema(
-  PPT_GENERATION_SETTINGS_META,
-);
-
 const generateZodSchemaObjectFromSettings = ({
   settings,
   hasGrouping = false,
@@ -193,6 +158,41 @@ const generateZodSchemaObjectFromSettings = ({
   );
 };
 
+export const generatSectionSettingZodSchema = (
+  settingsMeta: PptGenerationSettingMetaType,
+) => {
+  const sectionSchema: { [key in string]: any } = {};
+  // General section schema-------------------
+  const generalSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.section,
+  });
+  sectionSchema[SETTING_CATEGORY.GENERAL] = z.object(generalSchema);
+
+  // Cover section schema--------------------
+  const coverSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.cover,
+  });
+  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
+
+  // Content section schema-------------------
+  const contentSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.content,
+    hasGrouping: true,
+  });
+  const textBoxSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.contentTextbox,
+  });
+
+  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
+  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.object(contentSchema));
+
+  return z.object(sectionSchema);
+};
+
+export const sectionSettingSchema = generatSectionSettingZodSchema(
+  PPT_GENERATION_SETTINGS_META,
+);
+
 const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
@@ -201,8 +201,8 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       category === SETTING_CATEGORY.GENERAL ||
       category === SETTING_CATEGORY.FILE
     ) {
-      const schemaObject = generateZodSchemaObjectFromSettings({ settings });
-      schemaObject[category] = z.object(schemaObject);
+      const schema = generateZodSchemaObjectFromSettings({ settings });
+      schemaObject[category] = z.object(schema);
     }
 
     if (category === SETTING_CATEGORY.CONTENT) {
