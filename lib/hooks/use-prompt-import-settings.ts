@@ -1,9 +1,6 @@
 import { useAlertDialog } from "@/components/context/AlertDialogContext";
 import { useOptionsDialog } from "@/components/context/OptionsDialogContext";
-import {
-  MAIN_SECTION_NAME,
-  PPT_GENERATION_GENERAL_SETTINGS,
-} from "../constant";
+import { MAIN_SECTION_NAME, PPT_GENERATION_SETTINGS_META } from "../constant";
 import { DIALOG_RESULT } from "../constant/general";
 
 const usePromptImportSettings = () => {
@@ -44,7 +41,7 @@ const usePromptImportSettings = () => {
       (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
     ) {
       let result = await showOptionsDialog(
-        `Override the value of "${PPT_GENERATION_GENERAL_SETTINGS.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
+        `Override the value of "${PPT_GENERATION_SETTINGS_META.general.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
         {
           optionItems: [
             {

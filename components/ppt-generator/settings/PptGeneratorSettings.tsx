@@ -16,6 +16,7 @@ import {
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
+  BaseSettingMetaType,
   ComboboxItemsType,
   PptSettingsStateType,
   PptSettingsUIState,
@@ -74,6 +75,27 @@ const GeneralSettingsTabContent = ({
   isSectionGeneral?: boolean;
   sectionValue?: string;
 }) => {
+  const { form } = usePptGeneratorFormContext();
+  const { getValues } = form;
+
+  const settings = getValues() as PptSettingsStateType;
+  const isSectionUseMainSectionSettings =
+    settings.section?.[sectionValue as SectionSettingsKeyType]?.general
+      .useMainSectionSettings;
+  const settingMetaToUse: BaseSettingMetaType = useMemo(() => {
+    if (!isSectionGeneral || sectionValue === undefined) {
+      return PPT_GENERATION_SETTINGS_META.general;
+    }
+
+    if (isSectionUseMainSectionSettings) {
+      return {
+        useMainSectionSettings:
+          PPT_GENERATION_SETTINGS_META.section.useMainSectionSettings,
+      };
+    }
+    return PPT_GENERATION_SETTINGS_META.section;
+  }, [isSectionGeneral, sectionValue, isSectionUseMainSectionSettings]);
+
   return (
     <TabsContent value={SETTING_CATEGORY.GENERAL}>
       <ScrollArea
@@ -83,11 +105,7 @@ const GeneralSettingsTabContent = ({
         )}
       >
         <BaseSettings
-          settingsMeta={
-            isSectionGeneral
-              ? PPT_GENERATION_SETTINGS_META.section
-              : PPT_GENERATION_SETTINGS_META.general
-          }
+          settingsMeta={settingMetaToUse}
           keyPrefix={
             isSectionGeneral
               ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.GENERAL}.`
