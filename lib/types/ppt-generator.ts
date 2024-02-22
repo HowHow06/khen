@@ -8,6 +8,7 @@ import {
   PPT_GENERATION_FILE_SETTINGS,
   PPT_GENERATION_GENERAL_SETTINGS,
   PPT_GENERATION_SECTION_SETTINGS,
+  PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SECTION_PREFIX,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
@@ -146,8 +147,6 @@ export type PptGenerationSettingMetaType = {
   [key in PptGenerationCategory]: BaseSettingMetaType;
 };
 
-export type PptSettingsPresetName = "onsite-chinese";
-
 export type SettingsValueType<
   T extends Record<string, BaseSettingItemMetaType>,
 > = {
@@ -195,7 +194,8 @@ type BasePptSettingsStateType = {
   >;
   [SETTING_CATEGORY.GENERAL]: SettingsValueType<
     typeof PPT_GENERATION_GENERAL_SETTINGS
-  >;
+  > &
+    SettingsValueType<typeof PPT_GENERATION_SHARED_GENERAL_SETTINGS>;
   [SETTING_CATEGORY.COVER]: {
     [T in ContentTypeType]: SettingsValueType<
       typeof PPT_GENERATION_COVER_SETTINGS
@@ -214,7 +214,8 @@ export type SectionSettingsType = Omit<
 > & {
   [SETTING_CATEGORY.GENERAL]: SettingsValueType<
     typeof PPT_GENERATION_SECTION_SETTINGS
-  >;
+  > &
+    SettingsValueType<typeof PPT_GENERATION_SHARED_GENERAL_SETTINGS>;
 };
 
 export type PptSettingsStateType = BasePptSettingsStateType & {
