@@ -81,6 +81,7 @@ const SettingsOptionsDropdown = ({
     targetSectionName: SectionSettingsKeyType;
   }) => {
     const originalSettings = getValues() as PptSettingsStateType;
+    // TODO: refactor
     const finalSettingsValue = {
       ...originalSettings,
       [SETTING_CATEGORY.SECTION]: {
