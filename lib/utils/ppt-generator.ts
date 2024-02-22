@@ -64,19 +64,14 @@ export const getInitialValueFromSettings = <T = { [key in string]: any }>({
 
     if (hasGrouping) {
       const grouping = setting.groupingName || DEFAULT_GROUPING_NAME;
-
-      const originalGroupingObject = resultValues[grouping];
-      resultValues[grouping] = {
-        ...originalGroupingObject,
-        [key]: setting.defaultValue,
-      };
+      if (resultValues[grouping] === undefined) {
+        resultValues[grouping] = {};
+      }
+      resultValues[grouping][key] = setting.defaultValue;
       return;
     }
 
-    resultValues = {
-      ...resultValues,
-      [key]: setting.defaultValue,
-    };
+    resultValues[key] = setting.defaultValue;
 
     return;
   });
@@ -305,7 +300,7 @@ const getIsNewSection = ({
   sectionName: string;
 }): boolean => {
   return (
-    !!latestMainSectionInfo.sectionName &&
+    latestMainSectionInfo.sectionName !== undefined &&
     latestMainSectionInfo.sectionName !== sectionName
   );
 };
@@ -595,7 +590,7 @@ function getWorkingSlide({
   sectionName: string;
   isEmptyLine: boolean;
   isBackgroundColorWhenEmpty: boolean;
-  currentPresSlide?: PptxGenJS.default.Slide;
+  currentPresSlide: PptxGenJS.default.Slide | undefined;
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
@@ -978,6 +973,7 @@ export const generateFullSettingsForSectionApplication = ({
 }) => {
   const sectionSettings = generateSectionSettingsFromFullSettings(newSettings);
   const originalSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
+  // TODO: refactor
   const outputSettings = {
     ...originalSettings,
     [SETTING_CATEGORY.SECTION]: {
@@ -1002,13 +998,12 @@ export const generateFullSettingsForMainApplication = ({
 }) => {
   let settingsToUse = newSettings;
   // 1. Preserve filename
-  settingsToUse[SETTING_CATEGORY.FILE] = {
-    ...settingsToUse[SETTING_CATEGORY.FILE],
-    filename: originalSettings.file.filename,
-  };
+  settingsToUse[SETTING_CATEGORY.FILE].filename =
+    originalSettings.file.filename;
 
   // 2. Preserve / Reset section settings
   if (isPreserveExistingSectionSetting) {
+    // TODO: refactor
     // preserve section values
     settingsToUse[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
@@ -1026,6 +1021,7 @@ export const generateFullSettingsForMainApplication = ({
     const sectionSettings = originalSettings[SETTING_CATEGORY.SECTION] as {
       [key in SectionSettingsKeyType]: SectionSettingsType;
     };
+    // TODO: refactor
     Object.entries(sectionSettings).forEach(([key, value]) => {
       settingsToUse[SETTING_CATEGORY.SECTION] = {
         ...settingsToUse[SETTING_CATEGORY.SECTION],
@@ -1036,11 +1032,8 @@ export const generateFullSettingsForMainApplication = ({
 
   // 3. Preserve use different setting
   if (isPreserveUseDifferentSetting) {
-    settingsToUse[SETTING_CATEGORY.GENERAL] = {
-      ...settingsToUse[SETTING_CATEGORY.GENERAL],
-      useDifferentSettingForEachSection:
-        originalSettings.general.useDifferentSettingForEachSection,
-    };
+    settingsToUse[SETTING_CATEGORY.GENERAL].useDifferentSettingForEachSection =
+      originalSettings.general.useDifferentSettingForEachSection;
   }
 
   return settingsToUse;
@@ -1162,12 +1155,10 @@ export const exportFullSettings = ({
   }
 
   // remove background image
-  settingsValue[SETTING_CATEGORY.GENERAL] = {
-    ...settingsValue[SETTING_CATEGORY.GENERAL],
-    mainBackgroundImage: null,
-  };
+  settingsValue[SETTING_CATEGORY.GENERAL].mainBackgroundImage = null;
 
   if (isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
+    // TODO: refactor
     const sectionSettings = {
       ...settingsValue[SETTING_CATEGORY.SECTION],
     } as Record<SectionSettingsKeyType, SectionSettingsType>;
@@ -1211,6 +1202,7 @@ export const exportSectionSettings = ({
   }
 
   // remove background image in section
+  // TODO: refactor
   originalTargetSectionValues[SETTING_CATEGORY.GENERAL] = {
     ...originalTargetSectionValues[SETTING_CATEGORY.GENERAL],
     sectionBackgroundImage: null,
