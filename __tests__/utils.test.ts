@@ -24,8 +24,12 @@ describe("deepMerge Functionality", () => {
       },
       [SETTING_CATEGORY.FILE]: {},
       [SETTING_CATEGORY.CONTENT]: {
-        [CONTENT_TYPE.MAIN]: {},
-        [CONTENT_TYPE.SECONDARY]: {},
+        [CONTENT_TYPE.MAIN]: {
+          textbox: {},
+        },
+        [CONTENT_TYPE.SECONDARY]: {
+          textbox: {},
+        },
       },
       [SETTING_CATEGORY.COVER]: {
         [CONTENT_TYPE.MAIN]: {},
