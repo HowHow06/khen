@@ -54,6 +54,7 @@ const usePromptImportSettings = () => {
             {
               text: `No`,
               value: "no",
+              variant: "default",
             },
           ],
         },
@@ -63,22 +64,23 @@ const usePromptImportSettings = () => {
       }
       isPreserveUseDifferentSetting = result === "no";
 
-      result = await showOptionsDialog(`Preserve section settings values?`, {
-        optionItems: [
-          {
-            text: "Yes",
-            value: "yes",
-          },
-          {
-            text: `No`,
-            value: "no",
-          },
-        ],
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isToPreserveExistingSectionSetting = result === "yes";
+      // result = await showOptionsDialog(`Preserve section settings values?`, {
+      //   optionItems: [
+      //     {
+      //       text: "Yes",
+      //       value: "yes",
+      //       variant: "default",
+      //     },
+      //     {
+      //       text: `No`,
+      //       value: "no",
+      //     },
+      //   ],
+      // });
+      // if (result === DIALOG_RESULT.CANCEL) {
+      //   return;
+      // }
+      // isToPreserveExistingSectionSetting = result === "yes"; // default to preserve existing section setting
     }
 
     return {
@@ -128,31 +130,32 @@ const usePromptImportSettings = () => {
       isExportSectionSettings = result === "current-section";
     }
 
-    if (
-      hasSectionSettings &&
-      (currentSectionName === MAIN_SECTION_NAME ||
-        (currentSectionName !== MAIN_SECTION_NAME && !isExportSectionSettings))
-    ) {
-      const result = await showOptionsDialog(
-        `To include sections settings in the export?`,
-        {
-          optionItems: [
-            {
-              text: "Yes",
-              value: "yes",
-            },
-            {
-              text: `No`,
-              value: "no",
-            },
-          ],
-        },
-      );
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
-      }
-      isIncludeSectionSettings = result === "yes";
-    }
+    // if (
+    //   hasSectionSettings &&
+    //   (currentSectionName === MAIN_SECTION_NAME ||
+    //     (currentSectionName !== MAIN_SECTION_NAME && !isExportSectionSettings))
+    // ) {
+    //   const result = await showOptionsDialog(
+    //     `To include sections settings in the export?`,
+    //     {
+    //       optionItems: [
+    //         {
+    //           text: "Yes",
+    //           value: "yes",
+    //         },
+    //         {
+    //           text: `No`,
+    //           value: "no",
+    //           variant: "default",
+    //         },
+    //       ],
+    //     },
+    //   );
+    //   if (result === DIALOG_RESULT.CANCEL) {
+    //     return;
+    //   }
+    //   isIncludeSectionSettings = result === "yes"; // default to not to include section settings
+    // }
 
     return {
       isIncludeSectionSettings,
