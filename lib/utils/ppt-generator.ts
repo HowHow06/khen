@@ -24,10 +24,10 @@ import {
   MAIN_SECTION_NAME,
   MASTER_SLIDE_BACKGROUND_COLOR,
   MASTER_SLIDE_BACKGROUND_IMAGE,
+  PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
   PPT_GENERATION_CONTENT_SETTINGS,
   PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
-  PPT_GENERATION_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
   SECTION_PREFIX,
   SETTING_CATEGORY,
@@ -335,7 +335,8 @@ function createSlidesFromLyrics({
   } = settingValues;
   const mainIsBackgroundColorWhenEmpty =
     useBackgroundColorWhenEmpty ??
-    PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue;
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
+      .defaultValue;
   const mainLinePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
   const mainHasSecondaryContent = !ignoreSubcontent;
 
@@ -424,16 +425,17 @@ function createSlidesFromLyrics({
       !currentSectionSetting.general?.useMainSectionSettings;
 
     const isBackgroundColorWhenEmpty = isUseSectionSettings
-      ? currentSectionSetting.general?.sectionUseBackgroundColorWhenEmpty ??
-        PPT_GENERATION_GENERAL_SETTINGS.useBackgroundColorWhenEmpty.defaultValue
+      ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
+        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
+          .defaultValue
       : mainIsBackgroundColorWhenEmpty;
     const linePerSlide = isUseSectionSettings
-      ? currentSectionSetting.general?.sectionSingleLineMode
+      ? currentSectionSetting.general?.singleLineMode
         ? 1
         : DEFAULT_LINE_COUNT_PER_SLIDE
       : mainLinePerSlide;
     const hasSecondaryContent = isUseSectionSettings
-      ? !currentSectionSetting.general?.sectionIgnoreSubcontent
+      ? !currentSectionSetting.general?.ignoreSubcontent
       : mainHasSecondaryContent;
 
     // Get the current index before manipulating the cover count
@@ -526,7 +528,7 @@ function createSlidesFromLyrics({
     if (hasSecondaryContent) {
       let secondaryLine = secondaryLinesArray[index]?.trim() ?? "";
       const toRemoveIdenticalWords = isUseSectionSettings
-        ? currentSectionSetting.general?.sectionIgnoreSubcontentWhenIdentical
+        ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
         : settingValues.general.ignoreSubcontentWhenIdentical;
       if (toRemoveIdenticalWords) {
         secondaryLine = removeIdenticalWords(secondaryLine, primaryLine);
@@ -830,10 +832,10 @@ export const generatePpt = async ({
 
   const mainBackgroundColorToUse =
     mainBackgroundColor ??
-    PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
   const mainBackgroundImageToUse =
     mainBackgroundImage ??
-    PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
   // 1. Get background prop for the presentation
   const mainBackgroundProp = await getPptBackgroundProp({
     backgroundColor: mainBackgroundColorToUse,
@@ -846,10 +848,12 @@ export const generatePpt = async ({
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
       const sectionBackgroundColor =
         sectionSetting.general?.sectionBackgroundColor ??
-        PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
+        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor
+          .defaultValue;
       const sectionBackgroundImage =
         sectionSetting.general?.sectionBackgroundImage ??
-        PPT_GENERATION_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
+        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage
+          .defaultValue;
 
       const backgroundProp = await getPptBackgroundProp({
         backgroundColor: sectionSetting.general?.useMainBackgroundColor
@@ -953,12 +957,12 @@ export const generateSectionSettingsFromFullSettings = (
       sectionBackgroundImage: presetGeneralSetting.mainBackgroundImage,
       useMainBackgroundColor: false,
       sectionBackgroundColor: presetGeneralSetting.mainBackgroundColor,
-      sectionUseBackgroundColorWhenEmpty:
+      useBackgroundColorWhenEmpty:
         presetGeneralSetting.useBackgroundColorWhenEmpty,
-      sectionIgnoreSubcontent: presetGeneralSetting.ignoreSubcontent,
-      sectionIgnoreSubcontentWhenIdentical:
+      ignoreSubcontent: presetGeneralSetting.ignoreSubcontent,
+      ignoreSubcontentWhenIdentical:
         presetGeneralSetting.ignoreSubcontentWhenIdentical,
-      sectionSingleLineMode: presetGeneralSetting.singleLineMode,
+      singleLineMode: presetGeneralSetting.singleLineMode,
     },
     [SETTING_CATEGORY.COVER]: settings.cover,
     [SETTING_CATEGORY.CONTENT]: settings.content,
