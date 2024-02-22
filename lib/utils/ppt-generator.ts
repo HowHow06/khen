@@ -968,15 +968,12 @@ export const generateFullSettingsForSectionApplication = ({
   targetSectionName: SectionSettingsKeyType;
 }) => {
   const sectionSettings = generateSectionSettingsFromFullSettings(newSettings);
-  const originalSectionValues = originalSettings[SETTING_CATEGORY.SECTION];
-  // TODO: refactor
-  const outputSettings = {
-    ...originalSettings,
-    [SETTING_CATEGORY.SECTION]: {
-      ...originalSectionValues,
-      [targetSectionName as SectionSettingsKeyType]: sectionSettings,
-    },
-  } as PptSettingsStateType;
+
+  const outputSettings = originalSettings;
+  outputSettings[SETTING_CATEGORY.SECTION] = {
+    ...originalSettings[SETTING_CATEGORY.SECTION],
+    [targetSectionName as SectionSettingsKeyType]: sectionSettings,
+  };
 
   return outputSettings;
 };
@@ -999,7 +996,6 @@ export const generateFullSettingsForMainApplication = ({
 
   // 2. Preserve / Reset section settings
   if (isPreserveExistingSectionSetting) {
-    // TODO: refactor
     // preserve section values
     settingsToUse[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
@@ -1017,7 +1013,7 @@ export const generateFullSettingsForMainApplication = ({
     const sectionSettings = originalSettings[SETTING_CATEGORY.SECTION] as {
       [key in SectionSettingsKeyType]: SectionSettingsType;
     };
-    // TODO: refactor
+
     Object.entries(sectionSettings).forEach(([key, value]) => {
       settingsToUse[SETTING_CATEGORY.SECTION] = {
         ...settingsToUse[SETTING_CATEGORY.SECTION],
@@ -1154,24 +1150,20 @@ export const exportFullSettings = ({
   settingsValue[SETTING_CATEGORY.GENERAL].mainBackgroundImage = null;
 
   if (isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
-    // TODO: refactor
     const sectionSettings = {
       ...settingsValue[SETTING_CATEGORY.SECTION],
-    } as Record<SectionSettingsKeyType, SectionSettingsType>;
+    };
 
     // remove background image in sections
     Object.entries(sectionSettings).forEach(
       ([sectionKey, sectionSettingValue]) => {
-        const newSectionValue = sectionSettingValue;
-        newSectionValue[SETTING_CATEGORY.GENERAL] = {
-          ...newSectionValue[SETTING_CATEGORY.GENERAL],
-          sectionBackgroundImage: null,
-        };
+        sectionSettingValue[SETTING_CATEGORY.GENERAL].sectionBackgroundImage =
+          null;
 
-        settingsValue[SETTING_CATEGORY.SECTION] = {
-          ...sectionSettings,
-          [sectionKey]: newSectionValue,
-        };
+        // added ! to tell typescript that the settingsValue[SETTING_CATEGORY.SECTION] will not be undefined
+        settingsValue[SETTING_CATEGORY.SECTION]![
+          sectionKey as SectionSettingsKeyType
+        ] = sectionSettingValue;
       },
     );
   }
@@ -1198,11 +1190,8 @@ export const exportSectionSettings = ({
   }
 
   // remove background image in section
-  // TODO: refactor
-  originalTargetSectionValues[SETTING_CATEGORY.GENERAL] = {
-    ...originalTargetSectionValues[SETTING_CATEGORY.GENERAL],
-    sectionBackgroundImage: null,
-  };
+  originalTargetSectionValues[SETTING_CATEGORY.GENERAL].sectionBackgroundImage =
+    null;
 
   exportObjectToJsonFile({
     obj: originalTargetSectionValues,

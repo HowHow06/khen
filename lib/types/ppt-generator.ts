@@ -210,7 +210,7 @@ export type SectionSettingsType = Omit<
   BasePptSettingsStateType,
   typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
 > & {
-  [SETTING_CATEGORY.GENERAL]?: SettingsValueType<
+  [SETTING_CATEGORY.GENERAL]: SettingsValueType<
     typeof PPT_GENERATION_SECTION_SETTINGS
   >;
 };
