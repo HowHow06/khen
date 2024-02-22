@@ -25,6 +25,7 @@ export const SPECIAL_WORDS_TO_CAPITALIZE: { [key in string]: string } = {
   him: "Him",
   himself: "Himself",
   he: "He",
+  his: "His",
   holy: "Holy",
   lion: "Lion",
   lamb: "Lamb",
