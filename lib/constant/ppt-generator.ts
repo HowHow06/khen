@@ -622,3 +622,5 @@ export const DEFAULT_IMAGES: DropdownImagesType = [
     path: "/images/background/greenScreenWithBlackCover_v2.png",
   },
 ];
+
+export const TEXTBOX_SETTING_KEY = "textbox" as const;
