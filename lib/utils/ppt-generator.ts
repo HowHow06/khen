@@ -49,7 +49,7 @@ import {
   SettingsValueType,
 } from "../types";
 
-export const getInitialValueFromSettings = <T = { [key in string]: any }>({
+export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
   hasGrouping = false,
 }: {
@@ -79,7 +79,7 @@ export const getInitialValueFromSettings = <T = { [key in string]: any }>({
   return resultValues;
 };
 
-export const getTextboxSettingsInitialValue = ({
+export const getTextboxSettingsInitialValues = ({
   textboxSettings,
   textboxCount = DEFAULT_LINE_COUNT_PER_SLIDE,
 }: {
@@ -89,7 +89,7 @@ export const getTextboxSettingsInitialValue = ({
   const textBoxInitialState: ContentTextboxSettingsType = {};
   Array.from({ length: textboxCount }).forEach((_, index) => {
     textBoxInitialState[`${TEXTBOX_GROUPING_PREFIX}${index + 1}`] =
-      getInitialValueFromSettings({
+      getInitialValuesFromSettings({
         settingsMeta: textboxSettings,
       });
   });
@@ -104,8 +104,12 @@ export const generatePptSettingsInitialState = (
     [SETTING_CATEGORY.GENERAL]: {},
     [SETTING_CATEGORY.FILE]: {},
     [SETTING_CATEGORY.CONTENT]: {
-      [CONTENT_TYPE.MAIN]: {},
-      [CONTENT_TYPE.SECONDARY]: {},
+      [CONTENT_TYPE.MAIN]: {
+        textbox: {},
+      },
+      [CONTENT_TYPE.SECONDARY]: {
+        textbox: {},
+      },
     },
     [SETTING_CATEGORY.COVER]: {
       [CONTENT_TYPE.MAIN]: {},
@@ -117,13 +121,13 @@ export const generatePptSettingsInitialState = (
     switch (category) {
       case SETTING_CATEGORY.GENERAL:
       case SETTING_CATEGORY.FILE:
-        initialState[category] = getInitialValueFromSettings({
+        initialState[category] = getInitialValuesFromSettings({
           settingsMeta,
         });
         break;
       case SETTING_CATEGORY.COVER:
         Object.values(CONTENT_TYPE).forEach((contentType) => {
-          initialState[category][contentType] = getInitialValueFromSettings({
+          initialState[category][contentType] = getInitialValuesFromSettings({
             settingsMeta,
           });
         });
@@ -131,11 +135,11 @@ export const generatePptSettingsInitialState = (
       case SETTING_CATEGORY.CONTENT:
         Object.values(CONTENT_TYPE).forEach((contentType) => {
           initialState[category][contentType] = {
-            ...getInitialValueFromSettings({
+            ...getInitialValuesFromSettings({
               settingsMeta,
               hasGrouping: true,
             }),
-            ...getTextboxSettingsInitialValue({
+            textbox: getTextboxSettingsInitialValues({
               textboxSettings: settings.contentTextbox,
               textboxCount,
             }),
@@ -162,8 +166,12 @@ export const getSectionSettingsInitialValue = ({
       [CONTENT_TYPE.SECONDARY]: {},
     },
     [SETTING_CATEGORY.CONTENT]: {
-      [CONTENT_TYPE.MAIN]: {},
-      [CONTENT_TYPE.SECONDARY]: {},
+      [CONTENT_TYPE.MAIN]: {
+        textbox: {},
+      },
+      [CONTENT_TYPE.SECONDARY]: {
+        textbox: {},
+      },
     },
   };
   const sectionGeneralSettings = settings.section;
@@ -171,21 +179,21 @@ export const getSectionSettingsInitialValue = ({
   const contentSettings = settings.content;
   const contentBoxSettings = settings.contentTextbox;
 
-  sectionInitialState[SETTING_CATEGORY.GENERAL] = getInitialValueFromSettings({
+  sectionInitialState[SETTING_CATEGORY.GENERAL] = getInitialValuesFromSettings({
     settingsMeta: sectionGeneralSettings,
   });
 
   Object.values(CONTENT_TYPE).forEach((contentType) => {
     sectionInitialState[SETTING_CATEGORY.COVER][contentType] =
-      getInitialValueFromSettings({
+      getInitialValuesFromSettings({
         settingsMeta: coverSettings,
       });
     sectionInitialState[SETTING_CATEGORY.CONTENT][contentType] = {
-      ...getInitialValueFromSettings({
+      ...getInitialValuesFromSettings({
         settingsMeta: contentSettings,
         hasGrouping: true,
       }),
-      ...getTextboxSettingsInitialValue({
+      textbox: getTextboxSettingsInitialValues({
         textboxSettings: contentBoxSettings,
         textboxCount,
       }),
@@ -660,13 +668,14 @@ function getTextOptionFromContentSettings({
   contentOption: ContentSettingsType;
   textboxKey: keyof ContentTextboxSettingsType;
 }): PptxGenJS.default.TextPropsOptions {
-  const { text, glow, outline, shadow, [textboxKey]: textbox } = contentOption;
+  const { text, glow, outline, shadow, textbox } = contentOption;
+  const { [textboxKey]: targetTextbox } = textbox;
   const defaultContent = PPT_GENERATION_CONTENT_SETTINGS;
   const defaultTextbox = PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS;
 
   let customOption: PptxGenJS.default.TextPropsOptions = {
-    x: `${textbox.textboxPositionX || defaultTextbox.textboxPositionX.defaultValue}%`,
-    y: `${textbox.textboxPositionY || defaultTextbox.textboxPositionY.defaultValue}%`,
+    x: `${targetTextbox.textboxPositionX || defaultTextbox.textboxPositionX.defaultValue}%`,
+    y: `${targetTextbox.textboxPositionY || defaultTextbox.textboxPositionY.defaultValue}%`,
     bold: text?.bold,
     color:
       getColorValue(text?.fontColor) ??

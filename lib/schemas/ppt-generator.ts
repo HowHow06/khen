@@ -1,12 +1,11 @@
 import { z } from "zod";
 import {
   DEFAULT_GROUPING_NAME,
-  DEFAULT_LINE_COUNT_PER_SLIDE,
   HORIZONTAL_ALIGNMENT,
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
   SHADOW_TYPE,
-  TEXTBOX_GROUPING_PREFIX,
+  TEXTBOX_SETTING_KEY,
 } from "../constant";
 import {
   BaseSettingItemMetaType,
@@ -154,19 +153,15 @@ export const generatSectionSettingZodSchema = (
     }
     contentSchema[groupingName][key] = createZodSchemaFromSettingItem(setting);
   });
-  Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach((_, index) => {
-    Object.entries(settingsMeta.contentTextbox).forEach(([key, setting]) => {
-      if (setting.isNotAvailable) {
-        return;
-      }
-      const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
-      if (!contentSchema[groupingName]) {
-        contentSchema[groupingName] = {};
-      }
-      contentSchema[groupingName][key] =
-        createZodSchemaFromSettingItem(setting);
-    });
+
+  const textBoxSchema: any = {};
+  Object.entries(settingsMeta.contentTextbox).forEach(([key, setting]) => {
+    if (setting.isNotAvailable) {
+      return;
+    }
+    textBoxSchema[key] = createZodSchemaFromSettingItem(setting);
   });
+
   const contentZodSchema = Object.entries(contentSchema).reduce(
     (acc, [groupingName, fields]) => {
       // fields here is object of {fieldKey: zodSchema}
@@ -175,6 +170,7 @@ export const generatSectionSettingZodSchema = (
     },
     {} as { [groupingName: string]: any },
   );
+  contentZodSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
   sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(
     z.object(contentZodSchema),
   );
@@ -222,26 +218,6 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
         contentSchema[groupingName][key] = settingSchema;
       });
 
-      // TODO: refactor this to be record instead, for textboxline
-      Array.from({ length: DEFAULT_LINE_COUNT_PER_SLIDE }).forEach(
-        (_, index) => {
-          Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
-            if (setting.isNotAvailable) {
-              return;
-            }
-
-            const settingSchema = createZodSchemaFromSettingItem(setting);
-            const groupingName = `${TEXTBOX_GROUPING_PREFIX}${index + 1}`;
-
-            if (!contentSchema[groupingName]) {
-              contentSchema[groupingName] = {};
-            }
-
-            contentSchema[groupingName][key] = settingSchema;
-          });
-        },
-      );
-
       // Convert each groupingName object into a z.object and wrap the whole thing in z.record
       const contentZodSchema = Object.entries(contentSchema).reduce(
         (acc, [groupingName, fields]) => {
@@ -251,6 +227,18 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
         {} as { [groupingName: string]: any },
       );
 
+      const textBoxSchema: any = {};
+      Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
+        if (setting.isNotAvailable) {
+          return;
+        }
+
+        const settingSchema = createZodSchemaFromSettingItem(setting);
+
+        textBoxSchema[key] = settingSchema;
+      });
+
+      contentZodSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
       schemaObject[category] = z.record(z.object(contentZodSchema));
     }
 

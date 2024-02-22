@@ -13,6 +13,7 @@ import {
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
   TEXTBOX_GROUPING_PREFIX,
+  TEXTBOX_SETTING_KEY,
 } from "../constant";
 
 export type HorizontalAlignSettingType =
@@ -182,8 +183,9 @@ export type ContentTextboxSettingsType = {
 
 export type ContentSettingsType = GroupedSettingsValueType<
   typeof PPT_GENERATION_CONTENT_SETTINGS
-> &
-  ContentTextboxSettingsType;
+> & {
+  [TEXTBOX_SETTING_KEY]: ContentTextboxSettingsType;
+};
 
 export type ContentTypeType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 

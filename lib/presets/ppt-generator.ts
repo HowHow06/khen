@@ -60,13 +60,15 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 26,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 56,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 26,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 56,
+        },
       },
     },
     [CONTENT_TYPE.SECONDARY]: {
@@ -98,13 +100,15 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 39,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 69,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 39,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 69,
+        },
       },
     },
   },
@@ -169,13 +173,15 @@ export const liveChinesePreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 84,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 55,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 84,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 55,
+        },
       },
     },
     [CONTENT_TYPE.SECONDARY]: {
@@ -207,13 +213,15 @@ export const liveChinesePreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 92,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 65,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 92,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 65,
+        },
       },
     },
   },
@@ -278,13 +286,15 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 32,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 58,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 32,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 58,
+        },
       },
     },
     [CONTENT_TYPE.SECONDARY]: {
@@ -316,13 +326,15 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 39,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 69,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 39,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 69,
+        },
       },
     },
   },
@@ -387,13 +399,15 @@ export const liveEnglishPreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 87,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 0,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 87,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 0,
+        },
       },
     },
     [CONTENT_TYPE.SECONDARY]: {
@@ -425,13 +439,15 @@ export const liveEnglishPreset: PptSettingsStateType = {
         shadowAngle: 45,
         shadowOpacity: 0.5,
       },
-      textboxLine1: {
-        textboxPositionX: 0,
-        textboxPositionY: 92,
-      },
-      textboxLine2: {
-        textboxPositionX: 0,
-        textboxPositionY: 65,
+      textbox: {
+        textboxLine1: {
+          textboxPositionX: 0,
+          textboxPositionY: 92,
+        },
+        textboxLine2: {
+          textboxPositionX: 0,
+          textboxPositionY: 65,
+        },
       },
     },
   },

@@ -11,6 +11,7 @@ import {
   SECTION_PREFIX,
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
+  TEXTBOX_SETTING_KEY,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
@@ -175,15 +176,22 @@ const ContentSettingsTabContent = ({
   sectionValue?: string;
   settingsValues: PptSettingsStateType;
 }) => {
-  const prefix = isSectionGeneral
+  const categoryPrefix = isSectionGeneral
     ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.CONTENT}`
     : SETTING_CATEGORY.CONTENT;
-  const settingsMetaGrouped = useMemo(() => {
+  const groupedContentSettings = useMemo(() => {
+    return groupByAsObject(
+      PPT_GENERATION_SETTINGS_META.content,
+      "groupingName",
+    );
+  }, []);
+
+  const groupedTextBoxSettings = useMemo(() => {
     const textBoxCount = settingsValues.general.singleLineMode
       ? 1
       : DEFAULT_LINE_COUNT_PER_SLIDE;
 
-    const textBoxSettings = Array.from({
+    return Array.from({
       length: textBoxCount,
     }).reduce<{}>((result, _, currentIndex) => {
       return {
@@ -192,10 +200,6 @@ const ContentSettingsTabContent = ({
           PPT_GENERATION_SETTINGS_META.contentTextbox,
       };
     }, {});
-    return {
-      ...textBoxSettings,
-      ...groupByAsObject(PPT_GENERATION_SETTINGS_META.content, "groupingName"),
-    };
   }, [settingsValues.general.singleLineMode]);
 
   return (
@@ -218,9 +222,14 @@ const ContentSettingsTabContent = ({
             )}
           >
             <GroupedBaseSettings
-              keyPrefix={`${prefix}.${CONTENT_TYPE.MAIN}.`}
+              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.MAIN}.${TEXTBOX_SETTING_KEY}.`}
+              accordionKey={CONTENT_TYPE.MAIN + TEXTBOX_SETTING_KEY}
+              groupedSettingsMeta={groupedTextBoxSettings}
+            />
+            <GroupedBaseSettings
+              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.MAIN}.`}
               accordionKey={CONTENT_TYPE.MAIN}
-              groupedSettingsMeta={settingsMetaGrouped}
+              groupedSettingsMeta={groupedContentSettings}
               defaultAccordionValue={[`text`]}
               className="pb-5 xl:pb-10"
             />
@@ -234,9 +243,14 @@ const ContentSettingsTabContent = ({
             )}
           >
             <GroupedBaseSettings
-              keyPrefix={`${prefix}.${CONTENT_TYPE.SECONDARY}.`}
+              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
+              accordionKey={CONTENT_TYPE.SECONDARY + TEXTBOX_SETTING_KEY}
+              groupedSettingsMeta={groupedTextBoxSettings}
+            />
+            <GroupedBaseSettings
+              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.`}
               accordionKey={CONTENT_TYPE.SECONDARY}
-              groupedSettingsMeta={settingsMetaGrouped}
+              groupedSettingsMeta={groupedContentSettings}
               defaultAccordionValue={[`text`]}
               className="pb-5 xl:pb-10"
             />
