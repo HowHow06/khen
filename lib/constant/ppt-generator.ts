@@ -132,46 +132,6 @@ export const PPT_GENERATION_GENERAL_SETTINGS = {
     defaultValue: false,
     tips: "Separate sections into different files and download them as a zip file.",
   },
-  useBackgroundColorWhenEmpty: {
-    fieldDisplayName: "Use Background Color for Empty Slides",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: true,
-    tips: "If unchecked, background image will be used for empty slides.",
-  },
-  ignoreSubcontent: {
-    fieldDisplayName: "Ignore Secondary Content",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-  },
-  useSingleTextbox: {
-    fieldDisplayName: "Use Single Textbox",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-    isNotAvailable: true,
-  },
-  singleLineMode: {
-    fieldDisplayName: "Single Line Mode",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
-  },
-  lineCountPerSlide: {
-    fieldDisplayName: "Line Count Per Slide",
-    fieldType: SETTING_FIELD_TYPE.NUMBER,
-    defaultValue: 2,
-    isNotAvailable: true, // TODO: to implement
-  },
-  ignoreSubcontentWhenIdentical: {
-    fieldDisplayName: "Ignore Secondary Content when identical",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: true,
-  },
-  transition: {
-    fieldDisplayName: "Transition",
-    fieldType: SETTING_FIELD_TYPE.TRANSITION,
-    isNotAvailable: true, // TODO: implement transition, KHEN-26
-    defaultValue: "",
-  },
   sectionsAutoNumbering: {
     fieldDisplayName: "Section Auto Numbering",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
@@ -241,86 +201,48 @@ export const PPT_GENERATION_SECTION_SETTINGS = {
         fieldName.replace("sectionBackgroundColor", "useMainBackgroundColor"),
       ),
   },
-  sectionUseBackgroundColorWhenEmpty: {
-    fieldDisplayName: "Section Use Background Color for Empty Slides",
+} as const;
+
+export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
+  useBackgroundColorWhenEmpty: {
+    fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
     tips: "If unchecked, background image will be used for empty slides.",
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace(
-          "sectionUseBackgroundColorWhenEmpty",
-          "useMainSectionSettings",
-        ),
-      ),
   },
-  sectionIgnoreSubcontent: {
-    fieldDisplayName: "Section Ignore Secondary Content",
+  ignoreSubcontent: {
+    fieldDisplayName: "Ignore Secondary Content",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace("sectionIgnoreSubcontent", "useMainSectionSettings"),
-      ),
   },
-  sectionUseSingleTextbox: {
-    fieldDisplayName: "Section Use Single Textbox",
+  useSingleTextbox: {
+    fieldDisplayName: "Use Single Textbox",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     isNotAvailable: true,
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace("sectionUseSingleTextbox", "useMainSectionSettings"),
-      ),
   },
-  sectionSingleLineMode: {
-    fieldDisplayName: "Section Single Line Mode",
+  singleLineMode: {
+    fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace("sectionSingleLineMode", "useMainSectionSettings"),
-      ),
   },
-  sectionLineCountPerSlide: {
-    fieldDisplayName: "Section Line Count Per Slide",
+  lineCountPerSlide: {
+    fieldDisplayName: "Line Count Per Slide",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
     isNotAvailable: true, // TODO: to implement
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace("sectionLineCountPerSlide", "useMainSectionSettings"),
-      ),
   },
-  sectionIgnoreSubcontentWhenIdentical: {
-    fieldDisplayName: "Section Ignore Secondary Content when identical",
+  ignoreSubcontentWhenIdentical: {
+    fieldDisplayName: "Ignore Secondary Content when identical",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace(
-          "sectionIgnoreSubcontentWhenIdentical",
-          "useMainSectionSettings",
-        ),
-      ),
   },
-  sectionTransition: {
-    fieldDisplayName: "Section Transition",
+  transition: {
+    fieldDisplayName: "Transition",
     fieldType: SETTING_FIELD_TYPE.TRANSITION,
     isNotAvailable: true, // TODO: implement transition, KHEN-26
     defaultValue: "",
-    isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
-      !!getValueFromPath<boolean>(
-        settings,
-        fieldName.replace("sectionTransition", "useMainSectionSettings"),
-      ),
   },
 } as const;
 
@@ -555,12 +477,18 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
 // NOTE: this is metadata of the available settings for the users
 export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.FILE]: PPT_GENERATION_FILE_SETTINGS,
-  [SETTING_CATEGORY.GENERAL]: PPT_GENERATION_GENERAL_SETTINGS,
-  [SETTING_CATEGORY.SECTION]: PPT_GENERATION_SECTION_SETTINGS,
+  [SETTING_CATEGORY.GENERAL]: {
+    ...PPT_GENERATION_GENERAL_SETTINGS,
+    ...PPT_GENERATION_SHARED_GENERAL_SETTINGS,
+  },
+  [SETTING_CATEGORY.SECTION]: {
+    ...PPT_GENERATION_SECTION_SETTINGS,
+    ...PPT_GENERATION_SHARED_GENERAL_SETTINGS,
+  },
   [SETTING_CATEGORY.COVER]: PPT_GENERATION_COVER_SETTINGS,
   [SETTING_CATEGORY.CONTENT_TEXTBOX]: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
-} as const;
+};
 
 export const FONT_FACES_ITEMS: ComboboxItemsType = Object.entries(
   fontFaces,
