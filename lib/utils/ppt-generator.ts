@@ -331,8 +331,6 @@ function createSlidesFromLyrics({
   const mainLinePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
   const mainHasSecondaryContent = !ignoreSubcontent;
 
-  let coverCount = 0;
-  let pptSectionCount = 0;
   let mainSectionDisplayNumber = 0;
   let mainSectionCount = 0;
   let subsectionCount = 0;
@@ -357,7 +355,6 @@ function createSlidesFromLyrics({
     const isMainSection = primaryLine.startsWith(`${LYRIC_SECTION.SECTION} `);
     const isSubSection = primaryLine.startsWith(`${LYRIC_SECTION.SUBSECTION} `);
     if (isMainSection || isSubSection) {
-      pptSectionCount++;
       subsectionCount = isMainSection ? 0 : subsectionCount + 1;
       const identifier = isMainSection
         ? LYRIC_SECTION.SECTION
@@ -453,7 +450,6 @@ function createSlidesFromLyrics({
     // 2. check if is cover, update current line
     const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
     if (isCover) {
-      coverCount++;
       currentSectionCoverCount++;
       const regex = /^#[^#]*/;
       const mainTitle = currentLine
