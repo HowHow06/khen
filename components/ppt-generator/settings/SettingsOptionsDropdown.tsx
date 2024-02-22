@@ -81,14 +81,12 @@ const SettingsOptionsDropdown = ({
     targetSectionName: SectionSettingsKeyType;
   }) => {
     const originalSettings = getValues() as PptSettingsStateType;
-    const finalSettingsValue = {
-      ...originalSettings,
-      [SETTING_CATEGORY.SECTION]: {
-        ...originalSettings[SETTING_CATEGORY.SECTION],
-        [targetSectionName]: sectionSettings,
-      },
+
+    originalSettings[SETTING_CATEGORY.SECTION] = {
+      ...originalSettings[SETTING_CATEGORY.SECTION],
+      [targetSectionName]: sectionSettings,
     };
-    reset(finalSettingsValue);
+    reset(originalSettings);
   };
 
   const handleFullSettingImport = async ({ json }: { json: JSON }) => {

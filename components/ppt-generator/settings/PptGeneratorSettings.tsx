@@ -295,14 +295,18 @@ const PptGeneratorSetting = () => {
 
     sections.forEach((sectionName, currentIndex) => {
       const currentSectionNumber = currentIndex + 1;
-      if (!sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`]) {
-        sectionInitialValue[`${SECTION_PREFIX}${currentSectionNumber}`] =
-          getSectionSettingsInitialValue({
+      const currentSectionKey =
+        `${SECTION_PREFIX}${currentSectionNumber}` as SectionSettingsKeyType;
+
+      if (!sectionInitialValue[currentSectionKey]) {
+        sectionInitialValue[currentSectionKey] = getSectionSettingsInitialValue(
+          {
             settings: PPT_GENERATION_SETTINGS_META,
-          });
+          },
+        );
       }
       newSectionItems.push({
-        value: `${SECTION_PREFIX}${currentSectionNumber}`,
+        value: currentSectionKey,
         label: `${sectionName.replace(LYRIC_SECTION.SECTION, "")}`,
       });
     });

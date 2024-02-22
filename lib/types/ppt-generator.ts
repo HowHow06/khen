@@ -150,7 +150,7 @@ export type PptSettingsPresetName = "onsite-chinese";
 export type SettingsValueType<
   T extends Record<string, BaseSettingItemMetaType>,
 > = {
-  [K in keyof T as T[K]["isNotAvailable"] extends true
+  -readonly [K in keyof T as T[K]["isNotAvailable"] extends true
     ? never
     : K]?: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
 };
@@ -210,7 +210,7 @@ export type SectionSettingsType = Omit<
   BasePptSettingsStateType,
   typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
 > & {
-  [SETTING_CATEGORY.GENERAL]?: SettingsValueType<
+  [SETTING_CATEGORY.GENERAL]: SettingsValueType<
     typeof PPT_GENERATION_SECTION_SETTINGS
   >;
 };
