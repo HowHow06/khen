@@ -91,7 +91,6 @@ const SettingsOptionsDropdown = ({
     reset(finalSettingsValue);
   };
 
-  // TODO: refactor this together with presetsdropdown component
   const handleFullSettingImport = async ({ json }: { json: JSON }) => {
     const options = await promptToGetFullSettingsImportOptions({
       hasSectionSettings,

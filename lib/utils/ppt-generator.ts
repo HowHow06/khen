@@ -1013,7 +1013,12 @@ export const generateFullSettingsForMainApplication = ({
     settingsToUse[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
     };
-  } else if (originalSettings[SETTING_CATEGORY.SECTION] !== undefined) {
+  }
+
+  if (
+    !isPreserveExistingSectionSetting &&
+    originalSettings[SETTING_CATEGORY.SECTION] !== undefined
+  ) {
     // reset section values if section settings exist
     const sectionInitialValue = getSectionSettingsInitialValue({
       settings: PPT_GENERATION_SETTINGS_META,
@@ -1094,7 +1099,9 @@ export const getSettingTypeFromJSON = ({
 }): ImportedSettingType | null => {
   if (getIsValidToSchema(json, settingsSchema)) {
     return IMPORTED_SETTING_TYPE.FULL_SETTING;
-  } else if (getIsValidToSchema(json, sectionSettingSchema)) {
+  }
+
+  if (getIsValidToSchema(json, sectionSettingSchema)) {
     return IMPORTED_SETTING_TYPE.SECTION;
   }
   return null;
