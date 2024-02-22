@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodSchema, z } from "zod";
 import {
   DEFAULT_GROUPING_NAME,
   HORIZONTAL_ALIGNMENT,
@@ -9,6 +9,7 @@ import {
 } from "../constant";
 import {
   BaseSettingItemMetaType,
+  BaseSettingMetaType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
   ShadowTypeSettingType,
@@ -119,61 +120,30 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
 export const generatSectionSettingZodSchema = (
   settingsMeta: PptGenerationSettingMetaType,
 ) => {
-  const sectionSettingsMeta = settingsMeta.section;
   const sectionSchema: { [key in string]: any } = {};
   // General section schema-------------------
-  const generalSchema: any = {};
-  Object.entries(sectionSettingsMeta).forEach(([key, setting]) => {
-    if (setting.isNotAvailable) {
-      return;
-    }
-    generalSchema[key] = createZodSchemaFromSettingItem(setting);
+  const generalSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.section,
   });
   sectionSchema[SETTING_CATEGORY.GENERAL] = z.object(generalSchema);
 
   // Cover section schema--------------------
-  const coverSchema: any = {}; // reset
-  Object.entries(settingsMeta.cover).forEach(([key, setting]) => {
-    if (setting.isNotAvailable) {
-      return;
-    }
-    coverSchema[key] = createZodSchemaFromSettingItem(setting);
+  const coverSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.cover,
   });
   sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
 
   // Content section schema-------------------
-  const contentSchema: { [groupingName: string]: any } = {};
-  Object.entries(settingsMeta.content).forEach(([key, setting]) => {
-    if (setting.isNotAvailable) {
-      return;
-    }
-    const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
-    if (!contentSchema[groupingName]) {
-      contentSchema[groupingName] = {};
-    }
-    contentSchema[groupingName][key] = createZodSchemaFromSettingItem(setting);
+  const contentSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.content,
+    hasGrouping: true,
+  });
+  const textBoxSchema = generateZodSchemaObjectFromSettings({
+    settings: settingsMeta.contentTextbox,
   });
 
-  const textBoxSchema: any = {};
-  Object.entries(settingsMeta.contentTextbox).forEach(([key, setting]) => {
-    if (setting.isNotAvailable) {
-      return;
-    }
-    textBoxSchema[key] = createZodSchemaFromSettingItem(setting);
-  });
-
-  const contentZodSchema = Object.entries(contentSchema).reduce(
-    (acc, [groupingName, fields]) => {
-      // fields here is object of {fieldKey: zodSchema}
-      acc[groupingName] = z.object(fields);
-      return acc;
-    },
-    {} as { [groupingName: string]: any },
-  );
-  contentZodSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
-  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(
-    z.object(contentZodSchema),
-  );
+  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
+  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.object(contentSchema));
 
   return z.object(sectionSchema);
 };
@@ -182,7 +152,47 @@ export const sectionSettingSchema = generatSectionSettingZodSchema(
   PPT_GENERATION_SETTINGS_META,
 );
 
-// TODO: refactor this function
+const generateZodSchemaObjectFromSettings = ({
+  settings,
+  hasGrouping = false,
+}: {
+  settings: BaseSettingMetaType;
+  hasGrouping?: boolean;
+}): Record<string, ZodSchema> => {
+  const outputSchemaObject: Record<string, ZodSchema> = {};
+  const groupedSchemaObject: Record<string, Record<string, ZodSchema>> = {};
+  Object.entries(settings).forEach(([key, setting]) => {
+    if (setting.isNotAvailable) {
+      return;
+    }
+    const schema = createZodSchemaFromSettingItem(setting);
+
+    if (!hasGrouping) {
+      outputSchemaObject[key] = schema;
+      return;
+    }
+
+    const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
+    groupedSchemaObject[groupingName] = {
+      ...groupedSchemaObject[groupingName],
+      [key]: schema,
+    };
+    return;
+  });
+
+  if (!hasGrouping) {
+    return outputSchemaObject;
+  }
+
+  return Object.entries(groupedSchemaObject).reduce(
+    (acc, [groupingName, fields]) => {
+      acc[groupingName] = z.object(fields);
+      return acc;
+    },
+    {} as { [groupingName: string]: any },
+  );
+};
+
 const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
   let schemaObject: any = {};
 
@@ -191,70 +201,27 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       category === SETTING_CATEGORY.GENERAL ||
       category === SETTING_CATEGORY.FILE
     ) {
-      let categorySchema: any = {};
-      Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-        categorySchema[key] = createZodSchemaFromSettingItem(setting);
-      });
-      schemaObject[category] = z.object(categorySchema);
+      const schemaObject = generateZodSchemaObjectFromSettings({ settings });
+      schemaObject[category] = z.object(schemaObject);
     }
 
     if (category === SETTING_CATEGORY.CONTENT) {
-      let contentSchema: { [groupingName: string]: any } = {};
-      Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-
-        const settingSchema = createZodSchemaFromSettingItem(setting);
-        const groupingName = setting.groupingName || DEFAULT_GROUPING_NAME;
-
-        if (!contentSchema[groupingName]) {
-          contentSchema[groupingName] = {};
-        }
-
-        contentSchema[groupingName][key] = settingSchema;
+      const contentSchema = generateZodSchemaObjectFromSettings({
+        settings,
+        hasGrouping: true,
       });
-
-      // Convert each groupingName object into a z.object and wrap the whole thing in z.record
-      const contentZodSchema = Object.entries(contentSchema).reduce(
-        (acc, [groupingName, fields]) => {
-          acc[groupingName] = z.object(fields);
-          return acc;
-        },
-        {} as { [groupingName: string]: any },
-      );
-
-      const textBoxSchema: any = {};
-      Object.entries(metaData.contentTextbox).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-
-        const settingSchema = createZodSchemaFromSettingItem(setting);
-
-        textBoxSchema[key] = settingSchema;
+      const textBoxSchema = generateZodSchemaObjectFromSettings({
+        settings: metaData.contentTextbox,
       });
-
-      contentZodSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
-      schemaObject[category] = z.record(z.object(contentZodSchema));
+      contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
+      schemaObject[category] = z.record(z.object(contentSchema));
     }
 
     if (category === SETTING_CATEGORY.COVER) {
-      const contentSchema: { [key in string]: any } = {};
-      Object.entries(settings).forEach(([key, setting]) => {
-        if (setting.isNotAvailable) {
-          return;
-        }
-
-        const settingSchema = createZodSchemaFromSettingItem(setting);
-
-        contentSchema[key] = settingSchema;
+      const coverSchema = generateZodSchemaObjectFromSettings({
+        settings,
       });
-
-      schemaObject[category] = z.record(z.object(contentSchema));
+      schemaObject[category] = z.record(z.object(coverSchema));
     }
 
     if (category === SETTING_CATEGORY.SECTION) {
