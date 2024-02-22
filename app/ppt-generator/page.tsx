@@ -52,7 +52,7 @@ const PptGeneratorPage = (props: Props) => {
         <h2 className="mt-8 text-xl font-semibold tracking-tight">
           1. Search Lyrics
         </h2>
-        <div className="">to be implemented...</div>
+        <div className="">coming soon...</div>
       </Container>
       <PptSettingsUIProvider>
         <PptGeneratorFormProvider>
