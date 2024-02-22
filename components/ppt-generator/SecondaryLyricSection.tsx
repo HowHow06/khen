@@ -32,7 +32,7 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
         </div>
         <Textarea
           placeholder="Insert the secondary lyrics here."
-          className="min-h-52 md:min-h-72"
+          className="min-h-96 md:min-h-80"
           value={secondaryText}
           onChange={handleTextChange}
         />

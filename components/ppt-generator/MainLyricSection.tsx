@@ -138,7 +138,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       <Textarea
         ref={mainTextareaRef}
         placeholder="Insert the main lyrics here."
-        className="min-h-52 md:min-h-72"
+        className="min-h-96 md:min-h-80"
         value={mainText}
         onChange={handleTextChange}
         onSelect={handleSelect}
