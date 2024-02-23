@@ -116,14 +116,11 @@ export const OptionsDialogProvider: React.FC<OptionsDialogProviderProps> = ({
 
   return (
     <OptionsDialogContext.Provider value={{ showOptionsDialog, hideDialog }}>
-      <Dialog open={dialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         {/* <DialogTrigger asChild>
         <Button variant="outline">Show Dialog</Button>
       </DialogTrigger> */}
-        <DialogContent
-          className=" w-5/6 sm:max-w-[425px]"
-          setIsOpen={setDialog}
-        >
+        <DialogContent className=" w-5/6 sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{message}</DialogTitle>
             {description && (

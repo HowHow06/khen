@@ -1,23 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { LYRIC_SECTION } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
-import { LyricSectionType, TextareaRefType } from "@/lib/types";
-import { getPinyin } from "@/lib/utils/pinyin";
-import { ChevronDown } from "lucide-react";
-import { useRef } from "react";
-import { toast } from "sonner";
+import useUndoStack from "@/lib/hooks/use-undo-stack";
+import { TextareaRefType } from "@/lib/types";
+import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
+import GeneratePinyinDropdown from "../GeneratePinyinDropdown";
+import LyricSectionCommand from "../LyricSectionCommand";
+import SectionInsertDropdown from "../SectionInsertDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 
@@ -33,93 +26,70 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     handleTextChange: cursorHandleTextChange,
     handleSelect: cursorHandleSelect,
   } = useCursorPosition();
+  const [showCommand, setShowCommand] = useState<boolean>(false);
+  const onUndoCallback = useCallback(
+    (lastText: string) => setMainText(lastText),
+    [setMainText],
+  );
+
+  const { saveToUndoStack } = useUndoStack<string>({
+    ref: mainTextareaRef,
+    onUndo: onUndoCallback,
+  });
+
+  const setMainTextHandler = useCallback(
+    (newText: string) => {
+      saveToUndoStack(mainText);
+      setMainText(newText);
+    },
+    [mainText, saveToUndoStack, setMainText],
+  );
+
+  const setMainTextForSectionInsertion = useCallback(
+    (newText: string) => {
+      setMainTextHandler(newText);
+      const insertedTextLength = newText.length - mainText.length;
+      setCursorPosition(
+        cursorPosition.start + insertedTextLength,
+        cursorPosition.start + insertedTextLength,
+      );
+    },
+    [
+      cursorPosition.start,
+      mainText.length,
+      setCursorPosition,
+      setMainTextHandler,
+    ],
+  );
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainText(event.target.value);
     cursorHandleTextChange(event);
   };
 
-  const insertLyricSection = (section: LyricSectionType) => {
-    if (!mainTextareaRef.current) {
-      return;
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "/") {
+      setShowCommand(true);
     }
-
-    const isCursorAtBeginning = mainText && cursorPosition.start !== 0;
-    let textToAdd = `${LYRIC_SECTION[section]} `;
-    if (isCursorAtBeginning) {
-      textToAdd = "\n" + textToAdd;
-    }
-
-    const newText =
-      mainText.slice(0, cursorPosition.start) +
-      textToAdd +
-      mainText.slice(cursorPosition.start);
-
-    setMainText(newText);
-    setCursorPosition(
-      cursorPosition.start + textToAdd.length,
-      cursorPosition.start + textToAdd.length,
-    );
   };
 
-  function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
-    const pinyinText = getPinyin({ text: mainText, hasTone: hasTone });
-    setSecondaryText(pinyinText);
-    toast.success(`Pinyin ${hasTone ? "with" : "without"} tone generated.`);
-  }
+  const setTextareaSelectionOnDropdownClose = (event: Event) => {
+    event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+    if (mainTextareaRef.current && cursorPosition.end) {
+      mainTextareaRef.current.selectionStart = cursorPosition.end;
+      mainTextareaRef.current.focus();
+    }
+  };
 
   return (
     <div className="">
       <div className="my-2 flex flex-wrap gap-2">
-        {/* <Button variant="outline" onClick={insertSection}>
-          Test Button Insert Section
-        </Button> */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Insert...
-              <ChevronDown className="ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            onCloseAutoFocus={(event) => {
-              event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
-              if (mainTextareaRef.current && cursorPosition.end) {
-                mainTextareaRef.current.selectionStart = cursorPosition.end;
-                mainTextareaRef.current.focus();
-              }
-            }}
-          >
-            {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator /> */}
-            <DropdownMenuItem onSelect={() => insertLyricSection("SECTION")}>
-              Section
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => insertLyricSection("SUBSECTION")}>
-              Sub-section
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => insertLyricSection("MAINTITLE")}>
-              Main Title
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => insertLyricSection("SECONDARYTITLE")}
-            >
-              Secondary Title
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => insertLyricSection("EMPTYSLIDE")}>
-              Empty Slide
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => insertLyricSection("FILL_SLIDE")}>
-              Fill Slide
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <TextTransformDropdown
+        <SectionInsertDropdown
           text={mainText}
-          setText={setMainText}
+          setText={setMainTextForSectionInsertion}
           cursorPosition={cursorPosition}
-          onDropdownClosed={() => {
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
             if (mainTextareaRef.current && cursorPosition) {
               mainTextareaRef.current.setSelectionRange(
                 cursorPosition.start,
@@ -129,37 +99,42 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             }
           }}
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Generate Pinyin
-              <ChevronDown className="ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem
-              onSelect={() => onGeneratePinyinClick({ hasTone: false })}
-            >
-              without tone
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => onGeneratePinyinClick({ hasTone: true })}
-            >
-              with tone
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <FindAndReplaceButton text={mainText} setText={setMainText} />
+        <TextTransformDropdown
+          text={mainText}
+          setText={setMainTextHandler}
+          cursorPosition={cursorPosition}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            if (mainTextareaRef.current && cursorPosition) {
+              mainTextareaRef.current.setSelectionRange(
+                cursorPosition.start,
+                cursorPosition.end,
+              );
+              mainTextareaRef.current.focus();
+            }
+          }}
+        />
+        <GeneratePinyinDropdown setText={setSecondaryText} text={mainText} />
+        <FindAndReplaceButton text={mainText} setText={setMainTextHandler} />
         <CopyToClipboardButton text={mainText} />
-        <ClearTextButton text={mainText} setText={setMainText} />
+        <ClearTextButton text={mainText} setText={setMainTextHandler} />
       </div>
       <Textarea
         ref={mainTextareaRef}
-        placeholder="Insert the main lyrics here."
+        placeholder="Insert the main lyrics here. Press '/' for insert command."
         className="min-h-96 md:min-h-80"
         value={mainText}
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}
+        onKeyDown={handleKeyDown}
+      />
+      <LyricSectionCommand
+        open={showCommand}
+        onOpenChange={setShowCommand}
+        onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
+        cursorPosition={cursorPosition}
+        text={mainText}
+        setText={setMainTextForSectionInsertion}
       />
     </div>
   );

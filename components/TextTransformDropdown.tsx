@@ -24,14 +24,14 @@ type Props = {
   text: string;
   setText: (text: string) => void;
   cursorPosition?: CursorPosition;
-  onDropdownClosed?: () => void;
+  onCloseAutoFocus?: (event: Event) => void;
 };
 
 const TextTransformDropdown = ({
   text,
   setText,
   cursorPosition,
-  onDropdownClosed,
+  onCloseAutoFocus,
 }: Props) => {
   const hasSelectedText =
     cursorPosition && cursorPosition.start !== cursorPosition.end;
@@ -120,9 +120,8 @@ const TextTransformDropdown = ({
         <DropdownMenuContent
           align="start"
           onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (onDropdownClosed) {
-              onDropdownClosed();
+            if (onCloseAutoFocus) {
+              onCloseAutoFocus(event);
             }
           }} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
         >
