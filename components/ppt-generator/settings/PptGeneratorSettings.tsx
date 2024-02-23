@@ -380,9 +380,7 @@ const PptGeneratorSetting = () => {
       <Sheet
         modal={isExtraSmallScreen ? true : false}
         open={isOpen}
-        onOpenChange={(val) => {
-          setIsOpen(val), console.log("CHANED!", val);
-        }}
+        onOpenChange={setIsOpen}
       >
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
@@ -416,7 +414,7 @@ const PptGeneratorSetting = () => {
           onInteractOutside={
             isExtraSmallScreen
               ? () => setIsOpen(false)
-              : (event) => event.preventDefault()
+              : (event) => event.preventDefault() // prevent it from closing
           }
         >
           <SheetHeader>
