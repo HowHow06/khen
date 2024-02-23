@@ -12,13 +12,12 @@ import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { TextareaRefType } from "@/lib/types";
 import { getTextInsertedAtPosition } from "@/lib/utils";
-import { getPinyin } from "@/lib/utils/pinyin";
 import { ChevronDown } from "lucide-react";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
+import GeneratePinyinDropdown from "../GeneratePinyinDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import {
@@ -65,12 +64,6 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     },
     [mainText, cursorPosition.start, setCursorPosition, setMainText],
   );
-
-  function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
-    const pinyinText = getPinyin({ text: mainText, hasTone: hasTone });
-    setSecondaryText(pinyinText);
-    toast.success(`Pinyin ${hasTone ? "with" : "without"} tone generated.`);
-  }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "/") {
@@ -125,26 +118,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             }
           }}
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Generate Pinyin
-              <ChevronDown className="ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            <DropdownMenuItem
-              onSelect={() => onGeneratePinyinClick({ hasTone: false })}
-            >
-              without tone
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => onGeneratePinyinClick({ hasTone: true })}
-            >
-              with tone
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <GeneratePinyinDropdown setText={setSecondaryText} text={mainText} />
         <FindAndReplaceButton text={mainText} setText={setMainText} />
         <CopyToClipboardButton text={mainText} />
         <ClearTextButton text={mainText} setText={setMainText} />
