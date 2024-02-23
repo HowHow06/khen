@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { LYRIC_SECTION } from "@/lib/constant";
+import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { LyricSectionType, TextareaRefType } from "@/lib/types";
 import { getPinyin } from "@/lib/utils/pinyin";
 import { ChevronDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
@@ -26,41 +27,39 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const { mainText, setMainText, setSecondaryText } =
     usePptGeneratorFormContext();
   const mainTextareaRef = useRef<TextareaRefType>(null);
-  const [cursorPosition, setCursorPosition] = useState<number>(0);
+  const {
+    cursorPosition,
+    setCursorPosition,
+    handleTextChange: cursorHandleTextChange,
+    handleSelect: cursorHandleSelect,
+  } = useCursorPosition();
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainText(event.target.value);
-    setCursorPosition(event.target.selectionStart);
-  };
-
-  const handleSelect = (event: React.UIEvent<HTMLTextAreaElement>) => {
-    setCursorPosition(event.currentTarget.selectionStart);
+    cursorHandleTextChange(event);
   };
 
   const insertLyricSection = (section: LyricSectionType) => {
-    if (mainTextareaRef.current) {
-      const sectionValue =
-        mainText && cursorPosition !== 0
-          ? "\n" + LYRIC_SECTION[section]
-          : LYRIC_SECTION[section];
-      const sectionLength = sectionValue.length + 1;
-
-      const newText =
-        mainText.slice(0, cursorPosition) +
-        `${sectionValue} ` +
-        mainText.slice(cursorPosition);
-      setMainText(newText);
-      setCursorPosition(cursorPosition + sectionLength);
-
-      setTimeout(() => {
-        if (mainTextareaRef.current) {
-          mainTextareaRef.current.focus();
-          mainTextareaRef.current.selectionStart =
-            cursorPosition + sectionLength;
-          mainTextareaRef.current.selectionEnd = cursorPosition + sectionLength;
-        }
-      }, 0);
+    if (!mainTextareaRef.current) {
+      return;
     }
+
+    const isCursorAtBeginning = mainText && cursorPosition.start !== 0;
+    let textToAdd = `${LYRIC_SECTION[section]} `;
+    if (isCursorAtBeginning) {
+      textToAdd = "\n" + textToAdd;
+    }
+
+    const newText =
+      mainText.slice(0, cursorPosition.start) +
+      textToAdd +
+      mainText.slice(cursorPosition.start);
+
+    setMainText(newText);
+    setCursorPosition(
+      cursorPosition.start + textToAdd.length,
+      cursorPosition.start + textToAdd.length,
+    );
   };
 
   function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
@@ -84,7 +83,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            onCloseAutoFocus={(event) => event.preventDefault()} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+            onCloseAutoFocus={(event) => {
+              event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+              if (mainTextareaRef.current && cursorPosition.end) {
+                mainTextareaRef.current.selectionStart = cursorPosition.end;
+                mainTextareaRef.current.focus();
+              }
+            }}
           >
             {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator /> */}
@@ -110,7 +115,20 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <TextTransformDropdown text={mainText} setText={setMainText} />
+        <TextTransformDropdown
+          text={mainText}
+          setText={setMainText}
+          cursorPosition={cursorPosition}
+          onDropdownClosed={() => {
+            if (mainTextareaRef.current && cursorPosition) {
+              mainTextareaRef.current.setSelectionRange(
+                cursorPosition.start,
+                cursorPosition.end,
+              );
+              mainTextareaRef.current.focus();
+            }
+          }}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -141,7 +159,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         className="min-h-96 md:min-h-80"
         value={mainText}
         onChange={handleTextChange}
-        onSelect={handleSelect}
+        onSelect={cursorHandleSelect}
       />
     </div>
   );

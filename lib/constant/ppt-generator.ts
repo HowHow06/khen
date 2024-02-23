@@ -1,10 +1,10 @@
 import {
-  ComboboxItemsType,
   DropdownImagesType,
   HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
   PptSettingsStateType,
   PresetsType,
+  SelectionItemsType,
   ShadowTypeSettingType,
 } from "../types";
 import { getValueFromPath } from "../utils";
@@ -494,11 +494,11 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
 } as const;
 
-export const FONT_FACES_ITEMS: ComboboxItemsType = Object.entries(
+export const FONT_FACES_ITEMS: SelectionItemsType = Object.entries(
   fontFaces,
 ).map(([key, font]) => font);
 
-export const HORIZONTAL_ALIGNMENT_ITEMS: ComboboxItemsType<HorizontalAlignSettingType> =
+export const HORIZONTAL_ALIGNMENT_ITEMS: SelectionItemsType<HorizontalAlignSettingType> =
   Object.values(HORIZONTAL_ALIGNMENT).map((alignment) => {
     return {
       value: alignment,
@@ -506,7 +506,7 @@ export const HORIZONTAL_ALIGNMENT_ITEMS: ComboboxItemsType<HorizontalAlignSettin
     };
   });
 
-export const SHADOW_TYPE_ITEMS: ComboboxItemsType<ShadowTypeSettingType> =
+export const SHADOW_TYPE_ITEMS: SelectionItemsType<ShadowTypeSettingType> =
   Object.values(SHADOW_TYPE).map((shadowType) => {
     return {
       value: shadowType,
