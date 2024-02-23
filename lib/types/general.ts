@@ -7,7 +7,7 @@ import {
 
 export type LyricSectionType = keyof typeof LYRIC_SECTION;
 export type TextareaRefType = HTMLTextAreaElement | null;
-export type ComboboxItemsType<T = string> = { value: T; label: string }[];
+export type SelectionItemsType<T = string> = { value: T; label: string }[];
 export type Collection<T> = T[] | Record<string, T>;
 export type Prettify<T> = {
   [K in keyof T]: T[K];
