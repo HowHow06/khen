@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
+import { CursorPosition } from "../types";
 
 type UseCursorPositionReturnType = {
-  cursorPosition: number; // The cursor position
-  setCursorPosition: (position: number) => void;
+  cursorPosition: CursorPosition; // The cursor position
+  setCursorPosition: (startPosition: number, endPosition: number) => void;
   handleTextChange: (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
   ) => void; // Handler for change events
@@ -12,23 +13,42 @@ type UseCursorPositionReturnType = {
 };
 
 function useCursorPosition(): UseCursorPositionReturnType {
-  const [cursorPosition, setCursorPosition] = useState<number>(0);
+  const [startPosition, setStartPosition] = useState<number>(0);
+  const [endPosition, setEndPosition] = useState<number>(0);
 
   const handleTextChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      setCursorPosition(event.target.selectionStart ?? 0);
+      setStartPosition(event.target.selectionStart ?? 0);
+      setEndPosition(event.target.selectionEnd ?? 0);
     },
     [],
   );
 
   const handleSelect = useCallback(
     (event: React.SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-      setCursorPosition(event.currentTarget.selectionStart ?? 0);
+      setStartPosition(event.currentTarget.selectionStart ?? 0);
+      setEndPosition(event.currentTarget.selectionEnd ?? 0);
     },
     [],
   );
 
-  return { cursorPosition, setCursorPosition, handleTextChange, handleSelect };
+  const setCursorPosition = useCallback(
+    (startPosition: number, endPosition: number) => {
+      setStartPosition(startPosition);
+      setEndPosition(endPosition);
+    },
+    [],
+  );
+
+  return {
+    cursorPosition: {
+      start: startPosition,
+      end: endPosition,
+    },
+    setCursorPosition,
+    handleTextChange,
+    handleSelect,
+  };
 }
 
 export default useCursorPosition;

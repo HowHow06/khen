@@ -32,3 +32,8 @@ export type TextTransformType =
 
 export type AlertDialogResult =
   (typeof DIALOG_RESULT)[keyof typeof DIALOG_RESULT];
+
+export type CursorPosition = {
+  start: number;
+  end: number;
+};
