@@ -556,3 +556,30 @@ export const DEFAULT_IMAGES: DropdownImagesType = [
 ];
 
 export const TEXTBOX_SETTING_KEY = "textbox" as const;
+
+export const LYRIC_SECTION_ITEMS: SelectionItemsType = [
+  {
+    label: `Section`,
+    value: LYRIC_SECTION.SECTION,
+  },
+  {
+    label: `Sub Section`,
+    value: LYRIC_SECTION.SUBSECTION,
+  },
+  {
+    label: `Main Title`,
+    value: LYRIC_SECTION.MAINTITLE,
+  },
+  {
+    label: `Secondary Title`,
+    value: LYRIC_SECTION.SECONDARYTITLE,
+  },
+  {
+    label: `Empty Slide`,
+    value: LYRIC_SECTION.EMPTYSLIDE,
+  },
+  {
+    label: `Fill Slide`,
+    value: LYRIC_SECTION.FILL_SLIDE,
+  },
+];

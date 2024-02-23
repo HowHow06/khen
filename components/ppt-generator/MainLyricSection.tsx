@@ -8,12 +8,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
-import { LYRIC_SECTION } from "@/lib/constant";
+import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { TextareaRefType } from "@/lib/types";
 import { getPinyin } from "@/lib/utils/pinyin";
 import { ChevronDown } from "lucide-react";
-import { KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
@@ -86,46 +86,6 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     }
   };
 
-  const sectionsToInsert: {
-    displayName: string;
-    value: string;
-    onSelect: () => void;
-  }[] = useMemo(
-    () => [
-      {
-        displayName: `Section`,
-        value: "/section",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.SECTION),
-      },
-      {
-        displayName: `Sub-section`,
-        value: "/sub-section",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.SUBSECTION),
-      },
-      {
-        displayName: `Main Title`,
-        value: "/main-title",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.MAINTITLE),
-      },
-      {
-        displayName: `Secondary Title`,
-        value: "/secondary-title",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.SECONDARYTITLE),
-      },
-      {
-        displayName: `Empty Slide`,
-        value: "/empty-slide",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.EMPTYSLIDE),
-      },
-      {
-        displayName: `Fill Slide`,
-        value: "/fill-slide",
-        onSelect: () => insertLyricSection(LYRIC_SECTION.FILL_SLIDE),
-      },
-    ],
-    [insertLyricSection],
-  );
-
   const setTextareaSelection = (event: Event) => {
     event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
     if (mainTextareaRef.current && cursorPosition.end) {
@@ -148,9 +108,12 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             align="start"
             onCloseAutoFocus={setTextareaSelection}
           >
-            {sectionsToInsert.map(({ displayName, onSelect, value }) => (
-              <DropdownMenuItem key={value} onSelect={onSelect}>
-                {displayName}
+            {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
+              <DropdownMenuItem
+                key={value}
+                onSelect={() => insertLyricSection(value)}
+              >
+                {label}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -212,16 +175,16 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Inserts...">
-            {sectionsToInsert.map(({ displayName, onSelect, value }) => (
+            {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
               <CommandItem
                 key={value}
-                value={value}
+                value={`/${label}`}
                 onSelect={() => {
-                  onSelect();
+                  insertLyricSection(value);
                   setShowCommand(false);
                 }}
               >
-                {displayName}
+                {label}
               </CommandItem>
             ))}
           </CommandGroup>
