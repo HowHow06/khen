@@ -89,7 +89,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     }
   };
 
-  const setTextareaSelection = (event: Event) => {
+  const setTextareaSelectionOnDropdownClose = (event: Event) => {
     event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
     if (mainTextareaRef.current && cursorPosition.end) {
       mainTextareaRef.current.selectionStart = cursorPosition.end;
@@ -109,7 +109,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            onCloseAutoFocus={setTextareaSelection}
+            onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
           >
             {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
               <DropdownMenuItem
@@ -153,7 +153,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       <CommandDialog
         open={showCommand}
         onOpenChange={setShowCommand}
-        onCloseAutoFocus={setTextareaSelection}
+        onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
       >
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
