@@ -1,7 +1,7 @@
 "use client";
 import { TEXT_TRANSFORM } from "@/lib/constant/general";
-import { TextTransformType } from "@/lib/types";
-import { capitalizeSpecificWords } from "@/lib/utils";
+import { CursorPosition, TextTransformType } from "@/lib/types";
+import { getTransformedTextByLines } from "@/lib/utils";
 import {
   convertToSimplified,
   convertToTraditional,
@@ -23,78 +23,108 @@ import {
 type Props = {
   text: string;
   setText: (text: string) => void;
+  cursorPosition?: CursorPosition;
+  onDropdownClosed?: () => void;
 };
 
-const TextTransformDropdown = ({ text, setText }: Props) => {
-  const transformText = ({ actionType }: { actionType: TextTransformType }) => {
-    const tempText = text;
-    let resultText = "";
+const TextTransformDropdown = ({
+  text,
+  setText,
+  cursorPosition,
+  onDropdownClosed,
+}: Props) => {
+  const hasSelectedText =
+    cursorPosition && cursorPosition.start !== cursorPosition.end;
 
-    text.split("\n").forEach((textLine, index, arr) => {
-      if (actionType === TEXT_TRANSFORM.LOWER) {
-        resultText += textLine.toLowerCase();
-      }
-      if (actionType === TEXT_TRANSFORM.UPPER) {
-        resultText += textLine.toUpperCase();
-      }
-      if (actionType === TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER) {
-        const searchIndex = textLine.search(/[a-zA-Z]/);
-        const firstLetterIndex = searchIndex === -1 ? 0 : searchIndex;
+  const getTextByCursorPosition = (cursorPosition: CursorPosition) => {
+    return {
+      before: text.slice(0, cursorPosition.start),
+      targetValue: text.slice(cursorPosition.start, cursorPosition.end),
+      after: text.slice(cursorPosition.end),
+    };
+  };
 
-        resultText +=
-          textLine.slice(0, firstLetterIndex) +
-          textLine.slice(firstLetterIndex, firstLetterIndex + 1).toUpperCase() +
-          textLine.slice(firstLetterIndex + 1);
-      }
-      if (actionType === TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS) {
-        resultText += capitalizeSpecificWords(textLine);
-      }
-      if (index !== arr.length - 1) {
-        resultText += "\n";
-      }
-    });
-
-    if (resultText !== "") {
-      setText(resultText);
+  const getConvertedText = ({
+    conversion,
+  }: {
+    conversion: (txt: string) => string;
+  }): string => {
+    if (!hasSelectedText) {
+      return conversion(text);
     }
-    toast.success("Text transformed", {
-      action: {
-        label: "Undo",
-        onClick: () => setText(tempText),
-      },
-      duration: 10 * 1000,
-    });
+    const { before, targetValue, after } =
+      getTextByCursorPosition(cursorPosition);
+    const convertedText = conversion(targetValue);
+    return before + convertedText + after;
+  };
+
+  const convertText = ({
+    conversion,
+    messageOnSuccess,
+  }: {
+    conversion: (txt: string) => string;
+    messageOnSuccess?: string;
+  }): void => {
+    const originalText = text;
+    const convertedText = getConvertedText({ conversion });
+    setText(convertedText);
+    if (messageOnSuccess) {
+      toast.success(messageOnSuccess, {
+        action: {
+          label: "Undo",
+          onClick: () => setText(originalText),
+        },
+        duration: 10 * 1000,
+      });
+    }
   };
 
   const onConvertToSimplifiedClick = () => {
-    const simplifiedText = convertToSimplified(text);
-    setText(simplifiedText);
-    toast.success("Text converted.");
+    convertText({
+      messageOnSuccess: `Converted to simplified chinese`,
+      conversion: convertToSimplified,
+    });
   };
 
   const onConvertToTraditionalClick = () => {
-    const convertedText = convertToTraditional(text);
-    setText(convertedText);
-    toast.success("Text converted.");
+    convertText({
+      messageOnSuccess: `Converted to traditional chinese`,
+      conversion: convertToTraditional,
+    });
   };
 
   const onReplaceCharacterClick = (toFind: string, toReplaceWith: string) => {
-    const replacedText = text.replaceAll(toFind, toReplaceWith);
-    setText(replacedText);
-    toast.success("Text replaced.");
+    convertText({
+      messageOnSuccess: `Replaced ${toFind} with ${toReplaceWith}`,
+      conversion: (text) => text.replaceAll(toFind, toReplaceWith),
+    });
   };
+
+  const transformText = ({ actionType }: { actionType: TextTransformType }) => {
+    convertText({
+      messageOnSuccess: "Text transformed",
+      conversion: (text) =>
+        getTransformedTextByLines({ targetText: text, actionType }),
+    });
+  };
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">
-            Transform Text
+            Transform {hasSelectedText && "Selected "}Text
             <ChevronDown className="ml-1" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          onCloseAutoFocus={(event) => event.preventDefault()} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            if (onDropdownClosed) {
+              onDropdownClosed();
+            }
+          }} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
         >
           <DropdownMenuItem onSelect={onConvertToSimplifiedClick}>
             Convert to Simplified Chinese
@@ -124,7 +154,7 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
                     })
                   }
                 >
-                  For each line: Capitalize First Letter
+                  Capitalize First Letter for each line
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() =>
@@ -133,7 +163,7 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
                     })
                   }
                 >
-                  For each line: Capitalize Special Words
+                  Capitalize Special Words
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={() =>

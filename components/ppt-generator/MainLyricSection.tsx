@@ -44,29 +44,22 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       return;
     }
 
-    const isCursorAtBeginning = mainText && cursorPosition !== 0;
+    const isCursorAtBeginning = mainText && cursorPosition.start !== 0;
     let textToAdd = `${LYRIC_SECTION[section]} `;
     if (isCursorAtBeginning) {
       textToAdd = "\n" + textToAdd;
     }
 
     const newText =
-      mainText.slice(0, cursorPosition) +
+      mainText.slice(0, cursorPosition.start) +
       textToAdd +
-      mainText.slice(cursorPosition);
+      mainText.slice(cursorPosition.start);
 
     setMainText(newText);
-    setCursorPosition(cursorPosition + textToAdd.length);
-
-    setTimeout(() => {
-      if (mainTextareaRef.current) {
-        mainTextareaRef.current.focus();
-        mainTextareaRef.current.selectionStart =
-          cursorPosition + textToAdd.length;
-        mainTextareaRef.current.selectionEnd =
-          cursorPosition + textToAdd.length;
-      }
-    }, 0);
+    setCursorPosition(
+      cursorPosition.start + textToAdd.length,
+      cursorPosition.start + textToAdd.length,
+    );
   };
 
   function onGeneratePinyinClick({ hasTone = false }: { hasTone: boolean }) {
@@ -90,7 +83,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="start"
-            onCloseAutoFocus={(event) => event.preventDefault()} // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+            onCloseAutoFocus={(event) => {
+              event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
+              if (mainTextareaRef.current && cursorPosition.end) {
+                mainTextareaRef.current.selectionStart = cursorPosition.end;
+                mainTextareaRef.current.focus();
+              }
+            }}
           >
             {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator /> */}
@@ -116,7 +115,20 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <TextTransformDropdown text={mainText} setText={setMainText} />
+        <TextTransformDropdown
+          text={mainText}
+          setText={setMainText}
+          cursorPosition={cursorPosition}
+          onDropdownClosed={() => {
+            if (mainTextareaRef.current && cursorPosition) {
+              mainTextareaRef.current.setSelectionRange(
+                cursorPosition.start,
+                cursorPosition.end,
+              );
+              mainTextareaRef.current.focus();
+            }
+          }}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

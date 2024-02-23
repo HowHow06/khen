@@ -1,10 +1,14 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { DEFAULT_GROUPING_NAME } from "../constant";
-import { SPECIAL_WORDS_TO_CAPITALIZE } from "../constant/general";
+import {
+  SPECIAL_WORDS_TO_CAPITALIZE,
+  TEXT_TRANSFORM,
+} from "../constant/general";
 import {
   Collection,
   ResultWithOptionalPath,
+  TextTransformType,
   traverseAndCollectOption,
 } from "../types";
 
@@ -292,4 +296,40 @@ export const getJSONFromFile = ({
       resolve(null); // Resolve with null immediately if file type is not application/json
     }
   });
+};
+
+export const getTransformedTextByLines = ({
+  targetText,
+  actionType,
+}: {
+  targetText: string;
+  actionType: TextTransformType;
+}): string => {
+  let resultText = "";
+
+  targetText.split("\n").forEach((textLine, index, arr) => {
+    if (actionType === TEXT_TRANSFORM.LOWER) {
+      resultText += textLine.toLowerCase();
+    }
+    if (actionType === TEXT_TRANSFORM.UPPER) {
+      resultText += textLine.toUpperCase();
+    }
+    if (actionType === TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER) {
+      const searchIndex = textLine.search(/[a-zA-Z]/);
+      const firstLetterIndex = searchIndex === -1 ? 0 : searchIndex;
+
+      resultText +=
+        textLine.slice(0, firstLetterIndex) +
+        textLine.slice(firstLetterIndex, firstLetterIndex + 1).toUpperCase() +
+        textLine.slice(firstLetterIndex + 1);
+    }
+    if (actionType === TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS) {
+      resultText += capitalizeSpecificWords(textLine);
+    }
+    if (index !== arr.length - 1) {
+      resultText += "\n";
+    }
+  });
+
+  return resultText;
 };
