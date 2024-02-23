@@ -32,7 +32,8 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
             text={secondaryText}
             setText={setSecondaryText}
             cursorPosition={cursorPosition}
-            onDropdownClosed={() => {
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
               if (textAreaRef.current && cursorPosition) {
                 textAreaRef.current.setSelectionRange(
                   cursorPosition.start,
