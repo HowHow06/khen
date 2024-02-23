@@ -137,9 +137,6 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   return (
     <div className="">
       <div className="my-2 flex flex-wrap gap-2">
-        {/* <Button variant="outline" onClick={insertSection}>
-          Test Button Insert Section
-        </Button> */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -199,7 +196,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       </div>
       <Textarea
         ref={mainTextareaRef}
-        placeholder="Insert the main lyrics here."
+        placeholder="Insert the main lyrics here. Press '/' for insert command."
         className="min-h-96 md:min-h-80"
         value={mainText}
         onChange={handleTextChange}
