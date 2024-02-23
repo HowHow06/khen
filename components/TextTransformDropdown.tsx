@@ -13,6 +13,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
@@ -109,34 +113,45 @@ const TextTransformDropdown = ({ text, setText }: Props) => {
             他<ArrowRight />祂
           </DropdownMenuItem>
 
-          <DropdownMenuItem
-            onSelect={() =>
-              transformText({
-                actionType: TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER,
-              })
-            }
-          >
-            For each line: Capitalize First Letter
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() =>
-              transformText({
-                actionType: TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS,
-              })
-            }
-          >
-            For each line: Capitalize Special Words
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => transformText({ actionType: TEXT_TRANSFORM.LOWER })}
-          >
-            To Lowercase
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => transformText({ actionType: TEXT_TRANSFORM.UPPER })}
-          >
-            To Uppercase
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    transformText({
+                      actionType: TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER,
+                    })
+                  }
+                >
+                  For each line: Capitalize First Letter
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    transformText({
+                      actionType: TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS,
+                    })
+                  }
+                >
+                  For each line: Capitalize Special Words
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    transformText({ actionType: TEXT_TRANSFORM.LOWER })
+                  }
+                >
+                  To Lowercase
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    transformText({ actionType: TEXT_TRANSFORM.UPPER })
+                  }
+                >
+                  To Uppercase
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
