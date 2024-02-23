@@ -14,16 +14,15 @@ type SecondaryLyricSectionProps = {};
 const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
   const { secondaryText, setSecondaryText } = usePptGeneratorFormContext();
   const textAreaRef = useRef<TextareaRefType>(null);
-  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSecondaryText(event.target.value);
-    cursorHandleTextChange(event);
-  };
   const {
     cursorPosition,
     handleSelect: cursorHandleSelect,
     handleTextChange: cursorHandleTextChange,
-    setCursorPosition,
   } = useCursorPosition();
+  const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setSecondaryText(event.target.value);
+    cursorHandleTextChange(event);
+  };
 
   return (
     <>
