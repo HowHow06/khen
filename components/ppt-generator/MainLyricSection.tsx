@@ -1,27 +1,18 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
-import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
-import { getTextInsertedAtPosition } from "@/lib/utils";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
 import GeneratePinyinDropdown from "../GeneratePinyinDropdown";
+import LyricSectionCommand from "../LyricSectionCommand";
 import SectionInsertDropdown from "../SectionInsertDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
 
 type MainLyricSectionProps = {};
 
@@ -75,23 +66,6 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     setMainText(event.target.value);
     cursorHandleTextChange(event);
   };
-
-  const insertLyricSection = useCallback(
-    ({ section }: { section: string }) => {
-      const { resultText, insertedText } = getTextInsertedAtPosition({
-        originalText: mainText,
-        positionToInsert: cursorPosition.start,
-        textToInsert: `${section} `,
-      });
-
-      setMainTextHandler(resultText);
-      setCursorPosition(
-        cursorPosition.start + insertedText.length,
-        cursorPosition.start + insertedText.length,
-      );
-    },
-    [mainText, cursorPosition.start, setCursorPosition, setMainTextHandler],
-  );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "/") {
@@ -154,30 +128,14 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         onSelect={cursorHandleSelect}
         onKeyDown={handleKeyDown}
       />
-      <CommandDialog
+      <LyricSectionCommand
         open={showCommand}
         onOpenChange={setShowCommand}
         onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
-      >
-        <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Inserts...">
-            {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
-              <CommandItem
-                key={value}
-                value={`/${label}`}
-                onSelect={() => {
-                  insertLyricSection({ section: value });
-                  setShowCommand(false);
-                }}
-              >
-                {label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </CommandDialog>
+        cursorPosition={cursorPosition}
+        text={mainText}
+        setText={setMainTextForSectionInsertion}
+      />
     </div>
   );
 };
