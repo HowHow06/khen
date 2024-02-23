@@ -10,6 +10,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
+import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
 import { getTextInsertedAtPosition } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
@@ -42,6 +43,23 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     handleSelect: cursorHandleSelect,
   } = useCursorPosition();
   const [showCommand, setShowCommand] = useState<boolean>(false);
+  const onUndoCallback = useCallback(
+    (lastText: string) => setMainText(lastText),
+    [setMainText],
+  );
+
+  const { saveToUndoStack } = useUndoStack({
+    ref: mainTextareaRef,
+    onUndo: onUndoCallback,
+  });
+
+  const setMainTextHandler = useCallback(
+    (newText: string) => {
+      saveToUndoStack(mainText);
+      setMainText(newText);
+    },
+    [mainText, saveToUndoStack, setMainText],
+  );
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainText(event.target.value);
@@ -56,13 +74,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         textToInsert: `${section} `,
       });
 
-      setMainText(resultText);
+      setMainTextHandler(resultText);
       setCursorPosition(
         cursorPosition.start + insertedText.length,
         cursorPosition.start + insertedText.length,
       );
     },
-    [mainText, cursorPosition.start, setCursorPosition, setMainText],
+    [mainText, cursorPosition.start, setCursorPosition, setMainTextHandler],
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,7 +123,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         </DropdownMenu>
         <TextTransformDropdown
           text={mainText}
-          setText={setMainText}
+          setText={setMainTextHandler}
           cursorPosition={cursorPosition}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
@@ -119,9 +137,9 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           }}
         />
         <GeneratePinyinDropdown setText={setSecondaryText} text={mainText} />
-        <FindAndReplaceButton text={mainText} setText={setMainText} />
+        <FindAndReplaceButton text={mainText} setText={setMainTextHandler} />
         <CopyToClipboardButton text={mainText} />
-        <ClearTextButton text={mainText} setText={setMainText} />
+        <ClearTextButton text={mainText} setText={setMainTextHandler} />
       </div>
       <Textarea
         ref={mainTextareaRef}
