@@ -1,14 +1,14 @@
 import { RefObject, useCallback, useEffect, useState } from "react";
 
-type Props = {
+type Props<T> = {
   ref: RefObject<HTMLElement>; // Accept a generic ref to an HTML element
-  onUndo: (lastState: string) => void;
+  onUndo: (lastState: T) => void;
 };
 
-const useUndoStack = ({ ref, onUndo }: Props) => {
-  const [undoStack, setUndoStack] = useState<string[]>([]);
+const useUndoStack = <T = string>({ ref, onUndo }: Props<T>) => {
+  const [undoStack, setUndoStack] = useState<T[]>([]);
 
-  const saveToUndoStack = useCallback((currentText: string) => {
+  const saveToUndoStack = useCallback((currentText: T) => {
     setUndoStack((prevStack) => [...prevStack, currentText]);
   }, []);
 
@@ -18,7 +18,7 @@ const useUndoStack = ({ ref, onUndo }: Props) => {
         return prevStack;
       }
       const newStack = [...prevStack];
-      const lastState = newStack.pop() as string;
+      const lastState = newStack.pop() as T;
       onUndo(lastState);
       return newStack;
     });
