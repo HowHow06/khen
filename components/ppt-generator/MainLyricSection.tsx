@@ -54,6 +54,23 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     [mainText, saveToUndoStack, setMainText],
   );
 
+  const setMainTextForSectionInsertion = useCallback(
+    (newText: string) => {
+      setMainTextHandler(newText);
+      const insertedTextLength = newText.length - mainText.length;
+      setCursorPosition(
+        cursorPosition.start + insertedTextLength,
+        cursorPosition.start + insertedTextLength,
+      );
+    },
+    [
+      cursorPosition.start,
+      mainText.length,
+      setCursorPosition,
+      setMainTextHandler,
+    ],
+  );
+
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainText(event.target.value);
     cursorHandleTextChange(event);
@@ -95,14 +112,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       <div className="my-2 flex flex-wrap gap-2">
         <SectionInsertDropdown
           text={mainText}
-          setText={(newText) => {
-            setMainTextHandler(newText);
-            const insertedTextLength = newText.length - mainText.length;
-            setCursorPosition(
-              cursorPosition.start + insertedTextLength,
-              cursorPosition.start + insertedTextLength,
-            );
-          }}
+          setText={setMainTextForSectionInsertion}
           cursorPosition={cursorPosition}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
