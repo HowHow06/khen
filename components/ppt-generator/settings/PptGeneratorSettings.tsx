@@ -1,6 +1,7 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
+import FormSelect from "@/components/ui/form-select";
 import {
   CONTENT_TYPE,
   DEFAULT_LINE_COUNT_PER_SLIDE,
@@ -17,11 +18,11 @@ import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   BaseSettingMetaType,
-  ComboboxItemsType,
   PptSettingsStateType,
   PptSettingsUIState,
   SectionSettingsKeyType,
   SectionSettingsType,
+  SelectionItemsType,
 } from "@/lib/types";
 import {
   cn,
@@ -44,7 +45,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import BaseSettings from "./BaseSettings";
 import GroupedBaseSettings from "./GroupedBaseSettings";
 import PresetsDropdown from "./PresetsDropdown";
-import SectionsCombobox from "./SectionsCombobox";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
 const PptSettingsTabLists = () => {
@@ -292,7 +292,7 @@ const PptGeneratorSetting = () => {
   const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
-  const [sectionItems, setSectionItems] = useState<ComboboxItemsType>([
+  const [sectionItems, setSectionItems] = useState<SelectionItemsType>([
     {
       value: MAIN_SECTION_NAME,
       label: "Main Section",
@@ -428,10 +428,11 @@ const PptGeneratorSetting = () => {
               />
             </div>
             {isDifferentSettingsBySection && (
-              <SectionsCombobox
+              <FormSelect
                 items={sectionItems}
                 selectedValue={currentSection}
                 onItemSelect={(value) => setCurrentSection(value)}
+                className="w-full"
               />
             )}
           </SheetHeader>
