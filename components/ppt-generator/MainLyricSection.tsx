@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { TextareaRefType } from "@/lib/types";
+import { getTextInsertedAtPosition } from "@/lib/utils";
 import { getPinyin } from "@/lib/utils/pinyin";
 import { ChevronDown } from "lucide-react";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
@@ -49,26 +50,17 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   };
 
   const insertLyricSection = useCallback(
-    (section: string) => {
-      if (!mainTextareaRef.current) {
-        return;
-      }
+    ({ section }: { section: string }) => {
+      const { resultText, insertedText } = getTextInsertedAtPosition({
+        originalText: mainText,
+        positionToInsert: cursorPosition.start,
+        textToInsert: `${section} `,
+      });
 
-      const isCursorAtBeginning = !mainText || cursorPosition.start === 0;
-      let textToAdd = `${section} `;
-      if (!isCursorAtBeginning) {
-        textToAdd = "\n" + textToAdd;
-      }
-
-      const newText =
-        mainText.slice(0, cursorPosition.start) +
-        textToAdd +
-        mainText.slice(cursorPosition.start);
-
-      setMainText(newText);
+      setMainText(resultText);
       setCursorPosition(
-        cursorPosition.start + textToAdd.length,
-        cursorPosition.start + textToAdd.length,
+        cursorPosition.start + insertedText.length,
+        cursorPosition.start + insertedText.length,
       );
     },
     [mainText, cursorPosition.start, setCursorPosition, setMainText],
@@ -111,7 +103,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
               <DropdownMenuItem
                 key={value}
-                onSelect={() => insertLyricSection(value)}
+                onSelect={() => insertLyricSection({ section: value })}
               >
                 {label}
               </DropdownMenuItem>
@@ -180,7 +172,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
                 key={value}
                 value={`/${label}`}
                 onSelect={() => {
-                  insertLyricSection(value);
+                  insertLyricSection({ section: value });
                   setShowCommand(false);
                 }}
               >

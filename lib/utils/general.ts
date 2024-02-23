@@ -333,3 +333,26 @@ export const getTransformedTextByLines = ({
 
   return resultText;
 };
+
+export const getTextInsertedAtPosition = ({
+  textToInsert,
+  originalText,
+  positionToInsert,
+}: {
+  textToInsert: string;
+  originalText: string;
+  positionToInsert: number;
+}) => {
+  const isCursorAtBeginning = !originalText || positionToInsert === 0;
+  let textToAdd = textToInsert;
+  if (!isCursorAtBeginning) {
+    textToAdd = "\n" + textToAdd;
+  }
+
+  const resultText =
+    originalText.slice(0, positionToInsert) +
+    textToAdd +
+    originalText.slice(positionToInsert);
+
+  return { resultText, insertedText: textToAdd };
+};
