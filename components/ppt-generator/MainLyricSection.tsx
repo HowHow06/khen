@@ -1,24 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
 import { getTextInsertedAtPosition } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
 import GeneratePinyinDropdown from "../GeneratePinyinDropdown";
+import SectionInsertDropdown from "../SectionInsertDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import {
@@ -100,27 +93,28 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   return (
     <div className="">
       <div className="my-2 flex flex-wrap gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Insert...
-              <ChevronDown className="ml-1" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
-          >
-            {LYRIC_SECTION_ITEMS.map(({ label, value }) => (
-              <DropdownMenuItem
-                key={value}
-                onSelect={() => insertLyricSection({ section: value })}
-              >
-                {label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SectionInsertDropdown
+          text={mainText}
+          setText={(newText) => {
+            setMainTextHandler(newText);
+            const insertedTextLength = newText.length - mainText.length;
+            setCursorPosition(
+              cursorPosition.start + insertedTextLength,
+              cursorPosition.start + insertedTextLength,
+            );
+          }}
+          cursorPosition={cursorPosition}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            if (mainTextareaRef.current && cursorPosition) {
+              mainTextareaRef.current.setSelectionRange(
+                cursorPosition.start,
+                cursorPosition.end,
+              );
+              mainTextareaRef.current.focus();
+            }
+          }}
+        />
         <TextTransformDropdown
           text={mainText}
           setText={setMainTextHandler}
