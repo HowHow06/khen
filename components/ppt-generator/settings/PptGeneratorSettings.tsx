@@ -377,7 +377,13 @@ const PptGeneratorSetting = () => {
 
   return (
     <div className="flex flex-row space-x-2">
-      <Sheet modal={isExtraSmallScreen ? true : false} open={isOpen}>
+      <Sheet
+        modal={isExtraSmallScreen ? true : false}
+        open={isOpen}
+        onOpenChange={(val) => {
+          setIsOpen(val), console.log("CHANED!", val);
+        }}
+      >
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
             {isOpen ? "Close" : "Open"} Settings
@@ -402,17 +408,16 @@ const PptGeneratorSetting = () => {
         )}
 
         <SheetContent
-          onPointerDownOutside={
-            isExtraSmallScreen
-              ? () => setIsOpen(false)
-              : (event) => event.preventDefault()
-          }
-          setIsOpen={setIsOpen}
           className={cn(
             "w-100 h-4/5 sm:h-full sm:w-96 xl:w-1/4",
             isExtraSmallScreen && "rounded-t-3xl shadow-md",
           )}
           side={isExtraSmallScreen ? "bottom" : "right"}
+          onInteractOutside={
+            isExtraSmallScreen
+              ? () => setIsOpen(false)
+              : (event) => event.preventDefault()
+          }
         >
           <SheetHeader>
             <div className="flex flex-row items-center space-x-5">
