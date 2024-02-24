@@ -338,7 +338,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
   glowSize: {
     fieldDisplayName: "Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
-    defaultValue: 4,
+    defaultValue: 7,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -360,7 +360,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
   glowOpacity: {
     fieldDisplayName: "Opacity",
     fieldType: SETTING_FIELD_TYPE.PERCENTAGE,
-    defaultValue: 0.25,
+    defaultValue: 0.4,
     useProportionForm: true,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>

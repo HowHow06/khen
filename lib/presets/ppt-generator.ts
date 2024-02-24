@@ -42,9 +42,9 @@ export const onsiteChinesePreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -82,9 +82,9 @@ export const onsiteChinesePreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 8,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -155,9 +155,9 @@ export const liveChinesePreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -195,9 +195,9 @@ export const liveChinesePreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 8,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -268,9 +268,9 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -308,9 +308,9 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -381,9 +381,9 @@ export const liveEnglishPreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
@@ -421,9 +421,9 @@ export const liveEnglishPreset: PptSettingsStateType = {
       },
       glow: {
         hasGlow: false,
-        glowSize: 0,
+        glowSize: 7,
         glowColor: "#000000",
-        glowOpacity: 0.25,
+        glowOpacity: 0.4,
       },
       outline: {
         hasOutline: false,
