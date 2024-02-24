@@ -156,7 +156,6 @@ const TextTransformDropdown = ({
           >
             他<ArrowRight />祂
           </DropdownMenuItem>
-
           <MoreActionsWrapper>
             <DropdownMenuItem
               onSelect={() =>
@@ -166,6 +165,15 @@ const TextTransformDropdown = ({
               }
             >
               Capitalize First Letter for each line
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() =>
+                transformText({
+                  actionType: TEXT_TRANSFORM.CAPITALIZE_EACH_WORD,
+                })
+              }
+            >
+              Capitalize Each Word
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() =>

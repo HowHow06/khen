@@ -263,6 +263,15 @@ export function capitalizeSpecificWords(inputString: string) {
   return result;
 }
 
+export function capitalizeEachWord(input: string): string {
+  return input
+    .split(" ") // Split the string into words
+    .map(
+      (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(), // Capitalize the first letter of each word and make the rest lowercase
+    )
+    .join(" "); // Join the words back into a single string
+}
+
 export const getJSONFromFile = ({
   file,
 }: {
@@ -325,6 +334,9 @@ export const getTransformedTextByLines = ({
     }
     if (actionType === TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS) {
       resultText += capitalizeSpecificWords(textLine);
+    }
+    if (actionType === TEXT_TRANSFORM.CAPITALIZE_EACH_WORD) {
+      resultText += capitalizeEachWord(textLine);
     }
     if (index !== arr.length - 1) {
       resultText += "\n";
