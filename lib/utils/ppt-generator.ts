@@ -846,6 +846,13 @@ export const generatePpt = async ({
   const sectionsBackgroundProp: PptxGenJS.default.BackgroundProps[] = [];
   if (useDifferentSettingForEachSection && section) {
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
+      if (
+        sectionSetting.general?.useMainBackgroundColor &&
+        sectionSetting.general?.useMainBackgroundImage
+      ) {
+        // no point to create master slides for this section
+        return;
+      }
       const sectionBackgroundColor =
         sectionSetting.general?.sectionBackgroundColor ??
         PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor
@@ -860,7 +867,7 @@ export const generatePpt = async ({
           ? mainBackgroundColorToUse
           : sectionBackgroundColor,
         backgroundImage: sectionSetting.general?.useMainBackgroundImage
-          ? mainBackgroundImageToUse
+          ? null // no need to recreate the main image, the image wont be used, and will increase the file size
           : sectionBackgroundImage,
       });
       sectionsBackgroundProp.push(backgroundProp);
