@@ -1,5 +1,6 @@
 "use client";
-import { TEXT_TRANSFORM } from "@/lib/constant/general";
+import { SCREEN_SIZE, TEXT_TRANSFORM } from "@/lib/constant/general";
+import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { CursorPosition, TextTransformType } from "@/lib/types";
 import { getTransformedTextByLines } from "@/lib/utils";
 import {
@@ -33,6 +34,8 @@ const TextTransformDropdown = ({
   cursorPosition,
   onCloseAutoFocus,
 }: Props) => {
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
   const hasSelectedText =
     cursorPosition && cursorPosition.start !== cursorPosition.end;
 
@@ -108,6 +111,18 @@ const TextTransformDropdown = ({
     });
   };
 
+  const MoreActionsWrapper = ({ children }: { children: React.ReactNode }) =>
+    isExtraSmallScreen ? (
+      <>{children}</>
+    ) : (
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>{children}</DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
+    );
+
   return (
     <>
       <DropdownMenu>
@@ -142,45 +157,40 @@ const TextTransformDropdown = ({
             他<ArrowRight />祂
           </DropdownMenuItem>
 
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem
-                  onSelect={() =>
-                    transformText({
-                      actionType: TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER,
-                    })
-                  }
-                >
-                  Capitalize First Letter for each line
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() =>
-                    transformText({
-                      actionType: TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS,
-                    })
-                  }
-                >
-                  Capitalize Special Words
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() =>
-                    transformText({ actionType: TEXT_TRANSFORM.LOWER })
-                  }
-                >
-                  To Lowercase
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() =>
-                    transformText({ actionType: TEXT_TRANSFORM.UPPER })
-                  }
-                >
-                  To Uppercase
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+          <MoreActionsWrapper>
+            <DropdownMenuItem
+              onSelect={() =>
+                transformText({
+                  actionType: TEXT_TRANSFORM.CAPITALIZE_FIRST_LETTER,
+                })
+              }
+            >
+              Capitalize First Letter for each line
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() =>
+                transformText({
+                  actionType: TEXT_TRANSFORM.CAPITALIZE_SPECIAL_WORDS,
+                })
+              }
+            >
+              Capitalize Special Words
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() =>
+                transformText({ actionType: TEXT_TRANSFORM.LOWER })
+              }
+            >
+              To Lowercase
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() =>
+                transformText({ actionType: TEXT_TRANSFORM.UPPER })
+              }
+            >
+              To Uppercase
+            </DropdownMenuItem>
+          </MoreActionsWrapper>
         </DropdownMenuContent>
       </DropdownMenu>
     </>
