@@ -68,11 +68,11 @@ const PptSettingsTabLists = () => {
 
 const GeneralSettingsTabContent = ({
   isUseSectionSettings = true,
-  isSectionGeneral = false,
+  isForSection = false,
   sectionValue,
 }: {
   isUseSectionSettings?: boolean;
-  isSectionGeneral?: boolean;
+  isForSection?: boolean;
   sectionValue?: string;
 }) => {
   const { form } = usePptGeneratorFormContext();
@@ -83,7 +83,7 @@ const GeneralSettingsTabContent = ({
     settings.section?.[sectionValue as SectionSettingsKeyType]?.general
       .useMainSectionSettings;
   const settingMetaToUse: BaseSettingMetaType = useMemo(() => {
-    if (!isSectionGeneral || sectionValue === undefined) {
+    if (!isForSection || sectionValue === undefined) {
       return PPT_GENERATION_SETTINGS_META.general;
     }
 
@@ -94,7 +94,7 @@ const GeneralSettingsTabContent = ({
       };
     }
     return PPT_GENERATION_SETTINGS_META.section;
-  }, [isSectionGeneral, sectionValue, isSectionUseMainSectionSettings]);
+  }, [isForSection, sectionValue, isSectionUseMainSectionSettings]);
 
   return (
     <TabsContent value={SETTING_CATEGORY.GENERAL}>
@@ -107,7 +107,7 @@ const GeneralSettingsTabContent = ({
         <BaseSettings
           settingsMeta={settingMetaToUse}
           keyPrefix={
-            isSectionGeneral
+            isForSection
               ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.GENERAL}.`
               : SETTING_CATEGORY.GENERAL + "."
           }
@@ -122,16 +122,16 @@ const CoverSettingsTabContent = ({
   settingsUIState,
   setCurrentCoverTab,
   isUseSectionSettings = true,
-  isSectionGeneral = false,
+  isForSection = false,
   sectionValue,
 }: {
   settingsUIState?: PptSettingsUIState;
   setCurrentCoverTab?: (tab: string) => void;
   isUseSectionSettings?: boolean;
-  isSectionGeneral?: boolean;
+  isForSection?: boolean;
   sectionValue?: string;
 }) => {
-  const prefix = isSectionGeneral
+  const prefix = isForSection
     ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.COVER}.`
     : SETTING_CATEGORY.COVER + ".";
   return (
@@ -183,20 +183,33 @@ const ContentSettingsTabContent = ({
   settingsUIState,
   setCurrentContentTab,
   isUseSectionSettings = true,
-  isSectionGeneral = false,
+  isForSection = false,
   sectionValue,
   settingsValues,
 }: {
   settingsUIState?: PptSettingsUIState;
   setCurrentContentTab?: (tab: string) => void;
   isUseSectionSettings?: boolean;
-  isSectionGeneral?: boolean;
+  isForSection?: boolean;
   sectionValue?: string;
   settingsValues: PptSettingsStateType;
 }) => {
-  const categoryPrefix = isSectionGeneral
+  const isUsingSectionSettings =
+    isForSection && settingsValues.section && sectionValue;
+  const isSingleLineMode = isUsingSectionSettings
+    ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
+        .singleLineMode
+    : settingsValues.general.singleLineMode;
+
+  const isIgnoreSubcontent = isUsingSectionSettings
+    ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
+        .ignoreSubcontent
+    : settingsValues.general.ignoreSubcontent;
+
+  const categoryPrefix = isUsingSectionSettings
     ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.CONTENT}`
     : SETTING_CATEGORY.CONTENT;
+
   const groupedContentSettings = useMemo(() => {
     return groupByAsObject(
       PPT_GENERATION_SETTINGS_META.content,
@@ -205,10 +218,7 @@ const ContentSettingsTabContent = ({
   }, []);
 
   const groupedTextBoxSettings = useMemo(() => {
-    const textBoxCount = settingsValues.general.singleLineMode
-      ? 1
-      : DEFAULT_LINE_COUNT_PER_SLIDE;
-
+    const textBoxCount = isSingleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
     return Array.from({
       length: textBoxCount,
     }).reduce<{}>((result, _, currentIndex) => {
@@ -218,7 +228,15 @@ const ContentSettingsTabContent = ({
           PPT_GENERATION_SETTINGS_META.contentTextbox,
       };
     }, {});
-  }, [settingsValues.general.singleLineMode]);
+  }, [isSingleLineMode]);
+
+  if (
+    isIgnoreSubcontent &&
+    setCurrentContentTab &&
+    settingsUIState?.currentContentTab !== CONTENT_TYPE.MAIN
+  ) {
+    setCurrentContentTab(CONTENT_TYPE.MAIN);
+  }
 
   return (
     <TabsContent value={SETTING_CATEGORY.CONTENT}>
@@ -228,10 +246,12 @@ const ContentSettingsTabContent = ({
         onValueChange={setCurrentContentTab}
         className="w-full px-2"
       >
-        <TabsList className="my-2 grid w-full grid-cols-2">
-          <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-          <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
-        </TabsList>
+        {!isIgnoreSubcontent && (
+          <TabsList className="my-2 grid w-full grid-cols-2">
+            <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
+            <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
+          </TabsList>
+        )}
         <TabsContent value={CONTENT_TYPE.MAIN}>
           <ScrollArea
             className={cn(
@@ -253,27 +273,29 @@ const ContentSettingsTabContent = ({
             />
           </ScrollArea>
         </TabsContent>
-        <TabsContent value={CONTENT_TYPE.SECONDARY}>
-          <ScrollArea
-            className={cn(
-              "h-[50vh] pr-3 sm:h-[72vh]",
-              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
-            )}
-          >
-            <GroupedBaseSettings
-              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
-              accordionKey={CONTENT_TYPE.SECONDARY + TEXTBOX_SETTING_KEY}
-              groupedSettingsMeta={groupedTextBoxSettings}
-            />
-            <GroupedBaseSettings
-              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.`}
-              accordionKey={CONTENT_TYPE.SECONDARY}
-              groupedSettingsMeta={groupedContentSettings}
-              defaultAccordionValue={[`text`]}
-              className="pb-5 xl:pb-10"
-            />
-          </ScrollArea>
-        </TabsContent>
+        {!isIgnoreSubcontent && (
+          <TabsContent value={CONTENT_TYPE.SECONDARY}>
+            <ScrollArea
+              className={cn(
+                "h-[50vh] pr-3 sm:h-[72vh]",
+                isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
+              )}
+            >
+              <GroupedBaseSettings
+                keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
+                accordionKey={CONTENT_TYPE.SECONDARY + TEXTBOX_SETTING_KEY}
+                groupedSettingsMeta={groupedTextBoxSettings}
+              />
+              <GroupedBaseSettings
+                keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.`}
+                accordionKey={CONTENT_TYPE.SECONDARY}
+                groupedSettingsMeta={groupedContentSettings}
+                defaultAccordionValue={[`text`]}
+                className="pb-5 xl:pb-10"
+              />
+            </ScrollArea>
+          </TabsContent>
+        )}
       </Tabs>
     </TabsContent>
   );
@@ -375,6 +397,9 @@ const PptGeneratorSetting = () => {
     settingsValues.section?.[currentSection as SectionSettingsKeyType]?.general
       ?.useMainSectionSettings;
 
+  const isUserAtSectionSettings =
+    isDifferentSettingsBySection && currentSection !== MAIN_SECTION_NAME;
+
   return (
     <div className="flex flex-row space-x-2">
       <Sheet
@@ -439,8 +464,7 @@ const PptGeneratorSetting = () => {
               />
             )}
           </SheetHeader>
-          {isDifferentSettingsBySection &&
-          currentSection !== MAIN_SECTION_NAME ? (
+          {isUserAtSectionSettings ? (
             <Tabs
               defaultValue={SETTING_CATEGORY.GENERAL}
               className="mt-2 w-full"
@@ -471,15 +495,15 @@ const PptGeneratorSetting = () => {
                 </ScrollArea>
               )}
               <GeneralSettingsTabContent
-                isSectionGeneral={true}
+                isForSection={true}
                 sectionValue={currentSection}
               />
               <CoverSettingsTabContent
-                isSectionGeneral={true}
+                isForSection={true}
                 sectionValue={currentSection}
               />
               <ContentSettingsTabContent
-                isSectionGeneral={true}
+                isForSection={true}
                 sectionValue={currentSection}
                 settingsValues={settingsValues}
               />
