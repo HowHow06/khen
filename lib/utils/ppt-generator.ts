@@ -847,11 +847,12 @@ export const generatePpt = async ({
   if (useDifferentSettingForEachSection && section) {
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
       if (
-        sectionSetting.general?.useMainBackgroundColor &&
-        sectionSetting.general?.useMainBackgroundImage
+        sectionSetting.general?.useMainSectionSettings ||
+        (sectionSetting.general?.useMainBackgroundColor &&
+          sectionSetting.general?.useMainBackgroundImage)
       ) {
         // no point to create master slides for this section
-        return;
+        continue;
       }
       const sectionBackgroundColor =
         sectionSetting.general?.sectionBackgroundColor ??
