@@ -64,9 +64,9 @@ export const SETTING_CATEGORY = {
 export const LYRIC_SECTION = {
   SECTION: "----",
   SUBSECTION: "---",
-  MAINTITLE: "#",
-  SECONDARYTITLE: "##",
-  EMPTYSLIDE: "***",
+  MAIN_TITLE: "#",
+  SECONDARY_TITLE: "##",
+  EMPTY_SLIDE: "***",
   FILL_SLIDE: "**",
 } as const;
 
@@ -210,16 +210,16 @@ const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
     defaultValue: true,
     tips: "If unchecked, background image will be used for empty slides.",
   },
-  ignoreSubcontent: {
-    fieldDisplayName: "Ignore Secondary Content",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-  },
   useSingleTextbox: {
     fieldDisplayName: "Use Single Textbox",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    isNotAvailable: true,
+    isNotAvailable: true, //TODO: to implement
+  },
+  ignoreSubcontent: {
+    fieldDisplayName: "Ignore Secondary Content",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
   },
   singleLineMode: {
     fieldDisplayName: "Single Line Mode",
@@ -568,15 +568,15 @@ export const LYRIC_SECTION_ITEMS: SelectionItemsType = [
   },
   {
     label: `Main Title`,
-    value: LYRIC_SECTION.MAINTITLE,
+    value: LYRIC_SECTION.MAIN_TITLE,
   },
   {
     label: `Secondary Title`,
-    value: LYRIC_SECTION.SECONDARYTITLE,
+    value: LYRIC_SECTION.SECONDARY_TITLE,
   },
   {
     label: `Empty Slide`,
-    value: LYRIC_SECTION.EMPTYSLIDE,
+    value: LYRIC_SECTION.EMPTY_SLIDE,
   },
   {
     label: `Fill Slide`,

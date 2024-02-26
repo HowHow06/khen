@@ -458,17 +458,17 @@ function createSlidesFromLyrics({
     // });
 
     // 2. check if is cover, update current line
-    const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAINTITLE} `);
+    const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAIN_TITLE} `);
     if (isCover) {
       currentSectionCoverCount++;
       const regex = /^#[^#]*/;
       const mainTitle = currentLine
         .match(regex)?.[0]
-        .replace(`${LYRIC_SECTION.MAINTITLE}`, "")
+        .replace(`${LYRIC_SECTION.MAIN_TITLE}`, "")
         .trim();
       currentLine = mainTitle || currentLine;
     }
-    const isEmptySlide = primaryLine.startsWith(`${LYRIC_SECTION.EMPTYSLIDE}`);
+    const isEmptySlide = primaryLine.startsWith(`${LYRIC_SECTION.EMPTY_SLIDE}`);
     if (isEmptySlide) {
       const remainder = currentIndex % linePerSlide;
       currentSectionEmptySlideWeight =
@@ -535,13 +535,13 @@ function createSlidesFromLyrics({
       }
       if (isCover) {
         const subCoverLineIndex = secondaryLine.indexOf(
-          `${LYRIC_SECTION.SECONDARYTITLE} `,
+          `${LYRIC_SECTION.SECONDARY_TITLE} `,
         );
         const hasSecondaryTitle = subCoverLineIndex !== -1;
 
         secondaryLine = hasSecondaryTitle
           ? secondaryLine.substring(subCoverLineIndex + 3)
-          : secondaryLine.replace(`${LYRIC_SECTION.MAINTITLE} `, ""); // use the pinyin if no secondary title
+          : secondaryLine.replace(`${LYRIC_SECTION.MAIN_TITLE} `, ""); // use the pinyin if no secondary title
       }
       const secondaryContentOption = isUseSectionSettings
         ? currentSectionSetting.content.secondary
