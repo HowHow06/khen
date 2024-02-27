@@ -22,7 +22,6 @@ const LyricSectionCommand = ({
   text,
   setText,
   cursorPosition,
-  onOpenChange,
   ...restProps
 }: Props) => {
   const insertLyricSection = useCallback(
@@ -50,8 +49,8 @@ const LyricSectionCommand = ({
               value={`/${label}`}
               onSelect={() => {
                 insertLyricSection({ section: value });
-                if (onOpenChange) {
-                  onOpenChange(false);
+                if (restProps.onOpenChange) {
+                  restProps.onOpenChange(false);
                 }
               }}
             >

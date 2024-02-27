@@ -47,6 +47,7 @@ import GroupedBaseSettings from "./GroupedBaseSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
+//TODO: refactor this whole page
 const PptSettingsTabLists = () => {
   return (
     <ScrollArea className="w-full pb-3">
