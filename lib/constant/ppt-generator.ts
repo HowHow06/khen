@@ -323,6 +323,14 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     defaultValue: 2,
     groupingName: "text",
   },
+  lineSpacingMultiple: {
+    fieldDisplayName: "Line Spacing Multiple",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 1.0,
+    groupingName: "text",
+    tips: "1.0 represents single-spacing; 1.5 represents one and a half times the standard line height etc.",
+    pptxgenName: "lineSpacingMultiple",
+  },
   align: {
     fieldDisplayName: "Align",
     fieldType: SETTING_FIELD_TYPE.HORIZONTAL_ALIGN,
