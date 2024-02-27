@@ -34,6 +34,7 @@ import {
   SETTING_FIELD_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
+import { BREAK_LINE } from "../constant/general";
 import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
   BaseSettingMetaType,
@@ -766,6 +767,18 @@ function addTextLineToSlide({
     ...DEFAULT_BASE_OPTION,
     ...textOption,
   };
+
+  if (line.indexOf(BREAK_LINE) !== -1) {
+    const textObjects = line.split(BREAK_LINE).map((txt) => {
+      return {
+        text: txt,
+        options: { breakLine: true },
+      };
+    });
+    slide.addText(textObjects, finalOption);
+
+    return;
+  }
 
   slide.addText(line, finalOption);
 }

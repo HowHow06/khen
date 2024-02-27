@@ -37,3 +37,5 @@ export const SPECIAL_WORDS_TO_CAPITALIZE: { [key in string]: string } = {
   godhead: "Godhead",
   "three in one": "Three in One",
 };
+
+export const BREAK_LINE = "\\n";
