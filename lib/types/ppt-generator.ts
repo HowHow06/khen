@@ -122,6 +122,7 @@ export type BaseSettingItemMetaType = {
     | ((settingsState: PptSettingsStateType, fieldName: string) => boolean); // not visible to user, but still exist in value
   groupingName?: string;
   isOptional?: boolean;
+  pptxgenName?: keyof PptxGenJS.default.TextPropsOptions; // name of option in the pptxgen
 } & (
   | TextSettingItemMetaType
   | BooleanSettingItemMetaType
