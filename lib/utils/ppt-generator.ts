@@ -37,6 +37,7 @@ import {
 import { BREAK_LINE } from "../constant/general";
 import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
+  BaseSettingItemMetaType,
   BaseSettingMetaType,
   ContentSettingsType,
   ContentTextboxSettingsType,
@@ -688,6 +689,19 @@ function getTextOptionFromContentSettings({
     charSpacing: text?.charSpacing ?? defaultContent.charSpacing.defaultValue,
     align: text?.align ?? defaultContent.align.defaultValue,
   };
+
+  Object.entries(
+    PPT_GENERATION_CONTENT_SETTINGS as Record<string, BaseSettingItemMetaType>,
+  ).forEach(([settingKey, settingMeta]) => {
+    if (settingMeta.pptxgenName) {
+      const settingValue =
+        text?.[settingKey as keyof typeof text] ?? settingMeta.defaultValue;
+      customOption = {
+        ...customOption,
+        [settingMeta.pptxgenName]: settingValue,
+      };
+    }
+  });
 
   if (glow?.hasGlow) {
     customOption = {
