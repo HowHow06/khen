@@ -386,8 +386,8 @@ function createSlidesFromLyrics({
     const currentSectionSetting =
       section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
     const isUseSectionSettings =
-      useDifferentSettingForEachSection &&
-      currentSectionSetting &&
+      (useDifferentSettingForEachSection as boolean) &&
+      currentSectionSetting !== undefined &&
       !currentSectionSetting.general?.useMainSectionSettings;
 
     const isBackgroundColorWhenEmpty = isUseSectionSettings
@@ -406,6 +406,13 @@ function createSlidesFromLyrics({
       ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
         DEFAULT_TEXTBOX_COUNT_PER_SLIDE
       : mainTextboxCountPerSlide;
+
+    const isUseSectionColor =
+      isUseSectionSettings &&
+      !currentSectionSetting.general?.useMainBackgroundColor;
+    const isUseSectionImage =
+      isUseSectionSettings &&
+      !currentSectionSetting.general?.useMainBackgroundImage;
 
     // Get the current index before manipulating the cover count and other weights
     // current index is the index of each line (of the current section),
@@ -504,7 +511,16 @@ function createSlidesFromLyrics({
         totalLineCountPerSlide + remainingLineCount - 1;
       // weightage of each empty slide should be equal to
       // line per slide + remainder from previous slide - 1 (the 1 is the default increment of index)
-      currentLine = "";
+      createNewSlide({
+        pres,
+        isEmptyLine: true,
+        isBackgroundColorWhenEmpty,
+        isUseSectionColor,
+        isUseSectionImage,
+        currentSectionNumber: mainSectionCount,
+        sectionName: currentPptSectionName,
+      });
+      return;
     }
 
     const isFillSlide =
@@ -513,7 +529,7 @@ function createSlidesFromLyrics({
       currentSectionFillSlideWeight += remainingLineCount - 1;
       // weightage of each fill slide should be equal to
       // remainder from previous slide - 1 (the 1 is the default increment of index)
-      currentLine = "";
+      return;
     }
 
     const indexInCurrentSlide = currentIndex % totalLineCountPerSlide;
@@ -524,22 +540,12 @@ function createSlidesFromLyrics({
       isBackgroundColorWhenEmpty,
       sectionName: currentPptSectionName,
       currentPresSlide: currentSlide,
-      isUseSectionColor:
-        !!isUseSectionSettings &&
-        !currentSectionSetting.general?.useMainBackgroundColor,
-      isUseSectionImage:
-        !!isUseSectionSettings &&
-        !currentSectionSetting.general?.useMainBackgroundImage,
+      isUseSectionColor,
+      isUseSectionImage,
       currentSectionNumber: mainSectionCount,
       isCover,
-      isEmptySlideNotation: isEmptySlide,
-      isFillSlideNotation: isFillSlide,
     });
     currentSlide = slide; // update current slide
-
-    if (isEmptySlide || isFillSlide) {
-      return; // nothing to be inserted
-    }
 
     const textboxNumber = Math.floor(indexInCurrentSlide / linePerTextbox) + 1;
     const mainContentOption = isUseSectionSettings
@@ -593,10 +599,6 @@ function createSlidesFromLyrics({
           : secondaryLine.replace(`${LYRIC_SECTION.MAIN_TITLE} `, ""); // use the pinyin if no secondary title
       }
 
-      if (isEmptySlide || isFillSlide) {
-        secondaryLine = "";
-      }
-
       const secondaryContentOption = isUseSectionSettings
         ? currentSectionSetting.content.secondary
         : settingValues.content.secondary;
@@ -642,6 +644,40 @@ function createSlidesFromLyrics({
   };
 }
 
+function createNewSlide({
+  pres,
+  isEmptyLine,
+  isBackgroundColorWhenEmpty,
+  isUseSectionColor,
+  isUseSectionImage,
+  currentSectionNumber,
+  sectionName,
+}: {
+  pres: pptxgenjs;
+  sectionName: string;
+  isEmptyLine: boolean;
+  isBackgroundColorWhenEmpty: boolean;
+  isUseSectionColor: boolean;
+  isUseSectionImage: boolean;
+  currentSectionNumber: number;
+}): PptxGenJS.default.Slide {
+  const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
+  const colorMasterSlideToUse = isUseSectionColor
+    ? getSectionColorSlideMasterTitle(currentSectionNumber)
+    : MASTER_SLIDE_BACKGROUND_COLOR;
+  const imageMasterSlideToUse = isUseSectionImage
+    ? getSectionImageSlideMasterTitle(currentSectionNumber)
+    : MASTER_SLIDE_BACKGROUND_IMAGE;
+
+  const newSlide = pres.addSlide({
+    masterName: isUseBackgroundColor
+      ? colorMasterSlideToUse
+      : imageMasterSlideToUse,
+    ...(sectionName && { sectionTitle: sectionName }),
+  });
+  return newSlide;
+}
+
 function getWorkingSlide({
   pres,
   indexInCurrentSlide,
@@ -653,8 +689,6 @@ function getWorkingSlide({
   isUseSectionColor,
   isUseSectionImage,
   currentSectionNumber,
-  isEmptySlideNotation = false,
-  isFillSlideNotation = false,
 }: {
   pres: pptxgenjs;
   indexInCurrentSlide: number;
@@ -666,42 +700,20 @@ function getWorkingSlide({
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
-  isEmptySlideNotation?: boolean;
-  isFillSlideNotation?: boolean;
 }): PptxGenJS.default.Slide {
-  if (
-    indexInCurrentSlide === 0 &&
-    isFillSlideNotation &&
-    currentPresSlide !== undefined
-  ) {
-    // When the indexInCurrentSlide of the fillSlide notation is 0 (meaning to create new slide)
-    // do not create new slide but return the existing slide instead
-    // because in the next line, the indexInCurrentSlide will be 0 again (upon added the weight of fill slide)
-    return currentPresSlide;
-  }
-
   const isToCreateSlide =
-    currentPresSlide === undefined ||
-    indexInCurrentSlide === 0 ||
-    isCover ||
-    isEmptySlideNotation;
+    currentPresSlide === undefined || indexInCurrentSlide === 0 || isCover;
 
   if (isToCreateSlide) {
-    const isUseBackgroundColor = isEmptyLine && isBackgroundColorWhenEmpty;
-    const colorMasterSlideToUse = isUseSectionColor
-      ? getSectionColorSlideMasterTitle(currentSectionNumber)
-      : MASTER_SLIDE_BACKGROUND_COLOR;
-    const imageMasterSlideToUse = isUseSectionImage
-      ? getSectionImageSlideMasterTitle(currentSectionNumber)
-      : MASTER_SLIDE_BACKGROUND_IMAGE;
-
-    const newSlide = pres.addSlide({
-      masterName: isUseBackgroundColor
-        ? colorMasterSlideToUse
-        : imageMasterSlideToUse,
-      ...(sectionName && { sectionTitle: sectionName }),
+    return createNewSlide({
+      pres,
+      isEmptyLine,
+      isBackgroundColorWhenEmpty,
+      isUseSectionColor,
+      isUseSectionImage,
+      currentSectionNumber,
+      sectionName,
     });
-    return newSlide;
   }
 
   return currentPresSlide;
