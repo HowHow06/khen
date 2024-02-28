@@ -537,6 +537,10 @@ function createSlidesFromLyrics({
     });
     currentSlide = slide; // update current slide
 
+    if (isEmptySlide || isFillSlide) {
+      return; // nothing to be inserted
+    }
+
     const textboxNumber = Math.floor(indexInCurrentSlide / linePerTextbox) + 1;
     const mainContentOption = isUseSectionSettings
       ? currentSectionSetting.content.main
