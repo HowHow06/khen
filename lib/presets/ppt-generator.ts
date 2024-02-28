@@ -14,7 +14,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
     ignoreSubcontent: false,
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
-    singleLineMode: false,
+    textboxCountPerContentPerSlide: 2,
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -127,7 +127,7 @@ export const liveChinesePreset: PptSettingsStateType = {
     ignoreSubcontent: false,
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
-    singleLineMode: true,
+    textboxCountPerContentPerSlide: 1,
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -240,7 +240,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
     ignoreSubcontent: true,
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
-    singleLineMode: false,
+    textboxCountPerContentPerSlide: 2,
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -353,7 +353,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
     ignoreSubcontent: true,
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
-    singleLineMode: true,
+    textboxCountPerContentPerSlide: 1,
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {

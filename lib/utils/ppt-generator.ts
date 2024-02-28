@@ -15,10 +15,10 @@ import {
   DEFAULT_BASE_OPTION,
   DEFAULT_FILENAME,
   DEFAULT_GROUPING_NAME,
-  DEFAULT_LINE_COUNT_PER_SLIDE,
   DEFAULT_LINE_COUNT_PER_TEXTBOX,
   DEFAULT_PPT_LAYOUT,
   DEFAULT_SUBJECT,
+  DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
   DEFAULT_TITLE,
   IMPORTED_SETTING_TYPE,
   LYRIC_SECTION,
@@ -84,7 +84,7 @@ export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
 
 export const getTextboxSettingsInitialValues = ({
   textboxSettings,
-  textboxCount = DEFAULT_LINE_COUNT_PER_SLIDE,
+  textboxCount = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
 }: {
   textboxSettings: BaseSettingMetaType;
   textboxCount: number;
@@ -101,7 +101,7 @@ export const getTextboxSettingsInitialValues = ({
 
 export const generatePptSettingsInitialState = (
   settings: PptGenerationSettingMetaType,
-  textboxCount: number = DEFAULT_LINE_COUNT_PER_SLIDE,
+  textboxCount: number = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
 ): PptSettingsStateType => {
   const initialState: PptSettingsStateType = {
     [SETTING_CATEGORY.GENERAL]: {},
@@ -157,7 +157,7 @@ export const generatePptSettingsInitialState = (
 
 export const getSectionSettingsInitialValue = ({
   settings,
-  textboxCount = DEFAULT_LINE_COUNT_PER_SLIDE,
+  textboxCount = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
 }: {
   settings: PptGenerationSettingMetaType;
   textboxCount?: number;
@@ -340,7 +340,7 @@ function createSlidesFromLyrics({
   const {
     general: {
       useBackgroundColorWhenEmpty,
-      singleLineMode,
+      textboxCountPerContentPerSlide,
       ignoreSubcontent,
       useDifferentSettingForEachSection,
       lineCountPerTextbox,
@@ -351,7 +351,8 @@ function createSlidesFromLyrics({
     useBackgroundColorWhenEmpty ??
     PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
       .defaultValue;
-  const mainLinePerSlide = singleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
+  const mainTextboxCountPerSlide =
+    textboxCountPerContentPerSlide ?? DEFAULT_TEXTBOX_COUNT_PER_SLIDE;
   const mainLinePerTextbox =
     lineCountPerTextbox ?? DEFAULT_LINE_COUNT_PER_TEXTBOX;
   const mainHasSecondaryContent = !ignoreSubcontent;
@@ -381,9 +382,8 @@ function createSlidesFromLyrics({
       // skip
       return;
     }
-
     const currentSectionSetting =
-      section?.[`${SECTION_PREFIX}${mainSectionCount + 1}`]; // the main section count starting from 1
+      section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
     const isUseSectionSettings =
       useDifferentSettingForEachSection &&
       currentSectionSetting &&
@@ -402,10 +402,9 @@ function createSlidesFromLyrics({
         DEFAULT_LINE_COUNT_PER_TEXTBOX
       : mainLinePerTextbox;
     const textboxCountPerSlide = isUseSectionSettings
-      ? currentSectionSetting.general?.singleLineMode
-        ? 1
-        : DEFAULT_LINE_COUNT_PER_SLIDE
-      : mainLinePerSlide;
+      ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
+        DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+      : mainTextboxCountPerSlide;
 
     // Get the current index before manipulating the cover count and other weights
     // current index is the index of each line (of the current section),
@@ -1048,7 +1047,8 @@ export const generateSectionSettingsFromFullSettings = (
       ignoreSubcontent: presetGeneralSetting.ignoreSubcontent,
       ignoreSubcontentWhenIdentical:
         presetGeneralSetting.ignoreSubcontentWhenIdentical,
-      singleLineMode: presetGeneralSetting.singleLineMode,
+      textboxCountPerContentPerSlide:
+        presetGeneralSetting.textboxCountPerContentPerSlide,
     },
     [SETTING_CATEGORY.COVER]: settings.cover,
     [SETTING_CATEGORY.CONTENT]: settings.content,
