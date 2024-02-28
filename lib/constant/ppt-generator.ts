@@ -320,12 +320,16 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Character Spacing",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
+    rangeMin: 0,
     groupingName: "text",
   },
   lineSpacingMultiple: {
     fieldDisplayName: "Line Spacing Multiple",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 1.0,
+    rangeMin: 0,
+    rangeMax: 9.9,
+    step: 0.1,
     groupingName: "text",
     tips: "1.0 represents single-spacing; 1.5 represents one and a half times the standard line height etc.",
     pptxgenName: "lineSpacingMultiple",
@@ -346,6 +350,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 7,
+    rangeMin: 0,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -387,6 +392,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "outline",
     defaultValue: 1,
+    rangeMin: 0,
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
         settings,
@@ -436,6 +442,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Blur",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 3,
+    rangeMin: 0,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -447,6 +454,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Offset",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 3,
+    rangeMin: 0,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(

@@ -37,6 +37,7 @@ const renderInputField = (
         min={settingItemMeta.rangeMin}
         max={settingItemMeta.rangeMax}
         onChange={(event) => field.onChange(parseFloat(event.target.value))}
+        step={settingItemMeta.step}
       />
     );
   }
