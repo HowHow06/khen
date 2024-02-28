@@ -386,7 +386,10 @@ function createSlidesFromLyrics({
     const currentSectionSetting =
       section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
     const isUseSectionSettings =
-      (useDifferentSettingForEachSection as boolean) &&
+      (useDifferentSettingForEachSection === undefined
+        ? PPT_GENERATION_COMBINED_GENERAL_SETTINGS
+            .useDifferentSettingForEachSection.defaultValue
+        : useDifferentSettingForEachSection) &&
       currentSectionSetting !== undefined &&
       !currentSectionSetting.general?.useMainSectionSettings;
 
