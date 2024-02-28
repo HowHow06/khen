@@ -13,6 +13,7 @@ import { fontFaces } from "./font-face";
 
 export const DEFAULT_GROUPING_NAME = "default" as const;
 export const DEFAULT_LINE_COUNT_PER_SLIDE = 2 as const;
+export const DEFAULT_LINE_COUNT_PER_TEXTBOX = 1 as const;
 export const TEXTBOX_GROUPING_PREFIX = "textboxLine" as const;
 export const SECTION_PREFIX = "section" as const;
 export const DEFAULT_AUTHOR = "Khen Ho2" as const;
@@ -210,11 +211,13 @@ const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
     defaultValue: true,
     tips: "If unchecked, background image will be used for empty slides.",
   },
-  useSingleTextbox: {
-    fieldDisplayName: "Use Single Textbox",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-    isNotAvailable: true, //TODO: to implement
+  lineCountPerTextbox: {
+    fieldDisplayName: "Line Count per Textbox",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: 1,
+    isNotAvailable: false,
+    rangeMin: 1,
+    rangeMax: 99,
   },
   ignoreSubcontent: {
     fieldDisplayName: "Ignore Secondary Content",
@@ -225,7 +228,7 @@ const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
     fieldDisplayName: "Single Line Mode",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
+    tips: "If checked, each slide will only generate one textbox for the lyric from each main content and secondary content.",
   },
   lineCountPerSlide: {
     fieldDisplayName: "Line Count Per Slide",
