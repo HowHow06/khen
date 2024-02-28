@@ -30,6 +30,7 @@ import {
   PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   PPT_GENERATION_COVER_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
+  PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SECTION_PREFIX,
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
@@ -1042,17 +1043,23 @@ export const generateSectionSettingsFromFullSettings = (
       sectionBackgroundImage: presetGeneralSetting.mainBackgroundImage,
       useMainBackgroundColor: false,
       sectionBackgroundColor: presetGeneralSetting.mainBackgroundColor,
-      useBackgroundColorWhenEmpty:
-        presetGeneralSetting.useBackgroundColorWhenEmpty,
-      ignoreSubcontent: presetGeneralSetting.ignoreSubcontent,
-      ignoreSubcontentWhenIdentical:
-        presetGeneralSetting.ignoreSubcontentWhenIdentical,
-      textboxCountPerContentPerSlide:
-        presetGeneralSetting.textboxCountPerContentPerSlide,
     },
     [SETTING_CATEGORY.COVER]: settings.cover,
     [SETTING_CATEGORY.CONTENT]: settings.content,
   };
+
+  Object.entries(PPT_GENERATION_SHARED_GENERAL_SETTINGS).forEach(
+    ([settingKey, meta]) => {
+      const key = settingKey as keyof SettingsValueType<
+        typeof PPT_GENERATION_SHARED_GENERAL_SETTINGS
+      >;
+      const originalSetting = presetGeneralSetting[key];
+      sectionValues.general = {
+        ...sectionValues.general,
+        [key]: originalSetting,
+      };
+    },
+  );
 
   return sectionValues;
 };

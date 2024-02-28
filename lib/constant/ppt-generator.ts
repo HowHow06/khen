@@ -204,7 +204,7 @@ const PPT_GENERATION_SECTION_SETTINGS = {
   },
 } as const;
 
-const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
+export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
