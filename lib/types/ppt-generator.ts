@@ -66,6 +66,7 @@ export type NumberSettingItemMetaType = {
   rangeMax?: InferTypeScriptTypeFromSettingFieldType<
     typeof SETTING_FIELD_TYPE.NUMBER
   >;
+  step?: number;
 };
 export type PercentageSettingItemMetaType = {
   fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;

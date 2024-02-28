@@ -20,7 +20,7 @@ describe("deepMerge Functionality", () => {
         ignoreSubcontent: false,
         // ignoreSubcontentWhenIdentical: true, // default is true
         sectionsAutoNumbering: false, // default is true
-        singleLineMode: false,
+        textboxCountPerContentPerSlide: 2,
       },
       [SETTING_CATEGORY.FILE]: {},
       [SETTING_CATEGORY.CONTENT]: {

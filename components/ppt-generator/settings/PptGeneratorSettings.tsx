@@ -4,10 +4,10 @@ import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIConte
 import FormSelect from "@/components/ui/form-select";
 import {
   CONTENT_TYPE,
-  DEFAULT_LINE_COUNT_PER_SLIDE,
   DEFAULT_PRESETS,
   LYRIC_SECTION,
   MAIN_SECTION_NAME,
+  PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
   SECTION_PREFIX,
   SETTING_CATEGORY,
@@ -197,10 +197,31 @@ const ContentSettingsTabContent = ({
 }) => {
   const isUsingSectionSettings =
     isForSection && settingsValues.section && sectionValue;
-  const isSingleLineMode = isUsingSectionSettings
-    ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
-        .singleLineMode
-    : settingsValues.general.singleLineMode;
+  let textBoxCount: number =
+    (isUsingSectionSettings
+      ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
+          .textboxCountPerContentPerSlide
+      : settingsValues.general.textboxCountPerContentPerSlide) ??
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .defaultValue;
+  if (
+    textBoxCount >
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .rangeMax
+  ) {
+    textBoxCount =
+      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+        .rangeMax;
+  }
+  if (
+    textBoxCount <
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .rangeMin
+  ) {
+    textBoxCount =
+      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+        .rangeMin;
+  }
 
   const isIgnoreSubcontent = isUsingSectionSettings
     ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
@@ -219,7 +240,6 @@ const ContentSettingsTabContent = ({
   }, []);
 
   const groupedTextBoxSettings = useMemo(() => {
-    const textBoxCount = isSingleLineMode ? 1 : DEFAULT_LINE_COUNT_PER_SLIDE;
     return Array.from({
       length: textBoxCount,
     }).reduce<{}>((result, _, currentIndex) => {
@@ -229,7 +249,7 @@ const ContentSettingsTabContent = ({
           PPT_GENERATION_SETTINGS_META.contentTextbox,
       };
     }, {});
-  }, [isSingleLineMode]);
+  }, [textBoxCount]);
 
   if (
     isIgnoreSubcontent &&
@@ -238,6 +258,7 @@ const ContentSettingsTabContent = ({
   ) {
     setCurrentContentTab(CONTENT_TYPE.MAIN);
   }
+  //TODO: repopulate the textbox value in settings, similar to section settings
 
   return (
     <TabsContent value={SETTING_CATEGORY.CONTENT}>

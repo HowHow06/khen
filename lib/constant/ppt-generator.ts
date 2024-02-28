@@ -12,7 +12,8 @@ import { convertToTraditional } from "../utils/character-converter";
 import { fontFaces } from "./font-face";
 
 export const DEFAULT_GROUPING_NAME = "default" as const;
-export const DEFAULT_LINE_COUNT_PER_SLIDE = 2 as const;
+export const DEFAULT_TEXTBOX_COUNT_PER_SLIDE = 2 as const;
+export const DEFAULT_LINE_COUNT_PER_TEXTBOX = 1 as const;
 export const TEXTBOX_GROUPING_PREFIX = "textboxLine" as const;
 export const SECTION_PREFIX = "section" as const;
 export const DEFAULT_AUTHOR = "Khen Ho2" as const;
@@ -203,35 +204,33 @@ const PPT_GENERATION_SECTION_SETTINGS = {
   },
 } as const;
 
-const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
+export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: true,
     tips: "If unchecked, background image will be used for empty slides.",
   },
-  useSingleTextbox: {
-    fieldDisplayName: "Use Single Textbox",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-    isNotAvailable: true, //TODO: to implement
+  lineCountPerTextbox: {
+    fieldDisplayName: "Line Count per Textbox",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: DEFAULT_LINE_COUNT_PER_TEXTBOX,
+    isNotAvailable: false,
+    rangeMin: 1,
+    rangeMax: 99,
+  },
+  textboxCountPerContentPerSlide: {
+    fieldDisplayName: "Textbox Count per Content per Slide",
+    fieldType: SETTING_FIELD_TYPE.NUMBER,
+    defaultValue: DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
+    rangeMin: 1,
+    rangeMax: 2,
+    tips: "Number of textbox that will be generated for each main content and secondary content in each slide. Default is 2.",
   },
   ignoreSubcontent: {
     fieldDisplayName: "Ignore Secondary Content",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
-  },
-  singleLineMode: {
-    fieldDisplayName: "Single Line Mode",
-    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
-    defaultValue: false,
-    tips: "If checked, each slide will have only one line of lyric from each main content and secondary content.",
-  },
-  lineCountPerSlide: {
-    fieldDisplayName: "Line Count Per Slide",
-    fieldType: SETTING_FIELD_TYPE.NUMBER,
-    defaultValue: 2,
-    isNotAvailable: true, // TODO: to implement
   },
   ignoreSubcontentWhenIdentical: {
     fieldDisplayName: "Ignore Secondary Content when identical",
@@ -321,12 +320,16 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Character Spacing",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 2,
+    rangeMin: 0,
     groupingName: "text",
   },
   lineSpacingMultiple: {
     fieldDisplayName: "Line Spacing Multiple",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 1.0,
+    rangeMin: 0,
+    rangeMax: 9.9,
+    step: 0.1,
     groupingName: "text",
     tips: "1.0 represents single-spacing; 1.5 represents one and a half times the standard line height etc.",
     pptxgenName: "lineSpacingMultiple",
@@ -347,6 +350,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Size",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 7,
+    rangeMin: 0,
     groupingName: "glow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -388,6 +392,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     groupingName: "outline",
     defaultValue: 1,
+    rangeMin: 0,
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
         settings,
@@ -437,6 +442,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Blur",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 3,
+    rangeMin: 0,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -448,6 +454,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
     fieldDisplayName: "Offset",
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: 3,
+    rangeMin: 0,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -500,7 +507,7 @@ export const PPT_GENERATION_SETTINGS_META: PptGenerationSettingMetaType = {
   [SETTING_CATEGORY.COVER]: PPT_GENERATION_COVER_SETTINGS,
   [SETTING_CATEGORY.CONTENT_TEXTBOX]: PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS,
   [SETTING_CATEGORY.CONTENT]: PPT_GENERATION_CONTENT_SETTINGS,
-} as const;
+};
 
 export const FONT_FACES_ITEMS: SelectionItemsType = Object.entries(
   fontFaces,
