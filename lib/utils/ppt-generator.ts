@@ -386,10 +386,7 @@ function createSlidesFromLyrics({
     const currentSectionSetting =
       section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
     const isUseSectionSettings =
-      (useDifferentSettingForEachSection === undefined
-        ? PPT_GENERATION_COMBINED_GENERAL_SETTINGS
-            .useDifferentSettingForEachSection.defaultValue
-        : useDifferentSettingForEachSection) &&
+      useDifferentSettingForEachSection === true &&
       currentSectionSetting !== undefined &&
       !currentSectionSetting.general?.useMainSectionSettings;
 
@@ -941,7 +938,7 @@ export const generatePpt = async ({
 
   // 1.1 Get background props for all sections
   const sectionsBackgroundProp: PptxGenJS.default.BackgroundProps[] = [];
-  if (useDifferentSettingForEachSection && section) {
+  if (useDifferentSettingForEachSection === true && section) {
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
       if (
         sectionSetting.general?.useMainSectionSettings ||

@@ -334,14 +334,14 @@ const PptGeneratorSetting = () => {
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
-  const screenSize = useScreenSize();
-  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
   const [sectionItems, setSectionItems] = useState<SelectionItemsType>([
     {
       value: MAIN_SECTION_NAME,
       label: "Main Section",
     },
   ]);
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
   const settingsValues = getValues() as PptSettingsStateType;
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
