@@ -578,7 +578,7 @@ function createSlidesFromLyrics({
       text: textToInsert,
       contentOption: mainContentOption,
       coverOption: isCover ? mainCoverOption : undefined,
-      textboxKey: `textboxLine${textboxNumber}`,
+      textboxKey: `${TEXTBOX_GROUPING_PREFIX}${textboxNumber}`,
       settingValues,
     });
 
@@ -624,7 +624,7 @@ function createSlidesFromLyrics({
         text: textToInsert,
         contentOption: secondaryContentOption,
         coverOption: isCover ? secondaryCoverOption : undefined,
-        textboxKey: `textboxLine${textboxNumber}`,
+        textboxKey: `${TEXTBOX_GROUPING_PREFIX}${textboxNumber}`,
         settingValues,
       });
     }
