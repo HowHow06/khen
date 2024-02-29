@@ -22,7 +22,6 @@ import {
   ContentTypeType,
   PptSettingsStateType,
   SectionSettingsKeyType,
-  SectionSettingsType,
   SelectionItemsType,
 } from "@/lib/types";
 import {
@@ -80,12 +79,11 @@ type TabContentWithInnerTabProp = TabContentBaseProp & {
 
 const GeneralSettingsTabContent = ({
   scrollAreaClassName,
-  isForSection,
   settingsPrefix,
+  isForSection,
   isSectionUseMainSectionSettings = false,
-}: TabContentBaseProp & {
-  sectionSettings?: SectionSettingsType;
-} & (
+}: TabContentBaseProp &
+  (
     | {
         isForSection: boolean;
         isSectionUseMainSectionSettings: boolean;
@@ -178,10 +176,10 @@ const groupedContentSettings = groupByAsObject(
 const ContentSettingsTabContent = ({
   tabsValue,
   onTabsValueChange,
-  isIgnoreSubcontent = false,
-  textBoxCount,
   scrollAreaClassName,
   settingsPrefix,
+  isIgnoreSubcontent = false,
+  textBoxCount,
 }: TabContentWithInnerTabProp & {
   textBoxCount: number;
   isIgnoreSubcontent?: boolean;
@@ -319,9 +317,9 @@ const PptGeneratorSetting = () => {
     ];
 
     const originalSettingValues = getValues();
-    const newSectionValues: {
-      [key in SectionSettingsKeyType]: SectionSettingsType;
-    } = { ...originalSettingValues[SETTING_CATEGORY.SECTION] };
+    const newSectionValues = {
+      ...originalSettingValues[SETTING_CATEGORY.SECTION],
+    };
 
     sections.forEach((sectionName, currentIndex) => {
       const currentSectionNumber = currentIndex + 1;
@@ -336,7 +334,7 @@ const PptGeneratorSetting = () => {
       }
       newSectionItems.push({
         value: currentSectionKey,
-        label: `${sectionName.replace(LYRIC_SECTION.SECTION, "")}`,
+        label: `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}`,
       });
     });
 
@@ -364,11 +362,14 @@ const PptGeneratorSetting = () => {
 
   useEffect(() => {
     const settingsValues = getValues() as PptSettingsStateType;
-    const currentContentSettings = isUserAtSectionSettings
+    const currentTargetSetting = isUserAtSectionSettings
       ? settingsValues.section?.[currentSection as SectionSettingsKeyType]
-          ?.content
-      : settingsValues?.content;
-    if (currentContentSettings === undefined) {
+      : settingsValues;
+    const currentContentSettings = currentTargetSetting?.content;
+    if (
+      currentTargetSetting === undefined ||
+      currentContentSettings === undefined
+    ) {
       return;
     }
     const newContentSettings = { ...currentContentSettings };
@@ -409,13 +410,7 @@ const PptGeneratorSetting = () => {
       },
     );
 
-    if (isUserAtSectionSettings && settingsValues.section) {
-      settingsValues.section[currentSection as SectionSettingsKeyType].content =
-        newContentSettings;
-    } else {
-      settingsValues.content = newContentSettings;
-    }
-
+    currentTargetSetting.content = newContentSettings;
     reset(settingsValues);
   }, [
     currentTextboxCount,
