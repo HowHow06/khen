@@ -9,6 +9,7 @@ import {
   MAIN_SECTION_NAME,
   PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
+  PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SECTION_PREFIX,
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
@@ -19,7 +20,6 @@ import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   BaseSettingMetaType,
   PptSettingsStateType,
-  PptSettingsUIState,
   SectionSettingsKeyType,
   SectionSettingsType,
   SelectionItemsType,
@@ -47,7 +47,6 @@ import GroupedBaseSettings from "./GroupedBaseSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 
-//TODO: refactor this whole page
 const PptSettingsTabLists = () => {
   return (
     <ScrollArea className="w-full pb-3">
@@ -67,24 +66,35 @@ const PptSettingsTabLists = () => {
   );
 };
 
-const GeneralSettingsTabContent = ({
-  isUseSectionSettings = true,
-  isForSection = false,
-  sectionValue,
-}: {
-  isUseSectionSettings?: boolean;
-  isForSection?: boolean;
-  sectionValue?: string;
-}) => {
-  const { form } = usePptGeneratorFormContext();
-  const { getValues } = form;
+type TabContentBaseProp = {
+  scrollAreaClassName?: string;
+  settingsPrefix: string;
+};
 
-  const settings = getValues() as PptSettingsStateType;
-  const isSectionUseMainSectionSettings =
-    settings.section?.[sectionValue as SectionSettingsKeyType]?.general
-      .useMainSectionSettings;
+type TabContentWithInnerTabProp = TabContentBaseProp & {
+  tabsValue?: string;
+  onTabsValueChange?: (tab: string) => void;
+};
+
+const GeneralSettingsTabContent = ({
+  scrollAreaClassName,
+  isForSection,
+  settingsPrefix,
+  isSectionUseMainSectionSettings = false,
+}: TabContentBaseProp & {
+  sectionSettings?: SectionSettingsType;
+} & (
+    | {
+        isForSection: boolean;
+        isSectionUseMainSectionSettings: boolean;
+      }
+    | {
+        isForSection?: never;
+        isSectionUseMainSectionSettings?: never;
+      }
+  )) => {
   const settingMetaToUse: BaseSettingMetaType = useMemo(() => {
-    if (!isForSection || sectionValue === undefined) {
+    if (!isForSection) {
       return PPT_GENERATION_SETTINGS_META.general;
     }
 
@@ -92,26 +102,20 @@ const GeneralSettingsTabContent = ({
       return {
         useMainSectionSettings:
           PPT_GENERATION_SETTINGS_META.section.useMainSectionSettings,
-      };
+      }; // show only useMainSectionSettings
     }
+
     return PPT_GENERATION_SETTINGS_META.section;
-  }, [isForSection, sectionValue, isSectionUseMainSectionSettings]);
+  }, [isForSection, isSectionUseMainSectionSettings]);
 
   return (
     <TabsContent value={SETTING_CATEGORY.GENERAL}>
       <ScrollArea
-        className={cn(
-          "h-[54vh] pl-3 pr-4 sm:h-[75vh]",
-          isUseSectionSettings && "h-[47vh] sm:h-[68vh]",
-        )}
+        className={cn("h-[54vh] pl-3 pr-4 sm:h-[75vh]", scrollAreaClassName)}
       >
         <BaseSettings
           settingsMeta={settingMetaToUse}
-          keyPrefix={
-            isForSection
-              ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.GENERAL}.`
-              : SETTING_CATEGORY.GENERAL + "."
-          }
+          keyPrefix={settingsPrefix}
           className="pb-5 xl:pb-10"
         />
       </ScrollArea>
@@ -120,27 +124,17 @@ const GeneralSettingsTabContent = ({
 };
 
 const CoverSettingsTabContent = ({
-  settingsUIState,
-  setCurrentCoverTab,
-  isUseSectionSettings = true,
-  isForSection = false,
-  sectionValue,
-}: {
-  settingsUIState?: PptSettingsUIState;
-  setCurrentCoverTab?: (tab: string) => void;
-  isUseSectionSettings?: boolean;
-  isForSection?: boolean;
-  sectionValue?: string;
-}) => {
-  const prefix = isForSection
-    ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.COVER}.`
-    : SETTING_CATEGORY.COVER + ".";
+  tabsValue,
+  onTabsValueChange,
+  scrollAreaClassName,
+  settingsPrefix,
+}: TabContentWithInnerTabProp & {}) => {
   return (
     <TabsContent value={SETTING_CATEGORY.COVER}>
       <Tabs
         defaultValue={CONTENT_TYPE.MAIN}
-        value={settingsUIState?.currentCoverTab || undefined}
-        onValueChange={setCurrentCoverTab}
+        value={tabsValue}
+        onValueChange={onTabsValueChange}
         className="w-full px-2"
       >
         <TabsList className="my-2 grid w-full grid-cols-2">
@@ -149,28 +143,22 @@ const CoverSettingsTabContent = ({
         </TabsList>
         <TabsContent value={CONTENT_TYPE.MAIN}>
           <ScrollArea
-            className={cn(
-              "h-[50vh] pr-3 sm:h-[72vh]",
-              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
-            )}
+            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
           >
             <BaseSettings
               settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
-              keyPrefix={prefix + CONTENT_TYPE.MAIN + "."}
+              keyPrefix={settingsPrefix + CONTENT_TYPE.MAIN + "."}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
         <TabsContent value={CONTENT_TYPE.SECONDARY}>
           <ScrollArea
-            className={cn(
-              "h-[50vh] pr-3 sm:h-[72vh]",
-              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
-            )}
+            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
           >
             <BaseSettings
               settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
-              keyPrefix={prefix + CONTENT_TYPE.SECONDARY + "."}
+              keyPrefix={settingsPrefix + CONTENT_TYPE.SECONDARY + "."}
               className="pb-5 xl:pb-10"
             />
           </ScrollArea>
@@ -180,30 +168,23 @@ const CoverSettingsTabContent = ({
   );
 };
 
+const groupedContentSettings = groupByAsObject(
+  PPT_GENERATION_SETTINGS_META.content,
+  "groupingName",
+);
+
 const ContentSettingsTabContent = ({
-  settingsUIState,
-  setCurrentContentTab,
-  isUseSectionSettings = true,
-  isForSection = false,
-  sectionValue,
-  settingsValues,
-}: {
-  settingsUIState?: PptSettingsUIState;
-  setCurrentContentTab?: (tab: string) => void;
-  isUseSectionSettings?: boolean;
-  isForSection?: boolean;
-  sectionValue?: string;
-  settingsValues: PptSettingsStateType;
+  tabsValue,
+  onTabsValueChange,
+  isIgnoreSubcontent = false,
+  textBoxCount,
+  scrollAreaClassName,
+  settingsPrefix,
+}: TabContentWithInnerTabProp & {
+  textBoxCount: number;
+  isIgnoreSubcontent?: boolean;
 }) => {
-  const isUsingSectionSettings =
-    isForSection && settingsValues.section && sectionValue;
-  let textBoxCount: number =
-    (isUsingSectionSettings
-      ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
-          .textboxCountPerContentPerSlide
-      : settingsValues.general.textboxCountPerContentPerSlide) ??
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-      .defaultValue;
+  //TODO: move this to outside of component
   if (
     textBoxCount >
     PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
@@ -223,22 +204,6 @@ const ContentSettingsTabContent = ({
         .rangeMin;
   }
 
-  const isIgnoreSubcontent = isUsingSectionSettings
-    ? settingsValues.section![sectionValue as SectionSettingsKeyType].general
-        .ignoreSubcontent
-    : settingsValues.general.ignoreSubcontent;
-
-  const categoryPrefix = isUsingSectionSettings
-    ? `${SETTING_CATEGORY.SECTION}.${sectionValue}.${SETTING_CATEGORY.CONTENT}`
-    : SETTING_CATEGORY.CONTENT;
-
-  const groupedContentSettings = useMemo(() => {
-    return groupByAsObject(
-      PPT_GENERATION_SETTINGS_META.content,
-      "groupingName",
-    );
-  }, []);
-
   const groupedTextBoxSettings = useMemo(() => {
     return Array.from({
       length: textBoxCount,
@@ -250,22 +215,14 @@ const ContentSettingsTabContent = ({
       };
     }, {});
   }, [textBoxCount]);
-
-  if (
-    isIgnoreSubcontent &&
-    setCurrentContentTab &&
-    settingsUIState?.currentContentTab !== CONTENT_TYPE.MAIN
-  ) {
-    setCurrentContentTab(CONTENT_TYPE.MAIN);
-  }
   //TODO: repopulate the textbox value in settings, similar to section settings
 
   return (
     <TabsContent value={SETTING_CATEGORY.CONTENT}>
       <Tabs
         defaultValue={CONTENT_TYPE.MAIN}
-        value={settingsUIState?.currentContentTab || undefined}
-        onValueChange={setCurrentContentTab}
+        value={tabsValue}
+        onValueChange={onTabsValueChange}
         className="w-full px-2"
       >
         {!isIgnoreSubcontent && (
@@ -276,18 +233,15 @@ const ContentSettingsTabContent = ({
         )}
         <TabsContent value={CONTENT_TYPE.MAIN}>
           <ScrollArea
-            className={cn(
-              "h-[50vh] pr-3 sm:h-[72vh]",
-              isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
-            )}
+            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
           >
             <GroupedBaseSettings
-              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.MAIN}.${TEXTBOX_SETTING_KEY}.`}
+              keyPrefix={`${settingsPrefix}${CONTENT_TYPE.MAIN}.${TEXTBOX_SETTING_KEY}.`}
               accordionKey={CONTENT_TYPE.MAIN + TEXTBOX_SETTING_KEY}
               groupedSettingsMeta={groupedTextBoxSettings}
             />
             <GroupedBaseSettings
-              keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.MAIN}.`}
+              keyPrefix={`${settingsPrefix}${CONTENT_TYPE.MAIN}.`}
               accordionKey={CONTENT_TYPE.MAIN}
               groupedSettingsMeta={groupedContentSettings}
               defaultAccordionValue={[`text`]}
@@ -298,18 +252,15 @@ const ContentSettingsTabContent = ({
         {!isIgnoreSubcontent && (
           <TabsContent value={CONTENT_TYPE.SECONDARY}>
             <ScrollArea
-              className={cn(
-                "h-[50vh] pr-3 sm:h-[72vh]",
-                isUseSectionSettings && "h-[43vh] sm:h-[65vh]",
-              )}
+              className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
             >
               <GroupedBaseSettings
-                keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
+                keyPrefix={`${settingsPrefix}${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
                 accordionKey={CONTENT_TYPE.SECONDARY + TEXTBOX_SETTING_KEY}
                 groupedSettingsMeta={groupedTextBoxSettings}
               />
               <GroupedBaseSettings
-                keyPrefix={`${categoryPrefix}.${CONTENT_TYPE.SECONDARY}.`}
+                keyPrefix={`${settingsPrefix}${CONTENT_TYPE.SECONDARY}.`}
                 accordionKey={CONTENT_TYPE.SECONDARY}
                 groupedSettingsMeta={groupedContentSettings}
                 defaultAccordionValue={[`text`]}
@@ -342,15 +293,35 @@ const PptGeneratorSetting = () => {
   ]);
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
+
   const settingsValues = getValues() as PptSettingsStateType;
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
-  if (
-    sectionItems.find(({ value }) => value === currentSection) === undefined
-  ) {
-    setCurrentSection(MAIN_SECTION_NAME);
-  }
+  const isUserAtSectionSettings =
+    isDifferentSettingsBySection && currentSection !== MAIN_SECTION_NAME;
+
+  const currentSectionSetting =
+    settingsValues.section?.[currentSection as SectionSettingsKeyType];
+  const currentGeneralSetting = isUserAtSectionSettings
+    ? currentSectionSetting?.general
+    : settingsValues.general;
+
+  const currentTextboxCount =
+    currentGeneralSetting?.textboxCountPerContentPerSlide ??
+    PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .defaultValue;
+
+  const currentIsIgnoreSubContent =
+    currentGeneralSetting?.ignoreSubcontent === true;
+
+  const isUseMainSectionSettings =
+    isUserAtSectionSettings &&
+    currentSectionSetting?.general?.useMainSectionSettings === true;
+
+  const toggleSettingSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     if (!isDifferentSettingsBySection) {
@@ -365,7 +336,7 @@ const PptGeneratorSetting = () => {
     ];
 
     const originalSettingValues = getValues();
-    const sectionInitialValue: {
+    const newSectionValues: {
       [key in SectionSettingsKeyType]: SectionSettingsType;
     } = { ...originalSettingValues[SETTING_CATEGORY.SECTION] };
 
@@ -374,12 +345,11 @@ const PptGeneratorSetting = () => {
       const currentSectionKey =
         `${SECTION_PREFIX}${currentSectionNumber}` as SectionSettingsKeyType;
 
-      if (!sectionInitialValue[currentSectionKey]) {
-        sectionInitialValue[currentSectionKey] = getSectionSettingsInitialValue(
-          {
-            settings: PPT_GENERATION_SETTINGS_META,
-          },
-        );
+      if (!newSectionValues[currentSectionKey]) {
+        // generate initial values for new sections
+        newSectionValues[currentSectionKey] = getSectionSettingsInitialValue({
+          settings: PPT_GENERATION_SETTINGS_META,
+        });
       }
       newSectionItems.push({
         value: currentSectionKey,
@@ -392,14 +362,14 @@ const PptGeneratorSetting = () => {
       const difference = sectionItems.length - 1 - sections.length;
       Array.from({ length: difference }).forEach((_, index) => {
         const sectionNumber = sections.length + 1 + index;
-        delete sectionInitialValue[`${SECTION_PREFIX}${sectionNumber}`];
+        delete newSectionValues[`${SECTION_PREFIX}${sectionNumber}`];
       });
     }
 
     setSectionItems(newSectionItems);
     reset({
       ...originalSettingValues,
-      [SETTING_CATEGORY.SECTION]: sectionInitialValue,
+      [SETTING_CATEGORY.SECTION]: newSectionValues,
     });
   }, [
     mainText,
@@ -409,18 +379,19 @@ const PptGeneratorSetting = () => {
     sectionItems.length,
   ]);
 
-  const toggleSettingSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  if (
+    currentSection === MAIN_SECTION_NAME &&
+    settingsUIState.currentContentTab !== CONTENT_TYPE.MAIN &&
+    settingsValues.general.ignoreSubcontent === true
+  ) {
+    setCurrentContentTab(CONTENT_TYPE.MAIN);
+  }
 
-  const isUseMainSectionSettings =
-    isDifferentSettingsBySection &&
-    currentSection !== MAIN_SECTION_NAME &&
-    settingsValues.section?.[currentSection as SectionSettingsKeyType]?.general
-      ?.useMainSectionSettings;
-
-  const isUserAtSectionSettings =
-    isDifferentSettingsBySection && currentSection !== MAIN_SECTION_NAME;
+  if (
+    sectionItems.find(({ value }) => value === currentSection) === undefined
+  ) {
+    setCurrentSection(MAIN_SECTION_NAME);
+  }
 
   return (
     <div className="flex flex-row space-x-2">
@@ -491,43 +462,21 @@ const PptGeneratorSetting = () => {
               defaultValue={SETTING_CATEGORY.GENERAL}
               className="mt-2 w-full"
             >
-              {!isUseMainSectionSettings && (
-                <ScrollArea className="w-full pb-3">
-                  <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
-                    <TabsTrigger
-                      value={SETTING_CATEGORY.GENERAL}
-                      className="min-w-20"
-                    >
-                      General
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value={SETTING_CATEGORY.COVER}
-                      className="min-w-20"
-                    >
-                      Cover
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value={SETTING_CATEGORY.CONTENT}
-                      className="min-w-20"
-                    >
-                      Content
-                    </TabsTrigger>
-                    <ScrollBar orientation="horizontal" />
-                  </TabsList>
-                </ScrollArea>
-              )}
+              {!isUseMainSectionSettings && <PptSettingsTabLists />}
               <GeneralSettingsTabContent
+                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.GENERAL}.`}
                 isForSection={true}
-                sectionValue={currentSection}
+                isSectionUseMainSectionSettings={
+                  currentSectionSetting?.general.useMainSectionSettings === true
+                }
               />
               <CoverSettingsTabContent
-                isForSection={true}
-                sectionValue={currentSection}
+                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.COVER}.`}
               />
               <ContentSettingsTabContent
-                isForSection={true}
-                sectionValue={currentSection}
-                settingsValues={settingsValues}
+                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.CONTENT}.`}
+                textBoxCount={currentTextboxCount}
+                isIgnoreSubcontent={currentIsIgnoreSubContent}
               />
             </Tabs>
           ) : (
@@ -539,18 +488,22 @@ const PptGeneratorSetting = () => {
             >
               <PptSettingsTabLists />
               <GeneralSettingsTabContent
-                isUseSectionSettings={isDifferentSettingsBySection}
+                settingsPrefix={`${SETTING_CATEGORY.GENERAL}.`}
+                scrollAreaClassName="h-[47vh] sm:h-[68vh]"
               />
               <CoverSettingsTabContent
-                settingsUIState={settingsUIState}
-                setCurrentCoverTab={setCurrentCoverTab}
-                isUseSectionSettings={isDifferentSettingsBySection}
+                tabsValue={settingsUIState?.currentCoverTab}
+                onTabsValueChange={setCurrentCoverTab}
+                settingsPrefix={`${SETTING_CATEGORY.COVER}.`}
+                scrollAreaClassName="h-[43vh] sm:h-[65vh]"
               />
               <ContentSettingsTabContent
-                settingsUIState={settingsUIState}
-                setCurrentContentTab={setCurrentContentTab}
-                isUseSectionSettings={isDifferentSettingsBySection}
-                settingsValues={settingsValues}
+                tabsValue={settingsUIState.currentContentTab}
+                onTabsValueChange={setCurrentContentTab}
+                settingsPrefix={`${SETTING_CATEGORY.CONTENT}.`}
+                scrollAreaClassName={"h-[43vh] sm:h-[65vh]"}
+                textBoxCount={currentTextboxCount}
+                isIgnoreSubcontent={currentIsIgnoreSubContent}
               />
             </Tabs>
           )}
