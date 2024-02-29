@@ -18,6 +18,7 @@ import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   BaseSettingMetaType,
+  ContentTypeType,
   PptSettingsStateType,
   SectionSettingsKeyType,
   SectionSettingsType,
@@ -25,6 +26,7 @@ import {
 } from "@/lib/types";
 import {
   cn,
+  getInitialTextboxSettings,
   getLinesStartingWith,
   getSectionSettingsInitialValue,
   groupByAsObject,
@@ -359,9 +361,70 @@ const PptGeneratorSetting = () => {
     sectionItems.length,
   ]);
 
-  // useEffect(() => {
-  //   //TODO: repopulate the textbox value in settings, similar to section settings
-  // }, [currentTextboxCount]);
+  useEffect(() => {
+    const settingsValues = getValues() as PptSettingsStateType;
+    const currentSectionSetting =
+      settingsValues.section?.[currentSection as SectionSettingsKeyType];
+    const currentContentSettings = isUserAtSectionSettings
+      ? currentSectionSetting?.content
+      : settingsValues?.content;
+    if (currentContentSettings === undefined) {
+      return;
+    }
+    const newContentSettings = { ...currentContentSettings };
+    Object.entries(currentContentSettings).forEach(
+      ([contentType, settings]) => {
+        const contentTypeKey = contentType as ContentTypeType;
+        const originalTextboxSettings = settings.textbox;
+        const originalTextboxCount = Object.keys(
+          originalTextboxSettings,
+        ).length;
+        const differenceInTextboxCount =
+          currentTextboxCount - originalTextboxCount;
+        if (differenceInTextboxCount === 0) {
+          return;
+        }
+        if (differenceInTextboxCount > 0) {
+          // add new
+          Array.from({ length: differenceInTextboxCount }).forEach(
+            (_, index) => {
+              const newTextboxNumber = originalTextboxCount + index + 1;
+              newContentSettings[contentTypeKey].textbox[
+                `${TEXTBOX_GROUPING_PREFIX}${newTextboxNumber}`
+              ] = getInitialTextboxSettings();
+            },
+          );
+        }
+
+        if (differenceInTextboxCount < 0) {
+          // remove excess
+          Array.from({ length: -differenceInTextboxCount }).forEach(
+            (_, index) => {
+              const targetTextboxNumber = currentTextboxCount + 1 + index;
+              delete newContentSettings[contentTypeKey].textbox[
+                `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
+              ];
+            },
+          );
+        }
+      },
+    );
+
+    if (isUserAtSectionSettings && settingsValues.section) {
+      settingsValues.section[currentSection as SectionSettingsKeyType].content =
+        newContentSettings;
+    } else {
+      settingsValues.content = newContentSettings;
+    }
+
+    reset(settingsValues);
+  }, [
+    currentTextboxCount,
+    getValues,
+    reset,
+    currentSection,
+    isUserAtSectionSettings,
+  ]);
 
   if (
     currentSection === MAIN_SECTION_NAME &&

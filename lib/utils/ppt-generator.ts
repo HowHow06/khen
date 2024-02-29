@@ -1321,3 +1321,14 @@ export const exportSectionSettings = ({
     fileName: `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`,
   });
 };
+
+export function getInitialTextboxSettings(): SettingsValueType<
+  typeof PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS
+> {
+  return {
+    textboxPositionX:
+      PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS.textboxPositionX.defaultValue,
+    textboxPositionY:
+      PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS.textboxPositionY.defaultValue,
+  };
+}
