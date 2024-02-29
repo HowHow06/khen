@@ -7,7 +7,6 @@ import {
   DEFAULT_PRESETS,
   LYRIC_SECTION,
   MAIN_SECTION_NAME,
-  PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
   PPT_GENERATION_SETTINGS_META,
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SECTION_PREFIX,
@@ -184,26 +183,6 @@ const ContentSettingsTabContent = ({
   textBoxCount: number;
   isIgnoreSubcontent?: boolean;
 }) => {
-  //TODO: move this to outside of component
-  if (
-    textBoxCount >
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-      .rangeMax
-  ) {
-    textBoxCount =
-      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-        .rangeMax;
-  }
-  if (
-    textBoxCount <
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-      .rangeMin
-  ) {
-    textBoxCount =
-      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-        .rangeMin;
-  }
-
   const groupedTextBoxSettings = useMemo(() => {
     return Array.from({
       length: textBoxCount,
@@ -215,7 +194,6 @@ const ContentSettingsTabContent = ({
       };
     }, {});
   }, [textBoxCount]);
-  //TODO: repopulate the textbox value in settings, similar to section settings
 
   return (
     <TabsContent value={SETTING_CATEGORY.CONTENT}>
@@ -303,11 +281,13 @@ const PptGeneratorSetting = () => {
 
   const currentSectionSetting =
     settingsValues.section?.[currentSection as SectionSettingsKeyType];
-  const currentGeneralSetting = isUserAtSectionSettings
-    ? currentSectionSetting?.general
-    : settingsValues.general;
+  const currentSetting = isUserAtSectionSettings
+    ? currentSectionSetting
+    : settingsValues;
 
-  const currentTextboxCount =
+  const currentGeneralSetting = currentSetting?.general;
+
+  let currentTextboxCount =
     currentGeneralSetting?.textboxCountPerContentPerSlide ??
     PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
       .defaultValue;
@@ -379,10 +359,14 @@ const PptGeneratorSetting = () => {
     sectionItems.length,
   ]);
 
+  // useEffect(() => {
+  //   //TODO: repopulate the textbox value in settings, similar to section settings
+  // }, [currentTextboxCount]);
+
   if (
     currentSection === MAIN_SECTION_NAME &&
     settingsUIState.currentContentTab !== CONTENT_TYPE.MAIN &&
-    settingsValues.general.ignoreSubcontent === true
+    currentGeneralSetting?.ignoreSubcontent === true
   ) {
     setCurrentContentTab(CONTENT_TYPE.MAIN);
   }
@@ -391,6 +375,19 @@ const PptGeneratorSetting = () => {
     sectionItems.find(({ value }) => value === currentSection) === undefined
   ) {
     setCurrentSection(MAIN_SECTION_NAME);
+  }
+
+  const textboxCountMax =
+    PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .rangeMax;
+  const textboxCountMin =
+    PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
+      .rangeMin;
+  if (currentTextboxCount > textboxCountMax) {
+    currentTextboxCount = textboxCountMax;
+  }
+  if (currentTextboxCount < textboxCountMin) {
+    currentTextboxCount = textboxCountMin;
   }
 
   return (
