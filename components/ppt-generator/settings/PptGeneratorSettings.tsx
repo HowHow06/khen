@@ -363,10 +363,9 @@ const PptGeneratorSetting = () => {
 
   useEffect(() => {
     const settingsValues = getValues() as PptSettingsStateType;
-    const currentSectionSetting =
-      settingsValues.section?.[currentSection as SectionSettingsKeyType];
     const currentContentSettings = isUserAtSectionSettings
-      ? currentSectionSetting?.content
+      ? settingsValues.section?.[currentSection as SectionSettingsKeyType]
+          ?.content
       : settingsValues?.content;
     if (currentContentSettings === undefined) {
       return;
@@ -398,14 +397,14 @@ const PptGeneratorSetting = () => {
 
         if (differenceInTextboxCount < 0) {
           // remove excess
-          Array.from({ length: -differenceInTextboxCount }).forEach(
-            (_, index) => {
-              const targetTextboxNumber = currentTextboxCount + 1 + index;
-              delete newContentSettings[contentTypeKey].textbox[
-                `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
-              ];
-            },
-          );
+          // Array.from({ length: -differenceInTextboxCount }).forEach(
+          //   (_, index) => {
+          //     const targetTextboxNumber = currentTextboxCount + 1 + index;
+          //     delete newContentSettings[contentTypeKey].textbox[
+          //       `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
+          //     ];
+          //   },
+          // );
         }
       },
     );

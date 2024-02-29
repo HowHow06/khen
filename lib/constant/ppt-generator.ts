@@ -224,7 +224,7 @@ export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.NUMBER,
     defaultValue: DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
     rangeMin: 1,
-    rangeMax: 2,
+    rangeMax: 4,
     tips: "Number of textbox that will be generated for each main content and secondary content in each slide. Default is 2.",
   },
   ignoreSubcontent: {
