@@ -174,9 +174,10 @@ export type GroupedSettingsValueType<
   };
 };
 
+export type ContentTextboxKey = `${typeof TEXTBOX_GROUPING_PREFIX}${number}`;
 // Static part of the CONTENT category settings
 export type ContentTextboxSettingsType = {
-  [key in `${typeof TEXTBOX_GROUPING_PREFIX}${number}`]: SettingsValueType<
+  [key in ContentTextboxKey]: SettingsValueType<
     typeof PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS
   >;
 };

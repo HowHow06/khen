@@ -18,6 +18,7 @@ import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   BaseSettingMetaType,
+  ContentTextboxKey,
   ContentTypeType,
   PptSettingsStateType,
   SectionSettingsKeyType,
@@ -374,10 +375,7 @@ const PptGeneratorSetting = () => {
     Object.entries(currentContentSettings).forEach(
       ([contentType, settings]) => {
         const contentTypeKey = contentType as ContentTypeType;
-        const originalTextboxSettings = settings.textbox;
-        const originalTextboxCount = Object.keys(
-          originalTextboxSettings,
-        ).length;
+        const originalTextboxCount = Object.keys(settings.textbox).length;
         const differenceInTextboxCount =
           currentTextboxCount - originalTextboxCount;
         if (differenceInTextboxCount === 0) {
@@ -388,9 +386,11 @@ const PptGeneratorSetting = () => {
           Array.from({ length: differenceInTextboxCount }).forEach(
             (_, index) => {
               const newTextboxNumber = originalTextboxCount + index + 1;
-              newContentSettings[contentTypeKey].textbox[
-                `${TEXTBOX_GROUPING_PREFIX}${newTextboxNumber}`
-              ] = getInitialTextboxSettings();
+              const textboxKey =
+                `${TEXTBOX_GROUPING_PREFIX}${newTextboxNumber}` as ContentTextboxKey;
+
+              newContentSettings[contentTypeKey].textbox[textboxKey] =
+                getInitialTextboxSettings();
             },
           );
         }
