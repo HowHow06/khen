@@ -1,4 +1,8 @@
-import { CONTENT_TYPE, SETTING_CATEGORY } from "../constant";
+import {
+  CONTENT_TYPE,
+  SETTING_CATEGORY,
+  TEXTBOX_GROUPING_PREFIX,
+} from "../constant";
 import { PptSettingsStateType } from "../types";
 
 export const onsiteChinesePreset: PptSettingsStateType = {
@@ -61,11 +65,11 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 26,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 56,
         },
@@ -101,11 +105,11 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 39,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 69,
         },
@@ -174,11 +178,11 @@ export const liveChinesePreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 84,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 55,
         },
@@ -214,11 +218,11 @@ export const liveChinesePreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 92,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 65,
         },
@@ -289,11 +293,11 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 45,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 58,
         },
@@ -329,11 +333,11 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 39,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 69,
         },
@@ -402,11 +406,11 @@ export const liveEnglishPreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 87,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 0,
         },
@@ -442,11 +446,11 @@ export const liveEnglishPreset: PptSettingsStateType = {
         shadowOpacity: 0.5,
       },
       textbox: {
-        textboxLine1: {
+        [`${TEXTBOX_GROUPING_PREFIX}1`]: {
           textboxPositionX: 0,
           textboxPositionY: 92,
         },
-        textboxLine2: {
+        [`${TEXTBOX_GROUPING_PREFIX}2`]: {
           textboxPositionX: 0,
           textboxPositionY: 65,
         },
