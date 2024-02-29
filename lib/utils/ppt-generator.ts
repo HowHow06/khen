@@ -84,17 +84,17 @@ export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
 };
 
 export const getTextboxSettingsInitialValues = ({
-  textboxSettings,
+  textboxSettingsMeta,
   textboxCount = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
 }: {
-  textboxSettings: BaseSettingMetaType;
+  textboxSettingsMeta: BaseSettingMetaType;
   textboxCount: number;
 }): ContentTextboxSettingsType => {
   const textBoxInitialState: ContentTextboxSettingsType = {};
   Array.from({ length: textboxCount }).forEach((_, index) => {
     textBoxInitialState[`${TEXTBOX_GROUPING_PREFIX}${index + 1}`] =
       getInitialValuesFromSettings({
-        settingsMeta: textboxSettings,
+        settingsMeta: textboxSettingsMeta,
       });
   });
   return textBoxInitialState;
@@ -144,7 +144,7 @@ export const generatePptSettingsInitialState = (
               hasGrouping: true,
             }),
             textbox: getTextboxSettingsInitialValues({
-              textboxSettings: settings.contentTextbox,
+              textboxSettingsMeta: settings.contentTextbox,
               textboxCount,
             }),
           };
@@ -198,7 +198,7 @@ export const getSectionSettingsInitialValue = ({
         hasGrouping: true,
       }),
       textbox: getTextboxSettingsInitialValues({
-        textboxSettings: contentBoxSettings,
+        textboxSettingsMeta: contentBoxSettings,
         textboxCount,
       }),
     };
@@ -386,7 +386,7 @@ function createSlidesFromLyrics({
     const currentSectionSetting =
       section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
     const isUseSectionSettings =
-      (useDifferentSettingForEachSection as boolean) &&
+      useDifferentSettingForEachSection === true &&
       currentSectionSetting !== undefined &&
       !currentSectionSetting.general?.useMainSectionSettings;
 
@@ -578,7 +578,7 @@ function createSlidesFromLyrics({
       text: textToInsert,
       contentOption: mainContentOption,
       coverOption: isCover ? mainCoverOption : undefined,
-      textboxKey: `textboxLine${textboxNumber}`,
+      textboxKey: `${TEXTBOX_GROUPING_PREFIX}${textboxNumber}`,
       settingValues,
     });
 
@@ -624,7 +624,7 @@ function createSlidesFromLyrics({
         text: textToInsert,
         contentOption: secondaryContentOption,
         coverOption: isCover ? secondaryCoverOption : undefined,
-        textboxKey: `textboxLine${textboxNumber}`,
+        textboxKey: `${TEXTBOX_GROUPING_PREFIX}${textboxNumber}`,
         settingValues,
       });
     }
@@ -938,7 +938,7 @@ export const generatePpt = async ({
 
   // 1.1 Get background props for all sections
   const sectionsBackgroundProp: PptxGenJS.default.BackgroundProps[] = [];
-  if (useDifferentSettingForEachSection && section) {
+  if (useDifferentSettingForEachSection === true && section) {
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
       if (
         sectionSetting.general?.useMainSectionSettings ||
@@ -1321,3 +1321,14 @@ export const exportSectionSettings = ({
     fileName: `KhenPptGeneratorSectionSettings_${new Date().getTime()}.json`,
   });
 };
+
+export function getInitialTextboxSettings(): SettingsValueType<
+  typeof PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS
+> {
+  return {
+    textboxPositionX:
+      PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS.textboxPositionX.defaultValue,
+    textboxPositionY:
+      PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS.textboxPositionY.defaultValue,
+  };
+}
