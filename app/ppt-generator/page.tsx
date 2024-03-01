@@ -7,6 +7,7 @@ import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGenerato
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Khen | PPT Generator",
@@ -29,8 +30,9 @@ const PptGeneratorPage = (props: Props) => {
             // variant="ghost"
             variant="outline"
             className="px-5 py-6"
+            asChild
           >
-            Get Started!
+            <Link href={"#search-lyrics"}>Get Started!</Link>
           </Button>
           {/* <Button
                 variant="outline"
@@ -49,7 +51,10 @@ const PptGeneratorPage = (props: Props) => {
         </div>
       </Container>
       <Container>
-        <h2 className="mt-8 text-xl font-semibold tracking-tight">
+        <h2
+          className="mt-8 text-xl font-semibold tracking-tight"
+          id="search-lyrics"
+        >
           1. Search Lyrics
         </h2>
         <div className="">coming soon...</div>
