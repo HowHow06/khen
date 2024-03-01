@@ -22,7 +22,7 @@ const Footer = (props: Props) => {
                 </span>
               </Link>
               <ul className="text-secondary-500 mb-6 flex flex-wrap items-center text-sm font-medium sm:mb-0">
-                <li>
+                {/* <li>
                   <a href="#" className="me-4 hover:underline md:me-6">
                     About
                   </a>
@@ -41,6 +41,15 @@ const Footer = (props: Props) => {
                   <a href="#" className="hover:underline">
                     Contact
                   </a>
+                </li> */}
+                <li>
+                  <Link
+                    href={`https://www.linkedin.com/in/howard-lim-hl06/`}
+                    target="_blank"
+                    className="hover:underline"
+                  >
+                    My LinkedIn
+                  </Link>
                 </li>
               </ul>
             </div>

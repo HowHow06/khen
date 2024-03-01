@@ -85,7 +85,7 @@ const Header = (props: Props) => {
                 asChild
               >
                 <Link
-                  href={`https://www.linkedin.com/in/howard-lim-3b79a21b8/`}
+                  href={`https://www.linkedin.com/in/howard-lim-hl06/`}
                   target="_blank"
                 >
                   <Linkedin className="h-6 w-6" />
@@ -93,8 +93,8 @@ const Header = (props: Props) => {
                 </Link>
               </Button>
               <ThemeSwitcher />
-              {/* auth to be implemented */}
-              <Button
+              {/* TODO: auth to be implemented */}
+              {/* <Button
                 variant="ghost"
                 className="hidden md:inline"
                 aria-label="Sign In"
@@ -103,7 +103,7 @@ const Header = (props: Props) => {
               </Button>
               <Button aria-label="Sign Up" className="hidden md:inline">
                 Sign Up
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
