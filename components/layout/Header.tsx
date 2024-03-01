@@ -5,6 +5,7 @@ import ThemeSwitcher from "../theme/ThemeSwitcher";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import KhenNavigationMenu from "./KhenNavigationMenu";
 
 type Props = {};
 
@@ -12,6 +13,7 @@ const routes = [
   {
     href: "/ppt-generator",
     label: "PPT Generator",
+    description: "A tool to generate PPT Slides for your songs at ease.",
   },
 ];
 
@@ -58,23 +60,9 @@ const Header = (props: Props) => {
               <h1 className="text-xl font-bold">Khen</h1>
             </Link>
           </div>
-
           <div className="flex items-center divide-x">
             <div className="hidden md:block">
-              <nav className="flex  items-center space-x-4 pr-2  lg:space-x-6">
-                {/* scale-0 so that it is hidden from mobile size to md size */}
-                {routes.map((route, i) => (
-                  <Button asChild variant="ghost" key={route.label}>
-                    <Link
-                      key={i}
-                      href={route.href}
-                      className="text-sm font-medium transition-colors"
-                    >
-                      {route.label}
-                    </Link>
-                  </Button>
-                ))}
-              </nav>
+              <KhenNavigationMenu routes={routes} />
             </div>
 
             <div className="flex items-center space-x-2 pl-2 ">

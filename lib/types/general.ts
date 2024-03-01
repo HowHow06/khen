@@ -37,3 +37,9 @@ export type CursorPosition = {
   start: number;
   end: number;
 };
+
+export type Route = {
+  href: string;
+  label: string;
+  description?: string;
+};
