@@ -1,5 +1,6 @@
 # khen
-A web based tool suite. 
+
+A web based tool suite.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -41,6 +42,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 ---
 
 ## Error faced in using jest
+
 - When using yarn v1 with jest, it might be fine on the first `yarn install`. However, when new dependencies are added, the `yarn test` will no longer works.
 - As workaround, the code below is added to the `package.json` file
   ```
@@ -55,3 +57,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
   - [\[Bug?\]: Error [ERR_REQUIRE_ESM]: require() of ES Module string-width/index.js](https://github.com/yarnpkg/yarn/issues/8994)
   - [Jest fails to run after installing selenium-webdriver](https://stackoverflow.com/questions/77592704/jest-fails-to-run-after-installing-selenium-webdriver/77592734#77592734)
   - [Error [ERR_REQUIRE_ESM]: require() of ES Module, node_modules\wrap-ansi\index.js not supported](https://stackoverflow.com/questions/77406363/error-err-require-esm-require-of-es-module-node-modules-wrap-ansi-index-js)
+
+---
+
+# PPT Generator Tool
+
+## Tutorial
+
+Refer to the guide [here](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4)
