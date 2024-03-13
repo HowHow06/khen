@@ -270,7 +270,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         fontSize: 44,
         charSpacing: -1,
         align: "center",
-        lineSpacingMultiple: 1.3,
+        lineSpacingMultiple: 1.5,
       },
       glow: {
         hasGlow: false,
