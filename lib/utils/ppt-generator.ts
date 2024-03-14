@@ -273,7 +273,7 @@ function createPresentationInstance({
   title?: string;
   layout?: string;
   backgroundProp: PptxGenJS.default.BackgroundProps;
-  sectionsBackgroundProp?: PptxGenJS.default.BackgroundProps[];
+  sectionsBackgroundProp?: (PptxGenJS.default.BackgroundProps | null)[];
 }) {
   let pres = new pptxgenjs();
   pres.author = author;
@@ -290,6 +290,9 @@ function createPresentationInstance({
   });
   if (sectionsBackgroundProp) {
     sectionsBackgroundProp.forEach((prop, index) => {
+      if (prop === null) {
+        return;
+      }
       pres.defineSlideMaster({
         title: getSectionImageSlideMasterTitle(index + 1),
         background: prop,
@@ -937,7 +940,8 @@ export const generatePpt = async ({
   });
 
   // 1.1 Get background props for all sections
-  const sectionsBackgroundProp: PptxGenJS.default.BackgroundProps[] = [];
+  const sectionsBackgroundProp: (PptxGenJS.default.BackgroundProps | null)[] =
+    [];
   if (useDifferentSettingForEachSection === true && section) {
     for (const [sectionName, sectionSetting] of Object.entries(section)) {
       if (
@@ -945,6 +949,7 @@ export const generatePpt = async ({
         (sectionSetting.general?.useMainBackgroundColor &&
           sectionSetting.general?.useMainBackgroundImage)
       ) {
+        sectionsBackgroundProp.push(null);
         // no point to create master slides for this section
         continue;
       }
