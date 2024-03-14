@@ -1,6 +1,10 @@
 "use client";
-import { CONTENT_TYPE, SETTING_CATEGORY } from "@/lib/constant";
-import { PptSettingsUIState } from "@/lib/types";
+import {
+  CONTENT_TYPE,
+  SETTING_CATEGORY,
+  TAB_TYPE_STATE_NAME_MAPPING,
+} from "@/lib/constant";
+import { PptSettingsUIState, TabType } from "@/lib/types";
 import React, {
   ReactNode,
   createContext,
@@ -8,6 +12,12 @@ import React, {
   useContext,
   useReducer,
 } from "react";
+
+type setSectionTabsProps = {
+  sectionName: string;
+  tab: string;
+  tabType: TabType;
+};
 
 type PptSettingsUIAction =
   | { type: "SET_CURRENT_CATEGORY_TAB"; tab: string }
@@ -17,7 +27,10 @@ type PptSettingsUIAction =
       type: "SET_ACCORDION_OPEN";
       accordions: string[];
       grouping: string;
-    };
+    }
+  | ({
+      type: "SET_SECTION_TABS";
+    } & setSectionTabsProps);
 
 type PptSettingsUIContextType = {
   settingsUIState: PptSettingsUIState;
@@ -29,6 +42,7 @@ type PptSettingsUIContextType = {
     accordions: string[];
     grouping: string;
   }) => void;
+  setSectionTabs: (props: setSectionTabsProps) => void;
 };
 
 const initialState: PptSettingsUIState = {
@@ -38,6 +52,7 @@ const initialState: PptSettingsUIState = {
   openAccordions: {
     base: [],
   },
+  sectionTabs: {},
 };
 
 const pptSettingsUIReducer = (
@@ -60,6 +75,17 @@ const pptSettingsUIReducer = (
     case "SET_CURRENT_COVER_TAB":
       return { ...state, currentCoverTab: action.tab };
 
+    case "SET_SECTION_TABS":
+      const targetTabName = TAB_TYPE_STATE_NAME_MAPPING[action.tabType];
+      const originalTargetSection = state.sectionTabs[action.sectionName];
+      const newSectionTabs = {
+        ...state.sectionTabs,
+        [action.sectionName]: {
+          ...originalTargetSection,
+          [targetTabName]: action.tab,
+        },
+      };
+      return { ...state, sectionTabs: newSectionTabs };
     default:
       return state;
   }
@@ -101,6 +127,18 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
     return dispatch({ type: "SET_CURRENT_COVER_TAB", tab: tab });
   }, []);
 
+  const setSectionTabs = useCallback(
+    ({ sectionName, tab, tabType }: setSectionTabsProps) => {
+      return dispatch({
+        type: "SET_SECTION_TABS",
+        tab: tab,
+        sectionName,
+        tabType,
+      });
+    },
+    [],
+  );
+
   return (
     <PptSettingsUIContext.Provider
       value={{
@@ -109,6 +147,7 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
         setCurrentContentTab,
         setAccordionsOpen,
         setCurrentCoverTab,
+        setSectionTabs,
       }}
     >
       {children}

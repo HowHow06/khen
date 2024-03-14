@@ -11,6 +11,7 @@ import {
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SECTION_PREFIX,
   SETTING_CATEGORY,
+  TAB_TYPES,
   TEXTBOX_GROUPING_PREFIX,
   TEXTBOX_SETTING_KEY,
 } from "@/lib/constant";
@@ -23,6 +24,7 @@ import {
   PptSettingsStateType,
   SectionSettingsKeyType,
   SelectionItemsType,
+  TabType,
 } from "@/lib/types";
 import {
   cn,
@@ -261,6 +263,7 @@ const PptGeneratorSetting = () => {
     setCurrentCategoryTab,
     setCurrentContentTab,
     setCurrentCoverTab,
+    setSectionTabs,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
@@ -303,6 +306,17 @@ const PptGeneratorSetting = () => {
   const toggleSettingSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  // Function Currying
+  const handleSectionTabChange =
+    ({ sectionName, tabType }: { sectionName: string; tabType: TabType }) =>
+    (newTabValue: string) => {
+      setSectionTabs({
+        sectionName: sectionName,
+        tab: newTabValue,
+        tabType: tabType,
+      });
+    };
 
   useEffect(() => {
     if (!isDifferentSettingsBySection) {
@@ -513,8 +527,15 @@ const PptGeneratorSetting = () => {
           </SheetHeader>
           {isUserAtSectionSettings ? (
             <Tabs
-              defaultValue={SETTING_CATEGORY.GENERAL}
+              value={
+                settingsUIState.sectionTabs[currentSection]
+                  ?.currentCategoryTab || SETTING_CATEGORY.GENERAL
+              }
               className="mt-2 w-full"
+              onValueChange={handleSectionTabChange({
+                sectionName: currentSection,
+                tabType: TAB_TYPES.SETTINGS_CATEGORY,
+              })}
             >
               {!isUseMainSectionSettings && <PptSettingsTabLists />}
               <GeneralSettingsTabContent
@@ -526,11 +547,25 @@ const PptGeneratorSetting = () => {
               />
               <CoverSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.COVER}.`}
+                onTabsValueChange={handleSectionTabChange({
+                  sectionName: currentSection,
+                  tabType: TAB_TYPES.COVER,
+                })}
+                tabsValue={
+                  settingsUIState.sectionTabs[currentSection]?.currentCoverTab
+                }
               />
               <ContentSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.CONTENT}.`}
                 textBoxCount={currentTextboxCount}
                 isIgnoreSubcontent={currentIsIgnoreSubContent}
+                onTabsValueChange={handleSectionTabChange({
+                  sectionName: currentSection,
+                  tabType: TAB_TYPES.CONTENT,
+                })}
+                tabsValue={
+                  settingsUIState.sectionTabs[currentSection]?.currentContentTab
+                }
               />
             </Tabs>
           ) : (

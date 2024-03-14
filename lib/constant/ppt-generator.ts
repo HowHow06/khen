@@ -598,3 +598,15 @@ export const LYRIC_SECTION_ITEMS: SelectionItemsType = [
     value: LYRIC_SECTION.FILL_SLIDE,
   },
 ];
+
+export const TAB_TYPES = {
+  SETTINGS_CATEGORY: "SETTINGS_CATEGORY",
+  CONTENT: "CONTENT",
+  COVER: "COVER",
+} as const;
+
+export const TAB_TYPE_STATE_NAME_MAPPING = {
+  [TAB_TYPES.SETTINGS_CATEGORY]: "currentCategoryTab",
+  [TAB_TYPES.CONTENT]: "currentContentTab",
+  [TAB_TYPES.COVER]: "currentCoverTab",
+} as const;

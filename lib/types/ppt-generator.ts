@@ -12,6 +12,8 @@ import {
   SETTING_CATEGORY,
   SETTING_FIELD_TYPE,
   SHADOW_TYPE,
+  TAB_TYPES,
+  TAB_TYPE_STATE_NAME_MAPPING,
   TEXTBOX_GROUPING_PREFIX,
   TEXTBOX_SETTING_KEY,
 } from "../constant";
@@ -235,13 +237,21 @@ export type PresetsType = {
   presetName: string;
 }[];
 
+export type TabType = (typeof TAB_TYPES)[keyof typeof TAB_TYPES];
+export type TabStateNameType =
+  (typeof TAB_TYPE_STATE_NAME_MAPPING)[keyof typeof TAB_TYPE_STATE_NAME_MAPPING];
+
 export type PptSettingsUIState = {
-  currentCategoryTab: string;
-  currentContentTab: string;
-  currentCoverTab: string;
   openAccordions: {
     [key: string]: string[];
   };
+  sectionTabs: {
+    [sectionName: string]: {
+      [key in TabStateNameType]: string;
+    };
+  };
+} & {
+  [key in TabStateNameType]: string;
 };
 
 export type ImportedSettingType =
