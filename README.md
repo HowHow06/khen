@@ -1,45 +1,65 @@
-# khen
+# Khen: My Web-Based Tool Suite
 
-A web based tool suite.
+Welcome to Khen, a versatile web-based tool suite designed to streamline and enrich your digital tasks. At the heart of Khen lies a commitment to solving real-world problems through the power of programming. The star of the show is our PPT Generator tool, crafted to significantly reduce the time and effort involved in creating PowerPoint presentations for praise and worship songs, making it a game-changer for church services.
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## 🌟 Highlight: PPT Generator Tool
 
-## Getting Started
+Creating PowerPoint presentations for each praise and worship session can be daunting, especially when handling a vast selection of songs. The PPT Generator tool within Khen addresses this challenge head-on, offering a quick and efficient way to generate presentations by simply inserting song lyrics. It's more than just a tool; it's a solution designed to save time, allowing you to focus on the essence of worship.
 
-First, run the development server:
+## 🔧 Features
+
+- **PPT Generator**: Automate the creation of PowerPoint presentations for songs with ease.
+- **User-Friendly Interface**: Designed with simplicity in mind, ensuring accessibility for all users.
+- **Expandable Suite**: While the PPT Generator takes center stage, Khen is built to grow, with plans to introduce more tools tailored to your needs.
+
+## 🚀 Getting Started
+
+Setting up Khen is straightforward, ensuring you can get up and running with minimal fuss:
+
+1. **Clone the Repository**
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/HowHow06/khen.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Installation**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Navigate to the project directory and install the necessary dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+# Install dependencies
+npm install
+```
 
-## Learn More
+3. **Environment Configuration**
 
-To learn more about Next.js, take a look at the following resources:
+Copy the `.env.example` file to a new file named `.env.local` and update it with your specific configurations:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cp .env.example .env.local
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+4. **Running the Application**
 
-## Deploy on Vercel
+Launch Khen with the following command:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The application will be available at `http://localhost:3000` or the port specified in your `.env` file.
+
+## 📚 Documentation: PPT Generator Tool
+
+For more detailed information on each tool within Khen, including walkthroughs and tips, refer to the [guide](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4).
+
+## 🙌 Contributing
+
+Khen is a personal passion project, but collaboration is the key to improvement. Whether it's suggesting new features, improving existing tools, or fixing bugs, your contributions are welcome. Feel free to fork the repository and submit pull requests.
 
 ---
+
+## Troubleshooting
 
 ## Error faced in using jest
 
@@ -57,11 +77,3 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
   - [\[Bug?\]: Error [ERR_REQUIRE_ESM]: require() of ES Module string-width/index.js](https://github.com/yarnpkg/yarn/issues/8994)
   - [Jest fails to run after installing selenium-webdriver](https://stackoverflow.com/questions/77592704/jest-fails-to-run-after-installing-selenium-webdriver/77592734#77592734)
   - [Error [ERR_REQUIRE_ESM]: require() of ES Module, node_modules\wrap-ansi\index.js not supported](https://stackoverflow.com/questions/77406363/error-err-require-esm-require-of-es-module-node-modules-wrap-ansi-index-js)
-
----
-
-# PPT Generator Tool
-
-## Tutorial
-
-Refer to the guide [here](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4)
