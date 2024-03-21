@@ -10,8 +10,9 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Khen | PPT Generator",
-  description: "A tool to generator PPT by inserting lyrics.",
+  title: "PPT Generator",
+  description:
+    "A tool to generator PPT by inserting lyrics, simplifying the creation of PowerPoint presentations for church praise and worship songs.",
 };
 type Props = {};
 
