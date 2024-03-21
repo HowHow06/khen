@@ -51,6 +51,7 @@ const FindAndReplaceButton = ({
             type="button"
             size={isIconButton ? "icon" : "default"}
             tooltipText={"Find & Replace"}
+            aria-label="find and replace"
           >
             {isIconButton ? <Replace /> : "Find & Replace"}
           </TooltipButton>

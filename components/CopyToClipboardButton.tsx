@@ -35,6 +35,7 @@ const CopyToClipboardButton = ({ text, isIconButton = true }: Props) => {
         type="button"
         size={isIconButton ? "icon" : "default"}
         tooltipText="Copy to Clipboard"
+        aria-label="Copy to clipboard"
       >
         {isIconButton ? <ClipboardCopy /> : "Copy to clipboard"}
       </TooltipButton>

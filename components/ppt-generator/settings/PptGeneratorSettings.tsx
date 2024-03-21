@@ -483,6 +483,7 @@ const PptGeneratorSetting = () => {
                   ? "right-1/2 duration-500 sm:right-96 xl:right-1/4"
                   : "right-0 duration-300"
               }`}
+              aria-label="Open settings"
             >
               <ChevronLeft
                 className={`${isOpen ? "rotate-180 transform" : ""} transition-transform duration-700`}

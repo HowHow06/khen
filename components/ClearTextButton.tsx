@@ -27,6 +27,7 @@ const ClearTextButton = ({ text, setText, isIconButton = true }: Props) => {
       type="button"
       size={isIconButton ? "icon" : "default"}
       tooltipText="Clear Text"
+      aria-label="Clear text"
     >
       {isIconButton ? <XCircle /> : "Clear"}
     </TooltipButton>
