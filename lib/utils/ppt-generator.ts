@@ -383,7 +383,7 @@ function createSlidesFromLyrics({
   const insertedIndex: number[] = [];
   primaryLinesArray.forEach((primaryLine, index, arr) => {
     if (insertedIndex.indexOf(index) !== -1) {
-      // skip
+      // the line is inserted, skipping it
       return;
     }
     const currentSectionSetting =
@@ -586,21 +586,9 @@ function createSlidesFromLyrics({
     });
 
     if (hasSecondaryContent) {
-      let secondaryLine = secondaryLinesArray[index]?.trim() ?? "";
       const toRemoveIdenticalWords = isUseSectionSettings
         ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
         : settingValues.general.ignoreSubcontentWhenIdentical;
-
-      if (isCover) {
-        const subCoverLineIndex = secondaryLine.indexOf(
-          `${LYRIC_SECTION.SECONDARY_TITLE} `,
-        );
-        const hasSecondaryTitle = subCoverLineIndex !== -1;
-
-        secondaryLine = hasSecondaryTitle
-          ? secondaryLine.substring(subCoverLineIndex + 3)
-          : secondaryLine.replace(`${LYRIC_SECTION.MAIN_TITLE} `, ""); // use the pinyin if no secondary title
-      }
 
       const secondaryContentOption = isUseSectionSettings
         ? currentSectionSetting.content.secondary
@@ -609,9 +597,22 @@ function createSlidesFromLyrics({
         ? currentSectionSetting.cover.secondary
         : settingValues.cover.secondary;
 
-      const textToInsert = [secondaryLine];
-      insertedIndex.slice(1).forEach((i) => {
+      const textToInsert: string[] = [];
+      insertedIndex.forEach((i) => {
         let tempLine = secondaryLinesArray[i]?.trim() ?? "";
+
+        if (isCover) {
+          // if the inserted line is a cover, and the insertedIndex must be length of 1
+          const subCoverLineIndex = tempLine.indexOf(
+            `${LYRIC_SECTION.SECONDARY_TITLE} `,
+          );
+          const hasSecondaryTitle = subCoverLineIndex !== -1;
+
+          tempLine = hasSecondaryTitle
+            ? tempLine.substring(subCoverLineIndex + 3)
+            : tempLine.replace(`${LYRIC_SECTION.MAIN_TITLE} `, ""); // use the pinyin if no secondary title
+        }
+
         if (toRemoveIdenticalWords) {
           tempLine = removeIdenticalWords(
             tempLine,
