@@ -3,6 +3,7 @@ import * as OpenCC from "opencc-js";
 const customTraditionalToSimplifiedDict: [string, string][] = [
   ["罣虑", "挂虑"],
   ["擡", "抬"],
+  ["計畫", "计划"]
 ];
 
 export function convertToSimplified(text: string) {
