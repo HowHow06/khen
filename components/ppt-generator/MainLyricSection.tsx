@@ -35,6 +35,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const { saveToUndoStack } = useUndoStack<string>({
     ref: mainTextareaRef,
     onUndo: onUndoCallback,
+    disableUndoShortcut: true,
   });
 
   const setMainTextHandler = useCallback(
