@@ -79,6 +79,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   不着: "bù zháo",
   祢: "nǐ",
   袮: "nǐ",
+  牵引着: "qiān yǐn zhe"
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
