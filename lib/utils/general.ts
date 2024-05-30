@@ -7,6 +7,7 @@ import {
 } from "../constant/general";
 import {
   Collection,
+  CursorPosition,
   ResultWithOptionalPath,
   TextTransformType,
   traverseAndCollectOption,
@@ -367,4 +368,13 @@ export const getTextInsertedAtPosition = ({
     originalText.slice(positionToInsert);
 
   return { resultText, insertedText: textToAdd };
+};
+
+
+export const getTextByCursorPosition = (cursorPosition: CursorPosition, text: string) => {
+  return {
+    before: text.slice(0, cursorPosition.start),
+    targetValue: text.slice(cursorPosition.start, cursorPosition.end),
+    after: text.slice(cursorPosition.end),
+  };
 };

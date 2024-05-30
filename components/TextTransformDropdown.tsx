@@ -2,7 +2,10 @@
 import { SCREEN_SIZE, TEXT_TRANSFORM } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { CursorPosition, TextTransformType } from "@/lib/types";
-import { getTransformedTextByLines } from "@/lib/utils";
+import {
+  getTextByCursorPosition,
+  getTransformedTextByLines,
+} from "@/lib/utils";
 import {
   convertToSimplified,
   convertToTraditional,
@@ -39,14 +42,6 @@ const TextTransformDropdown = ({
   const hasSelectedText =
     cursorPosition && cursorPosition.start !== cursorPosition.end;
 
-  const getTextByCursorPosition = (cursorPosition: CursorPosition) => {
-    return {
-      before: text.slice(0, cursorPosition.start),
-      targetValue: text.slice(cursorPosition.start, cursorPosition.end),
-      after: text.slice(cursorPosition.end),
-    };
-  };
-
   const getConvertedText = ({
     conversion,
   }: {
@@ -55,8 +50,10 @@ const TextTransformDropdown = ({
     if (!hasSelectedText) {
       return conversion(text);
     }
-    const { before, targetValue, after } =
-      getTextByCursorPosition(cursorPosition);
+    const { before, targetValue, after } = getTextByCursorPosition(
+      cursorPosition,
+      text,
+    );
     const convertedText = conversion(targetValue);
     return before + convertedText + after;
   };
