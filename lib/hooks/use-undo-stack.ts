@@ -41,12 +41,12 @@ const useUndoStack = <T = string>({
 
   useEffect(() => {
     const currentRef = ref.current;
-    if (currentRef && disableUndoShortcut) {
+    if (currentRef && !disableUndoShortcut) {
       currentRef.addEventListener("keydown", handleKeyDown as EventListener);
     }
 
     return () => {
-      if (currentRef && disableUndoShortcut) {
+      if (currentRef && !disableUndoShortcut) {
         currentRef.removeEventListener(
           "keydown",
           handleKeyDown as EventListener,
