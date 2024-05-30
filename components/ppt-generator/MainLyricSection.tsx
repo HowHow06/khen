@@ -89,31 +89,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           text={mainText}
           setText={setMainTextForSectionInsertion}
           cursorPosition={cursorPosition}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (mainTextareaRef.current && cursorPosition) {
-              mainTextareaRef.current.setSelectionRange(
-                cursorPosition.start,
-                cursorPosition.end,
-              );
-              mainTextareaRef.current.focus();
-            }
-          }}
+          onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
         />
         <TextTransformDropdown
           text={mainText}
           setText={setMainTextHandler}
           cursorPosition={cursorPosition}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            if (mainTextareaRef.current && cursorPosition) {
-              mainTextareaRef.current.setSelectionRange(
-                cursorPosition.start,
-                cursorPosition.end,
-              );
-              mainTextareaRef.current.focus();
-            }
-          }}
+          onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
         />
         <GeneratePinyinDropdown setText={setSecondaryText} text={mainText} />
         <FindAndReplaceButton text={mainText} setText={setMainTextHandler} />
