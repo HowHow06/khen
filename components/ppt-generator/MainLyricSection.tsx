@@ -27,15 +27,11 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     handleSelect: cursorHandleSelect,
   } = useCursorPosition();
   const [showCommand, setShowCommand] = useState<boolean>(false);
-  const onUndoCallback = useCallback(
-    (lastText: string) => setMainText(lastText),
-    [setMainText],
-  );
 
   const { saveToUndoStack } = useUndoStack<string>({
     ref: mainTextareaRef,
-    onUndo: onUndoCallback,
-    disableUndoShortcut: false,
+    textValue: mainText,
+    onTextUpdate: setMainText,
   });
 
   const setMainTextHandler = useCallback(
