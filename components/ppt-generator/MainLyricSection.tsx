@@ -35,7 +35,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const { saveToUndoStack } = useUndoStack<string>({
     ref: mainTextareaRef,
     onUndo: onUndoCallback,
-    disableUndoShortcut: true,
+    disableUndoShortcut: false,
   });
 
   const setMainTextHandler = useCallback(
@@ -64,7 +64,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   );
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMainText(event.target.value);
+    setMainTextHandler(event.target.value);
     cursorHandleTextChange(event);
   };
 
