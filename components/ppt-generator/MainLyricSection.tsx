@@ -32,6 +32,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     ref: mainTextareaRef,
     textValue: mainText,
     onTextUpdate: setMainText,
+    disableShortcut: true,
   });
 
   const setMainTextHandler = useCallback(
@@ -67,6 +68,14 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "/") {
       setShowCommand(true);
+    }
+
+    if (event.ctrlKey && !event.altKey) {
+      if (event.key === "h") {
+        event.preventDefault();
+        // const selectedText = getTextByCursorPosition(cursorPosition, mainText);
+        // open replace bar
+      }
     }
   };
 
