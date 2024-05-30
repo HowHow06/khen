@@ -123,7 +123,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       <Textarea
         ref={mainTextareaRef}
         placeholder="Insert the main lyrics here. Press '/' for insert command."
-        className="min-h-96 md:min-h-80"
+        className="min-h-96 md:min-h-[35rem]"
         value={mainText}
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}
