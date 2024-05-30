@@ -12,12 +12,16 @@ type Props = {
   text: string;
   setText: (text: string) => void;
   isIconButton?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
 };
 
 const FindAndReplaceButton = ({
   align = "center",
   text,
   setText,
+  isOpen,
+  onOpenChange,
   isIconButton = true,
 }: Props) => {
   const [findText, setFindText] = useState("");
@@ -44,7 +48,7 @@ const FindAndReplaceButton = ({
   };
   return (
     <>
-      <Popover>
+      <Popover open={isOpen} onOpenChange={onOpenChange}>
         <PopoverTrigger asChild>
           <TooltipButton
             variant="outline"
