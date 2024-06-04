@@ -41,7 +41,6 @@ const LyricFormatterDialogButton = (props: Props) => {
         toast.warning(`Invalid input!`, {
           description: `Make sure the each line of lyric has corresponding translation.`,
           duration: 10 * 1000,
-          closeButton: true,
         });
         return;
       }
@@ -61,13 +60,15 @@ const LyricFormatterDialogButton = (props: Props) => {
       <DialogTrigger asChild>
         <Button variant="outline">Lyric Formatter</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[60vw]">
+      <DialogContent className="max-w-[80vw] sm:max-w-[60vw]">
         <DialogHeader>
-          <DialogTitle>Multi-languages Lyric Formatter</DialogTitle>
+          <DialogTitle className="text-left">
+            Multi-languages Lyric Formatter
+          </DialogTitle>
         </DialogHeader>
-        <div className="flex justify-between space-x-2">
+        <div className="flex flex-col justify-between space-x-2 space-y-4 md:flex-row">
           <div className="flex flex-[2] flex-col space-y-2">
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap sm:space-x-4">
               <div className="flex items-center space-x-2">
                 <Label className="text-nowrap">Lanaguage Count:</Label>
                 <Input
@@ -84,7 +85,7 @@ const LyricFormatterDialogButton = (props: Props) => {
               <Button onClick={onFormatClick}>Format</Button>
             </div>
             <Textarea
-              className="h-[300px]"
+              className="h-32 sm:h-[300px]"
               onChange={handleTextChange(setLyricContent)}
               value={lyricContent}
             />
@@ -93,7 +94,11 @@ const LyricFormatterDialogButton = (props: Props) => {
             <div className="flex space-x-4">
               <CopyToClipboardButton text={resultContent} />
             </div>
-            <Textarea className="h-[300px]" readOnly value={resultContent} />
+            <Textarea
+              className="h-32 sm:h-[300px]"
+              readOnly
+              value={resultContent}
+            />
           </div>
         </div>
       </DialogContent>
