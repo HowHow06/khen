@@ -13,6 +13,7 @@ import LyricSectionCommand from "../LyricSectionCommand";
 import SectionInsertDropdown from "../SectionInsertDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
+import LyricFormatterDialogButton from "../lyric-formatter/LyricFormatterDialogButton";
 
 type MainLyricSectionProps = {};
 
@@ -106,6 +107,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         <FindAndReplaceButton text={mainText} setText={setMainTextHandler} />
         <CopyToClipboardButton text={mainText} />
         <ClearTextButton text={mainText} setText={setMainTextHandler} />
+        <LyricFormatterDialogButton />
       </div>
       <Textarea
         ref={mainTextareaRef}
