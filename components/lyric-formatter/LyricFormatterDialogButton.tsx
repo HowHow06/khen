@@ -66,7 +66,7 @@ const LyricFormatterDialogButton = (props: Props) => {
             Multi-languages Lyric Formatter
           </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col justify-between space-x-2 space-y-4 md:flex-row">
+        <div className="flex flex-col justify-between space-x-0 space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           <div className="flex flex-[2] flex-col space-y-2">
             <div className="flex flex-wrap sm:space-x-4">
               <div className="flex items-center space-x-2">
