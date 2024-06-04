@@ -1,7 +1,9 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
+import { SCREEN_SIZE } from "@/lib/constant/general";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
+import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
@@ -28,6 +30,8 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     handleSelect: cursorHandleSelect,
   } = useCursorPosition();
   const [showCommand, setShowCommand] = useState<boolean>(false);
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
   const { saveToUndoStack } = useUndoStack<string>({
     ref: mainTextareaRef,
@@ -111,7 +115,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       </div>
       <Textarea
         ref={mainTextareaRef}
-        placeholder="Insert the main lyrics here. Press '/' for insert command."
+        placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? '' : `Press '/' for insert command.`}`}
         className="min-h-96 md:min-h-[35rem]"
         value={mainText}
         onChange={handleTextChange}
