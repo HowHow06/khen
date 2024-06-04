@@ -45,7 +45,9 @@ const LyricFormatterDialogButton = (props: Props) => {
         return;
       }
       const tempResult = formatLyrics(lyrics, languageCount);
-      tempResult.forEach((result, index) => resultArray[index].push(...result));
+      tempResult.forEach(
+        (result, index) => resultArray[index].push(...result, ""), //add empty line
+      );
     }
 
     const resultText = resultArray
