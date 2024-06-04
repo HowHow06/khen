@@ -69,7 +69,7 @@ const LyricFormatterDialogButton = (props: Props) => {
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col justify-between space-x-0 space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
-          <div className="flex flex-[2] flex-col space-y-2">
+          <div className="flex flex-[2] flex-col space-y-1">
             <div className="flex flex-wrap sm:space-x-4">
               <div className="flex items-center space-x-2">
                 <Label className="text-nowrap">Lanaguage Count:</Label>
@@ -86,16 +86,22 @@ const LyricFormatterDialogButton = (props: Props) => {
 
               <Button onClick={onFormatClick}>Format</Button>
             </div>
+            <Label className="text-xs font-normal text-muted-foreground">
+              Input:
+            </Label>
             <Textarea
               className="h-32 sm:h-[300px]"
               onChange={handleTextChange(setLyricContent)}
               value={lyricContent}
             />
           </div>
-          <div className="flex flex-[1] flex-col space-y-2">
+          <div className="flex flex-[1] flex-col space-y-1">
             <div className="flex space-x-4">
               <CopyToClipboardButton text={resultContent} />
             </div>
+            <Label className="text-xs font-normal text-muted-foreground">
+              Result:
+            </Label>
             <Textarea
               className="h-32 sm:h-[300px]"
               readOnly
