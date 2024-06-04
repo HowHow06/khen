@@ -58,7 +58,7 @@ const LyricFormatterDialogButton = (props: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Lyric Formatter</Button>
+        <Button variant="outline">Split Lyrics By Language</Button>
       </DialogTrigger>
       <DialogContent className="max-w-[80vw] sm:max-w-[60vw]">
         <DialogHeader>
