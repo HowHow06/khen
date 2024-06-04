@@ -63,7 +63,7 @@ const LyricFormatterDialogButton = (props: Props) => {
       </DialogTrigger>
       <DialogContent className="max-w-[60vw]">
         <DialogHeader>
-          <DialogTitle>Multi-languages lyric formatter</DialogTitle>
+          <DialogTitle>Multi-languages Lyric Formatter</DialogTitle>
         </DialogHeader>
         <div className="flex justify-between space-x-2">
           <div className="flex flex-[2] flex-col space-y-2">
