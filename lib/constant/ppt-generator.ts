@@ -81,6 +81,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   袮: "nǐ",
   牵引着: "qiān yǐn zhe",
   明了: "míng liǎo",
+  同行: "tóng xíng",
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
