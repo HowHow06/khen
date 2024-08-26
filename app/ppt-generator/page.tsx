@@ -91,7 +91,6 @@ const PptGeneratorPage = (props: Props) => {
                 <Button variant="default" type="submit">
                   Generate
                 </Button>
-                <GeneratePreviewButton/>
               </div>
             </div>
           </Container>
