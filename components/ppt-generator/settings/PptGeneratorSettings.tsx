@@ -480,7 +480,7 @@ const PptGeneratorSetting = () => {
               variant={"outline"}
               className={`fixed top-1/2 flex -translate-y-1/2 transform items-center rounded-r-none px-0 py-10 transition-all ease-in-out ${
                 isOpen
-                  ? "right-1/2 duration-500 sm:right-96 xl:right-1/4"
+                  ? "right-1/2 duration-500 sm:right-96 xl:right-1/4 2xl:right-[21vw]"
                   : "right-0 duration-300"
               }`}
               aria-label="Open settings"
@@ -494,7 +494,7 @@ const PptGeneratorSetting = () => {
 
         <SheetContent
           className={cn(
-            "w-100 h-4/5 sm:h-full sm:w-96 xl:w-1/4",
+            "w-100 h-4/5 sm:max-w-none sm:h-full sm:w-96 xl:w-1/4 2xl:w-[21vw]",
             isExtraSmallScreen && "rounded-t-3xl shadow-md",
           )}
           side={isExtraSmallScreen ? "bottom" : "right"}
