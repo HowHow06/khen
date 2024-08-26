@@ -1,5 +1,6 @@
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
+import GeneratePreviewButton from "@/components/ppt-generator/GeneratePreviewButton";
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
 import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
 import FileSettings from "@/components/ppt-generator/settings/FileSettings";
@@ -90,6 +91,7 @@ const PptGeneratorPage = (props: Props) => {
                 <Button variant="default" type="submit">
                   Generate
                 </Button>
+                <GeneratePreviewButton/>
               </div>
             </div>
           </Container>

@@ -1,5 +1,6 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
+import type { PptxGenJS as PptxGenJSType2 } from "../types/pptxgenjs";
 import { ZodError, ZodSchema } from "zod";
 import {
   deepMerge,
@@ -52,6 +53,7 @@ import {
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
+import { InternalPresentation, InternalSlideObject, InternalTextPart } from "../react-pptx-preview/normalizer";
 
 export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
@@ -905,6 +907,139 @@ const parsePptFilename = ({
     fileNamePrefix,
     fileNameSuffix,
   };
+};
+
+export const generatePreviewConfig = async ({
+  settingValues,
+  primaryLyric,
+  secondaryLyric,
+}: {
+  settingValues: PptSettingsStateType;
+  primaryLyric: string;
+  secondaryLyric: string;
+}): Promise<InternalPresentation> => {
+  const {
+    general: {
+      separateSectionsToFiles,
+      mainBackgroundColor,
+      mainBackgroundImage,
+      useDifferentSettingForEachSection,
+    },
+    section,
+  } = settingValues;
+  const primaryLinesArray = primaryLyric.split("\n");
+  const secondaryLinesArray = secondaryLyric.split("\n");
+
+  const mainBackgroundColorToUse =
+    mainBackgroundColor ??
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
+  const mainBackgroundImageToUse =
+    mainBackgroundImage ??
+    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
+  // 1. Get background prop for the presentation
+  const mainBackgroundProp = await getPptBackgroundProp({
+    backgroundColor: mainBackgroundColorToUse,
+    backgroundImage: mainBackgroundImageToUse,
+  });
+
+  // 1.1 Get background props for all sections
+  const sectionsBackgroundProp: (PptxGenJS.default.BackgroundProps | null)[] =
+    [];
+  if (useDifferentSettingForEachSection === true && section) {
+    for (const [sectionName, sectionSetting] of Object.entries(section)) {
+      if (
+        sectionSetting.general?.useMainSectionSettings ||
+        (sectionSetting.general?.useMainBackgroundColor &&
+          sectionSetting.general?.useMainBackgroundImage)
+      ) {
+        sectionsBackgroundProp.push(null);
+        // no point to create master slides for this section
+        continue;
+      }
+      const sectionBackgroundColor =
+        sectionSetting.general?.sectionBackgroundColor ??
+        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor
+          .defaultValue;
+      const sectionBackgroundImage =
+        sectionSetting.general?.sectionBackgroundImage ??
+        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage
+          .defaultValue;
+
+      const backgroundProp = await getPptBackgroundProp({
+        backgroundColor: sectionSetting.general?.useMainBackgroundColor
+          ? mainBackgroundColorToUse
+          : sectionBackgroundColor,
+        backgroundImage: sectionSetting.general?.useMainBackgroundImage
+          ? null // no need to recreate the main image, the image wont be used, and will increase the file size
+          : sectionBackgroundImage,
+      });
+      sectionsBackgroundProp.push(backgroundProp);
+    }
+  }
+
+  // 2. Create a new Presentation instance
+  const pres = createPresentationInstance({
+    backgroundProp: mainBackgroundProp,
+    sectionsBackgroundProp: sectionsBackgroundProp,
+  });
+
+  // 3. Create Slides in the Presentation
+  createSlidesFromLyrics({
+    pres,
+    primaryLinesArray,
+    secondaryLinesArray,
+    settingValues,
+  });
+
+  // 3.1 Convert to the real PptxGenJS type
+  const presV2 = pres as unknown as PptxGenJSType2;
+  window.ppxtgen = presV2;
+  const masterSlides = presV2.slideLayouts;
+  const slides = presV2.slides;
+  const layout = presV2.layout.replace("LAYOUT_", "");
+
+  console.log({
+    masterSlides,
+    slides,
+  });
+
+  const masterSlidesConfig = masterSlides.reduce(
+    (acc, masterSlide) => ({
+      ...acc,
+      [masterSlide._name!]: {
+        name: masterSlide._name,
+        objects: masterSlide._slideObjects,
+        backgroundColor: masterSlide.background?.color,
+        backgroundImage: masterSlide.background?.data,
+      },
+    }),
+    {},
+  );
+
+  const slidesConfig = slides.map((slide) => ({
+    masterName: slide._slideLayout._name || null,
+    backgroundColor: slide.background?.color,
+    backgroundImage: slide.background?.data,
+    hidden: slide.hidden,
+    objects: slide._slideObjects?.map((object) => ({
+      kind: object._type,
+      text: object.text?.map((txt) => ({
+        text: txt.text || '',
+        style: {}, // TODO: convert option to style
+      })) || [],
+      style: object.options,
+    })),
+  }));
+
+  const reactPptxConfig: InternalPresentation = {
+    layout: layout as InternalPresentation['layout'],
+    masterSlides: masterSlidesConfig,
+    slides: slidesConfig as unknown as InternalPresentation['slides'], // TODO: check this
+  };
+
+  console.log({ reactPptxConfig });
+
+  return reactPptxConfig;
 };
 
 export const generatePpt = async ({
