@@ -49,11 +49,15 @@ import {
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
+  Prettify,
   SectionSettingsKeyType,
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
-import { InternalPresentation, InternalSlideObject, InternalTextPart } from "../react-pptx-preview/normalizer";
+import {
+  InternalPresentation,
+  InternalText,
+} from "../react-pptx-preview/normalizer";
 
 export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
@@ -1023,21 +1027,51 @@ export const generatePreviewConfig = async ({
     hidden: slide.hidden,
     objects: slide._slideObjects?.map((object) => ({
       kind: object._type,
-      text: object.text?.map((txt) => ({
-        text: txt.text || '',
-        style: {}, // TODO: convert option to style
-      })) || [],
-      style: object.options,
+      text:
+        object.text?.map((txt) => ({
+          text: txt.text || "",
+          style: {}, // TODO: convert option to style
+        })) || [],
+      style: {
+        verticalAlign: "middle", // default set to middle
+        h: 0,
+        ...object.options, // TODO: handle shadow, glow, isTextBox, linesSpacing, lineSpacingMultiple, charSpacing
+      },
     })),
   }));
 
-  const reactPptxConfig: InternalPresentation = {
-    layout: layout as InternalPresentation['layout'],
-    masterSlides: masterSlidesConfig,
-    slides: slidesConfig as unknown as InternalPresentation['slides'], // TODO: check this
+  const test: Prettify<InternalText["style"]> = {
+    verticalAlign: "middle",
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+    color: "",
+    fontFace: "",
+    align: "center",
+    fontSize: 0,
+    backgroundColor: "",
+    bold: true,
+    charSpacing: 0,
+    italic: false,
+    lineSpacing: 0,
+    margin: 0,
+    paraSpaceAfter: 0,
+    paraSpaceBefore: 0,
+    rotate: 0,
+    strike: false,
+    subscript: false,
+    superscript: false,
+    underline: {
+      style: "none",
+    },
   };
 
-  console.log({ reactPptxConfig });
+  const reactPptxConfig: InternalPresentation = {
+    layout: layout as InternalPresentation["layout"],
+    masterSlides: masterSlidesConfig,
+    slides: slidesConfig as unknown as InternalPresentation["slides"], // TODO: check this
+  };
 
   return reactPptxConfig;
 };
