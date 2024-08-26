@@ -58,6 +58,7 @@ import {
   InternalPresentation,
   InternalText,
 } from "../react-pptx-preview/normalizer";
+import { DataOrPathProps } from "../types/pptxgenjs/core-interfaces";
 
 export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
@@ -913,6 +914,23 @@ const parsePptFilename = ({
   };
 };
 
+const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
+  if (prop.data) {
+    return {
+      kind: "data",
+      data: prop.data,
+    };
+  }
+  if (prop.path) {
+    return {
+      kind: "path",
+      data: prop.path,
+    };
+  }
+
+  return null;
+};
+
 export const generatePreviewConfig = async ({
   settingValues,
   primaryLyric,
@@ -1014,7 +1032,9 @@ export const generatePreviewConfig = async ({
         name: masterSlide._name,
         objects: masterSlide._slideObjects,
         backgroundColor: masterSlide.background?.color,
-        backgroundImage: masterSlide.background?.data,
+        backgroundImage: masterSlide.background
+          ? getPreviewImageSrcFromPresImage(masterSlide.background)
+          : null,
       },
     }),
     {},
