@@ -38,12 +38,24 @@ const GeneratePreviewButton = (props: Props) => {
         open={previewConfig !== undefined}
         onOpenChange={(isOpen) => !isOpen && setPreviewConfig(undefined)}
       >
-        <DialogContent>
-          <Preview normalizedConfig={previewConfig} drawBoundingBoxes={false} />
+        <DialogContent className="flex min-w-[70vw]">
+          <div className="w-2/3">
+            <h3 className="text-xl font-semibold tracking-tight">Settings</h3>
+            
+          </div>
+          <div className="w-1/3">
+            <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
+            <div className="max-h-[80vh] overflow-y-auto">
+              <Preview
+                normalizedConfig={previewConfig}
+                drawBoundingBoxes={false}
+              />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      <Button variant="default" type="button" onClick={onGeneratePreviewClick}>
+      <Button variant="outline" type="button" onClick={onGeneratePreviewClick}>
         Preview
       </Button>
     </>
