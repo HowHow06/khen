@@ -49,6 +49,8 @@ import BaseSettings from "./BaseSettings";
 import GroupedBaseSettings from "./GroupedBaseSettings";
 import PresetsDropdown from "./PresetsDropdown";
 import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
+import GeneratePreviewButton from "../GeneratePreviewButton";
+import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
 
 const PptSettingsTabLists = () => {
   return (
@@ -492,9 +494,11 @@ const PptGeneratorSetting = () => {
           </SheetTrigger>
         )}
 
+        <GeneratePreviewButton />
+
         <SheetContent
           className={cn(
-            "w-100 h-4/5 sm:max-w-none sm:h-full sm:w-96 xl:w-1/4 2xl:w-[21vw]",
+            "w-100 h-4/5 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
             isExtraSmallScreen && "rounded-t-3xl shadow-md",
           )}
           side={isExtraSmallScreen ? "bottom" : "right"}
@@ -505,26 +509,12 @@ const PptGeneratorSetting = () => {
           }
         >
           <SheetHeader>
-            <div className="flex flex-row items-center space-x-5">
-              <SheetTitle>Settings</SheetTitle>
-              <PresetsDropdown
-                hasSectionSettings={isDifferentSettingsBySection}
-                currentSectionName={currentSection}
-                presets={DEFAULT_PRESETS}
-              />
-              <SettingsOptionsDropdown
-                hasSectionSettings={isDifferentSettingsBySection}
-                currentSectionName={currentSection}
-              />
-            </div>
-            {isDifferentSettingsBySection && (
-              <FormSelect
-                items={sectionItems}
-                selectedValue={currentSection}
-                onItemSelect={(value) => setCurrentSection(value)}
-                className="w-full"
-              />
-            )}
+            <PptGeneratorSettingHeader
+              isDifferentSettingsBySection={isDifferentSettingsBySection}
+              currentSection={currentSection}
+              sectionItems={sectionItems}
+              setCurrentSection={setCurrentSection}
+            />
           </SheetHeader>
           {isUserAtSectionSettings ? (
             <Tabs
