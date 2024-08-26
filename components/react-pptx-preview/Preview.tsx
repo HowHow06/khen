@@ -115,9 +115,6 @@ const getTextStyleForPart = (
     case "bottom":
       verticalAlign = "end";
       break;
-    default:
-      verticalAlign = "center"; // TODO: check if successfully set to middle
-      break;
   }
 
   const textDecorationParts: string[] = [];
