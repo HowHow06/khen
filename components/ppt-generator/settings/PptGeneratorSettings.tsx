@@ -278,7 +278,10 @@ const PptGeneratorSetting = () => {
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
-  const settingsValues = getValues() as PptSettingsStateType;
+  const settingsValues = useMemo(
+    () => getValues() as PptSettingsStateType,
+    [getValues],
+  );
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
@@ -320,6 +323,7 @@ const PptGeneratorSetting = () => {
       });
     };
 
+  // handle add / remove section based on main text 
   useEffect(() => {
     if (!isDifferentSettingsBySection) {
       return;
@@ -376,6 +380,7 @@ const PptGeneratorSetting = () => {
     sectionItems.length,
   ]);
 
+  // handle currentTextboxCount change 
   useEffect(() => {
     const settingsValues = getValues() as PptSettingsStateType;
     const currentTargetSetting = isUserAtSectionSettings
