@@ -2,14 +2,13 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import {
   CONTENT_TYPE,
   DEFAULT_PRESETS,
@@ -21,12 +20,10 @@ import {
   SETTING_CATEGORY,
   TAB_TYPES,
   TEXTBOX_GROUPING_PREFIX,
-  TEXTBOX_SETTING_KEY,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
-  BaseSettingMetaType,
   ContentTextboxKey,
   ContentTypeType,
   PptSettingsStateType,
@@ -39,220 +36,16 @@ import {
   getInitialTextboxSettings,
   getLinesStartingWith,
   getSectionSettingsInitialValue,
-  groupByAsObject,
 } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
-import BaseSettings from "./BaseSettings";
-import GroupedBaseSettings from "./GroupedBaseSettings";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
+import PptSettingsTabs from "./PptSettingsTabs";
 import PresetsDropdown from "./PresetsDropdown";
-
-const PptSettingsTabLists = () => {
-  return (
-    <ScrollArea className="w-full pb-3">
-      <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
-        <TabsTrigger value={SETTING_CATEGORY.GENERAL} className="min-w-20">
-          General
-        </TabsTrigger>
-        <TabsTrigger value={SETTING_CATEGORY.COVER} className="min-w-20">
-          Cover
-        </TabsTrigger>
-        <TabsTrigger value={SETTING_CATEGORY.CONTENT} className="min-w-20">
-          Content
-        </TabsTrigger>
-        <ScrollBar orientation="horizontal" />
-      </TabsList>
-    </ScrollArea>
-  );
-};
-
-type TabContentBaseProp = {
-  scrollAreaClassName?: string;
-  settingsPrefix: string;
-};
-
-type TabContentWithInnerTabProp = TabContentBaseProp & {
-  tabsValue?: string;
-  onTabsValueChange?: (tab: string) => void;
-};
-
-const GeneralSettingsTabContent = ({
-  scrollAreaClassName,
-  settingsPrefix,
-  isForSection,
-  isSectionUseMainSectionSettings = false,
-}: TabContentBaseProp &
-  (
-    | {
-        isForSection: boolean;
-        isSectionUseMainSectionSettings: boolean;
-      }
-    | {
-        isForSection?: never;
-        isSectionUseMainSectionSettings?: never;
-      }
-  )) => {
-  const settingMetaToUse: BaseSettingMetaType = useMemo(() => {
-    if (!isForSection) {
-      return PPT_GENERATION_SETTINGS_META.general;
-    }
-
-    if (isSectionUseMainSectionSettings) {
-      return {
-        useMainSectionSettings:
-          PPT_GENERATION_SETTINGS_META.section.useMainSectionSettings,
-      }; // show only useMainSectionSettings
-    }
-
-    return PPT_GENERATION_SETTINGS_META.section;
-  }, [isForSection, isSectionUseMainSectionSettings]);
-
-  return (
-    <TabsContent value={SETTING_CATEGORY.GENERAL}>
-      <ScrollArea
-        className={cn("h-[54vh] pl-3 pr-4 sm:h-[75vh]", scrollAreaClassName)}
-      >
-        <BaseSettings
-          settingsMeta={settingMetaToUse}
-          keyPrefix={settingsPrefix}
-          className="pb-5 xl:pb-10"
-        />
-      </ScrollArea>
-    </TabsContent>
-  );
-};
-
-const CoverSettingsTabContent = ({
-  tabsValue,
-  onTabsValueChange,
-  scrollAreaClassName,
-  settingsPrefix,
-}: TabContentWithInnerTabProp & {}) => {
-  return (
-    <TabsContent value={SETTING_CATEGORY.COVER}>
-      <Tabs
-        defaultValue={CONTENT_TYPE.MAIN}
-        value={tabsValue}
-        onValueChange={onTabsValueChange}
-        className="w-full px-2"
-      >
-        <TabsList className="my-2 grid w-full grid-cols-2">
-          <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-          <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
-        </TabsList>
-        <TabsContent value={CONTENT_TYPE.MAIN}>
-          <ScrollArea
-            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
-          >
-            <BaseSettings
-              settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
-              keyPrefix={settingsPrefix + CONTENT_TYPE.MAIN + "."}
-              className="pb-5 xl:pb-10"
-            />
-          </ScrollArea>
-        </TabsContent>
-        <TabsContent value={CONTENT_TYPE.SECONDARY}>
-          <ScrollArea
-            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
-          >
-            <BaseSettings
-              settingsMeta={PPT_GENERATION_SETTINGS_META.cover}
-              keyPrefix={settingsPrefix + CONTENT_TYPE.SECONDARY + "."}
-              className="pb-5 xl:pb-10"
-            />
-          </ScrollArea>
-        </TabsContent>
-      </Tabs>
-    </TabsContent>
-  );
-};
-
-const groupedContentSettings = groupByAsObject(
-  PPT_GENERATION_SETTINGS_META.content,
-  "groupingName",
-);
-
-const ContentSettingsTabContent = ({
-  tabsValue,
-  onTabsValueChange,
-  scrollAreaClassName,
-  settingsPrefix,
-  isIgnoreSubcontent = false,
-  textBoxCount,
-}: TabContentWithInnerTabProp & {
-  textBoxCount: number;
-  isIgnoreSubcontent?: boolean;
-}) => {
-  const groupedTextBoxSettings = useMemo(() => {
-    return Array.from({
-      length: textBoxCount,
-    }).reduce<{}>((result, _, currentIndex) => {
-      return {
-        ...result,
-        [`${TEXTBOX_GROUPING_PREFIX}${currentIndex + 1}`]:
-          PPT_GENERATION_SETTINGS_META.contentTextbox,
-      };
-    }, {});
-  }, [textBoxCount]);
-
-  return (
-    <TabsContent value={SETTING_CATEGORY.CONTENT}>
-      <Tabs
-        defaultValue={CONTENT_TYPE.MAIN}
-        value={tabsValue}
-        onValueChange={onTabsValueChange}
-        className="w-full px-2"
-      >
-        {!isIgnoreSubcontent && (
-          <TabsList className="my-2 grid w-full grid-cols-2">
-            <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-            <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
-          </TabsList>
-        )}
-        <TabsContent value={CONTENT_TYPE.MAIN}>
-          <ScrollArea
-            className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
-          >
-            <GroupedBaseSettings
-              keyPrefix={`${settingsPrefix}${CONTENT_TYPE.MAIN}.${TEXTBOX_SETTING_KEY}.`}
-              accordionKey={CONTENT_TYPE.MAIN + TEXTBOX_SETTING_KEY}
-              groupedSettingsMeta={groupedTextBoxSettings}
-            />
-            <GroupedBaseSettings
-              keyPrefix={`${settingsPrefix}${CONTENT_TYPE.MAIN}.`}
-              accordionKey={CONTENT_TYPE.MAIN}
-              groupedSettingsMeta={groupedContentSettings}
-              defaultAccordionValue={[`text`]}
-              className="pb-5 xl:pb-10"
-            />
-          </ScrollArea>
-        </TabsContent>
-        {!isIgnoreSubcontent && (
-          <TabsContent value={CONTENT_TYPE.SECONDARY}>
-            <ScrollArea
-              className={cn("h-[50vh] pr-3 sm:h-[72vh]", scrollAreaClassName)}
-            >
-              <GroupedBaseSettings
-                keyPrefix={`${settingsPrefix}${CONTENT_TYPE.SECONDARY}.${TEXTBOX_SETTING_KEY}.`}
-                accordionKey={CONTENT_TYPE.SECONDARY + TEXTBOX_SETTING_KEY}
-                groupedSettingsMeta={groupedTextBoxSettings}
-              />
-              <GroupedBaseSettings
-                keyPrefix={`${settingsPrefix}${CONTENT_TYPE.SECONDARY}.`}
-                accordionKey={CONTENT_TYPE.SECONDARY}
-                groupedSettingsMeta={groupedContentSettings}
-                defaultAccordionValue={[`text`]}
-                className="pb-5 xl:pb-10"
-              />
-            </ScrollArea>
-          </TabsContent>
-        )}
-      </Tabs>
-    </TabsContent>
-  );
-};
+import ContentSettingsTabContent from "./SettingsTabContent/Content";
+import CoverSettingsTabContent from "./SettingsTabContent/Cover";
+import GeneralSettingsTabContent from "./SettingsTabContent/General";
 
 const PptGeneratorSetting = () => {
   const { form, mainText } = usePptGeneratorFormContext();
@@ -530,7 +323,7 @@ const PptGeneratorSetting = () => {
                 tabType: TAB_TYPES.SETTINGS_CATEGORY,
               })}
             >
-              {!isUseMainSectionSettings && <PptSettingsTabLists />}
+              {!isUseMainSectionSettings && <PptSettingsTabs />}
               <GeneralSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.GENERAL}.`}
                 isForSection={true}
@@ -568,7 +361,7 @@ const PptGeneratorSetting = () => {
               value={settingsUIState.currentCategoryTab}
               onValueChange={setCurrentCategoryTab}
             >
-              <PptSettingsTabLists />
+              <PptSettingsTabs />
               <GeneralSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.GENERAL}.`}
                 scrollAreaClassName="h-[47vh] sm:h-[68vh]"
