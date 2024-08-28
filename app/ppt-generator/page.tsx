@@ -1,9 +1,8 @@
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
-import GeneratePreviewButton from "@/components/ppt-generator/GeneratePreviewButton";
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
 import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
-import FileSettings from "@/components/ppt-generator/settings/FileSettings";
+import FileNameSettings from "@/components/ppt-generator/settings/FileNameSettings";
 import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
@@ -86,7 +85,7 @@ const PptGeneratorPage = (props: Props) => {
               5. Generate PPT!
             </h2>
             <div className="mr-2 w-full lg:w-1/2">
-              <FileSettings />
+              <FileNameSettings />
               <div>
                 <Button variant="default" type="submit">
                   Generate
