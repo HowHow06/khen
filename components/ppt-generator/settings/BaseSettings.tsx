@@ -2,7 +2,7 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { BaseSettingMetaType, PptSettingsStateType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import SettingFormField from "./SettingFormField";
+import SettingFormField from "./common/SettingFormField";
 
 type BaseSettingsProps = {
   settingsMeta: BaseSettingMetaType;

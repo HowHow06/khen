@@ -1,18 +1,18 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import {
-  PPT_GENERATION_SETTINGS_META,
-  SETTING_CATEGORY,
-  SETTING_FIELD_TYPE,
-} from "@/lib/constant";
-import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../ui/form";
-import { Input } from "../../ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  PPT_GENERATION_SETTINGS_META,
+  SETTING_CATEGORY,
+  SETTING_FIELD_TYPE,
+} from "@/lib/constant";
 
 type Props = {};
 

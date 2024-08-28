@@ -1,7 +1,15 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
-import FormSelect from "@/components/ui/form-select";
+import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CONTENT_TYPE,
   DEFAULT_PRESETS,
@@ -35,22 +43,11 @@ import {
 } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "../../ui/button";
-import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../../ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import GeneratePreviewButton from "../GeneratePreviewButton";
 import BaseSettings from "./BaseSettings";
 import GroupedBaseSettings from "./GroupedBaseSettings";
-import PresetsDropdown from "./PresetsDropdown";
-import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
-import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
+import PresetsDropdown from "./PresetsDropdown";
 
 const PptSettingsTabLists = () => {
   return (
@@ -323,7 +320,7 @@ const PptGeneratorSetting = () => {
       });
     };
 
-  // handle add / remove section based on main text 
+  // handle add / remove section based on main text
   useEffect(() => {
     if (!isDifferentSettingsBySection) {
       return;
@@ -380,7 +377,7 @@ const PptGeneratorSetting = () => {
     sectionItems.length,
   ]);
 
-  // handle currentTextboxCount change 
+  // handle currentTextboxCount change
   useEffect(() => {
     const settingsValues = getValues() as PptSettingsStateType;
     const currentTargetSetting = isUserAtSectionSettings
