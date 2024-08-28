@@ -1,9 +1,8 @@
-import React from "react";
-import PresetsDropdown from "./PresetsDropdown";
-import SettingsOptionsDropdown from "./SettingsOptionsDropdown";
 import FormSelect from "@/components/ui/form-select";
 import { DEFAULT_PRESETS } from "@/lib/constant";
 import { SelectionItemsType } from "@/lib/types";
+import MoreOptionsDropdown from "../MoreOptionsDropdown";
+import PresetsDropdown from "../PresetsDropdown";
 
 type Props = {
   isDifferentSettingsBySection: boolean;
@@ -27,7 +26,7 @@ const PptGeneratorSettingHeader = ({
           currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />
-        <SettingsOptionsDropdown
+        <MoreOptionsDropdown
           hasSectionSettings={isDifferentSettingsBySection}
           currentSectionName={currentSection}
         />
