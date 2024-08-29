@@ -236,6 +236,10 @@ export const deepMerge = <T extends { [key in string]: any }>(
   return tempResult;
 };
 
+export const deepCopy = <T>(object: T) => {
+  return JSON.parse(JSON.stringify(object)) as T;
+};
+
 export function getLinesStartingWith(inputString: string, find: string) {
   const lines = inputString.split("\n");
 
@@ -370,8 +374,10 @@ export const getTextInsertedAtPosition = ({
   return { resultText, insertedText: textToAdd };
 };
 
-
-export const getTextByCursorPosition = (cursorPosition: CursorPosition, text: string) => {
+export const getTextByCursorPosition = (
+  cursorPosition: CursorPosition,
+  text: string,
+) => {
   return {
     before: text.slice(0, cursorPosition.start),
     targetValue: text.slice(cursorPosition.start, cursorPosition.end),

@@ -11,31 +11,23 @@ import {
 import {
   CONTENT_TYPE,
   DEFAULT_PRESETS,
-  LYRIC_SECTION,
   MAIN_SECTION_NAME,
-  PPT_GENERATION_SETTINGS_META,
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
-  SECTION_PREFIX,
   SETTING_CATEGORY,
   TAB_TYPES,
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
+import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   ContentTextboxKey,
   ContentTypeType,
   PptSettingsStateType,
   SectionSettingsKeyType,
-  SelectionItemsType,
   TabType,
 } from "@/lib/types";
-import {
-  cn,
-  getInitialTextboxSettings,
-  getLinesStartingWith,
-  getSectionSettingsInitialValue,
-} from "@/lib/utils";
+import { cn, getInitialTextboxSettings } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
@@ -56,17 +48,18 @@ const PptGeneratorSetting = () => {
     setSectionTabs,
   } = usePptSettingsUIContext();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
-  const [sectionItems, setSectionItems] = useState<SelectionItemsType>([
-    {
-      value: MAIN_SECTION_NAME,
-      label: "Main Section",
-    },
-  ]);
+
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
   const settingsValues = getValues() as PptSettingsStateType;
+  const { sectionItems, currentSection, setCurrentSection } =
+    usePptSettingsSections({
+      mainText,
+      getValues,
+      formReset: reset,
+    });
+
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
@@ -108,64 +101,7 @@ const PptGeneratorSetting = () => {
       });
     };
 
-  // handle add / remove section based on main text
-  useEffect(() => {
-    if (!isDifferentSettingsBySection) {
-      return;
-    }
-    const sections = getLinesStartingWith(mainText, LYRIC_SECTION.SECTION);
-    const newSectionItems = [
-      {
-        value: MAIN_SECTION_NAME,
-        label: "Main Section",
-      },
-    ];
-
-    const originalSettingValues = getValues();
-    const newSectionValues = {
-      ...originalSettingValues[SETTING_CATEGORY.SECTION],
-    };
-
-    sections.forEach((sectionName, currentIndex) => {
-      const currentSectionNumber = currentIndex + 1;
-      const currentSectionKey =
-        `${SECTION_PREFIX}${currentSectionNumber}` as SectionSettingsKeyType;
-
-      if (!newSectionValues[currentSectionKey]) {
-        // generate initial values for new sections
-        newSectionValues[currentSectionKey] = getSectionSettingsInitialValue({
-          settings: PPT_GENERATION_SETTINGS_META,
-        });
-      }
-      newSectionItems.push({
-        value: currentSectionKey,
-        label: `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}`,
-      });
-    });
-
-    if (sections.length < sectionItems.length - 1) {
-      // delete excess sections
-      const difference = sectionItems.length - 1 - sections.length;
-      Array.from({ length: difference }).forEach((_, index) => {
-        const sectionNumber = sections.length + 1 + index;
-        delete newSectionValues[`${SECTION_PREFIX}${sectionNumber}`];
-      });
-    }
-
-    setSectionItems(newSectionItems);
-    reset({
-      ...originalSettingValues,
-      [SETTING_CATEGORY.SECTION]: newSectionValues,
-    });
-  }, [
-    mainText,
-    isDifferentSettingsBySection,
-    getValues,
-    reset,
-    sectionItems.length,
-  ]);
-
-  // handle currentTextboxCount change
+  // handle currentTextboxCount change, TODO: become hook
   useEffect(() => {
     const settingsValues = getValues() as PptSettingsStateType;
     const currentTargetSetting = isUserAtSectionSettings
@@ -232,12 +168,6 @@ const PptGeneratorSetting = () => {
     currentGeneralSetting?.ignoreSubcontent === true
   ) {
     setCurrentContentTab(CONTENT_TYPE.MAIN);
-  }
-
-  if (
-    sectionItems.find(({ value }) => value === currentSection) === undefined
-  ) {
-    setCurrentSection(MAIN_SECTION_NAME);
   }
 
   const textboxCountMax =
