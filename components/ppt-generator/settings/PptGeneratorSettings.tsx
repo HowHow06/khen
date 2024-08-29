@@ -8,7 +8,6 @@ import {
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Tabs } from "@/components/ui/tabs";
 import {
   CONTENT_TYPE,
   DEFAULT_PRESETS,
@@ -41,11 +40,10 @@ import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
-import PptSettingsTabsList from "./PptSettingsTabsList";
+import PptGeneratorSettingsTabContent, {
+  PptGeneratorSettingsTabContentProps,
+} from "./PptGeneratorSettingsTabContent";
 import PresetsDropdown from "./PresetsDropdown";
-import ContentSettingsTabContent from "./SettingsTabContent/Content";
-import CoverSettingsTabContent from "./SettingsTabContent/Cover";
-import GeneralSettingsTabContent from "./SettingsTabContent/General";
 
 const PptGeneratorSetting = () => {
   const { form, mainText } = usePptGeneratorFormContext();
@@ -255,6 +253,71 @@ const PptGeneratorSetting = () => {
     currentTextboxCount = textboxCountMin;
   }
 
+  const settingsContentProps: PptGeneratorSettingsTabContentProps =
+    isUserAtSectionSettings
+      ? {
+          tabs: {
+            value:
+              settingsUIState.sectionTabs[currentSection]?.currentCategoryTab ||
+              SETTING_CATEGORY.GENERAL,
+            onValueChange: handleSectionTabChange({
+              sectionName: currentSection,
+              tabType: TAB_TYPES.SETTINGS_CATEGORY,
+            }),
+          },
+          isHideSettingsTabsList: isUseMainSectionSettings,
+          generalContent: {
+            settingsPrefix: `${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.GENERAL}.`,
+            isForSection: true,
+            isSectionUseMainSectionSettings:
+              currentSectionSetting?.general.useMainSectionSettings === true,
+          },
+          coverContent: {
+            settingsPrefix: `${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.COVER}.`,
+            onTabsValueChange: handleSectionTabChange({
+              sectionName: currentSection,
+              tabType: TAB_TYPES.COVER,
+            }),
+            tabsValue:
+              settingsUIState.sectionTabs[currentSection]?.currentCoverTab,
+          },
+          contentContent: {
+            settingsPrefix: `${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.CONTENT}.`,
+            textBoxCount: currentTextboxCount,
+            isIgnoreSubcontent: currentIsIgnoreSubContent,
+            onTabsValueChange: handleSectionTabChange({
+              sectionName: currentSection,
+              tabType: TAB_TYPES.CONTENT,
+            }),
+            tabsValue:
+              settingsUIState.sectionTabs[currentSection]?.currentContentTab,
+          },
+        }
+      : {
+          tabs: {
+            value: settingsUIState.currentCategoryTab,
+            onValueChange: setCurrentCategoryTab,
+          },
+          isHideSettingsTabsList: false,
+          generalContent: {
+            settingsPrefix: `${SETTING_CATEGORY.GENERAL}.`,
+            isForSection: false,
+            isSectionUseMainSectionSettings: false,
+          },
+          coverContent: {
+            settingsPrefix: `${SETTING_CATEGORY.COVER}.`,
+            onTabsValueChange: setCurrentCoverTab,
+            tabsValue: settingsUIState?.currentCoverTab,
+          },
+          contentContent: {
+            settingsPrefix: `${SETTING_CATEGORY.CONTENT}.`,
+            textBoxCount: currentTextboxCount,
+            isIgnoreSubcontent: currentIsIgnoreSubContent,
+            onTabsValueChange: setCurrentContentTab,
+            tabsValue: settingsUIState.currentContentTab,
+          },
+        };
+
   return (
     <div className="flex flex-row space-x-2">
       <Sheet
@@ -286,7 +349,6 @@ const PptGeneratorSetting = () => {
           </SheetTrigger>
         )}
         <GeneratePreviewButton />
-
         <SheetContent
           className={cn(
             "w-100 flex h-4/5 flex-col gap-2 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
@@ -307,74 +369,7 @@ const PptGeneratorSetting = () => {
               setCurrentSection={setCurrentSection}
             />
           </SheetHeader>
-          {isUserAtSectionSettings ? (
-            <Tabs
-              value={
-                settingsUIState.sectionTabs[currentSection]
-                  ?.currentCategoryTab || SETTING_CATEGORY.GENERAL
-              }
-              className="flex h-full w-full flex-col"
-              onValueChange={handleSectionTabChange({
-                sectionName: currentSection,
-                tabType: TAB_TYPES.SETTINGS_CATEGORY,
-              })}
-            >
-              {!isUseMainSectionSettings && <PptSettingsTabsList />}
-              <GeneralSettingsTabContent
-                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.GENERAL}.`}
-                isForSection={true}
-                isSectionUseMainSectionSettings={
-                  currentSectionSetting?.general.useMainSectionSettings === true
-                }
-              />
-              <CoverSettingsTabContent
-                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.COVER}.`}
-                onTabsValueChange={handleSectionTabChange({
-                  sectionName: currentSection,
-                  tabType: TAB_TYPES.COVER,
-                })}
-                tabsValue={
-                  settingsUIState.sectionTabs[currentSection]?.currentCoverTab
-                }
-              />
-              <ContentSettingsTabContent
-                settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.CONTENT}.`}
-                textBoxCount={currentTextboxCount}
-                isIgnoreSubcontent={currentIsIgnoreSubContent}
-                onTabsValueChange={handleSectionTabChange({
-                  sectionName: currentSection,
-                  tabType: TAB_TYPES.CONTENT,
-                })}
-                tabsValue={
-                  settingsUIState.sectionTabs[currentSection]?.currentContentTab
-                }
-              />
-            </Tabs>
-          ) : (
-            <Tabs
-              defaultValue={SETTING_CATEGORY.GENERAL}
-              className="flex h-full w-full flex-col"
-              value={settingsUIState.currentCategoryTab}
-              onValueChange={setCurrentCategoryTab}
-            >
-              <PptSettingsTabsList />
-              <GeneralSettingsTabContent
-                settingsPrefix={`${SETTING_CATEGORY.GENERAL}.`}
-              />
-              <CoverSettingsTabContent
-                tabsValue={settingsUIState?.currentCoverTab}
-                onTabsValueChange={setCurrentCoverTab}
-                settingsPrefix={`${SETTING_CATEGORY.COVER}.`}
-              />
-              <ContentSettingsTabContent
-                tabsValue={settingsUIState.currentContentTab}
-                onTabsValueChange={setCurrentContentTab}
-                settingsPrefix={`${SETTING_CATEGORY.CONTENT}.`}
-                textBoxCount={currentTextboxCount}
-                isIgnoreSubcontent={currentIsIgnoreSubContent}
-              />
-            </Tabs>
-          )}
+          <PptGeneratorSettingsTabContent {...settingsContentProps} />
         </SheetContent>
       </Sheet>
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}

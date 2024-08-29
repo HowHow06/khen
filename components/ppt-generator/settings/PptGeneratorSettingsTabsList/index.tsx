@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 type Props = {};
 
-const PptSettingsTabsList = (props: Props) => {
+const PptGeneratorSettingsTabsList = (props: Props) => {
   return (
     <ScrollArea className="w-full flex-shrink-0">
       <TabsList className={cn("grid h-9 w-max min-w-full grid-cols-3")}>
@@ -34,4 +34,4 @@ const PptSettingsTabsList = (props: Props) => {
   );
 };
 
-export default PptSettingsTabsList;
+export default PptGeneratorSettingsTabsList;
