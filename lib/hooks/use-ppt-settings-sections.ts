@@ -16,6 +16,7 @@ import { getLinesStartingWith, getSectionSettingsInitialValue } from "../utils";
 
 type Props = {
   mainText: string;
+  settingsValues: PptSettingsStateType;
   getValues: UseFormGetValues<{
     [x: string]: any;
   }>;
@@ -24,7 +25,12 @@ type Props = {
   }>;
 };
 
-const usePptSettingsSections = ({ mainText, getValues, formReset }: Props) => {
+const usePptSettingsSections = ({
+  mainText,
+  settingsValues,
+  getValues,
+  formReset,
+}: Props) => {
   const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
   const [sectionItems, setSectionItems] = useState<SelectionItemsType>([
     {
@@ -32,7 +38,6 @@ const usePptSettingsSections = ({ mainText, getValues, formReset }: Props) => {
       label: "Main Section",
     },
   ]);
-  const settingsValues = getValues();
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
@@ -89,25 +94,25 @@ const usePptSettingsSections = ({ mainText, getValues, formReset }: Props) => {
     }
 
     setSectionItems(newSectionItems);
-    // onSectionSettingsChange(newSectionValues);
     formReset({
       ...originalSettingValues,
       [SETTING_CATEGORY.SECTION]: newSectionValues,
     });
   }, [
     mainText,
-    // onSectionSettingsChange,
     sectionItems.length,
     isDifferentSettingsBySection,
     getValues,
     formReset,
   ]);
 
-  if (
-    sectionItems.find(({ value }) => value === currentSection) === undefined
-  ) {
-    setCurrentSection(MAIN_SECTION_NAME);
-  }
+  useEffect(() => {
+    if (
+      sectionItems.find(({ value }) => value === currentSection) === undefined
+    ) {
+      setCurrentSection(MAIN_SECTION_NAME);
+    }
+  }, [currentSection, sectionItems]);
 
   return {
     sectionItems,

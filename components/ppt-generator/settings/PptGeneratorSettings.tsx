@@ -56,6 +56,7 @@ const PptGeneratorSetting = () => {
   const { sectionItems, currentSection, setCurrentSection } =
     usePptSettingsSections({
       mainText,
+      settingsValues,
       getValues,
       formReset: reset,
     });
