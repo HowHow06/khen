@@ -9,7 +9,8 @@ import {
   HORIZONTAL_ALIGNMENT_ITEMS,
   SHADOW_TYPE_ITEMS,
 } from "@/lib/constant";
-import { BaseSettingItemMetaType } from "@/lib/types";
+import { useScreenSize } from "@/lib/hooks/use-screen-size";
+import { BaseSettingItemMetaType, ScreenSizeType } from "@/lib/types";
 import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ type SettingInputFieldProps = {
 const renderInputField = (
   settingItemMeta: BaseSettingItemMetaType,
   field: ControllerRenderProps<FieldValues, string>,
+  screenSize: ScreenSizeType,
 ): ReactNode => {
   if (settingItemMeta.fieldType === "boolean") {
     return <Switch checked={field.value} onCheckedChange={field.onChange} />;
@@ -74,7 +76,11 @@ const renderInputField = (
   if (settingItemMeta.fieldType === "color") {
     return (
       <div className="col-span-6 ml-4 flex flex-col items-center">
-        <ColorPicker color={field.value} onChange={field.onChange} />
+        <ColorPicker
+          color={field.value}
+          onChange={field.onChange}
+          showColorPicker={screenSize !== "XS"}
+        />
       </div>
     );
   }
@@ -130,15 +136,16 @@ const renderInputField = (
     );
   }
 
-  // TODO: add for text field when necessary
-  return <></>;
+  throw new Error("Invalid Setting Input Field Type");
 };
 
 const SettingInputField = ({
   settingItemMeta,
   field,
 }: SettingInputFieldProps) => {
-  return <>{renderInputField(settingItemMeta, field)}</>;
+  const screenSize = useScreenSize();
+
+  return <>{renderInputField(settingItemMeta, field, screenSize)}</>;
 };
 
 export default SettingInputField;
