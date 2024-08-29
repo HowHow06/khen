@@ -42,7 +42,7 @@ const SettingFormField = ({
         render={({ field }) => (
           <FormItem
             className={cn(
-              "grid grid-cols-6 items-center gap-x-3 py-4",
+              "grid grid-cols-6 items-center gap-x-3 py-3",
               className,
             )}
           >

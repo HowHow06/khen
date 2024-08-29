@@ -9,6 +9,7 @@ import {
   HORIZONTAL_ALIGNMENT_ITEMS,
   SHADOW_TYPE_ITEMS,
 } from "@/lib/constant";
+import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { BaseSettingItemMetaType, ScreenSizeType } from "@/lib/types";
 import { ReactNode } from "react";
@@ -34,7 +35,7 @@ const renderInputField = (
     return (
       <Input
         {...field}
-        className="col-span-2 text-sm"
+        className="col-span-2 text-xs"
         type="number"
         min={settingItemMeta.rangeMin}
         max={settingItemMeta.rangeMax}
@@ -52,10 +53,11 @@ const renderInputField = (
             images={DEFAULT_IMAGES}
             align={"end"}
             onImageClick={(imagePath) => field.onChange(imagePath)}
+            dropdownItemClassName="text-xs"
           />
         </div>
         <ImageDropzoneComponent
-          className="col-span-6 text-sm"
+          className="col-span-6 text-xs"
           onFilesSelected={(file) => field.onChange(file)}
           onFilesRejected={(fileRejections) => {
             fileRejections.forEach((fileRejection) => {
@@ -79,7 +81,7 @@ const renderInputField = (
         <ColorPicker
           color={field.value}
           onChange={field.onChange}
-          showColorPicker={screenSize !== "XS"}
+          showColorPicker={screenSize !== SCREEN_SIZE.XS}
         />
       </div>
     );
@@ -93,7 +95,7 @@ const renderInputField = (
         onItemSelect={field.onChange}
         notFoundLabel="Font not found."
         defaultLabel="Select font..."
-        className="col-span-6 w-full text-sm"
+        className="col-span-6 w-full text-xs"
       />
     );
   }
@@ -104,7 +106,7 @@ const renderInputField = (
         items={HORIZONTAL_ALIGNMENT_ITEMS}
         selectedValue={field.value}
         onItemSelect={field.onChange}
-        className="col-span-6 w-full text-sm"
+        className="col-span-6 w-full text-xs"
         hasNoSearch
       />
     );
@@ -116,7 +118,7 @@ const renderInputField = (
         items={SHADOW_TYPE_ITEMS}
         selectedValue={field.value}
         onItemSelect={field.onChange}
-        className="col-span-6 w-full text-sm"
+        className="col-span-6 w-full text-xs"
         hasNoSearch
       />
     );
@@ -126,7 +128,7 @@ const renderInputField = (
     return (
       <Input
         {...field}
-        className="col-span-2 text-sm"
+        className="col-span-2 text-xs"
         type="number"
         {...(settingItemMeta.useProportionForm
           ? { min: 0.0, max: 1.0, step: 0.1 }

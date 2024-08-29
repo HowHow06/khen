@@ -41,7 +41,7 @@ import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
-import PptSettingsTabs from "./PptSettingsTabs";
+import PptSettingsTabsList from "./PptSettingsTabsList";
 import PresetsDropdown from "./PresetsDropdown";
 import ContentSettingsTabContent from "./SettingsTabContent/Content";
 import CoverSettingsTabContent from "./SettingsTabContent/Cover";
@@ -319,7 +319,7 @@ const PptGeneratorSetting = () => {
                 tabType: TAB_TYPES.SETTINGS_CATEGORY,
               })}
             >
-              {!isUseMainSectionSettings && <PptSettingsTabs />}
+              {!isUseMainSectionSettings && <PptSettingsTabsList />}
               <GeneralSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.SECTION}.${currentSection}.${SETTING_CATEGORY.GENERAL}.`}
                 isForSection={true}
@@ -357,7 +357,7 @@ const PptGeneratorSetting = () => {
               value={settingsUIState.currentCategoryTab}
               onValueChange={setCurrentCategoryTab}
             >
-              <PptSettingsTabs />
+              <PptSettingsTabsList />
               <GeneralSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.GENERAL}.`}
               />

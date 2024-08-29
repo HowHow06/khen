@@ -45,7 +45,6 @@ const GeneralSettingsTabContent = ({
         <BaseSettings
           settingsMeta={settingMetaToUse}
           keyPrefix={settingsPrefix}
-          className="pb-5 xl:pb-10"
         />
       </ScrollArea>
     </TabsContent>

@@ -24,7 +24,7 @@ const SettingLabel = ({ displayLabel, tips, tipsImagePath }: Props) => {
 
   return (
     <>
-      <FormLabel className="text-left text-sm">{displayLabel}</FormLabel>
+      <FormLabel className="text-left text-xs">{displayLabel}</FormLabel>
       {(tips || tipsImagePath) && (
         <>
           <TooltipProvider>
@@ -45,7 +45,7 @@ const SettingLabel = ({ displayLabel, tips, tipsImagePath }: Props) => {
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <div className="flex max-w-52 flex-col">
+                <div className="flex max-w-52 flex-col text-xs">
                   {tips && <p>{tips}</p>}
                   {tipsImagePath && (
                     <Image

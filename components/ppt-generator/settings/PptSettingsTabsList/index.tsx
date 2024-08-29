@@ -6,17 +6,26 @@ import { cn } from "@/lib/utils";
 
 type Props = {};
 
-const PptSettingsTabs = (props: Props) => {
+const PptSettingsTabsList = (props: Props) => {
   return (
     <ScrollArea className="w-full flex-shrink-0">
-      <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
-        <TabsTrigger value={SETTING_CATEGORY.GENERAL} className="min-w-20">
+      <TabsList className={cn("grid h-9 w-max min-w-full grid-cols-3")}>
+        <TabsTrigger
+          value={SETTING_CATEGORY.GENERAL}
+          className="min-w-20 text-xs"
+        >
           General
         </TabsTrigger>
-        <TabsTrigger value={SETTING_CATEGORY.COVER} className="min-w-20">
+        <TabsTrigger
+          value={SETTING_CATEGORY.COVER}
+          className="min-w-20 text-xs"
+        >
           Cover
         </TabsTrigger>
-        <TabsTrigger value={SETTING_CATEGORY.CONTENT} className="min-w-20">
+        <TabsTrigger
+          value={SETTING_CATEGORY.CONTENT}
+          className="min-w-20 text-xs"
+        >
           Content
         </TabsTrigger>
         <ScrollBar orientation="horizontal" />
@@ -25,4 +34,4 @@ const PptSettingsTabs = (props: Props) => {
   );
 };
 
-export default PptSettingsTabs;
+export default PptSettingsTabsList;

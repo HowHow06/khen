@@ -16,9 +16,15 @@ type Props = Pick<
 > & {
   images: DropdownImagesType;
   onImageClick: (imagePath: string) => void;
+  dropdownItemClassName?: string;
 };
 
-const ImageSelectDropdown = ({ images, onImageClick, ...restProps }: Props) => {
+const ImageSelectDropdown = ({
+  images,
+  onImageClick,
+  dropdownItemClassName,
+  ...restProps
+}: Props) => {
   return (
     <>
       <DropdownMenu>
@@ -27,6 +33,7 @@ const ImageSelectDropdown = ({ images, onImageClick, ...restProps }: Props) => {
             variant={"outline"}
             size={"icon"}
             tooltipText="Select images"
+            tooltipTextClassName={dropdownItemClassName}
           >
             <Image />
           </TooltipButton>
@@ -34,7 +41,11 @@ const ImageSelectDropdown = ({ images, onImageClick, ...restProps }: Props) => {
         <DropdownMenuContent align="start" {...restProps}>
           {images.map(({ displayName, path }, index) => {
             return (
-              <DropdownMenuItem key={index} onSelect={() => onImageClick(path)}>
+              <DropdownMenuItem
+                key={index}
+                onSelect={() => onImageClick(path)}
+                className={dropdownItemClassName}
+              >
                 {displayName}
               </DropdownMenuItem>
             );

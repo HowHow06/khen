@@ -9,17 +9,18 @@ import {
 
 type Props = {
   tooltipText: string;
+  tooltipTextClassName?: string;
 };
 
 const TooltipButton = React.forwardRef<HTMLButtonElement, ButtonProps & Props>(
-  ({ tooltipText, ...restProps }, ref) => {
+  ({ tooltipText, tooltipTextClassName, ...restProps }, ref) => {
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button ref={ref} {...restProps} />
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent className={tooltipTextClassName}>
             <p>{tooltipText}</p>
           </TooltipContent>
         </Tooltip>

@@ -45,15 +45,14 @@ const GroupedBaseSettings = ({
         {Object.entries(groupedSettingsMeta).map(([groupingName, settings]) => {
           return (
             <AccordionItem value={groupingName} key={groupingName}>
-              <AccordionTrigger className="text-base font-bold capitalize">
+              <AccordionTrigger className="text-[.8rem] font-bold capitalize">
                 {toNormalCase(groupingName)}
               </AccordionTrigger>
               <AccordionContent>
                 <BaseSettings
                   keyPrefix={keyPrefix + groupingName + "."}
                   settingsMeta={settings}
-                  className="mx-3 pb-2"
-                  formFieldClassName="gap-y-2 space-y-0 py-3"
+                  className="mx-3"
                 />
               </AccordionContent>
             </AccordionItem>

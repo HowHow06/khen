@@ -1,6 +1,6 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   CONTENT_TYPE,
   PPT_GENERATION_SETTINGS_META,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/constant";
 import { cn, groupByAsObject } from "@/lib/utils";
 import { useMemo } from "react";
+import ContentTypeTabsList from "../ContentTypeTabsList";
 import GroupedBaseSettings from "../GroupedBaseSettings";
 import { TabContentWithInnerTabProp } from "./types";
 
@@ -50,12 +51,7 @@ const ContentSettingsTabContent = ({
         onValueChange={onTabsValueChange}
         className="flex h-full w-full flex-col"
       >
-        {!isIgnoreSubcontent && (
-          <TabsList className="my-1 grid w-full flex-shrink-0 grid-cols-2">
-            <TabsTrigger value={CONTENT_TYPE.MAIN}>Main</TabsTrigger>
-            <TabsTrigger value={CONTENT_TYPE.SECONDARY}>Secondary</TabsTrigger>
-          </TabsList>
-        )}
+        {!isIgnoreSubcontent && <ContentTypeTabsList />}
         <TabsContent className="flex-grow" value={CONTENT_TYPE.MAIN}>
           <ScrollArea className={cn("pr-3")} isFillParent>
             <GroupedBaseSettings
@@ -68,7 +64,6 @@ const ContentSettingsTabContent = ({
               accordionKey={CONTENT_TYPE.MAIN}
               groupedSettingsMeta={groupedContentSettings}
               defaultAccordionValue={[`text`]}
-              className="pb-5 xl:pb-10"
             />
           </ScrollArea>
         </TabsContent>
@@ -85,7 +80,6 @@ const ContentSettingsTabContent = ({
                 accordionKey={CONTENT_TYPE.SECONDARY}
                 groupedSettingsMeta={groupedContentSettings}
                 defaultAccordionValue={[`text`]}
-                className="pb-5 xl:pb-10"
               />
             </ScrollArea>
           </TabsContent>
