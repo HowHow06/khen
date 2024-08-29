@@ -20,7 +20,6 @@ type Props = TabContentBaseProp &
   );
 
 const GeneralSettingsTabContent = ({
-  scrollAreaClassName,
   settingsPrefix,
   isForSection,
   isSectionUseMainSectionSettings = false,
@@ -41,10 +40,8 @@ const GeneralSettingsTabContent = ({
   }, [isForSection, isSectionUseMainSectionSettings]);
 
   return (
-    <TabsContent value={SETTING_CATEGORY.GENERAL}>
-      <ScrollArea
-        className={cn("h-[54vh] pl-3 pr-4 sm:h-[75vh]", scrollAreaClassName)}
-      >
+    <TabsContent className="flex-grow" value={SETTING_CATEGORY.GENERAL}>
+      <ScrollArea className={cn("pl-3 pr-4")} isFillParent>
         <BaseSettings
           settingsMeta={settingMetaToUse}
           keyPrefix={settingsPrefix}

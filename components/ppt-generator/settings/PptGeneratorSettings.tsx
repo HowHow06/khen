@@ -38,7 +38,7 @@ import {
   getSectionSettingsInitialValue,
 } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
 import PptSettingsTabs from "./PptSettingsTabs";
@@ -68,10 +68,7 @@ const PptGeneratorSetting = () => {
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
-  const settingsValues = useMemo(
-    () => getValues() as PptSettingsStateType,
-    [getValues],
-  );
+  const settingsValues = getValues() as PptSettingsStateType;
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
@@ -288,12 +285,11 @@ const PptGeneratorSetting = () => {
             </Button>
           </SheetTrigger>
         )}
-
         <GeneratePreviewButton />
 
         <SheetContent
           className={cn(
-            "w-100 h-4/5 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
+            "w-100 flex h-4/5 flex-col gap-2 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
             isExtraSmallScreen && "rounded-t-3xl shadow-md",
           )}
           side={isExtraSmallScreen ? "bottom" : "right"}
@@ -317,7 +313,7 @@ const PptGeneratorSetting = () => {
                 settingsUIState.sectionTabs[currentSection]
                   ?.currentCategoryTab || SETTING_CATEGORY.GENERAL
               }
-              className="mt-2 w-full"
+              className="flex h-full w-full flex-col"
               onValueChange={handleSectionTabChange({
                 sectionName: currentSection,
                 tabType: TAB_TYPES.SETTINGS_CATEGORY,
@@ -357,26 +353,23 @@ const PptGeneratorSetting = () => {
           ) : (
             <Tabs
               defaultValue={SETTING_CATEGORY.GENERAL}
-              className="mt-2 w-full"
+              className="flex h-full w-full flex-col"
               value={settingsUIState.currentCategoryTab}
               onValueChange={setCurrentCategoryTab}
             >
               <PptSettingsTabs />
               <GeneralSettingsTabContent
                 settingsPrefix={`${SETTING_CATEGORY.GENERAL}.`}
-                scrollAreaClassName="h-[47vh] sm:h-[68vh]"
               />
               <CoverSettingsTabContent
                 tabsValue={settingsUIState?.currentCoverTab}
                 onTabsValueChange={setCurrentCoverTab}
                 settingsPrefix={`${SETTING_CATEGORY.COVER}.`}
-                scrollAreaClassName="h-[43vh] sm:h-[65vh]"
               />
               <ContentSettingsTabContent
                 tabsValue={settingsUIState.currentContentTab}
                 onTabsValueChange={setCurrentContentTab}
                 settingsPrefix={`${SETTING_CATEGORY.CONTENT}.`}
-                scrollAreaClassName={"h-[43vh] sm:h-[65vh]"}
                 textBoxCount={currentTextboxCount}
                 isIgnoreSubcontent={currentIsIgnoreSubContent}
               />

@@ -1,5 +1,4 @@
 export type TabContentBaseProp = {
-  scrollAreaClassName?: string;
   settingsPrefix: string;
 };
 

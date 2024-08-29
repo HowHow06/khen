@@ -8,7 +8,7 @@ type Props = {};
 
 const PptSettingsTabs = (props: Props) => {
   return (
-    <ScrollArea className="w-full pb-3">
+    <ScrollArea className="w-full flex-shrink-0">
       <TabsList className={cn("grid w-max min-w-full grid-cols-3")}>
         <TabsTrigger value={SETTING_CATEGORY.GENERAL} className="min-w-20">
           General
