@@ -42,24 +42,24 @@ const usePptSettingsSections = ({
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
 
+  // listen to mainText change, set options for sectionDropdown and set sectionValues
   useEffect(() => {
     if (!isDifferentSettingsBySection) {
       return;
     }
+    const originalSettingValues = settingsValues;
 
     const sectionNameList = getLinesStartingWith(
       mainText,
       LYRIC_SECTION.SECTION,
     );
 
-    const originalSettingValues = settingsValues;
-
     // for settings form
     const newSectionValues = {
       ...deepCopy(originalSettingValues[SETTING_CATEGORY.SECTION] || {}),
     };
 
-    // for dropdown options
+    // for section dropdown options
     const newSectionItems = [
       {
         value: MAIN_SECTION_NAME,
