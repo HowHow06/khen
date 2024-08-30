@@ -1,12 +1,12 @@
-import { InternalPresentation } from "./normalizer";
 import React from "react";
 import ReactIs from "react-is";
 import { isReactPPTXComponent } from "./nodes";
+import { InternalPresentation } from "./normalizer";
 
 export const POINTS_TO_INCHES = 1 / 72;
 
 export const layoutToInches = (
-  layout: InternalPresentation["layout"]
+  layout: InternalPresentation["layout"],
 ): [number, number] => {
   switch (layout) {
     case "16x10":
@@ -27,8 +27,7 @@ export const layoutToInches = (
 export type ChildElement<P> = React.ReactElement<P> | ChildElement<P>[];
 
 export function isReactElementOrElementArray<T>(
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  arr: {} | null | undefined
+  arr: {} | null | undefined,
 ): arr is ChildElement<T> {
   return React.isValidElement(arr);
 }
@@ -39,7 +38,7 @@ type PotentialChildren = Array<
 >;
 export function flattenChildren(
   children: React.ReactNode,
-  keys: (string | number)[] = []
+  keys: (string | number)[] = [],
 ): PotentialChildren {
   return React.Children.toArray(children).reduce(
     (acc: PotentialChildren, node, nodeIndex) => {
@@ -47,8 +46,8 @@ export function flattenChildren(
         acc.push(
           ...flattenChildren(
             node.props.children,
-            keys.concat(node.key || nodeIndex)
-          )
+            keys.concat(node.key || nodeIndex),
+          ),
         );
       } else {
         if (ReactIs.isElement(node)) {
@@ -56,7 +55,7 @@ export function flattenChildren(
             acc.push(
               React.cloneElement(node, {
                 key: keys.concat(String(node.key)).join("."),
-              })
+              }),
             );
           } else {
             // A component that could return/contain react-pptx components,
@@ -64,11 +63,11 @@ export function flattenChildren(
             let children = node.props.children;
             if (node.type instanceof Function) {
               children = (node.type as React.FunctionComponent<any>)(
-                node.props
+                node.props,
               );
             }
             acc.push(
-              ...flattenChildren(children, keys.concat(node.key || nodeIndex))
+              ...flattenChildren(children, keys.concat(node.key || nodeIndex)),
             );
           }
         } else if (typeof node === "string" || typeof node === "number") {
@@ -77,6 +76,6 @@ export function flattenChildren(
       }
       return acc;
     },
-    []
+    [],
   ) as PotentialChildren;
 }
