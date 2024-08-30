@@ -2,12 +2,7 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   DEFAULT_PRESETS,
   MAIN_SECTION_NAME,
@@ -29,6 +24,13 @@ import PptGeneratorSettingsTabContent, {
 import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSettings = () => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const toggleSettingSidebar = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
+
   const { settingsValues, sectionItems, currentSection, setCurrentSection } =
     usePptGeneratorFormContext();
   const {
@@ -38,12 +40,6 @@ const PptGeneratorSettings = () => {
     setCurrentCoverTab,
     setSectionTabs,
   } = usePptSettingsUIContext();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const toggleSettingSidebar = () => {
-    setIsSettingsOpen(!isSettingsOpen);
-  };
-  const screenSize = useScreenSize();
-  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
@@ -190,14 +186,12 @@ const PptGeneratorSettings = () => {
               : (event) => event.preventDefault() // prevent it from closing
           }
         >
-          <SheetHeader>
-            <PptGeneratorSettingHeader
-              isDifferentSettingsBySection={isDifferentSettingsBySection}
-              currentSection={currentSection}
-              sectionItems={sectionItems}
-              setCurrentSection={setCurrentSection}
-            />
-          </SheetHeader>
+          <PptGeneratorSettingHeader
+            isDifferentSettingsBySection={isDifferentSettingsBySection}
+            currentSection={currentSection}
+            sectionItems={sectionItems}
+            setCurrentSection={setCurrentSection}
+          />
           <PptGeneratorSettingsTabContent {...settingsContentProps} />
         </SheetContent>
       </Sheet>
