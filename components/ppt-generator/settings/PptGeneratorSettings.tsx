@@ -74,7 +74,6 @@ const PptGeneratorSettings = () => {
       <PptSettingsUIProvider>
         <GeneratePreviewButton />
       </PptSettingsUIProvider>
-
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
