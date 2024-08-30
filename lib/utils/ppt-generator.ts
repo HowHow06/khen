@@ -1,8 +1,8 @@
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
-import type { PptxGenJS as PptxGenJSType2 } from "../types/pptxgenjs";
 import { ZodError, ZodSchema } from "zod";
 import {
+  deepCopy,
   deepMerge,
   extractNumber,
   getBase64,
@@ -38,6 +38,10 @@ import {
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 import { BREAK_LINE } from "../constant/general";
+import {
+  InternalPresentation,
+  InternalText,
+} from "../react-pptx-preview/normalizer";
 import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
   BaseSettingItemMetaType,
@@ -54,10 +58,7 @@ import {
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
-import {
-  InternalPresentation,
-  InternalText,
-} from "../react-pptx-preview/normalizer";
+import type { PptxGenJS as PptxGenJSType2 } from "../types/pptxgenjs";
 import { DataOrPathProps } from "../types/pptxgenjs/core-interfaces";
 
 export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
@@ -1020,6 +1021,7 @@ export const generatePreviewConfig = async ({
   const slides = presV2.slides;
   const layout = presV2.layout.replace("LAYOUT_", "");
 
+  // TODO: remove this
   console.log({
     masterSlides,
     slides,
@@ -1459,16 +1461,17 @@ export const exportFullSettings = ({
   settingsValue: PptSettingsStateType;
   isIncludeSectionSettings: boolean;
 }) => {
-  if (!isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
-    delete settingsValue[SETTING_CATEGORY.SECTION];
+  const settingsCopy = deepCopy(settingsValue);
+  if (!isIncludeSectionSettings && settingsCopy[SETTING_CATEGORY.SECTION]) {
+    delete settingsCopy[SETTING_CATEGORY.SECTION];
   }
 
   // remove background image
-  settingsValue[SETTING_CATEGORY.GENERAL].mainBackgroundImage = null;
+  settingsCopy[SETTING_CATEGORY.GENERAL].mainBackgroundImage = null;
 
-  if (isIncludeSectionSettings && settingsValue[SETTING_CATEGORY.SECTION]) {
+  if (isIncludeSectionSettings && settingsCopy[SETTING_CATEGORY.SECTION]) {
     const sectionSettings = {
-      ...settingsValue[SETTING_CATEGORY.SECTION],
+      ...settingsCopy[SETTING_CATEGORY.SECTION],
     };
 
     // remove background image in sections
@@ -1477,8 +1480,8 @@ export const exportFullSettings = ({
         sectionSettingValue[SETTING_CATEGORY.GENERAL].sectionBackgroundImage =
           null;
 
-        // added ! to tell typescript that the settingsValue[SETTING_CATEGORY.SECTION] will not be undefined
-        settingsValue[SETTING_CATEGORY.SECTION]![
+        // added ! to tell typescript that the settingsCopy[SETTING_CATEGORY.SECTION] will not be undefined
+        settingsCopy[SETTING_CATEGORY.SECTION]![
           sectionKey as SectionSettingsKeyType
         ] = sectionSettingValue;
       },
@@ -1486,7 +1489,7 @@ export const exportFullSettings = ({
   }
 
   exportObjectToJsonFile({
-    obj: settingsValue,
+    obj: settingsCopy,
     document: document,
     fileName: `KhenPptGeneratorSettings_${new Date().getTime()}.json`,
   });
@@ -1499,8 +1502,9 @@ export const exportSectionSettings = ({
   settingsValue: PptSettingsStateType;
   targetSectionName: SectionSettingsKeyType;
 }) => {
-  const originalTargetSectionValues =
-    settingsValue[SETTING_CATEGORY.SECTION]?.[targetSectionName];
+  const originalTargetSectionValues = deepCopy(
+    settingsValue[SETTING_CATEGORY.SECTION]?.[targetSectionName],
+  );
 
   if (!originalTargetSectionValues) {
     return;
