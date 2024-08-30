@@ -9,7 +9,7 @@ type Props = {
 
 const useMemoizedSettingsValues = ({ newSettingsValues }: Props) => {
   const existingSettingsValuesRef = useRef<PptSettingsStateType | null>(null);
-  const debouncedNewSettingsValues = useDebouncedValue(newSettingsValues, 300);
+  const debouncedNewSettingsValues = useDebouncedValue(newSettingsValues, 200);
   // TODO: can debounce?
   const settingsValues = useMemo(() => {
     // If prevSettingsValuesRef is null (first render),
