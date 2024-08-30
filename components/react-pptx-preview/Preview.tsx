@@ -528,17 +528,24 @@ const Preview = (props: {
         }}
       >
         {normalized.slides.map((slide, i) => (
-          <SlidePreview
+          <div
+            style={{
+              marginBottom: "10px",
+            }}
             key={i}
-            slide={slide}
-            masterSlide={
-              (slide.masterName && normalized.masterSlides[slide.masterName]) ||
-              undefined
-            }
-            dimensions={layoutToInches(normalized.layout)}
-            slideStyle={props.slideStyle}
-            drawBoundingBoxes={!!props.drawBoundingBoxes}
-          />
+          >
+            <SlidePreview
+              slide={slide}
+              masterSlide={
+                (slide.masterName &&
+                  normalized.masterSlides[slide.masterName]) ||
+                undefined
+              }
+              dimensions={layoutToInches(normalized.layout)}
+              slideStyle={props.slideStyle}
+              drawBoundingBoxes={!!props.drawBoundingBoxes}
+            />
+          </div>
         ))}
       </div>
     );
