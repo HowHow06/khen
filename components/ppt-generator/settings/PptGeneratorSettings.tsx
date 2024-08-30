@@ -1,5 +1,6 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
+import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DEFAULT_PRESETS } from "@/lib/constant";
@@ -52,20 +53,22 @@ const PptGeneratorSettings = () => {
           </SheetTrigger>
         )}
         <GeneratePreviewButton />
-        <SheetContent
-          className={cn(
-            "w-100 flex h-4/5 flex-col gap-2 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
-            isExtraSmallScreen && "rounded-t-3xl shadow-md",
-          )}
-          side={isExtraSmallScreen ? "bottom" : "right"}
-          onInteractOutside={
-            isExtraSmallScreen
-              ? () => setIsSettingsOpen(false)
-              : (event) => event.preventDefault() // prevent it from closing
-          }
-        >
-          <PptGeneratorSettingsContent />
-        </SheetContent>
+        <PptSettingsUIProvider>
+          <SheetContent
+            className={cn(
+              "w-100 flex h-4/5 flex-col gap-2 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
+              isExtraSmallScreen && "rounded-t-3xl shadow-md",
+            )}
+            side={isExtraSmallScreen ? "bottom" : "right"}
+            onInteractOutside={
+              isExtraSmallScreen
+                ? () => setIsSettingsOpen(false)
+                : (event) => event.preventDefault() // prevent it from closing
+            }
+          >
+            <PptGeneratorSettingsContent />
+          </SheetContent>
+        </PptSettingsUIProvider>
       </Sheet>
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
