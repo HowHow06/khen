@@ -19,6 +19,9 @@ const useMemoizedSettingsValues = ({ valuesGetter }: Props) => {
       prevSettingsValuesRef.current === null ||
       !deepCompare(prevSettingsValuesRef.current, newSettingsValues)
     ) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("Settings Value Reference Updated:", newSettingsValues);
+      }
       prevSettingsValuesRef.current = newSettingsValues;
     }
 
