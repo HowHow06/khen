@@ -21,6 +21,7 @@ const GeneratePreviewButton = (props: Props) => {
     setIsModalOpen(true);
   };
 
+  // TODO: add validation check here, OR show message like 'invalid content' instead of preview
   const updatePreviewConfig = useCallback(async () => {
     const previewConfig = await generatePreviewConfig({
       settingValues: settingsValues,
