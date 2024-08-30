@@ -98,6 +98,12 @@ const usePptSettingsSections = ({
     const isSectionItemsChanged = !deepCompare(sectionItems, newSectionItems);
     if (isSectionItemsChanged) {
       setSectionItems(newSectionItems);
+      setCurrentSection((currentSection) =>
+        newSectionItems.find(({ value }) => value === currentSection) ===
+        undefined
+          ? MAIN_SECTION_NAME
+          : currentSection,
+      );
     }
 
     // Only reset the form if new values are different from the current ones
@@ -113,15 +119,6 @@ const usePptSettingsSections = ({
       });
     }
   }, [mainText, sectionItems, settingsValues, formReset]);
-
-  useEffect(() => {
-    // handle case where selected currentSection is removed in mainText
-    if (
-      sectionItems.find(({ value }) => value === currentSection) === undefined
-    ) {
-      setCurrentSection(MAIN_SECTION_NAME);
-    }
-  }, [currentSection, sectionItems]);
 
   return {
     sectionItems,
