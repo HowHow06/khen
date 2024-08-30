@@ -2,9 +2,10 @@
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
+import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
-import { PptSettingsStateType } from "@/lib/types";
+import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
 import {
   combineWithDefaultSettings,
   generatePpt,
@@ -14,7 +15,14 @@ import {
   traverseAndCollect,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ReactNode, createContext, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 import {
   FieldError,
   FieldErrors,
@@ -33,6 +41,9 @@ type PptGeneratorFormContextType = {
   setSecondaryText: (text: string) => void;
   form: UseFormReturn<z.infer<typeof settingsSchema>>;
   settingsValues: PptSettingsStateType;
+  sectionItems: SelectionItemsType;
+  currentSection: string;
+  setCurrentSection: Dispatch<SetStateAction<string>>;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -72,6 +83,13 @@ export const PptGeneratorFormProvider: React.FC<
   const settingsValues = useMemoizedSettingsValues({
     valuesGetter: form.getValues,
   });
+
+  const { sectionItems, currentSection, setCurrentSection } =
+    usePptSettingsSections({
+      mainText,
+      settingsValues,
+      formReset: form.reset,
+    });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
     if (process.env.NODE_ENV === "development") {
@@ -145,6 +163,9 @@ export const PptGeneratorFormProvider: React.FC<
         setSecondaryText,
         form,
         settingsValues,
+        sectionItems,
+        currentSection,
+        setCurrentSection,
       }}
     >
       <Form {...form}>

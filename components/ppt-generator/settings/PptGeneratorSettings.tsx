@@ -18,7 +18,6 @@ import {
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
-import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   ContentTextboxKey,
@@ -42,7 +41,14 @@ import PptGeneratorSettingsTabContent, {
 import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSettings = () => {
-  const { form, mainText, settingsValues } = usePptGeneratorFormContext();
+  const {
+    form,
+    mainText,
+    settingsValues,
+    sectionItems,
+    currentSection,
+    setCurrentSection,
+  } = usePptGeneratorFormContext();
   const { reset } = form;
   const {
     settingsUIState,
@@ -55,13 +61,6 @@ const PptGeneratorSettings = () => {
 
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
-
-  const { sectionItems, currentSection, setCurrentSection } =
-    usePptSettingsSections({
-      mainText,
-      settingsValues,
-      formReset: reset,
-    });
 
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
