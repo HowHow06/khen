@@ -1,30 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import { generatePreviewConfig } from "@/lib/utils";
-import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
-import { PptSettingsStateType } from "@/lib/types";
-import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
+import { generatePreviewConfig } from "@/lib/utils";
+import { useCallback, useEffect, useState } from "react";
+import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
+import { Button } from "../ui/button";
+import PptGeneratorSettingsContent from "./settings/PptGeneratorSettingsContent";
 
 type Props = {};
 
 const GeneratePreviewButton = (props: Props) => {
-  const { mainText, secondaryText, form } = usePptGeneratorFormContext();
+  const { mainText, secondaryText, settingsValues } =
+    usePptGeneratorFormContext();
   const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const onGeneratePreviewClick = async () => {
+  const onGeneratePreviewClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const updatePreviewConfig = useCallback(async () => {
     const previewConfig = await generatePreviewConfig({
-      settingValues: form.getValues() as PptSettingsStateType,
+      settingValues: settingsValues,
       primaryLyric: mainText || "",
       secondaryLyric: secondaryText,
     });
-
-    console.log({ previewConfig });
     setPreviewConfig(previewConfig);
-  };
+  }, [settingsValues, mainText, secondaryText]);
+
+  // update preview config on settingsValues change
+  useEffect(() => {
+    updatePreviewConfig();
+  }, [updatePreviewConfig]);
 
   return (
     <>
@@ -35,17 +44,21 @@ const GeneratePreviewButton = (props: Props) => {
         {`@import url(https://fonts.cdnfonts.com/css/microsoft-yahei);`}
       </style> */}
       <Dialog
-        open={previewConfig !== undefined}
-        onOpenChange={(isOpen) => !isOpen && setPreviewConfig(undefined)}
+        open={isModalOpen}
+        onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
-        <DialogContent className="flex min-w-[70vw]">
-          <div className="w-2/3">
-            <h3 className="text-xl font-semibold tracking-tight">Settings</h3>
-            
+        <DialogContent className="flex h-[85vh] min-w-[60vw]">
+          <div className="w-100 flex h-full w-3/5 flex-col gap-2">
+            <PptGeneratorSettingsContent />
           </div>
-          <div className="w-1/3">
+          <div className="flex h-full w-2/5 flex-col">
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
-            <div className="max-h-[80vh] overflow-y-auto">
+            <span className="text-xs">
+              Note: might not display properly if the font isnt locally
+              installed
+            </span>
+            <div className="flex-grow overflow-y-auto">
+              {/* TODO: add space between slides */}
               <Preview
                 normalizedConfig={previewConfig}
                 drawBoundingBoxes={false}
