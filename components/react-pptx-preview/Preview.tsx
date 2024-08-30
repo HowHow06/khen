@@ -1,6 +1,5 @@
 "use client"; // TODO: check if this is needed
 
-import * as React from "react";
 import { PresentationProps } from "@/lib/react-pptx-preview/nodes";
 import type {
   ComplexColor,
@@ -16,10 +15,12 @@ import type {
   InternalTextPart,
   InternalTextPartBaseStyle,
 } from "@/lib/react-pptx-preview/normalizer";
+import { normalizeJsx } from "@/lib/react-pptx-preview/normalizer";
 import {
-  normalizeJsx,
-} from "@/lib/react-pptx-preview/normalizer";
-import { POINTS_TO_INCHES, layoutToInches } from "@/lib/react-pptx-preview/util";
+  POINTS_TO_INCHES,
+  layoutToInches,
+} from "@/lib/react-pptx-preview/util";
+import * as React from "react";
 
 const normalizedColorToCSS = (color: HexColor | ComplexColor) => {
   if (typeof color === "string") {
@@ -88,7 +89,7 @@ interface ListParts {
 const getTextStyleForPart = (
   style: Partial<InternalTextPartBaseStyle>,
   dimensions: [number, number],
-  slideWidth: number
+  slideWidth: number,
 ): React.CSSProperties => {
   const pointsToPx = (points: number) =>
     ((points * POINTS_TO_INCHES) / dimensions[0]) * slideWidth;
@@ -185,17 +186,18 @@ const TextPreview = ({
         return [...collectedSoFar, { listType: bulletType, parts: [part] }];
       }
     },
-    []
+    [],
   );
   let children = (
     <>
-      {listsOfParts.reduce((elements, { listType, parts }, index) => { // TODO: fix issue here
+      {listsOfParts.reduce((elements, { listType, parts }, index) => {
+        // TODO: fix issue here
         if (!listType) {
           const nonListParts = parts.map((part, partIndex) => {
             const style = getTextStyleForPart(
               part.style,
               dimensions,
-              slideWidth
+              slideWidth,
             );
             if (part.link) {
               if ((part.link as any).url) {
@@ -235,9 +237,9 @@ const TextPreview = ({
               );
             } else {
               return (
-                <span key={`${index}-${partIndex}`} style={style}>
+                <div key={`${index}-${partIndex}`} style={style}>
                   {part.text}
-                </span>
+                </div>
               );
             }
           });
@@ -247,7 +249,7 @@ const TextPreview = ({
             const style = getTextStyleForPart(
               part.style,
               dimensions,
-              slideWidth
+              slideWidth,
             );
             return (
               <li key={partIndex} style={style}>
@@ -275,7 +277,7 @@ const TextPreview = ({
 };
 
 const constrainObjectFit = (
-  sizing: InternalImage["style"]["sizing"]
+  sizing: InternalImage["style"]["sizing"],
 ): "contain" | "cover" | undefined => {
   const fit = sizing?.fit;
   if (fit === "contain" || fit === "cover") {
@@ -394,7 +396,7 @@ const SlideObjectPreview = ({
                         ...getTextStyleForPart(
                           cell.style,
                           dimensions,
-                          slideWidth
+                          slideWidth,
                         ),
                         border: normalizeBorderToCSS(object.style),
                         textAlign: cell.style.align,
@@ -508,14 +510,17 @@ const Preview = (props: {
   slideStyle?: React.CSSProperties;
   drawBoundingBoxes?: boolean;
   normalizedConfig?: InternalPresentation;
-} ): JSX.Element | null => {
+}): JSX.Element | null => {
   if (!props.children && !props.normalizedConfig) {
     return null;
   }
 
   try {
-    const normalized = props.children && React.Children.only(props.children) ? normalizeJsx(props.children) : props.normalizedConfig!;
-    
+    const normalized =
+      props.children && React.Children.only(props.children)
+        ? normalizeJsx(props.children)
+        : props.normalizedConfig!;
+
     return (
       <div
         style={{
