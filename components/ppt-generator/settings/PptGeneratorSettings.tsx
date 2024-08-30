@@ -76,7 +76,7 @@ const PptGeneratorSettings = () => {
 
   const currentGeneralSetting = currentSetting?.general;
 
-  let currentTextboxCount =
+  const currentTextboxCount =
     currentGeneralSetting?.textboxCountPerContentPerSlide ??
     PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
       .defaultValue;
@@ -180,19 +180,6 @@ const PptGeneratorSettings = () => {
     currentGeneralSetting?.ignoreSubcontent === true
   ) {
     setCurrentContentTab(CONTENT_TYPE.MAIN);
-  }
-
-  const textboxCountMax =
-    PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-      .rangeMax;
-  const textboxCountMin =
-    PPT_GENERATION_SHARED_GENERAL_SETTINGS.textboxCountPerContentPerSlide
-      .rangeMin;
-  if (currentTextboxCount > textboxCountMax) {
-    currentTextboxCount = textboxCountMax;
-  }
-  if (currentTextboxCount < textboxCountMin) {
-    currentTextboxCount = textboxCountMin;
   }
 
   const settingsContentProps: PptGeneratorSettingsTabContentProps =
