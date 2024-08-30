@@ -47,14 +47,14 @@ const usePptSettingsSections = ({
     if (!isDifferentSettingsBySection) {
       return;
     }
-    const originalSettingValues = settingsValues;
 
+    const originalSettingValues = settingsValues;
     const sectionNameList = getLinesStartingWith(
       mainText,
       LYRIC_SECTION.SECTION,
     );
 
-    // for settings form
+    // for settings form value
     const newSectionValues = {
       ...deepCopy(originalSettingValues[SETTING_CATEGORY.SECTION] || {}),
     };
