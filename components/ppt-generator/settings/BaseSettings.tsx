@@ -1,6 +1,6 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
-import { BaseSettingMetaType, PptSettingsStateType } from "@/lib/types";
+import { BaseSettingMetaType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import SettingFormField from "./common/SettingFormField";
 
@@ -15,8 +15,8 @@ const BaseSettings = ({
   keyPrefix,
   className,
 }: BaseSettingsProps) => {
-  const { form } = usePptGeneratorFormContext();
-  const { control, getValues } = form;
+  const { form, settingsValues } = usePptGeneratorFormContext();
+  const { control } = form;
 
   return (
     <div className={cn("mr-2 grid divide-y pb-2", className)}>
@@ -27,7 +27,7 @@ const BaseSettings = ({
             name={keyPrefix + key}
             key={keyPrefix + key}
             settingField={value}
-            settingsState={getValues() as PptSettingsStateType}
+            settingsState={settingsValues}
             className={cn(index === 0 && "pt-0")}
           />
         );

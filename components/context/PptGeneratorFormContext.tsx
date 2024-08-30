@@ -1,6 +1,7 @@
 "use client";
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
 import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType } from "@/lib/types";
@@ -31,6 +32,7 @@ type PptGeneratorFormContextType = {
   setMainText: (text: string) => void;
   setSecondaryText: (text: string) => void;
   form: UseFormReturn<z.infer<typeof settingsSchema>>;
+  settingsValues: PptSettingsStateType;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -65,6 +67,10 @@ export const PptGeneratorFormProvider: React.FC<
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
+  });
+
+  const settingsValues = useMemoizedSettingsValues({
+    valuesGetter: form.getValues,
   });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
@@ -138,6 +144,7 @@ export const PptGeneratorFormProvider: React.FC<
         setMainText,
         setSecondaryText,
         form,
+        settingsValues,
       }}
     >
       <Form {...form}>

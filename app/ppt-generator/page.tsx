@@ -3,7 +3,7 @@ import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
 import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
 import FileNameSettings from "@/components/ppt-generator/settings/FileNameSettings";
-import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGeneratorSettings";
+import PptGeneratorSettings from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import { Metadata } from "next";
@@ -78,7 +78,7 @@ const PptGeneratorPage = (props: Props) => {
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               4. Settings
             </h2>
-            <PptGeneratorSetting />
+            <PptGeneratorSettings />
           </Container>
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">

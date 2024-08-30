@@ -1,29 +1,29 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    IMPORTED_SETTING_TYPE,
-    MAIN_SECTION_NAME,
-    SETTING_CATEGORY,
+  IMPORTED_SETTING_TYPE,
+  MAIN_SECTION_NAME,
+  SETTING_CATEGORY,
 } from "@/lib/constant";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import {
-    PptSettingsStateType,
-    SectionSettingsKeyType,
-    SectionSettingsType,
+  PptSettingsStateType,
+  SectionSettingsKeyType,
+  SectionSettingsType,
 } from "@/lib/types";
 import {
-    combineWithDefaultSettings,
-    exportFullSettings,
-    exportSectionSettings,
-    generateFullSettings,
-    getJSONFromFile,
-    getSettingTypeFromJSON,
+  combineWithDefaultSettings,
+  exportFullSettings,
+  exportSectionSettings,
+  generateFullSettings,
+  getJSONFromFile,
+  getSettingTypeFromJSON,
 } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { ChangeEvent, useRef } from "react";
@@ -39,8 +39,8 @@ const MoreOptionsDropdown = ({
   currentSectionName,
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { form } = usePptGeneratorFormContext();
-  const { reset, getValues } = form;
+  const { form, settingsValues } = usePptGeneratorFormContext();
+  const { reset } = form;
 
   const {
     promptToGetFullSettingsImportOptions,
@@ -64,7 +64,7 @@ const MoreOptionsDropdown = ({
   }) => {
     const finalSettingsValue = generateFullSettings({
       newSettings: combineWithDefaultSettings(settingValues),
-      originalSettings: getValues() as PptSettingsStateType,
+      originalSettings: settingsValues,
       isApplyToSection,
       isPreserveUseDifferentSetting,
       isPreserveExistingSectionSetting: isToPreserveExistingSectionSetting,
@@ -80,7 +80,7 @@ const MoreOptionsDropdown = ({
     sectionSettings: SectionSettingsType;
     targetSectionName: SectionSettingsKeyType;
   }) => {
-    const originalSettings = getValues() as PptSettingsStateType;
+    const originalSettings = settingsValues;
 
     originalSettings[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
@@ -169,7 +169,7 @@ const MoreOptionsDropdown = ({
     isIncludeSectionSettings?: boolean;
     isExportSectionSettings?: boolean;
   }) => {
-    const currentValues = getValues() as PptSettingsStateType;
+    const currentValues = settingsValues;
     if (isExportSectionSettings) {
       exportSectionSettings({
         settingsValue: currentValues,

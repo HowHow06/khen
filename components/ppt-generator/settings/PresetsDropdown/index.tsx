@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import { pptPresets } from "@/lib/presets";
-import { PptSettingsStateType, PresetsType } from "@/lib/types";
+import { PresetsType } from "@/lib/types";
 import {
   combineWithDefaultSettings,
   generateFullSettings,
@@ -34,8 +34,8 @@ const PresetsDropdown = ({
   ...restProps
 }: Props &
   Pick<DropdownMenuContentProps, "side" | "sideOffset" | "alignOffset">) => {
-  const { form } = usePptGeneratorFormContext();
-  const { reset: formReset, getValues } = form;
+  const { form, settingsValues } = usePptGeneratorFormContext();
+  const { reset: formReset } = form;
   const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
 
   const applyPreset = (
@@ -48,7 +48,7 @@ const PresetsDropdown = ({
     if (preset) {
       const finalValues = generateFullSettings({
         newSettings: combineWithDefaultSettings(preset),
-        originalSettings: getValues() as PptSettingsStateType,
+        originalSettings: settingsValues,
         targetSectionName: currentSectionName,
         isApplyToSection: isApplyToSection,
         isPreserveUseDifferentSetting: isPreserveUseDifferentSetting,

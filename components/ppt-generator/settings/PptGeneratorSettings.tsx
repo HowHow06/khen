@@ -27,7 +27,7 @@ import {
   SectionSettingsKeyType,
   TabType,
 } from "@/lib/types";
-import { cn, getInitialTextboxSettings } from "@/lib/utils";
+import { cn, deepCompare, getInitialTextboxSettings } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
@@ -37,8 +37,8 @@ import PptGeneratorSettingsTabContent, {
 } from "./PptGeneratorSettingsTabContent";
 import PresetsDropdown from "./PresetsDropdown";
 
-const PptGeneratorSetting = () => {
-  const { form, mainText } = usePptGeneratorFormContext();
+const PptGeneratorSettings = () => {
+  const { form, mainText, settingsValues } = usePptGeneratorFormContext();
   const { getValues, reset } = form;
   const {
     settingsUIState,
@@ -52,12 +52,10 @@ const PptGeneratorSetting = () => {
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
-  const settingsValues = getValues() as PptSettingsStateType;
   const { sectionItems, currentSection, setCurrentSection } =
     usePptSettingsSections({
       mainText,
       settingsValues,
-      getValues,
       formReset: reset,
     });
 
@@ -154,7 +152,11 @@ const PptGeneratorSetting = () => {
     );
 
     currentTargetSetting.content = newContentSettings;
-    reset(settingsValues);
+    const ori = getValues();
+    const isSectionItemsChanged = !deepCompare(ori, settingsValues);
+    if (isSectionItemsChanged) {
+      reset(settingsValues);
+    }
   }, [
     currentTextboxCount,
     getValues,
@@ -315,4 +317,4 @@ const PptGeneratorSetting = () => {
   );
 };
 
-export default PptGeneratorSetting;
+export default PptGeneratorSettings;

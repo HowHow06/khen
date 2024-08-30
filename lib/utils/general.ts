@@ -240,6 +240,10 @@ export const deepCopy = <T>(object: T) => {
   return JSON.parse(JSON.stringify(object)) as T;
 };
 
+export const deepCompare = (object1: object, object2: object) => {
+  return JSON.stringify(object1) === JSON.stringify(object2);
+};
+
 export function getLinesStartingWith(inputString: string, find: string) {
   const lines = inputString.split("\n");
 
