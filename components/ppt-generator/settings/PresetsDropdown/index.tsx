@@ -22,14 +22,12 @@ import { toast } from "sonner";
 type Props = {
   presets: PresetsType;
   useIcon?: boolean;
-  hasSectionSettings: boolean;
   currentSectionName: string;
 };
 
 const PresetsDropdown = ({
   presets,
   useIcon = true,
-  hasSectionSettings,
   currentSectionName,
   ...restProps
 }: Props &
@@ -61,7 +59,6 @@ const PresetsDropdown = ({
 
   const onPresetClick = async (presetName: string) => {
     const options = await promptToGetFullSettingsImportOptions({
-      hasSectionSettings,
       currentSectionName,
     });
 
