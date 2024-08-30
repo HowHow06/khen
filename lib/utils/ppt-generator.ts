@@ -1016,7 +1016,6 @@ export const generatePreviewConfig = async ({
 
   // 3.1 Convert to the real PptxGenJS type
   const presV2 = pres as unknown as PptxGenJSType2;
-  window.ppxtgen = presV2;
   const masterSlides = presV2.slideLayouts;
   const slides = presV2.slides;
   const layout = presV2.layout.replace("LAYOUT_", "");

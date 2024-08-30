@@ -1,5 +1,4 @@
-"use client"; // TODO: check if this is needed
-
+"use client";
 import { PresentationProps } from "@/lib/react-pptx-preview/nodes";
 import type {
   ComplexColor,
@@ -188,86 +187,77 @@ const TextPreview = ({
     },
     [],
   );
-  let children = (
-    <>
-      {listsOfParts.reduce((elements, { listType, parts }, index) => {
-        // TODO: fix issue here
-        if (!listType) {
-          const nonListParts = parts.map((part, partIndex) => {
-            const style = getTextStyleForPart(
-              part.style,
-              dimensions,
-              slideWidth,
-            );
-            if (part.link) {
-              if ((part.link as any).url) {
-                return (
-                  <a
-                    key={`${index}-${partIndex}`}
-                    title={part.link.tooltip}
-                    href={(part.link as any).url}
-                    style={style}
-                  >
-                    {part.text}
-                  </a>
-                );
-              } else if ((part.link as any).slide) {
-                // Not supported yet
-                return (
-                  <a
-                    key={`${index}-${partIndex}`}
-                    title={part.link.tooltip}
-                    style={{ ...style, cursor: "not-allowed" }}
-                  >
-                    {part.text}
-                  </a>
-                );
-              }
-            } else if (part.style.subscript) {
+  const childrenContent = listsOfParts.reduce(
+    (elements, { listType, parts }, index) => {
+      if (!listType) {
+        const nonListParts = parts.map((part, partIndex) => {
+          const style = getTextStyleForPart(part.style, dimensions, slideWidth);
+          if (part.link) {
+            if ((part.link as any).url) {
               return (
-                <sub key={`${index}-${partIndex}`} style={style}>
+                <a
+                  key={`${index}-${partIndex}`}
+                  title={part.link.tooltip}
+                  href={(part.link as any).url}
+                  style={style}
+                >
                   {part.text}
-                </sub>
+                </a>
               );
-            } else if (part.style.superscript) {
+            } else if ((part.link as any).slide) {
+              // Not supported yet
               return (
-                <sup key={`${index}-${partIndex}`} style={style}>
+                <a
+                  key={`${index}-${partIndex}`}
+                  title={part.link.tooltip}
+                  style={{ ...style, cursor: "not-allowed" }}
+                >
                   {part.text}
-                </sup>
-              );
-            } else {
-              return (
-                <div key={`${index}-${partIndex}`} style={style}>
-                  {part.text}
-                </div>
+                </a>
               );
             }
-          });
-          return [...elements, ...nonListParts];
-        } else {
-          const listParts = parts.map((part, partIndex) => {
-            const style = getTextStyleForPart(
-              part.style,
-              dimensions,
-              slideWidth,
-            );
+          } else if (part.style.subscript) {
             return (
-              <li key={partIndex} style={style}>
+              <sub key={`${index}-${partIndex}`} style={style}>
                 {part.text}
-              </li>
+              </sub>
             );
-          });
-          const listElement =
-            listType === "number" ? (
-              <ol key={index}>{listParts}</ol>
-            ) : (
-              <ul key={index}>{listParts}</ul>
+          } else if (part.style.superscript) {
+            return (
+              <sup key={`${index}-${partIndex}`} style={style}>
+                {part.text}
+              </sup>
             );
-          return [...elements, listElement];
-        }
-      }, [])}
-    </>
+          } else {
+            return (
+              <div key={`${index}-${partIndex}`} style={style}>
+                {part.text}
+              </div>
+            );
+          }
+        });
+        return [...elements, ...nonListParts];
+      } else {
+        const listParts = parts.map((part, partIndex) => {
+          const style = getTextStyleForPart(part.style, dimensions, slideWidth);
+          return (
+            <li key={partIndex} style={style}>
+              {part.text}
+            </li>
+          );
+        });
+        const listElement =
+          listType === "number" ? (
+            <ol key={index}>{listParts}</ol>
+          ) : (
+            <ul key={index}>{listParts}</ul>
+          );
+        return [...elements, listElement];
+      }
+    },
+    [] as (React.JSX.Element | undefined)[],
   );
+  let children = <>{childrenContent}</>;
   if (superscript) {
     children = <sup>{children}</sup>;
   } else if (subscript) {
@@ -409,7 +399,7 @@ const SlideObjectPreview = ({
                         parts={cell.text}
                         subscript={cell.style.subscript}
                         superscript={cell.style.superscript}
-                        dimensions={dimensions} // TODO: these should be divided by table rows/cols
+                        dimensions={dimensions}
                         slideWidth={slideWidth}
                       />
                     </td>
@@ -559,7 +549,7 @@ const Preview = (props: {
           color: "orange",
         }}
       >
-        invalid JSX: {e.toString()}
+        invalid JSX: {(e as Error).toString()}
       </div>
     );
   }
