@@ -47,11 +47,11 @@ const GeneratePreviewButton = (props: Props) => {
         open={isModalOpen}
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
-        <DialogContent className="flex h-[85vh] min-w-[60vw]">
-          <div className="w-100 flex h-full w-3/5 flex-col gap-2">
+        <DialogContent className="flex h-[85vh] min-w-[60vw] max-w-[80vw]">
+          <div className="w-100 hidden h-full w-3/5 flex-col gap-2 sm:flex">
             <PptGeneratorSettingsContent />
           </div>
-          <div className="flex h-full w-2/5 flex-col">
+          <div className="flex h-full w-full flex-col sm:w-2/5">
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
             <span className="text-xs">
               Note: might not display properly if the font isn&apos;t locally
