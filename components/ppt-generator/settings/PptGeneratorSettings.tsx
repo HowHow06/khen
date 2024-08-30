@@ -55,9 +55,6 @@ const PptGeneratorSettings = () => {
           </SheetTrigger>
         )}
         <PptSettingsUIProvider>
-          <GeneratePreviewButton />
-        </PptSettingsUIProvider>
-        <PptSettingsUIProvider>
           <SheetContent
             className={cn(
               "w-100 flex h-4/5 flex-col gap-2 sm:h-full sm:w-96 sm:max-w-none xl:w-1/4 2xl:w-[21vw]",
@@ -74,6 +71,10 @@ const PptGeneratorSettings = () => {
           </SheetContent>
         </PptSettingsUIProvider>
       </Sheet>
+      <PptSettingsUIProvider>
+        <GeneratePreviewButton />
+      </PptSettingsUIProvider>
+
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
