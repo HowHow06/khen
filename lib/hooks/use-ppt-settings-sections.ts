@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UseFormGetValues, UseFormReset } from "react-hook-form";
+import { UseFormReset } from "react-hook-form";
 import {
   LYRIC_SECTION,
   MAIN_SECTION_NAME,
@@ -12,14 +12,16 @@ import {
   SectionSettingsKeyType,
   SelectionItemsType,
 } from "../types";
-import { getLinesStartingWith, getSectionSettingsInitialValue } from "../utils";
+import {
+  deepCompare,
+  deepCopy,
+  getLinesStartingWith,
+  getSectionSettingsInitialValue,
+} from "../utils";
 
 type Props = {
   mainText: string;
   settingsValues: PptSettingsStateType;
-  getValues: UseFormGetValues<{
-    [x: string]: any;
-  }>;
   formReset: UseFormReset<{
     [x: string]: any;
   }>;
@@ -28,7 +30,6 @@ type Props = {
 const usePptSettingsSections = ({
   mainText,
   settingsValues,
-  getValues,
   formReset,
 }: Props) => {
   const [currentSection, setCurrentSection] = useState(MAIN_SECTION_NAME);
@@ -51,10 +52,11 @@ const usePptSettingsSections = ({
       LYRIC_SECTION.SECTION,
     );
 
-    const originalSettingValues = getValues() as PptSettingsStateType;
+    const originalSettingValues = settingsValues;
+
     // for settings form
     const newSectionValues = {
-      ...originalSettingValues[SETTING_CATEGORY.SECTION],
+      ...deepCopy(originalSettingValues[SETTING_CATEGORY.SECTION] || {}),
     };
 
     // for dropdown options
@@ -93,16 +95,28 @@ const usePptSettingsSections = ({
       });
     }
 
-    setSectionItems(newSectionItems);
-    formReset({
-      ...originalSettingValues,
-      [SETTING_CATEGORY.SECTION]: newSectionValues,
-    });
+    const isSectionItemsChanged = !deepCompare(sectionItems, newSectionItems);
+    if (isSectionItemsChanged) {
+      setSectionItems(newSectionItems);
+    }
+
+    // Only reset the form if new values are different from the current ones
+    const isSettingsValuesChanged = !deepCompare(
+      newSectionValues,
+      originalSettingValues[SETTING_CATEGORY.SECTION] || {},
+    );
+
+    if (isSettingsValuesChanged) {
+      formReset({
+        ...originalSettingValues,
+        [SETTING_CATEGORY.SECTION]: newSectionValues,
+      });
+    }
   }, [
     mainText,
-    sectionItems.length,
+    sectionItems,
     isDifferentSettingsBySection,
-    getValues,
+    settingsValues,
     formReset,
   ]);
 
