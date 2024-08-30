@@ -75,25 +75,21 @@ export const PptGeneratorFormProvider: React.FC<
   const [mainText, setMainText] = useState("");
   const [secondaryText, setSecondaryText] = useState("");
   const { showDialog } = useAlertDialog();
-
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
   });
-
   // form.watch will make this component rerender on value change
   const settingsValues = useMemoizedSettingsValues({
     newSettingsValues: form.watch() as PptSettingsStateType,
   });
-
-  usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
-
   const { sectionItems, currentSection, setCurrentSection } =
     usePptSettingsSections({
       mainText,
       settingsValues,
       formReset: form.reset,
     });
+  usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
     if (process.env.NODE_ENV === "development") {
