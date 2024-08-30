@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { useCallback, useEffect, useState } from "react";
 import { UseFormReset } from "react-hook-form";
 import {
   LYRIC_SECTION,
@@ -40,85 +41,94 @@ const usePptSettingsSections = ({
     },
   ]);
 
-  // listen to mainText change, set options for sectionDropdown and set sectionValues
-  useEffect(() => {
-    const isDifferentSettingsBySection =
-      settingsValues.general.useDifferentSettingForEachSection === true;
-    if (!isDifferentSettingsBySection) {
-      return;
-    }
+  const processMainTextChange = useCallback(
+    (mainText: string) => {
+      const isDifferentSettingsBySection =
+        settingsValues.general.useDifferentSettingForEachSection === true;
+      if (!isDifferentSettingsBySection) {
+        return;
+      }
 
-    const originalSettingValues = settingsValues;
-    const sectionNameList = getLinesStartingWith(
-      mainText,
-      LYRIC_SECTION.SECTION,
-    );
+      const originalSettingValues = settingsValues;
+      const sectionNameList = getLinesStartingWith(
+        mainText,
+        LYRIC_SECTION.SECTION,
+      );
 
-    // for settings form value
-    const newSectionValues = {
-      ...deepCopy(originalSettingValues[SETTING_CATEGORY.SECTION] || {}),
-    };
+      // for settings form value
+      const newSectionValues = {
+        ...deepCopy(originalSettingValues[SETTING_CATEGORY.SECTION] || {}),
+      };
 
-    // for section dropdown options
-    const newSectionItems = [
-      {
-        value: MAIN_SECTION_NAME,
-        label: "Main Section",
-      },
-    ];
+      // for section dropdown options
+      const newSectionItems = [
+        {
+          value: MAIN_SECTION_NAME,
+          label: "Main Section",
+        },
+      ];
 
-    sectionNameList.forEach((sectionName, currentIndex) => {
-      const currentSectionNumber = currentIndex + 1;
-      const currentSectionKey =
-        `${SECTION_PREFIX}${currentSectionNumber}` as SectionSettingsKeyType;
+      sectionNameList.forEach((sectionName, currentIndex) => {
+        const currentSectionNumber = currentIndex + 1;
+        const currentSectionKey =
+          `${SECTION_PREFIX}${currentSectionNumber}` as SectionSettingsKeyType;
 
-      if (!newSectionValues[currentSectionKey]) {
-        // generate initial values for new sections
-        newSectionValues[currentSectionKey] = getSectionSettingsInitialValue({
-          settings: PPT_GENERATION_SETTINGS_META,
+        if (!newSectionValues[currentSectionKey]) {
+          // generate initial values for new sections
+          newSectionValues[currentSectionKey] = getSectionSettingsInitialValue({
+            settings: PPT_GENERATION_SETTINGS_META,
+          });
+        }
+
+        newSectionItems.push({
+          value: currentSectionKey,
+          label: `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}`,
+        });
+      });
+
+      const hasRemovedSections =
+        newSectionItems.length < sectionItems.length - 1;
+      if (hasRemovedSections) {
+        // delete excess sections values
+        const difference = sectionItems.length - 1 - newSectionItems.length;
+        Array.from({ length: difference }).forEach((_, index) => {
+          const sectionNumber = sectionNameList.length + 1 + index;
+          delete newSectionValues[`${SECTION_PREFIX}${sectionNumber}`];
         });
       }
 
-      newSectionItems.push({
-        value: currentSectionKey,
-        label: `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}`,
-      });
-    });
+      const isSectionItemsChanged = !deepCompare(sectionItems, newSectionItems);
+      if (isSectionItemsChanged) {
+        setSectionItems(newSectionItems);
+        setCurrentSection((currentSection) =>
+          newSectionItems.find(({ value }) => value === currentSection) ===
+          undefined
+            ? MAIN_SECTION_NAME
+            : currentSection,
+        );
+      }
 
-    const hasRemovedSections = newSectionItems.length < sectionItems.length - 1;
-    if (hasRemovedSections) {
-      // delete excess sections values
-      const difference = sectionItems.length - 1 - newSectionItems.length;
-      Array.from({ length: difference }).forEach((_, index) => {
-        const sectionNumber = sectionNameList.length + 1 + index;
-        delete newSectionValues[`${SECTION_PREFIX}${sectionNumber}`];
-      });
-    }
-
-    const isSectionItemsChanged = !deepCompare(sectionItems, newSectionItems);
-    if (isSectionItemsChanged) {
-      setSectionItems(newSectionItems);
-      setCurrentSection((currentSection) =>
-        newSectionItems.find(({ value }) => value === currentSection) ===
-        undefined
-          ? MAIN_SECTION_NAME
-          : currentSection,
+      // Only reset the form if new values are different from the current ones
+      const isSettingsValuesChanged = !deepCompare(
+        newSectionValues,
+        originalSettingValues[SETTING_CATEGORY.SECTION] || {},
       );
-    }
 
-    // Only reset the form if new values are different from the current ones
-    const isSettingsValuesChanged = !deepCompare(
-      newSectionValues,
-      originalSettingValues[SETTING_CATEGORY.SECTION] || {},
-    );
+      if (isSettingsValuesChanged) {
+        formReset({
+          ...originalSettingValues,
+          [SETTING_CATEGORY.SECTION]: newSectionValues,
+        });
+      }
+    },
+    [sectionItems, settingsValues, formReset],
+  );
 
-    if (isSettingsValuesChanged) {
-      formReset({
-        ...originalSettingValues,
-        [SETTING_CATEGORY.SECTION]: newSectionValues,
-      });
-    }
-  }, [mainText, sectionItems, settingsValues, formReset]);
+  // listen to mainText change, set options for sectionDropdown and set sectionValues
+  useEffect(() => {
+    const debouncedStateHandler = debounce(processMainTextChange, 300);
+    debouncedStateHandler(mainText);
+  }, [mainText, processMainTextChange]);
 
   return {
     sectionItems,
