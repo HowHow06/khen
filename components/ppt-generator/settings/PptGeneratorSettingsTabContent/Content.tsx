@@ -47,7 +47,7 @@ const ContentSettingsTabContent = ({
     <TabsContent className="flex-grow" value={SETTING_CATEGORY.CONTENT}>
       <Tabs
         defaultValue={CONTENT_TYPE.MAIN}
-        value={tabsValue}
+        value={isIgnoreSubcontent ? CONTENT_TYPE.MAIN : tabsValue} // is subcontent ignored, force show main
         onValueChange={onTabsValueChange}
         className="flex h-full w-full flex-col"
       >

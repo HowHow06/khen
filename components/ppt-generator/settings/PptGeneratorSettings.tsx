@@ -9,7 +9,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  CONTENT_TYPE,
   DEFAULT_PRESETS,
   MAIN_SECTION_NAME,
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
@@ -84,31 +83,6 @@ const PptGeneratorSettings = () => {
         tabType: tabType,
       });
     };
-
-  // listen currentGeneralSetting?.ignoreSubcontent === true,
-  // to handle case where subcontent is ignore, force user go to Main lyric tab
-  if (
-    currentSection === MAIN_SECTION_NAME &&
-    settingsUIState.currentContentTab !== CONTENT_TYPE.MAIN &&
-    currentGeneralSetting?.ignoreSubcontent === true
-  ) {
-    setCurrentContentTab(CONTENT_TYPE.MAIN); // only effective for main content
-  }
-
-  // listen currentGeneralSetting?.ignoreSubcontent === true,
-  // to handle case where subcontent is ignore, force user go to Main lyric tab
-  if (
-    currentSection !== MAIN_SECTION_NAME &&
-    settingsUIState.sectionTabs[currentSection]?.currentContentTab !==
-      CONTENT_TYPE.MAIN &&
-    currentGeneralSetting?.ignoreSubcontent === true
-  ) {
-    setSectionTabs({
-      sectionName: currentSection,
-      tab: CONTENT_TYPE.MAIN,
-      tabType: TAB_TYPES.CONTENT,
-    });
-  }
 
   const settingsContentProps: PptGeneratorSettingsTabContentProps =
     isUserAtSectionSettings
