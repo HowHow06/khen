@@ -39,7 +39,9 @@ const PptGeneratorSettings = () => {
     setSectionTabs,
   } = usePptSettingsUIContext();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const toggleSettingSidebar = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
@@ -68,10 +70,6 @@ const PptGeneratorSettings = () => {
   const isUseMainSectionSettings =
     isUserAtSectionSettings &&
     currentSectionSetting?.general?.useMainSectionSettings === true;
-
-  const toggleSettingSidebar = () => {
-    setIsSettingsOpen(!isSettingsOpen);
-  };
 
   // Function Currying
   const handleSectionTabChange =
