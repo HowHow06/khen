@@ -20,7 +20,9 @@ const PptGeneratorSettings = () => {
   };
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
-  const { currentSection } = usePptGeneratorFormContext();
+  const { settingsValues, currentSection } = usePptGeneratorFormContext();
+  const isDifferentSettingsBySection =
+    settingsValues.general.useDifferentSettingForEachSection === true;
 
   return (
     <div className="flex flex-row space-x-2">
@@ -52,7 +54,9 @@ const PptGeneratorSettings = () => {
             </Button>
           </SheetTrigger>
         )}
-        <GeneratePreviewButton />
+        <PptSettingsUIProvider>
+          <GeneratePreviewButton />
+        </PptSettingsUIProvider>
         <PptSettingsUIProvider>
           <SheetContent
             className={cn(
@@ -73,6 +77,7 @@ const PptGeneratorSettings = () => {
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
+          hasSectionSettings={isDifferentSettingsBySection}
           currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />

@@ -23,12 +23,14 @@ type Props = {
   presets: PresetsType;
   useIcon?: boolean;
   currentSectionName: string;
+  hasSectionSettings: boolean;
 };
 
 const PresetsDropdown = ({
   presets,
   useIcon = true,
   currentSectionName,
+  hasSectionSettings,
   ...restProps
 }: Props &
   Pick<DropdownMenuContentProps, "side" | "sideOffset" | "alignOffset">) => {
@@ -59,6 +61,7 @@ const PresetsDropdown = ({
 
   const onPresetClick = async (presetName: string) => {
     const options = await promptToGetFullSettingsImportOptions({
+      hasSectionSettings,
       currentSectionName,
     });
 

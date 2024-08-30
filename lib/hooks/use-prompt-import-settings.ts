@@ -7,15 +7,17 @@ const usePromptImportSettings = () => {
   const { showOptionsDialog } = useOptionsDialog();
   const { showDialog: showAlertDialog } = useAlertDialog();
   const promptToGetFullSettingsImportOptions = async ({
+    hasSectionSettings,
     currentSectionName,
   }: {
+    hasSectionSettings: boolean;
     currentSectionName: string;
   }) => {
     let isApplyToSection = false;
     let isPreserveUseDifferentSetting = true;
     let isToPreserveExistingSectionSetting = true;
 
-    if (currentSectionName !== MAIN_SECTION_NAME) {
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
       const result = await showOptionsDialog("Apply settings to:", {
         optionItems: [
           {
@@ -34,7 +36,10 @@ const usePromptImportSettings = () => {
       isApplyToSection = result === "current-section";
     }
 
-    if (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection) {
+    if (
+      hasSectionSettings &&
+      (currentSectionName === MAIN_SECTION_NAME || !isApplyToSection)
+    ) {
       let result = await showOptionsDialog(
         `Override the value of "${PPT_GENERATION_SETTINGS_META.general.useDifferentSettingForEachSection.fieldDisplayName}" field?`,
         {
@@ -99,7 +104,7 @@ const usePromptImportSettings = () => {
     let isIncludeSectionSettings = false;
     let isExportSectionSettings = false;
 
-    if (currentSectionName !== MAIN_SECTION_NAME) {
+    if (hasSectionSettings && currentSectionName !== MAIN_SECTION_NAME) {
       const result = await showOptionsDialog(
         `Export which of the following? `,
         {

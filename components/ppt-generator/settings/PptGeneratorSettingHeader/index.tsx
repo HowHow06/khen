@@ -22,6 +22,7 @@ const PptGeneratorSettingHeader = ({
       <div className="flex flex-row items-center space-x-5">
         <h3 className="text-lg font-semibold text-foreground">Settings</h3>
         <PresetsDropdown
+          hasSectionSettings={isDifferentSettingsBySection}
           currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />
