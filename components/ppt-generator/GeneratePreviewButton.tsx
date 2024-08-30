@@ -54,11 +54,10 @@ const GeneratePreviewButton = (props: Props) => {
           <div className="flex h-full w-2/5 flex-col">
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
             <span className="text-xs">
-              Note: might not display properly if the font isnt locally
+              Note: might not display properly if the font isn&apos;t locally
               installed
             </span>
             <div className="flex-grow overflow-y-auto">
-              {/* TODO: add space between slides */}
               <Preview
                 normalizedConfig={previewConfig}
                 drawBoundingBoxes={false}
