@@ -30,15 +30,8 @@ import PptGeneratorSettingsTabContent, {
 import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSettings = () => {
-  const {
-    form,
-    mainText,
-    settingsValues,
-    sectionItems,
-    currentSection,
-    setCurrentSection,
-  } = usePptGeneratorFormContext();
-  const { reset } = form;
+  const { settingsValues, sectionItems, currentSection, setCurrentSection } =
+    usePptGeneratorFormContext();
   const {
     settingsUIState,
     setCurrentCategoryTab,
@@ -46,7 +39,7 @@ const PptGeneratorSettings = () => {
     setCurrentCoverTab,
     setSectionTabs,
   } = usePptSettingsUIContext();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
@@ -78,7 +71,7 @@ const PptGeneratorSettings = () => {
     currentSectionSetting?.general?.useMainSectionSettings === true;
 
   const toggleSettingSidebar = () => {
-    setIsOpen(!isOpen);
+    setIsSettingsOpen(!isSettingsOpen);
   };
 
   // Function Currying
@@ -92,12 +85,29 @@ const PptGeneratorSettings = () => {
       });
     };
 
+  // listen currentGeneralSetting?.ignoreSubcontent === true,
+  // to handle case where subcontent is ignore, force user go to Main lyric tab
   if (
     currentSection === MAIN_SECTION_NAME &&
     settingsUIState.currentContentTab !== CONTENT_TYPE.MAIN &&
     currentGeneralSetting?.ignoreSubcontent === true
   ) {
-    setCurrentContentTab(CONTENT_TYPE.MAIN);
+    setCurrentContentTab(CONTENT_TYPE.MAIN); // only effective for main content
+  }
+
+  // listen currentGeneralSetting?.ignoreSubcontent === true,
+  // to handle case where subcontent is ignore, force user go to Main lyric tab
+  if (
+    currentSection !== MAIN_SECTION_NAME &&
+    settingsUIState.sectionTabs[currentSection]?.currentContentTab !==
+      CONTENT_TYPE.MAIN &&
+    currentGeneralSetting?.ignoreSubcontent === true
+  ) {
+    setSectionTabs({
+      sectionName: currentSection,
+      tab: CONTENT_TYPE.MAIN,
+      tabType: TAB_TYPES.CONTENT,
+    });
   }
 
   const settingsContentProps: PptGeneratorSettingsTabContentProps =
@@ -169,12 +179,12 @@ const PptGeneratorSettings = () => {
     <div className="flex flex-row space-x-2">
       <Sheet
         modal={isExtraSmallScreen ? true : false}
-        open={isOpen}
-        onOpenChange={setIsOpen}
+        open={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
       >
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
-            {isOpen ? "Close" : "Open"} Settings
+            {isSettingsOpen ? "Close" : "Open"} Settings
           </Button>
         </SheetTrigger>
         {!isExtraSmallScreen && (
@@ -183,14 +193,14 @@ const PptGeneratorSettings = () => {
               onClick={toggleSettingSidebar}
               variant={"outline"}
               className={`fixed top-1/2 flex -translate-y-1/2 transform items-center rounded-r-none px-0 py-10 transition-all ease-in-out ${
-                isOpen
+                isSettingsOpen
                   ? "right-1/2 duration-500 sm:right-96 xl:right-1/4 2xl:right-[21vw]"
                   : "right-0 duration-300"
               }`}
               aria-label="Open settings"
             >
               <ChevronLeft
-                className={`${isOpen ? "rotate-180 transform" : ""} transition-transform duration-700`}
+                className={`${isSettingsOpen ? "rotate-180 transform" : ""} transition-transform duration-700`}
               />
             </Button>
           </SheetTrigger>
@@ -204,7 +214,7 @@ const PptGeneratorSettings = () => {
           side={isExtraSmallScreen ? "bottom" : "right"}
           onInteractOutside={
             isExtraSmallScreen
-              ? () => setIsOpen(false)
+              ? () => setIsSettingsOpen(false)
               : (event) => event.preventDefault() // prevent it from closing
           }
         >
