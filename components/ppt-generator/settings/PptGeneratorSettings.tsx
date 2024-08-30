@@ -15,24 +15,13 @@ import {
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   SETTING_CATEGORY,
   TAB_TYPES,
-  TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import {
-  ContentTextboxKey,
-  ContentTypeType,
-  SectionSettingsKeyType,
-  TabType,
-} from "@/lib/types";
-import {
-  cn,
-  deepCompare,
-  deepCopy,
-  getInitialTextboxSettings,
-} from "@/lib/utils";
+import { SectionSettingsKeyType, TabType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
 import PptGeneratorSettingsTabContent, {
@@ -102,77 +91,6 @@ const PptGeneratorSettings = () => {
         tabType: tabType,
       });
     };
-
-  // listen to currentTextboxCount (textbox count of the current focused section) change, TODO: become hook
-  useEffect(() => {
-    const originalSettingsValues = settingsValues;
-    const newSettingsValues = deepCopy(settingsValues);
-
-    const newTargetSetting = isUserAtSectionSettings
-      ? newSettingsValues.section?.[currentSection as SectionSettingsKeyType]
-      : newSettingsValues;
-
-    if (
-      newTargetSetting === undefined ||
-      newTargetSetting?.content === undefined
-    ) {
-      return;
-    }
-
-    const currentContentSettings = deepCopy(newTargetSetting.content);
-
-    Object.entries(currentContentSettings).forEach(
-      ([contentType, settings]) => {
-        const contentTypeKey = contentType as ContentTypeType;
-        const originalTextboxCount = Object.keys(settings.textbox).length;
-        const differenceInTextboxCount =
-          currentTextboxCount - originalTextboxCount;
-        if (differenceInTextboxCount === 0) {
-          return;
-        }
-        if (differenceInTextboxCount > 0) {
-          // add new
-          Array.from({ length: differenceInTextboxCount }).forEach(
-            (_, index) => {
-              const newTextboxNumber = originalTextboxCount + index + 1;
-              const textboxKey =
-                `${TEXTBOX_GROUPING_PREFIX}${newTextboxNumber}` as ContentTextboxKey;
-
-              currentContentSettings[contentTypeKey].textbox[textboxKey] =
-                getInitialTextboxSettings();
-            },
-          );
-        }
-
-        if (differenceInTextboxCount < 0) {
-          // remove excess
-          Array.from({ length: -differenceInTextboxCount }).forEach(
-            (_, index) => {
-              const targetTextboxNumber = currentTextboxCount + 1 + index;
-              delete currentContentSettings[contentTypeKey].textbox[
-                `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
-              ];
-            },
-          );
-        }
-      },
-    );
-
-    newTargetSetting.content = currentContentSettings;
-    const isSettingsChanged = !deepCompare(
-      originalSettingsValues,
-      newSettingsValues,
-    );
-    if (isSettingsChanged) {
-      reset(newSettingsValues);
-    }
-  }, [
-    currentTextboxCount,
-    settingsValues,
-    reset,
-    currentSection,
-    isUserAtSectionSettings,
-  ]);
 
   if (
     currentSection === MAIN_SECTION_NAME &&

@@ -2,6 +2,7 @@
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
+import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dynamic-textbox-count";
 import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
@@ -80,9 +81,12 @@ export const PptGeneratorFormProvider: React.FC<
     defaultValues: defaultSettingsValue,
   });
 
+  // form.watch will make this component rerender on value change
   const settingsValues = useMemoizedSettingsValues({
-    valuesGetter: form.getValues,
+    newSettingsValues: form.watch() as PptSettingsStateType,
   });
+
+  usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
 
   const { sectionItems, currentSection, setCurrentSection } =
     usePptSettingsSections({
