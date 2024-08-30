@@ -23,11 +23,15 @@ import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import {
   ContentTextboxKey,
   ContentTypeType,
-  PptSettingsStateType,
   SectionSettingsKeyType,
   TabType,
 } from "@/lib/types";
-import { cn, deepCompare, getInitialTextboxSettings } from "@/lib/utils";
+import {
+  cn,
+  deepCompare,
+  deepCopy,
+  getInitialTextboxSettings,
+} from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import GeneratePreviewButton from "../GeneratePreviewButton";
@@ -39,7 +43,7 @@ import PresetsDropdown from "./PresetsDropdown";
 
 const PptGeneratorSettings = () => {
   const { form, mainText, settingsValues } = usePptGeneratorFormContext();
-  const { getValues, reset } = form;
+  const { reset } = form;
   const {
     settingsUIState,
     setCurrentCategoryTab,
@@ -100,20 +104,24 @@ const PptGeneratorSettings = () => {
       });
     };
 
-  // handle currentTextboxCount change, TODO: become hook
+  // listen to currentTextboxCount (textbox count of the current focused section) change, TODO: become hook
   useEffect(() => {
-    const settingsValues = getValues() as PptSettingsStateType;
-    const currentTargetSetting = isUserAtSectionSettings
-      ? settingsValues.section?.[currentSection as SectionSettingsKeyType]
-      : settingsValues;
-    const currentContentSettings = currentTargetSetting?.content;
+    const originalSettingsValues = settingsValues;
+    const newSettingsValues = deepCopy(settingsValues);
+
+    const newTargetSetting = isUserAtSectionSettings
+      ? newSettingsValues.section?.[currentSection as SectionSettingsKeyType]
+      : newSettingsValues;
+
     if (
-      currentTargetSetting === undefined ||
-      currentContentSettings === undefined
+      newTargetSetting === undefined ||
+      newTargetSetting?.content === undefined
     ) {
       return;
     }
-    const newContentSettings = { ...currentContentSettings };
+
+    const currentContentSettings = deepCopy(newTargetSetting.content);
+
     Object.entries(currentContentSettings).forEach(
       ([contentType, settings]) => {
         const contentTypeKey = contentType as ContentTypeType;
@@ -131,7 +139,7 @@ const PptGeneratorSettings = () => {
               const textboxKey =
                 `${TEXTBOX_GROUPING_PREFIX}${newTextboxNumber}` as ContentTextboxKey;
 
-              newContentSettings[contentTypeKey].textbox[textboxKey] =
+              currentContentSettings[contentTypeKey].textbox[textboxKey] =
                 getInitialTextboxSettings();
             },
           );
@@ -139,27 +147,29 @@ const PptGeneratorSettings = () => {
 
         if (differenceInTextboxCount < 0) {
           // remove excess
-          // Array.from({ length: -differenceInTextboxCount }).forEach(
-          //   (_, index) => {
-          //     const targetTextboxNumber = currentTextboxCount + 1 + index;
-          //     delete newContentSettings[contentTypeKey].textbox[
-          //       `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
-          //     ];
-          //   },
-          // );
+          Array.from({ length: -differenceInTextboxCount }).forEach(
+            (_, index) => {
+              const targetTextboxNumber = currentTextboxCount + 1 + index;
+              delete currentContentSettings[contentTypeKey].textbox[
+                `${TEXTBOX_GROUPING_PREFIX}${targetTextboxNumber}`
+              ];
+            },
+          );
         }
       },
     );
 
-    currentTargetSetting.content = newContentSettings;
-    const ori = getValues();
-    const isSectionItemsChanged = !deepCompare(ori, settingsValues);
-    if (isSectionItemsChanged) {
-      reset(settingsValues);
+    newTargetSetting.content = currentContentSettings;
+    const isSettingsChanged = !deepCompare(
+      originalSettingsValues,
+      newSettingsValues,
+    );
+    if (isSettingsChanged) {
+      reset(newSettingsValues);
     }
   }, [
     currentTextboxCount,
-    getValues,
+    settingsValues,
     reset,
     currentSection,
     isUserAtSectionSettings,
