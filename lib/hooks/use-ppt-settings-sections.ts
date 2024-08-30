@@ -115,6 +115,7 @@ const usePptSettingsSections = ({
   }, [mainText, sectionItems, settingsValues, formReset]);
 
   useEffect(() => {
+    // handle case where selected currentSection is removed in mainText
     if (
       sectionItems.find(({ value }) => value === currentSection) === undefined
     ) {
