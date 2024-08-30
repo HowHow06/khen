@@ -39,11 +39,11 @@ const usePptSettingsSections = ({
       label: "Main Section",
     },
   ]);
-  const isDifferentSettingsBySection =
-    settingsValues.general.useDifferentSettingForEachSection === true;
 
   // listen to mainText change, set options for sectionDropdown and set sectionValues
   useEffect(() => {
+    const isDifferentSettingsBySection =
+      settingsValues.general.useDifferentSettingForEachSection === true;
     if (!isDifferentSettingsBySection) {
       return;
     }
@@ -112,13 +112,7 @@ const usePptSettingsSections = ({
         [SETTING_CATEGORY.SECTION]: newSectionValues,
       });
     }
-  }, [
-    mainText,
-    sectionItems,
-    isDifferentSettingsBySection,
-    settingsValues,
-    formReset,
-  ]);
+  }, [mainText, sectionItems, settingsValues, formReset]);
 
   useEffect(() => {
     if (
