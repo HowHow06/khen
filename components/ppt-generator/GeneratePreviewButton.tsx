@@ -17,6 +17,7 @@ const GeneratePreviewButton = (props: Props) => {
     usePptGeneratorFormContext();
   const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState<Error>();
 
   const onGeneratePreviewClick = () => {
     setIsModalOpen(true);
@@ -27,12 +28,18 @@ const GeneratePreviewButton = (props: Props) => {
     if (!isModalOpen) {
       return;
     }
-    const previewConfig = await generatePreviewConfig({
-      settingValues: settingsValues,
-      primaryLyric: mainText || "",
-      secondaryLyric: secondaryText,
-    });
-    setPreviewConfig(previewConfig);
+    try {
+      const previewConfig = await generatePreviewConfig({
+        settingValues: settingsValues,
+        primaryLyric: mainText || "",
+        secondaryLyric: secondaryText,
+      });
+
+      setPreviewConfig(previewConfig);
+      setError(undefined);
+    } catch (error) {
+      setError(error as Error);
+    }
   }, [settingsValues, mainText, secondaryText, isModalOpen]);
 
   // update preview config on settingsValues change
@@ -63,10 +70,17 @@ const GeneratePreviewButton = (props: Props) => {
               installed. Shadow, glow and outline won&apos;t be displayed here.
             </span>
             <div className="flex-grow overflow-y-auto">
-              <Preview
-                normalizedConfig={previewConfig}
-                drawBoundingBoxes={false}
-              />
+              {error ? (
+                <div>
+                  Working on the preview, meanwhile please check your
+                  settings...
+                </div>
+              ) : (
+                <Preview
+                  normalizedConfig={previewConfig}
+                  drawBoundingBoxes={false}
+                />
+              )}
             </div>
             <div className="flex justify-end">
               <div className="hidden sm:block">
