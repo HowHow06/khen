@@ -245,7 +245,7 @@ export const deepMerge = <T extends { [key in string]: any }>(
 };
 
 export const deepCopy = <T>(object: T) => {
-  return JSON.parse(JSON.stringify(object)) as T;
+  return Object.assign({}, object) as T;
 };
 
 export const deepCompare = (object1: object, object2: object) => {
