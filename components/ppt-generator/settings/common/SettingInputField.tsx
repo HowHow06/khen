@@ -69,7 +69,10 @@ const renderInputField = (
         </div>
         <ImageDropzoneComponent
           className="col-span-6 text-xs"
-          onFilesSelected={(file) => field.onChange(file)}
+          onFilesSelected={(file) => {
+            console.log("file", file);
+            field.onChange(file);
+          }}
           onFilesRejected={(fileRejections) => {
             fileRejections.forEach((fileRejection) => {
               const message = fileRejection.errors.reduce((result, error) => {
@@ -144,7 +147,18 @@ const renderInputField = (
         {...(settingItemMeta.useProportionForm
           ? { min: 0.0, max: 1.0, step: 0.1 }
           : { min: 0, max: 100 })}
-        onChange={(event) => field.onChange(parseFloat(event.target.value))}
+        onChange={(event) => {
+          let value = parseFloat(event.target.value);
+
+          if (value < 0) {
+            value = 0;
+          }
+          if (value > 100) {
+            value = 100;
+          }
+
+          field.onChange(value);
+        }}
       />
     );
   }
