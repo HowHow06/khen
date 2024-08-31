@@ -1,4 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
+import {
+  includes,
+  isArray,
+  isFunction,
+  isObject,
+  isString,
+  some,
+} from "lodash";
 import { twMerge } from "tailwind-merge";
 import { DEFAULT_GROUPING_NAME } from "../constant";
 import {
@@ -236,6 +244,14 @@ export const deepMerge = <T extends { [key in string]: any }>(
   return tempResult;
 };
 
+export const deepCopy = <T>(object: T) => {
+  return Object.assign({}, object) as T;
+};
+
+export const deepCompare = (object1: object, object2: object) => {
+  return JSON.stringify(object1) === JSON.stringify(object2);
+};
+
 export function getLinesStartingWith(inputString: string, find: string) {
   const lines = inputString.split("\n");
 
@@ -370,11 +386,27 @@ export const getTextInsertedAtPosition = ({
   return { resultText, insertedText: textToAdd };
 };
 
-
-export const getTextByCursorPosition = (cursorPosition: CursorPosition, text: string) => {
+export const getTextByCursorPosition = (
+  cursorPosition: CursorPosition,
+  text: string,
+) => {
   return {
     before: text.slice(0, cursorPosition.start),
     targetValue: text.slice(cursorPosition.start, cursorPosition.end),
     after: text.slice(cursorPosition.end),
   };
+};
+
+export const containsString = (obj: any, targetString: string): boolean => {
+  function search(value: any): boolean {
+    if (isString(value)) {
+      return includes(value, targetString);
+    } else if (isArray(value)) {
+      return some(value, search);
+    } else if (isObject(value) && !isFunction(value)) {
+      return some(value as object, search);
+    }
+    return false;
+  }
+  return search(obj);
 };

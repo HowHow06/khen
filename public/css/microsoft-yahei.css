@@ -1,0 +1,18 @@
+@font-face {
+  font-family: "Microsoft YaHei";
+  src:
+    local("Microsoft YaHei"),
+    url("/fonts/Microsoft_YaHei.tff") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Microsoft YaHei";
+  src:
+    local("Microsoft YaHei Bold"),
+    url("/fonts/Microsoft_YaHei_Bold.tff") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}

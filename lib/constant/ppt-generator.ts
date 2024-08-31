@@ -53,6 +53,11 @@ export const SHADOW_TYPE = {
   INNER: "inner",
 } as const;
 
+export enum PINYIN_TYPE {
+  WITH_TONE = "with tone",
+  WITHOUT_TONE = "without tone",
+}
+
 export const SETTING_CATEGORY = {
   FILE: "file",
   GENERAL: "general",
@@ -533,6 +538,15 @@ export const SHADOW_TYPE_ITEMS: SelectionItemsType<ShadowTypeSettingType> =
       label: shadowType,
     };
   });
+
+export const PINYIN_TYPE_ITEMS: SelectionItemsType<PINYIN_TYPE> = Object.values(
+  PINYIN_TYPE,
+).map((PINYIN_TYPE) => {
+  return {
+    value: PINYIN_TYPE,
+    label: PINYIN_TYPE,
+  };
+});
 
 export const CONTENT_TYPE = {
   MAIN: "main",

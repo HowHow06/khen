@@ -1,9 +1,12 @@
 "use client";
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
+import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dynamic-textbox-count";
+import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
-import { PptSettingsStateType } from "@/lib/types";
+import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
 import {
   combineWithDefaultSettings,
   generatePpt,
@@ -13,7 +16,15 @@ import {
   traverseAndCollect,
 } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ReactNode, createContext, useContext, useState } from "react";
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 import {
   FieldError,
   FieldErrors,
@@ -31,6 +42,11 @@ type PptGeneratorFormContextType = {
   setMainText: (text: string) => void;
   setSecondaryText: (text: string) => void;
   form: UseFormReturn<z.infer<typeof settingsSchema>>;
+  settingsValues: PptSettingsStateType;
+  sectionItems: SelectionItemsType;
+  currentSection: string;
+  setCurrentSection: Dispatch<SetStateAction<string>>;
+  submit: () => void;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -61,17 +77,23 @@ export const PptGeneratorFormProvider: React.FC<
   const [mainText, setMainText] = useState("");
   const [secondaryText, setSecondaryText] = useState("");
   const { showDialog } = useAlertDialog();
-
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
   });
+  // form.watch will make this component rerender on value change
+  const settingsValues = useMemoizedSettingsValues({
+    newSettingsValues: form.watch() as PptSettingsStateType,
+  });
+  const { sectionItems, currentSection, setCurrentSection } =
+    usePptSettingsSections({
+      mainText,
+      settingsValues,
+      formReset: form.reset,
+    });
+  usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
-    if (process.env.NODE_ENV === "development") {
-      const submittedValue = values as PptSettingsStateType;
-      console.log("Submitted Value:", submittedValue);
-    }
     const {
       general: { ignoreSubcontent, useDifferentSettingForEachSection },
     } = values;
@@ -90,6 +112,15 @@ export const PptGeneratorFormProvider: React.FC<
       if (result === DIALOG_RESULT.CANCEL) {
         return;
       }
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      const submittedValue = values as PptSettingsStateType;
+      console.log("Submitted Value:", {
+        submittedValue,
+        mainText,
+        secondaryText,
+      });
     }
 
     generatePpt({
@@ -130,6 +161,12 @@ export const PptGeneratorFormProvider: React.FC<
     });
   }
 
+  const submit = useCallback(form.handleSubmit(onSubmit, onInvalidSubmit), [
+    onSubmit,
+    onInvalidSubmit,
+    form.handleSubmit,
+  ]);
+
   return (
     <PptGeneratorFormContext.Provider
       value={{
@@ -138,13 +175,15 @@ export const PptGeneratorFormProvider: React.FC<
         setMainText,
         setSecondaryText,
         form,
+        settingsValues,
+        sectionItems,
+        currentSection,
+        setCurrentSection,
+        submit,
       }}
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}
-          className="space-y-8"
-        >
+        <form onSubmit={submit} className="space-y-8">
           {children}
         </form>
       </Form>

@@ -1,9 +1,9 @@
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
-import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
+
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
 import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
-import FileSettings from "@/components/ppt-generator/settings/FileSettings";
-import PptGeneratorSetting from "@/components/ppt-generator/settings/PptGeneratorSettings";
+import FileNameSettings from "@/components/ppt-generator/settings/FileNameSettings";
+import PptGeneratorSettings from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import { Metadata } from "next";
@@ -19,6 +19,16 @@ type Props = {};
 const PptGeneratorPage = (props: Props) => {
   return (
     <>
+      {" "}
+      {/* Font File: credit to https://github.com/pjobson/Microsoft-365-Fonts */}
+      {/* https://github.com/vercel/next.js/discussions/40345#discussioncomment-10145316 */}
+      {/* https://stackoverflow.com/questions/36178001/how-to-lazy-load-web-font-declared-by-font-face */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@import url(/css/microsoft-yahei.css);
+        @import url(/css/ebrima.css);`,
+        }}
+      />
       <Container className="max-w-screen-xl py-8 text-center lg:py-16">
         <h1 className="text-primary-900 mb-4 text-3xl font-extrabold leading-none tracking-tight md:text-4xl lg:text-5xl">
           Khen PPT Generator
@@ -60,41 +70,39 @@ const PptGeneratorPage = (props: Props) => {
         </h2>
         <div className="">coming soon...</div>
       </Container>
-      <PptSettingsUIProvider>
-        <PptGeneratorFormProvider>
-          <Container>
-            <h2 className="mt-8 text-xl font-semibold tracking-tight">
-              2. Insert Main Lyric
-            </h2>
-            <MainLyricSection />
-          </Container>
-          <Container>
-            <h2 className="mt-8 text-xl font-semibold tracking-tight">
-              3. Insert Secondary Lyric
-            </h2>
-            <SecondaryLyricSection />
-          </Container>
-          <Container>
-            <h2 className="mt-8 text-xl font-semibold tracking-tight">
-              4. Settings
-            </h2>
-            <PptGeneratorSetting />
-          </Container>
-          <Container>
-            <h2 className="mt-8 text-xl font-semibold tracking-tight">
-              5. Generate PPT!
-            </h2>
-            <div className="mr-2 w-full lg:w-1/2">
-              <FileSettings />
-              <div>
-                <Button variant="default" type="submit">
-                  Generate
-                </Button>
-              </div>
+      <PptGeneratorFormProvider>
+        <Container>
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            2. Insert Main Lyric
+          </h2>
+          <MainLyricSection />
+        </Container>
+        <Container>
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            3. Insert Secondary Lyric
+          </h2>
+          <SecondaryLyricSection />
+        </Container>
+        <Container>
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            4. Settings
+          </h2>
+          <PptGeneratorSettings />
+        </Container>
+        <Container>
+          <h2 className="mt-8 text-xl font-semibold tracking-tight">
+            5. Generate PPT!
+          </h2>
+          <div className="mr-2 w-full lg:w-1/2">
+            <FileNameSettings />
+            <div>
+              <Button variant="default" type="submit">
+                Generate
+              </Button>
             </div>
-          </Container>
-        </PptGeneratorFormProvider>
-      </PptSettingsUIProvider>
+          </div>
+        </Container>
+      </PptGeneratorFormProvider>
     </>
   );
 };

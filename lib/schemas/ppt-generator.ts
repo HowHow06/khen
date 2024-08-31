@@ -102,7 +102,6 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
           .min(0, "Percentage must be at least 0")
           .max(100, "Percentage must not exceed 100");
 
-      // TODO: Add cases for other field types
       default:
         return z.string();
     }
