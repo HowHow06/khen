@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import {
+  cloneDeep,
   includes,
   isArray,
   isFunction,
@@ -245,7 +246,7 @@ export const deepMerge = <T extends { [key in string]: any }>(
 };
 
 export const deepCopy = <T>(object: T) => {
-  return Object.assign({}, object) as T;
+  return cloneDeep(object) as T;
 };
 
 export const deepCompare = (object1: object, object2: object) => {

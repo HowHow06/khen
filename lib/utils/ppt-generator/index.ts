@@ -1351,10 +1351,11 @@ export const generateFullSettings = ({
   isPreserveExistingSectionSetting: boolean;
   targetSectionName: string;
 }): PptSettingsStateType => {
+  const originalSettingsCopy = deepCopy(originalSettings);
   if (isApplyToSection && targetSectionName !== MAIN_SECTION_NAME) {
     const resultSettings = generateFullSettingsForSectionApplication({
       newSettings,
-      originalSettings,
+      originalSettings: originalSettingsCopy,
       targetSectionName: targetSectionName as SectionSettingsKeyType,
     });
     return resultSettings;
@@ -1362,7 +1363,7 @@ export const generateFullSettings = ({
 
   const settingsToUse = generateFullSettingsForMainApplication({
     newSettings,
-    originalSettings,
+    originalSettings: originalSettingsCopy,
     isPreserveExistingSectionSetting,
     isPreserveUseDifferentSetting,
   });

@@ -19,6 +19,7 @@ import {
 } from "@/lib/types";
 import {
   combineWithDefaultSettings,
+  deepCopy,
   exportFullSettings,
   exportSectionSettings,
   generateFullSettings,
@@ -80,7 +81,7 @@ const MoreOptionsDropdown = ({
     sectionSettings: SectionSettingsType;
     targetSectionName: SectionSettingsKeyType;
   }) => {
-    const originalSettings = settingsValues;
+    const originalSettings = deepCopy(settingsValues);
 
     originalSettings[SETTING_CATEGORY.SECTION] = {
       ...originalSettings[SETTING_CATEGORY.SECTION],
