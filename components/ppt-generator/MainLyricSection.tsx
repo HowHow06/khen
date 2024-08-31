@@ -7,6 +7,7 @@ import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
+import AutoGeneratePinyinSwitch from "../AutoGeneratePinyinSwitch";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
@@ -113,9 +114,12 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         <ClearTextButton text={mainText} setText={setMainTextHandler} />
         <LyricFormatterDialogButton />
       </div>
+      <div className="mb-1">
+        <AutoGeneratePinyinSwitch text={mainText} setText={setSecondaryText} />
+      </div>
       <Textarea
         ref={mainTextareaRef}
-        placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? '' : `Press '/' for insert command.`}`}
+        placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? "" : `Press '/' for insert command.`}`}
         className="min-h-96 md:min-h-[35rem]"
         value={mainText}
         onChange={handleTextChange}
