@@ -454,6 +454,12 @@ const SlidePreview = ({
 
   const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
   const backgroundImage = slide.backgroundImage ?? masterSlide?.backgroundImage;
+  console.log("height", {
+    width,
+    dimension0: dimensions[0],
+    dimension1: dimensions[1],
+    height: width / (dimensions[0] / dimensions[1]),
+  });
 
   return (
     <div

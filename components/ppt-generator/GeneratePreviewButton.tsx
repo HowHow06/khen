@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { generatePreviewConfig } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
@@ -38,6 +39,7 @@ const GeneratePreviewButton = (props: Props) => {
       setPreviewConfig(previewConfig);
       setError(undefined);
     } catch (error) {
+      console.warn(error);
       setError(error as Error);
     }
   }, [settingsValues, mainText, secondaryText, isModalOpen]);
@@ -76,10 +78,13 @@ const GeneratePreviewButton = (props: Props) => {
                   settings...
                 </div>
               ) : (
-                <Preview
-                  normalizedConfig={previewConfig}
-                  drawBoundingBoxes={false}
-                />
+                // NOTE: very important to add scroll area because the default scroll bar will affect the width of the component
+                <ScrollArea className={"px-3"} isFillParent>
+                  <Preview
+                    normalizedConfig={previewConfig}
+                    drawBoundingBoxes={false}
+                  />
+                </ScrollArea>
               )}
             </div>
             <div className="flex justify-end">
