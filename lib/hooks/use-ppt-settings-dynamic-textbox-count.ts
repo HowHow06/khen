@@ -94,6 +94,7 @@ const usePptSettingsDynamicTextboxCount = ({
       settingsValuesCopy.general[fieldKey];
 
     if (isMainTextboxCountChanged) {
+      // handle main content settings
       const newContentSettings = getContentSettingsWithTextbox(
         settingsValuesCopy.content,
         settingsValuesCopy.general[fieldKey] || defaultTextboxCount,
@@ -104,10 +105,11 @@ const usePptSettingsDynamicTextboxCount = ({
     const sectionsValues =
       settingsValuesCopy.section && Object.entries(settingsValuesCopy.section);
     if (sectionsValues) {
+      // handle content settings for each section
       sectionsValues.forEach(([key, newValues]) => {
         const sectionKey = key as SectionSettingsKeyType;
         const isTextboxCountChanged =
-          prevSettingsValue?.section?.[sectionKey].general[fieldKey] !==
+          prevSettingsValue?.section?.[sectionKey]?.general[fieldKey] !==
           newValues.general[fieldKey];
         if (isTextboxCountChanged) {
           const newContentSettings = getContentSettingsWithTextbox(

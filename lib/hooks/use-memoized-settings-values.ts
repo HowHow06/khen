@@ -24,7 +24,7 @@ const useMemoizedSettingsValues = ({ newSettingsValues }: Props) => {
       if (process.env.NODE_ENV === "development") {
         console.log(
           "Settings Value Reference Updated:",
-          debouncedNewSettingsValues,
+          deepCopy(debouncedNewSettingsValues),
         );
       }
       existingSettingsValuesRef.current = deepCopy(debouncedNewSettingsValues);
