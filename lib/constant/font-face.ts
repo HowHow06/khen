@@ -748,8 +748,3 @@ export const fontFaces = {
     label: "SimHei",
   },
 };
-
-export const FONT_FILE_MAPPING = {
-  [fontFaces.MicrosoftYaHei.value]: `/css/microsoft-yahei.css`,
-  [fontFaces.Ebrima.value]: `/css/ebrima.css`,
-};
