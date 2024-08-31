@@ -2,9 +2,10 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FONT_FILE_MAPPING, fontFaces } from "@/lib/constant";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
-import { generatePreviewConfig } from "@/lib/utils";
-import { useCallback, useEffect, useState } from "react";
+import { containsString, generatePreviewConfig } from "@/lib/utils";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
 import { Button } from "../ui/button";
@@ -49,14 +50,27 @@ const GeneratePreviewButton = (props: Props) => {
     updatePreviewConfig();
   }, [updatePreviewConfig]);
 
+  const needYaheiFont = useMemo(
+    () => containsString(settingsValues, fontFaces.MicrosoftYaHei.value),
+    [settingsValues],
+  );
+  const needEbrimaFont = useMemo(
+    () => containsString(settingsValues, fontFaces.Ebrima.value),
+    [settingsValues],
+  );
+
   return (
     <>
-      {/* TODO: add auto import office fonts */}
+      {/* Font File: credit to https://github.com/pjobson/Microsoft-365-Fonts */}
       {/* https://github.com/vercel/next.js/discussions/40345#discussioncomment-10145316 */}
       {/* https://stackoverflow.com/questions/36178001/how-to-lazy-load-web-font-declared-by-font-face */}
-      {/* <style>
-        {`@import url(https://fonts.cdnfonts.com/css/microsoft-yahei);`}
-      </style> */}
+      <style>
+        {needYaheiFont &&
+          `@import url(${FONT_FILE_MAPPING[fontFaces.MicrosoftYaHei.value]});`}
+        {needEbrimaFont &&
+          `@import url(${FONT_FILE_MAPPING[fontFaces.Ebrima.value]});`}
+      </style>
+
       <Dialog
         open={isModalOpen}
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}

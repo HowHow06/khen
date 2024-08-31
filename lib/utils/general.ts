@@ -1,4 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
+import {
+  includes,
+  isArray,
+  isFunction,
+  isObject,
+  isString,
+  some,
+} from "lodash";
 import { twMerge } from "tailwind-merge";
 import { DEFAULT_GROUPING_NAME } from "../constant";
 import {
@@ -387,4 +395,18 @@ export const getTextByCursorPosition = (
     targetValue: text.slice(cursorPosition.start, cursorPosition.end),
     after: text.slice(cursorPosition.end),
   };
+};
+
+export const containsString = (obj: any, targetString: string): boolean => {
+  function search(value: any): boolean {
+    if (isString(value)) {
+      return includes(value, targetString);
+    } else if (isArray(value)) {
+      return some(value, search);
+    } else if (isObject(value) && !isFunction(value)) {
+      return some(value as object, search);
+    }
+    return false;
+  }
+  return search(obj);
 };
