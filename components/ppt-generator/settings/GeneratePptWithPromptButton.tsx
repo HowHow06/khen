@@ -23,8 +23,8 @@ const GeneratePptWithPromptButton = (props: Props) => {
           variant="outline"
           type="button"
           size={"icon"}
-          tooltipText={"Find & Replace"}
-          aria-label="find and replace"
+          tooltipText={"Save PPT"}
+          aria-label="save ppt"
         >
           <Download />
         </TooltipButton>
