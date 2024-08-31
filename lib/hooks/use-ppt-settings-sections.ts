@@ -80,9 +80,13 @@ const usePptSettingsSections = ({
           });
         }
 
+        const sectionIsUsingMainSettings =
+          newSectionValues[currentSectionKey].general.useMainSectionSettings ||
+          false;
+        const sectionLabel = `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}${!sectionIsUsingMainSettings ? " *" : ""}`;
         newSectionItems.push({
           value: currentSectionKey,
-          label: `${sectionName.replace(LYRIC_SECTION.SECTION, "").trim()}`,
+          label: sectionLabel,
         });
       });
 
