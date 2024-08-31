@@ -3,15 +3,13 @@
 
 import Color from "color";
 import type PptxGenJs from "pptxgenjs";
-import React, { ReactElement } from "react";
+import React from "react";
 import {
   MasterSlideProps,
   NodeTypes,
   PresentationProps,
   SlideProps,
-  TextBulletProps,
   TextChild,
-  TextLinkProps,
   VisualProps,
   isImage,
   isLine,
@@ -212,83 +210,69 @@ export const normalizeHexOrComplexColor = (
 
 export const normalizeText = (t: TextChild): InternalTextPart[] => {
   if (isReactElementOrElementArray(t)) {
-    // TODO: fix type issue here
-    return flattenChildren(t).reduce<InternalTextPart[]>(
-      (
-        textParts,
-        el:
-          | string
-          | number
-          | ReactElement<TextLinkProps>
-          | ReactElement<TextBulletProps>,
-      ) => {
-        if (React.isValidElement(el)) {
-          let bullet:
-            | true
-            | Exclude<
-                PptxGenJs.TextBaseProps["bullet"],
-                boolean | undefined | "style"
-              >;
-          if (isTextBullet(el)) {
-            // We know the intention is for a bullet, so pass on true if no customisation required
-            const { children, style, rtlMode, lang, ...bulletProps } = el.props;
-            bullet = Object.keys(bulletProps).length ? bulletProps : true;
+    return flattenChildren(t).reduce((textParts, el) => {
+      if (React.isValidElement(el)) {
+        let bullet:
+          | true
+          | Exclude<
+              PptxGenJs.TextBaseProps["bullet"],
+              boolean | undefined | "style"
+            >;
+        if (isTextBullet(el)) {
+          // We know the intention is for a bullet, so pass on true if no customisation required
+          const { children, style, rtlMode, lang, ...bulletProps } = el.props;
+          bullet = Object.keys(bulletProps).length ? bulletProps : true;
 
-            const normalizedChildren = normalizeText(children);
-            const normalizedParentColor = style?.color
-              ? normalizeHexColor(style.color)
-              : undefined;
-            const parentStyle = {
-              ...(style || {}),
-              color: normalizedParentColor,
-            };
+          const normalizedChildren = normalizeText(children);
+          const normalizedParentColor = style?.color
+            ? normalizeHexColor(style.color)
+            : undefined;
+          const parentStyle = {
+            ...(style || {}),
+            color: normalizedParentColor,
+          };
 
-            // Make `breakLine = false` for all child components except the last one
-            // (so every child will sit within the same bullet point)
-            const childParts = normalizedChildren.map((childPart, index) => ({
-              rtlMode,
-              lang,
-              bullet: index === 0 ? bullet : undefined,
-              ...childPart,
-              style: {
-                ...parentStyle,
-                ...childPart.style,
-              },
-              breakLine: index + 1 >= normalizedChildren.length,
-            }));
-            return textParts.concat(childParts);
-          }
-
-          let link;
-          if (isTextLink(el)) {
-            // props extracted here again so that ts can infer them as TextLinkProps
-            const { props } = el;
-            if ("url" in props) {
-              link = { url: props.url, tooltip: props.tooltip };
-            } else if (props.slide) {
-              link = { slide: props.slide, tooltip: props.tooltip };
-            }
-          }
-          const { children, style, rtlMode, lang } = el.props;
-          return textParts.concat({
-            text: children,
+          // Make `breakLine = false` for all child components except the last one
+          // (so every child will sit within the same bullet point)
+          const childParts = normalizedChildren.map((childPart, index) => ({
             rtlMode,
             lang,
-            link,
+            bullet: index === 0 ? bullet : undefined,
+            ...childPart,
             style: {
-              ...(style || {}),
-              color: style?.color ? normalizeHexColor(style.color) : undefined,
+              ...parentStyle,
+              ...childPart.style,
             },
-          });
-        } else {
-          return textParts.concat({
-            text: el.toString(),
-            style: {},
-          });
+            breakLine: index + 1 >= normalizedChildren.length,
+          }));
+          return textParts.concat(childParts);
         }
-      },
-      [],
-    );
+
+        let link;
+        if (isTextLink(el)) {
+          // props extracted here again so that ts can infer them as TextLinkProps
+          const { props } = el;
+          if ("url" in props) {
+            link = { url: props.url, tooltip: props.tooltip };
+          } else if (props.slide) {
+            link = { slide: props.slide, tooltip: props.tooltip };
+          }
+        }
+        const { children, style, rtlMode, lang } = el.props;
+        return textParts.concat({
+          text: children,
+          rtlMode,
+          lang,
+          link,
+          style: {
+            ...(style || {}),
+            color: style?.color ? normalizeHexColor(style.color) : undefined,
+          },
+        });
+      }
+
+      return textParts;
+    }, [] as InternalTextPart[]);
   } else if (Array.isArray(t)) {
     return t.reduce(
       (prev: InternalTextPart[], cur) => prev.concat(normalizeText(cur)),
@@ -479,7 +463,9 @@ const normalizeSlide = ({
   };
   if (props.children) {
     slide.objects = flattenChildren(props.children)
-      .map(normalizeSlideObject) // TODO: fix type issue here
+      .map((child) =>
+        normalizeSlideObject(child as React.ReactElement<VisualProps>),
+      )
       .filter(isPresent);
   }
   return slide;
@@ -497,7 +483,9 @@ const normalizeMasterSlide = ({
   };
   if (props.children) {
     slide.objects = flattenChildren(props.children)
-      .map(normalizeSlideObject) // TODO: fix type issue here
+      .map((child) =>
+        normalizeSlideObject(child as React.ReactElement<VisualProps>),
+      )
       .filter(isPresent);
   }
   return slide;
@@ -521,11 +509,13 @@ export const normalizeJsx = ({
 
     pres.slides = children
       .filter((child) => (child as any).type === NodeTypes.SLIDE)
-      .map(normalizeSlide); // TODO: fix type issue here
+      .map((child) => normalizeSlide(child as React.ReactElement<SlideProps>));
 
     const masterSlides = children
       .filter((child) => (child as any).type === NodeTypes.MASTER_SLIDE)
-      .map(normalizeMasterSlide); // TODO: fix type issue here
+      .map((child) =>
+        normalizeMasterSlide(child as React.ReactElement<MasterSlideProps>),
+      );
     pres.masterSlides = Object.fromEntries(
       masterSlides.map((slide) => [slide.name, slide]),
     );
