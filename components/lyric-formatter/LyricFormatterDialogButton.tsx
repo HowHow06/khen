@@ -6,6 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { formatLyrics } from "@/lib/utils/lyric-formatter";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+import TooltipInfoIcon from "../ui/tooltip-info-icon";
 
 type Props = {};
 
@@ -21,6 +23,7 @@ const LyricFormatterDialogButton = (props: Props) => {
   const [lyricContent, setLyricContent] = useState("");
   const [resultContent, setResultContent] = useState("");
   const [languageCount, setLanguageCount] = useState(2);
+  const [isFirstLineSection, setIsFirstLineSection] = useState(false);
 
   const handleTextChange =
     (textUpdateHandler: (text: string) => void) =>
@@ -37,17 +40,26 @@ const LyricFormatterDialogButton = (props: Props) => {
 
     for (const paragraph of paragraphs) {
       const lyrics = paragraph.trim().split("\n");
-      if (lyrics.length % languageCount !== 0) {
+      const isLyricsValid = isFirstLineSection
+        ? (lyrics.length - 1) % languageCount !== 0
+        : lyrics.length % languageCount !== 0;
+      if (isLyricsValid) {
         toast.warning(`Invalid input!`, {
           description: `Make sure the each line of lyric has corresponding translation.`,
           duration: 10 * 1000,
         });
         return;
       }
-      const tempResult = formatLyrics(lyrics, languageCount);
-      tempResult.forEach(
-        (result, index) => resultArray[index].push(...result, ""), //add empty line
-      );
+
+      const lyricsToFormat = isFirstLineSection ? [...lyrics.slice(1)] : lyrics;
+      const tempResult = formatLyrics(lyricsToFormat, languageCount);
+
+      tempResult.forEach((result, index) => {
+        if (isFirstLineSection) {
+          resultArray[index].push(lyrics[0]); // add first line
+        }
+        resultArray[index].push(...result, ""); //add empty line after each paragraph
+      });
     }
 
     const resultText = resultArray
@@ -70,18 +82,31 @@ const LyricFormatterDialogButton = (props: Props) => {
         </DialogHeader>
         <div className="flex flex-col justify-between space-x-0 space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           <div className="flex flex-[2] flex-col space-y-1">
-            <div className="flex flex-wrap sm:space-x-4">
-              <div className="flex items-center space-x-2">
-                <Label className="text-nowrap">Lanaguage Count:</Label>
-                <Input
-                  type="number"
-                  value={languageCount}
-                  max={100}
-                  min={0}
-                  onChange={(event) =>
-                    setLanguageCount(parseFloat(event.target.value))
-                  }
-                />
+            <div className="flex flex-wrap justify-between sm:space-x-4">
+              <div className="flex space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Label className="text-nowrap">Lanaguage Count:</Label>
+                  <Input
+                    type="number"
+                    value={languageCount}
+                    max={100}
+                    min={0}
+                    onChange={(event) =>
+                      setLanguageCount(parseFloat(event.target.value))
+                    }
+                    className="w-16"
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Label>Has section:</Label>
+                  <Switch
+                    checked={isFirstLineSection}
+                    onCheckedChange={(isFirstLineSection) =>
+                      setIsFirstLineSection(isFirstLineSection)
+                    }
+                  />
+                  <TooltipInfoIcon tooltipText="First line of each paragraph is section name" />
+                </div>
               </div>
 
               <Button onClick={onFormatClick}>Format</Button>
