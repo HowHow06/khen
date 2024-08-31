@@ -935,7 +935,7 @@ const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
   return null;
 };
 
-export const getPreviewTextObjectStyle = (
+const getPreviewTextObjectStyle = (
   presObjectOptions?: ObjectOptions,
 ): InternalText["style"] => {
   // NOTE: meaning shadow, glow, outline won't work
@@ -978,76 +978,13 @@ export const generatePreviewConfig = async ({
   primaryLyric: string;
   secondaryLyric: string;
 }): Promise<InternalPresentation> => {
-  const {
-    general: {
-      mainBackgroundColor,
-      mainBackgroundImage,
-      useDifferentSettingForEachSection,
-    },
-    section,
-  } = settingValues;
-  const primaryLinesArray = primaryLyric.split("\n");
-  const secondaryLinesArray = secondaryLyric.split("\n");
-
-  const mainBackgroundColorToUse =
-    mainBackgroundColor ??
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor.defaultValue;
-  const mainBackgroundImageToUse =
-    mainBackgroundImage ??
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage.defaultValue;
   // 1. Get background prop for the presentation
-  const mainBackgroundProp = await getPptBackgroundProp({
-    backgroundColor: mainBackgroundColorToUse,
-    backgroundImage: mainBackgroundImageToUse,
-  });
-
-  // 1.1 Get background props for all sections
-  const sectionsBackgroundProp: (PptxGenJS.default.BackgroundProps | null)[] =
-    [];
-  if (useDifferentSettingForEachSection === true && section) {
-    for (const [sectionName, sectionSetting] of Object.entries(section)) {
-      if (
-        sectionSetting.general?.useMainSectionSettings ||
-        (sectionSetting.general?.useMainBackgroundColor &&
-          sectionSetting.general?.useMainBackgroundImage)
-      ) {
-        sectionsBackgroundProp.push(null);
-        // no point to create master slides for this section
-        continue;
-      }
-      const sectionBackgroundColor =
-        sectionSetting.general?.sectionBackgroundColor ??
-        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundColor
-          .defaultValue;
-      const sectionBackgroundImage =
-        sectionSetting.general?.sectionBackgroundImage ??
-        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.mainBackgroundImage
-          .defaultValue;
-
-      const backgroundProp = await getPptBackgroundProp({
-        backgroundColor: sectionSetting.general?.useMainBackgroundColor
-          ? mainBackgroundColorToUse
-          : sectionBackgroundColor,
-        backgroundImage: sectionSetting.general?.useMainBackgroundImage
-          ? null // no need to recreate the main image, the image wont be used, and will increase the file size
-          : sectionBackgroundImage,
-      });
-      sectionsBackgroundProp.push(backgroundProp);
-    }
-  }
-
   // 2. Create a new Presentation instance
-  const pres = createPresentationInstance({
-    backgroundProp: mainBackgroundProp,
-    sectionsBackgroundProp: sectionsBackgroundProp,
-  });
-
   // 3. Create Slides in the Presentation
-  createSlidesFromLyrics({
-    pres,
-    primaryLinesArray,
-    secondaryLinesArray,
+  const { pres } = await createMainPresInstance({
     settingValues,
+    primaryLyric,
+    secondaryLyric,
   });
 
   // 3.1 Convert to the real PptxGenJS type
@@ -1098,7 +1035,7 @@ export const generatePreviewConfig = async ({
   return reactPptxConfig;
 };
 
-export const generatePpt = async ({
+const createMainPresInstance = async ({
   settingValues,
   primaryLyric,
   secondaryLyric,
@@ -1109,13 +1046,13 @@ export const generatePpt = async ({
 }) => {
   const {
     general: {
-      separateSectionsToFiles,
       mainBackgroundColor,
       mainBackgroundImage,
       useDifferentSettingForEachSection,
     },
     section,
   } = settingValues;
+
   const primaryLinesArray = primaryLyric.split("\n");
   const secondaryLinesArray = secondaryLyric.split("\n");
 
@@ -1178,6 +1115,45 @@ export const generatePpt = async ({
     primaryLinesArray,
     secondaryLinesArray,
     settingValues,
+  });
+
+  return {
+    pres,
+    sectionsInfo,
+    mainBackgroundProp,
+    sectionsBackgroundProp,
+    primaryLinesArray,
+    secondaryLinesArray,
+  };
+};
+
+export const generatePpt = async ({
+  settingValues,
+  primaryLyric,
+  secondaryLyric,
+}: {
+  settingValues: PptSettingsStateType;
+  primaryLyric: string;
+  secondaryLyric: string;
+}) => {
+  const {
+    general: { separateSectionsToFiles },
+  } = settingValues;
+
+  // 1. Get background prop for the presentation
+  // 2. Create a new Presentation instance
+  // 3. Create Slides in the Presentation
+  const {
+    pres,
+    sectionsInfo,
+    mainBackgroundProp,
+    sectionsBackgroundProp,
+    primaryLinesArray,
+    secondaryLinesArray,
+  } = await createMainPresInstance({
+    settingValues,
+    primaryLyric,
+    secondaryLyric,
   });
 
   // 4. Save the Presentation
