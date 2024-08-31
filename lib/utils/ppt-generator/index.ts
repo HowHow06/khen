@@ -766,9 +766,11 @@ function getTextOptionFromContentSettings({
   const defaultContent = PPT_GENERATION_CONTENT_SETTINGS;
   const defaultTextbox = PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS;
 
+  // NOTE: targetTextbox might be undefined because
+  // the hook update in usePptSettingsDynamicTextboxCount is debounced
   let customOption: PptxGenJS.default.TextPropsOptions = {
-    x: `${targetTextbox.textboxPositionX || defaultTextbox.textboxPositionX.defaultValue}%`,
-    y: `${targetTextbox.textboxPositionY || defaultTextbox.textboxPositionY.defaultValue}%`,
+    x: `${targetTextbox?.textboxPositionX || defaultTextbox.textboxPositionX.defaultValue}%`,
+    y: `${targetTextbox?.textboxPositionY || defaultTextbox.textboxPositionY.defaultValue}%`,
     bold: text?.bold,
     color:
       getColorValue(text?.fontColor) ??
@@ -1032,6 +1034,10 @@ export const generatePreviewConfig = async ({
     slides: slidesConfig,
   };
 
+  console.log({
+    presV2,
+    slidesConfig,
+  });
   return reactPptxConfig;
 };
 
