@@ -94,10 +94,6 @@ export const PptGeneratorFormProvider: React.FC<
   usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
 
   async function onSubmit(values: z.infer<typeof settingsSchema>) {
-    if (process.env.NODE_ENV === "development") {
-      const submittedValue = values as PptSettingsStateType;
-      console.log("Submitted Value:", submittedValue);
-    }
     const {
       general: { ignoreSubcontent, useDifferentSettingForEachSection },
     } = values;
@@ -116,6 +112,15 @@ export const PptGeneratorFormProvider: React.FC<
       if (result === DIALOG_RESULT.CANCEL) {
         return;
       }
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      const submittedValue = values as PptSettingsStateType;
+      console.log("Submitted Value:", {
+        submittedValue,
+        mainText,
+        secondaryText,
+      });
     }
 
     generatePpt({
@@ -156,7 +161,11 @@ export const PptGeneratorFormProvider: React.FC<
     });
   }
 
-  const submit = useCallback(form.handleSubmit(onSubmit, onInvalidSubmit), []);
+  const submit = useCallback(form.handleSubmit(onSubmit, onInvalidSubmit), [
+    onSubmit,
+    onInvalidSubmit,
+    form.handleSubmit,
+  ]);
 
   return (
     <PptGeneratorFormContext.Provider
