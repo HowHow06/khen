@@ -69,7 +69,9 @@ const GeneratePreviewButton = (props: Props) => {
               />
             </div>
             <div className="flex justify-end">
-              <GeneratePptWithPromptButton />
+              <div className="hidden sm:block">
+                <GeneratePptWithPromptButton />
+              </div>
             </div>
           </div>
         </DialogContent>
