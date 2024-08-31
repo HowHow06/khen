@@ -51,13 +51,6 @@ const GeneratePreviewButton = (props: Props) => {
 
   return (
     <>
-      {/* Font File: credit to https://github.com/pjobson/Microsoft-365-Fonts */}
-      {/* https://github.com/vercel/next.js/discussions/40345#discussioncomment-10145316 */}
-      {/* https://stackoverflow.com/questions/36178001/how-to-lazy-load-web-font-declared-by-font-face */}
-      <style>
-        {`@import url(/css/microsoft-yahei.css);`}
-        {`@import url(/css/ebrima.css);`}
-      </style>
       <Dialog
         open={isModalOpen}
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}

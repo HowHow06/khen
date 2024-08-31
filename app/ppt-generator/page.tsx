@@ -19,6 +19,16 @@ type Props = {};
 const PptGeneratorPage = (props: Props) => {
   return (
     <>
+      {" "}
+      {/* Font File: credit to https://github.com/pjobson/Microsoft-365-Fonts */}
+      {/* https://github.com/vercel/next.js/discussions/40345#discussioncomment-10145316 */}
+      {/* https://stackoverflow.com/questions/36178001/how-to-lazy-load-web-font-declared-by-font-face */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `@import url(/css/microsoft-yahei.css);
+        @import url(/css/ebrima.css);`,
+        }}
+      />
       <Container className="max-w-screen-xl py-8 text-center lg:py-16">
         <h1 className="text-primary-900 mb-4 text-3xl font-extrabold leading-none tracking-tight md:text-4xl lg:text-5xl">
           Khen PPT Generator
