@@ -41,6 +41,7 @@ import { BREAK_LINE } from "../constant/general";
 import {
   InternalPresentation,
   InternalText,
+  InternalTextPartBaseStyle,
 } from "../react-pptx-preview/normalizer";
 import { sectionSettingSchema, settingsSchema } from "../schemas";
 import {
@@ -53,13 +54,15 @@ import {
   PptGenerationSettingMetaType,
   PptMainSectionInfo,
   PptSettingsStateType,
-  Prettify,
   SectionSettingsKeyType,
   SectionSettingsType,
   SettingsValueType,
 } from "../types";
 import type { PptxGenJS as PptxGenJSType2 } from "../types/pptxgenjs";
-import { DataOrPathProps } from "../types/pptxgenjs/core-interfaces";
+import {
+  DataOrPathProps,
+  ObjectOptions,
+} from "../types/pptxgenjs/core-interfaces";
 
 export const getInitialValuesFromSettings = <T = { [key in string]: any }>({
   settingsMeta,
@@ -932,6 +935,40 @@ const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
   return null;
 };
 
+export const getPreviewTextObjectStyle = (
+  presObjectOptions?: ObjectOptions,
+): InternalText["style"] => {
+  // NOTE: meaning shadow, glow, outline won't work
+  return {
+    ...presObjectOptions,
+    verticalAlign: presObjectOptions?.valign ?? "middle", // default set to middle
+    h: presObjectOptions?.h ?? 0,
+    x: presObjectOptions?.x!,
+    y: presObjectOptions?.y!,
+    w: presObjectOptions?.w!,
+    color: presObjectOptions?.color ?? null,
+    fontFace: presObjectOptions?.fontFace,
+    align:
+      presObjectOptions?.align === "justify"
+        ? undefined
+        : presObjectOptions?.align,
+    fontSize: presObjectOptions?.fontSize,
+    // backgroundColor: presObjectOptions, // no such option on pres
+    bold: presObjectOptions?.bold,
+    charSpacing: presObjectOptions?.charSpacing,
+    italic: presObjectOptions?.italic,
+    lineSpacing: presObjectOptions?.lineSpacing,
+    margin: presObjectOptions?.margin,
+    paraSpaceAfter: presObjectOptions?.paraSpaceAfter,
+    paraSpaceBefore: presObjectOptions?.paraSpaceBefore,
+    rotate: presObjectOptions?.rotate,
+    strike: presObjectOptions?.strike,
+    subscript: presObjectOptions?.subscript,
+    superscript: presObjectOptions?.superscript,
+    underline: presObjectOptions?.underline,
+  };
+};
+
 export const generatePreviewConfig = async ({
   settingValues,
   primaryLyric,
@@ -943,7 +980,6 @@ export const generatePreviewConfig = async ({
 }): Promise<InternalPresentation> => {
   const {
     general: {
-      separateSectionsToFiles,
       mainBackgroundColor,
       mainBackgroundImage,
       useDifferentSettingForEachSection,
@@ -1020,12 +1056,6 @@ export const generatePreviewConfig = async ({
   const slides = presV2.slides;
   const layout = presV2.layout.replace("LAYOUT_", "");
 
-  // TODO: remove this
-  console.log({
-    masterSlides,
-    slides,
-  });
-
   const masterSlidesConfig = masterSlides.reduce(
     (acc, masterSlide) => ({
       ...acc,
@@ -1047,51 +1077,22 @@ export const generatePreviewConfig = async ({
     backgroundImage: slide.background?.data,
     hidden: slide.hidden,
     objects: slide._slideObjects?.map((object) => ({
-      kind: object._type,
+      kind: "text", // supposedly use `object._type` instead, but now only text type is supported. TODO: see if need to support other types
       text:
         object.text?.map((txt) => ({
           text: txt.text || "",
-          style: {}, // TODO: convert option to style
+          style: {
+            ...txt.options,
+          } as Partial<InternalTextPartBaseStyle>, // TODO: convert option to style properly based on the properties
         })) || [],
-      style: {
-        verticalAlign: "middle", // default set to middle
-        h: 0,
-        ...object.options, // TODO: handle shadow, glow, isTextBox, linesSpacing, lineSpacingMultiple, charSpacing
-      },
+      style: getPreviewTextObjectStyle(object.options),
     })),
-  }));
-
-  const test: Prettify<InternalText["style"]> = {
-    verticalAlign: "middle",
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-    color: "",
-    fontFace: "",
-    align: "center",
-    fontSize: 0,
-    backgroundColor: "",
-    bold: true,
-    charSpacing: 0,
-    italic: false,
-    lineSpacing: 0,
-    margin: 0,
-    paraSpaceAfter: 0,
-    paraSpaceBefore: 0,
-    rotate: 0,
-    strike: false,
-    subscript: false,
-    superscript: false,
-    underline: {
-      style: "none",
-    },
-  };
+  })) as unknown as InternalPresentation["slides"];
 
   const reactPptxConfig: InternalPresentation = {
     layout: layout as InternalPresentation["layout"],
     masterSlides: masterSlidesConfig,
-    slides: slidesConfig as unknown as InternalPresentation["slides"], // TODO: check this
+    slides: slidesConfig,
   };
 
   return reactPptxConfig;

@@ -1,4 +1,4 @@
-'use client'; // TODO: check if this is needed
+"use client"; // TODO: check if this is needed
 
 import type PptxGenJs from "pptxgenjs";
 import React from "react";
@@ -53,7 +53,7 @@ export type TextLinkProps = TextNodeBaseProps & {
 const TextLink: React.FC<TextLinkProps> =
   NodeTypes.TEXT_LINK as unknown as React.FC;
 export const isTextLink = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<TextLinkProps> => {
   return el.type === NodeTypes.TEXT_LINK;
 };
@@ -68,7 +68,7 @@ export type TextBulletProps = TextNodeBaseProps & {
 const TextBullet: React.FC<TextBulletProps> =
   NodeTypes.TEXT_BULLET as unknown as React.FC;
 export const isTextBullet = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<TextBulletProps> => {
   return el.type === NodeTypes.TEXT_BULLET;
 };
@@ -90,7 +90,8 @@ export type TextProps = TextNodeBaseProps & {
 };
 const TextFn: React.FC<TextProps> = () => null;
 // TODO: fix here prototype undefined
-if(TextFn.prototype){
+if (TextFn.prototype) {
+  console.log("Hi bro");
   TextFn.prototype.isPptxTextElement = true;
   TextFn.prototype.Link = TextLink;
   TextFn.prototype.Bullet = TextBullet;
@@ -101,14 +102,15 @@ export const Text = Object.assign(TextFn, {
 });
 
 // TODO: fix here prototype undefined
-if(Text.prototype){
-// We add a random symbol-ish to the prototype for use in isText
-// For some reason a normal el.type == Text doesn't work here when
-// the result is bundled
-(Text.prototype as any).isPptxTextElement = true;
+if (Text.prototype) {
+  console.log("Hi bro2");
+  // We add a random symbol-ish to the prototype for use in isText
+  // For some reason a normal el.type == Text doesn't work here when
+  // the result is bundled
+  (Text.prototype as any).isPptxTextElement = true;
 }
 export const isText = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.FunctionComponentElement<TextProps> => {
   return el.type instanceof Function && el.type.prototype?.isPptxTextElement;
 };
@@ -131,7 +133,7 @@ export type ImageProps = VisualBaseProps & {
 export const Image: React.FC<ImageProps> =
   NodeTypes.IMAGE as unknown as React.FC;
 export const isImage = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<ImageProps> => {
   return el.type === NodeTypes.IMAGE;
 };
@@ -148,7 +150,7 @@ export type ShapeProps = VisualBaseProps & {
 export const Shape: React.FC<ShapeProps> =
   NodeTypes.SHAPE as unknown as React.FC;
 export const isShape = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<ShapeProps> => {
   return el.type === NodeTypes.SHAPE;
 };
@@ -160,7 +162,7 @@ export type TableCellProps = TextProps & {
 export const TableCell: React.FC<TableCellProps> =
   NodeTypes.TABLE_CELL as unknown as React.FC;
 export const isTableCell = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<TableCellProps> => {
   return el.type === NodeTypes.TABLE_CELL;
 };
@@ -176,7 +178,7 @@ export type TableProps = VisualBaseProps & {
 };
 
 const TableFn: React.FC<TableProps> = () => null;
-if(TableFn.prototype){
+if (TableFn.prototype) {
   TableFn.prototype.isPptxTableElement = true;
   TableFn.prototype.Cell = TableCell;
 }
@@ -184,11 +186,11 @@ export const Table = Object.assign(TableFn, {
   Cell: TableCell,
 });
 
-if(Table.prototype){
+if (Table.prototype) {
   (Table.prototype as any).isPptxTableElement = true;
 }
 export const isTable = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.FunctionComponentElement<TableProps> => {
   return el.type instanceof Function && el.type.prototype?.isPptxTableElement;
 };
@@ -205,7 +207,7 @@ export type LineProps = {
 };
 export const Line: React.FC<LineProps> = NodeTypes.LINE as unknown as React.FC;
 export const isLine = (
-  el: React.ReactElement
+  el: React.ReactElement,
 ): el is React.ReactElement<LineProps> => {
   return el.type === NodeTypes.LINE;
 };

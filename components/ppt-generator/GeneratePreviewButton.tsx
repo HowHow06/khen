@@ -21,15 +21,18 @@ const GeneratePreviewButton = (props: Props) => {
     setIsModalOpen(true);
   };
 
-  // TODO: add validation check here, OR show message like 'invalid content' instead of preview
+  // TODO: add settings validation check here, OR show message like 'invalid content' instead of preview
   const updatePreviewConfig = useCallback(async () => {
+    if (!isModalOpen) {
+      return;
+    }
     const previewConfig = await generatePreviewConfig({
       settingValues: settingsValues,
       primaryLyric: mainText || "",
       secondaryLyric: secondaryText,
     });
     setPreviewConfig(previewConfig);
-  }, [settingsValues, mainText, secondaryText]);
+  }, [settingsValues, mainText, secondaryText, isModalOpen]);
 
   // update preview config on settingsValues change
   useEffect(() => {
@@ -56,7 +59,7 @@ const GeneratePreviewButton = (props: Props) => {
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
             <span className="text-xs">
               Note: might not display properly if the font isn&apos;t locally
-              installed
+              installed. Shadow, glow and outline won&apos;t be displayed here.
             </span>
             <div className="flex-grow overflow-y-auto">
               <Preview
