@@ -32,7 +32,7 @@ const FileNameSettings = (props: Props) => {
             name={SETTING_CATEGORY.FILE + "." + key}
             key={SETTING_CATEGORY.FILE + "." + key}
             render={({ field }) => (
-              <FormItem className="grid grid-cols-6 items-center gap-x-2">
+              <FormItem className="grid grid-cols-5 items-center gap-x-2">
                 <FormLabel className="col-span-2 text-left text-sm">
                   {value.fieldDisplayName}
                 </FormLabel>

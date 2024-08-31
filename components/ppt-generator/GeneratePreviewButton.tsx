@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
 import { Button } from "../ui/button";
+import GeneratePptWithPromptButton from "./settings/GeneratePptWithPromptButton";
 import PptGeneratorSettingsContent from "./settings/PptGeneratorSettingsContent";
 
 type Props = {};
@@ -66,6 +67,9 @@ const GeneratePreviewButton = (props: Props) => {
                 normalizedConfig={previewConfig}
                 drawBoundingBoxes={false}
               />
+            </div>
+            <div className="flex justify-end">
+              <GeneratePptWithPromptButton />
             </div>
           </div>
         </DialogContent>

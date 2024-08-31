@@ -21,6 +21,7 @@ import React, {
   ReactNode,
   SetStateAction,
   createContext,
+  useCallback,
   useContext,
   useState,
 } from "react";
@@ -45,6 +46,7 @@ type PptGeneratorFormContextType = {
   sectionItems: SelectionItemsType;
   currentSection: string;
   setCurrentSection: Dispatch<SetStateAction<string>>;
+  submit: () => void;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -154,6 +156,8 @@ export const PptGeneratorFormProvider: React.FC<
     });
   }
 
+  const submit = useCallback(form.handleSubmit(onSubmit, onInvalidSubmit), []);
+
   return (
     <PptGeneratorFormContext.Provider
       value={{
@@ -166,13 +170,11 @@ export const PptGeneratorFormProvider: React.FC<
         sectionItems,
         currentSection,
         setCurrentSection,
+        submit,
       }}
     >
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)}
-          className="space-y-8"
-        >
+        <form onSubmit={submit} className="space-y-8">
           {children}
         </form>
       </Form>
