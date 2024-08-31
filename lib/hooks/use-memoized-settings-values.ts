@@ -9,32 +9,28 @@ type Props = {
 
 const useMemoizedSettingsValues = ({ newSettingsValues }: Props) => {
   const existingSettingsValuesRef = useRef<PptSettingsStateType | null>(null);
-  const debouncedNewSettingsValues = useDebouncedValue(newSettingsValues, 200);
 
   const settingsValues = useMemo(() => {
     // If prevSettingsValuesRef is null (first render),
     // or if the new values are different, update the ref and return the new values
     if (
       existingSettingsValuesRef.current === null ||
-      !deepCompare(
-        existingSettingsValuesRef.current,
-        debouncedNewSettingsValues,
-      )
+      !deepCompare(existingSettingsValuesRef.current, newSettingsValues)
     ) {
       if (process.env.NODE_ENV === "development") {
         console.log(
           "Settings Value Reference Updated:",
-          deepCopy(debouncedNewSettingsValues),
+          deepCopy(newSettingsValues),
         );
       }
-      existingSettingsValuesRef.current = deepCopy(debouncedNewSettingsValues);
+      existingSettingsValuesRef.current = deepCopy(newSettingsValues);
     }
 
     // Return the current (or previous) values stored in the ref
     return existingSettingsValuesRef.current;
-  }, [debouncedNewSettingsValues]);
+  }, [newSettingsValues]);
 
-  return settingsValues;
+  return useDebouncedValue(settingsValues, 200);
 };
 
 export default useMemoizedSettingsValues;
