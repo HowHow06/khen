@@ -65,14 +65,14 @@ export enum SETTING_CATEGORY {
   CONTENT_TEXTBOX = "contentTextbox",
 }
 
-export const LYRIC_SECTION = {
-  SECTION: "----",
-  SUBSECTION: "---",
-  MAIN_TITLE: "#",
-  SECONDARY_TITLE: "##",
-  EMPTY_SLIDE: "***",
-  FILL_SLIDE: "**",
-} as const;
+export enum LYRIC_SECTION {
+  SECTION = "----",
+  SUBSECTION = "---",
+  MAIN_TITLE = "#",
+  SECONDARY_TITLE = "##",
+  EMPTY_SLIDE = "***",
+  FILL_SLIDE = "**",
+}
 
 export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   降服: "xiáng fú",
