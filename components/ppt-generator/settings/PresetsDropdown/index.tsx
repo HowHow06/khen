@@ -8,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
-import { pptPresets } from "@/lib/presets";
 import { PresetsType } from "@/lib/types";
 import {
   combineWithDefaultSettings,
@@ -44,7 +43,7 @@ const PresetsDropdown = ({
     isPreserveUseDifferentSetting: boolean = false,
     isToPreserveExistingSectionSetting: boolean = true,
   ) => {
-    const preset = getPreset(presetName, pptPresets);
+    const preset = getPreset(presetName);
     if (preset) {
       const finalValues = generateFullSettings({
         newSettings: combineWithDefaultSettings(preset),

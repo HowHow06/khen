@@ -4,7 +4,6 @@ import { DIALOG_RESULT } from "@/lib/constant/general";
 import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
 import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dynamic-textbox-count";
 import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
-import { pptPresets } from "@/lib/presets";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
 import {
@@ -58,10 +57,7 @@ let defaultSettingsValue = generatePptSettingsInitialState(
 );
 
 if (process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING) {
-  const preset = getPreset(
-    process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING,
-    pptPresets,
-  );
+  const preset = getPreset(process.env.NEXT_PUBLIC_DEFAULT_PPT_SETTING);
   if (preset) {
     defaultSettingsValue = combineWithDefaultSettings(preset);
   }
