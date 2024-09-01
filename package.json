@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "check": "npm run lint && npm run type-check"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
