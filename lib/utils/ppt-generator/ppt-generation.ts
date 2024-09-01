@@ -249,6 +249,11 @@ const getPresSections = (pres: pptxgenjs) => {
   return (pres as unknown as PptxGenJSType2).sections;
 };
 
+const getLastPresSection = (pres: pptxgenjs) => {
+  const sections = (pres as unknown as PptxGenJSType2).sections;
+  return sections.length ? sections[sections.length - 1] : undefined;
+};
+
 function createSlidesFromLyrics({
   pres,
   primaryLinesArray,
@@ -381,8 +386,9 @@ function createSlidesFromLyrics({
       }
 
       if (isMainSection) {
-        const isLastSectionDefault = currentMainSectionInfo.sectionName === "";
-        if (!isLastSectionDefault) {
+        const isPreviousSectionDefault =
+          currentMainSectionInfo.sectionName === "";
+        if (!isPreviousSectionDefault) {
           // since this is now a new section
           // calculate the endLineIndex for previous section
           // and save the previousSectionInfo into mainSectionsInfo
@@ -404,7 +410,7 @@ function createSlidesFromLyrics({
         currentSectionFillSlideWeight = 0;
       }
 
-      pres.addSection({ title: currentMainSectionInfo.sectionName });
+      pres.addSection({ title: sectionName });
 
       const isFirstPptSection = getPresSections(pres).length <= 1;
       // if is first ppt section, the behvaior is to not to add any slide, therefore the count should be -1
@@ -448,7 +454,7 @@ function createSlidesFromLyrics({
         isUseSectionColor,
         isUseSectionImage,
         currentSectionNumber: mainSectionCount,
-        sectionName: currentMainSectionInfo.sectionName,
+        sectionName: getLastPresSection(pres)?.title || "",
       });
       return;
     }
@@ -467,7 +473,7 @@ function createSlidesFromLyrics({
       indexInCurrentSlide,
       isEmptyLine: currentLine.trim().length === 0,
       isBackgroundColorWhenEmpty,
-      sectionName: currentMainSectionInfo.sectionName,
+      sectionName: getLastPresSection(pres)?.title || "",
       isUseSectionColor,
       isUseSectionImage,
       currentSectionNumber: mainSectionCount,
