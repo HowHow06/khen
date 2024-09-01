@@ -2,6 +2,7 @@ import {
   CONTENT_TYPE,
   HORIZONTAL_ALIGNMENT,
   SETTING_CATEGORY,
+  SHADOW_TYPE,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
 import { PptSettingsStateType } from "../types";
@@ -58,7 +59,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -98,7 +99,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -171,7 +172,7 @@ export const liveChinesePreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -211,7 +212,7 @@ export const liveChinesePreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -286,7 +287,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -326,7 +327,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -399,7 +400,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,
@@ -439,7 +440,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
       },
       shadow: {
         hasShadow: true,
-        shadowType: "outer",
+        shadowType: SHADOW_TYPE.OUTER,
         shadowColor: "#000000",
         shadowBlur: 3,
         shadowOffset: 3,

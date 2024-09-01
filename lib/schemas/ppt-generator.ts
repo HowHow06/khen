@@ -11,7 +11,6 @@ import {
   BaseSettingItemMetaType,
   BaseSettingMetaType,
   PptGenerationSettingMetaType,
-  ShadowTypeSettingType,
 } from "../types";
 
 const fileTypeValidator = (file: File, validTypes: string[]) => {
@@ -81,9 +80,7 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
       case "shadow-type":
         return z.custom<string>(
           (value) => {
-            return Object.values(SHADOW_TYPE).includes(
-              value as ShadowTypeSettingType,
-            );
+            return Object.values(SHADOW_TYPE).includes(value as SHADOW_TYPE);
           },
           {
             message: "Invalid shadow type",

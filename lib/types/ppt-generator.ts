@@ -18,8 +18,6 @@ import {
   TEXTBOX_SETTING_KEY,
 } from "../constant";
 
-export type ShadowTypeSettingType =
-  (typeof SHADOW_TYPE)[keyof typeof SHADOW_TYPE];
 export type TransitionSettingType = ""; // TODO: implement this
 
 export type FieldTypeToTypeScriptType = {
@@ -31,7 +29,7 @@ export type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.COLOR]: `#${string}`;
   [SETTING_FIELD_TYPE.FONT]: string;
   [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HORIZONTAL_ALIGNMENT;
-  [SETTING_FIELD_TYPE.SHADOW_TYPE]: ShadowTypeSettingType;
+  [SETTING_FIELD_TYPE.SHADOW_TYPE]: SHADOW_TYPE;
   [SETTING_FIELD_TYPE.TRANSITION]: TransitionSettingType;
 };
 

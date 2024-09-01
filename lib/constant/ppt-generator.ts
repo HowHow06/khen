@@ -4,7 +4,6 @@ import {
   PptSettingsStateType,
   PresetsType,
   SelectionItemsType,
-  ShadowTypeSettingType,
 } from "../types";
 import { getValueFromPath } from "../utils";
 import { convertToTraditional } from "../utils/character-converter";
@@ -47,10 +46,10 @@ export enum HORIZONTAL_ALIGNMENT {
   RIGHT = "right",
 }
 
-export const SHADOW_TYPE = {
-  OUTER: "outer",
-  INNER: "inner",
-} as const;
+export enum SHADOW_TYPE {
+  OUTER = "outer",
+  INNER = "inner",
+}
 
 export enum PINYIN_TYPE {
   WITH_TONE = "with tone",
@@ -428,7 +427,7 @@ export const PPT_GENERATION_CONTENT_SETTINGS = {
   shadowType: {
     fieldDisplayName: "Type",
     fieldType: SETTING_FIELD_TYPE.SHADOW_TYPE,
-    defaultValue: "outer",
+    defaultValue: SHADOW_TYPE.OUTER,
     groupingName: "shadow",
     isHidden: (settings: PptSettingsStateType, fieldName: string): boolean =>
       !getValueFromPath<boolean>(
@@ -530,13 +529,14 @@ export const HORIZONTAL_ALIGNMENT_ITEMS: SelectionItemsType<HORIZONTAL_ALIGNMENT
     };
   });
 
-export const SHADOW_TYPE_ITEMS: SelectionItemsType<ShadowTypeSettingType> =
-  Object.values(SHADOW_TYPE).map((shadowType) => {
-    return {
-      value: shadowType,
-      label: shadowType,
-    };
-  });
+export const SHADOW_TYPE_ITEMS: SelectionItemsType<SHADOW_TYPE> = Object.values(
+  SHADOW_TYPE,
+).map((shadowType) => {
+  return {
+    value: shadowType,
+    label: shadowType,
+  };
+});
 
 export const PINYIN_TYPE_ITEMS: SelectionItemsType<PINYIN_TYPE> = Object.values(
   PINYIN_TYPE,
