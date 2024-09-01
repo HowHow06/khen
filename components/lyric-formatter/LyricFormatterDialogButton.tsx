@@ -70,7 +70,7 @@ const LyricFormatterDialogButton = (props: Props) => {
   };
 
   return (
-    <Dialog open>
+    <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline">Split Lyrics By Language</Button>
       </DialogTrigger>
