@@ -87,7 +87,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
 
   const setTextareaSelectionOnDropdownClose = (event: Event) => {
     event.preventDefault(); // to disable autofocus, refer to https://www.radix-ui.com/primitives/docs/components/dropdown-menu/0.0.17#content
-    if (mainTextareaRef.current && cursorPosition.end) {
+    if (!isExtraSmallScreen && mainTextareaRef.current && cursorPosition.end) {
       mainTextareaRef.current.selectionStart = cursorPosition.end;
       mainTextareaRef.current.focus();
     }
