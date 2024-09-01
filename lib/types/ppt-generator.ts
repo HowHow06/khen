@@ -104,15 +104,12 @@ export type BaseSettingItemMetaType = {
   | TransitionTypeSettingItemMetaType
 );
 
-type PptGenerationCategory =
-  (typeof SETTING_CATEGORY)[keyof typeof SETTING_CATEGORY];
-
 export type BaseSettingMetaType = {
   [key: string]: BaseSettingItemMetaType;
 };
 
 export type PptGenerationSettingMetaType = {
-  [key in PptGenerationCategory]: BaseSettingMetaType;
+  [key in SETTING_CATEGORY]: BaseSettingMetaType;
 };
 
 export type SettingsValueType<
@@ -178,7 +175,7 @@ export type SectionSettingsKeyType = `${typeof SECTION_PREFIX}${number}`;
 
 export type SectionSettingsType = Omit<
   BasePptSettingsStateType,
-  typeof SETTING_CATEGORY.FILE | typeof SETTING_CATEGORY.GENERAL
+  SETTING_CATEGORY.FILE | SETTING_CATEGORY.GENERAL
 > & {
   [SETTING_CATEGORY.GENERAL]: SettingsValueType<
     typeof PPT_GENERATION_COMBINED_SECTION_SETTINGS

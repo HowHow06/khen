@@ -56,14 +56,14 @@ export enum PINYIN_TYPE {
   WITHOUT_TONE = "without tone",
 }
 
-export const SETTING_CATEGORY = {
-  FILE: "file",
-  GENERAL: "general",
-  SECTION: "section",
-  CONTENT: "content",
-  COVER: "cover",
-  CONTENT_TEXTBOX: "contentTextbox",
-} as const;
+export enum SETTING_CATEGORY {
+  FILE = "file",
+  GENERAL = "general",
+  SECTION = "section",
+  CONTENT = "content",
+  COVER = "cover",
+  CONTENT_TEXTBOX = "contentTextbox",
+}
 
 export const LYRIC_SECTION = {
   SECTION: "----",
