@@ -2,12 +2,13 @@
 import {
   CONTENT_TYPE,
   SETTING_CATEGORY,
-  TAB_TYPE_STATE_NAME_MAPPING,
+  TAB_TYPE_UI_STATE_NAME_MAPPING,
+  TAB_TYPES,
 } from "@/lib/constant";
-import { PptSettingsUIState, TabType } from "@/lib/types";
+import { PptSettingsUIState } from "@/lib/types";
 import React, {
-  ReactNode,
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useReducer,
@@ -16,7 +17,7 @@ import React, {
 type setSectionTabsProps = {
   sectionName: string;
   tab: string;
-  tabType: TabType;
+  tabType: TAB_TYPES;
 };
 
 type PptSettingsUIAction =
@@ -76,7 +77,7 @@ const pptSettingsUIReducer = (
       return { ...state, currentCoverTab: action.tab };
 
     case "SET_SECTION_TABS":
-      const targetTabName = TAB_TYPE_STATE_NAME_MAPPING[action.tabType];
+      const targetTabName = TAB_TYPE_UI_STATE_NAME_MAPPING[action.tabType];
       const originalTargetSection = state.sectionTabs[action.sectionName];
       const newSectionTabs = {
         ...state.sectionTabs,

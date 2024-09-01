@@ -7,7 +7,7 @@ import {
   SETTING_CATEGORY,
   TAB_TYPES,
 } from "@/lib/constant";
-import { SectionSettingsKeyType, TabType } from "@/lib/types";
+import { SectionSettingsKeyType } from "@/lib/types";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
 import PptGeneratorSettingsTabContent, {
   PptGeneratorSettingsTabContentProps,
@@ -54,7 +54,7 @@ const PptGeneratorSettingsContent = (props: Props) => {
 
   // Function Currying
   const handleSectionTabChange =
-    ({ sectionName, tabType }: { sectionName: string; tabType: TabType }) =>
+    ({ sectionName, tabType }: { sectionName: string; tabType: TAB_TYPES }) =>
     (newTabValue: string) => {
       setSectionTabs({
         sectionName: sectionName,

@@ -617,13 +617,13 @@ export const LYRIC_SECTION_ITEMS: SelectionItemsType = [
   },
 ];
 
-export const TAB_TYPES = {
-  SETTINGS_CATEGORY: "SETTINGS_CATEGORY",
-  CONTENT: "CONTENT",
-  COVER: "COVER",
-} as const;
+export enum TAB_TYPES {
+  SETTINGS_CATEGORY = "SETTINGS_CATEGORY",
+  CONTENT = "CONTENT",
+  COVER = "COVER",
+}
 
-export const TAB_TYPE_STATE_NAME_MAPPING = {
+export const TAB_TYPE_UI_STATE_NAME_MAPPING = {
   [TAB_TYPES.SETTINGS_CATEGORY]: "currentCategoryTab",
   [TAB_TYPES.CONTENT]: "currentContentTab",
   [TAB_TYPES.COVER]: "currentCoverTab",
