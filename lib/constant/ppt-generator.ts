@@ -5,7 +5,7 @@ import {
   PresetsType,
   SelectionItemsType,
 } from "../types";
-import { deepCopy, getValueFromPath } from "../utils";
+import { getValueFromPath } from "../utils";
 import { convertToTraditional } from "../utils/character-converter";
 import { fontFaces } from "./font-face";
 
@@ -88,7 +88,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   灭没: "miè mò",
 };
 
-const CUSTOM_PINYIN_MAP = deepCopy(CUSTOM_PINYIN_MAP_SIMPLIFIED) as {
+const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
   [key: string]: string;
 };
 
