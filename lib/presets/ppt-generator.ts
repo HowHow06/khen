@@ -1,5 +1,6 @@
 import {
   CONTENT_TYPE,
+  HORIZONTAL_ALIGNMENT,
   SETTING_CATEGORY,
   TEXTBOX_GROUPING_PREFIX,
 } from "../constant";
@@ -42,7 +43,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         font: "Microsoft YaHei",
         fontSize: 60,
         charSpacing: 2,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -82,7 +83,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 31,
         charSpacing: 0,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -155,7 +156,7 @@ export const liveChinesePreset: PptSettingsStateType = {
         font: "Microsoft YaHei",
         fontSize: 30,
         charSpacing: 2,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -195,7 +196,7 @@ export const liveChinesePreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 18,
         charSpacing: 0,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -269,7 +270,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 44,
         charSpacing: -1,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
         lineSpacingMultiple: 1.5,
       },
       glow: {
@@ -310,7 +311,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 31,
         charSpacing: 0,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -383,7 +384,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 26,
         charSpacing: 0,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,
@@ -423,7 +424,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
         font: "Ebrima",
         fontSize: 18,
         charSpacing: 0,
-        align: "center",
+        align: HORIZONTAL_ALIGNMENT.CENTER,
       },
       glow: {
         hasGlow: false,

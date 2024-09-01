@@ -18,8 +18,6 @@ import {
   TEXTBOX_SETTING_KEY,
 } from "../constant";
 
-export type HorizontalAlignSettingType =
-  (typeof HORIZONTAL_ALIGNMENT)[keyof typeof HORIZONTAL_ALIGNMENT];
 export type ShadowTypeSettingType =
   (typeof SHADOW_TYPE)[keyof typeof SHADOW_TYPE];
 export type TransitionSettingType = ""; // TODO: implement this
@@ -32,7 +30,7 @@ export type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.IMAGE]: File | string | null;
   [SETTING_FIELD_TYPE.COLOR]: `#${string}`;
   [SETTING_FIELD_TYPE.FONT]: string;
-  [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HorizontalAlignSettingType;
+  [SETTING_FIELD_TYPE.HORIZONTAL_ALIGN]: HORIZONTAL_ALIGNMENT;
   [SETTING_FIELD_TYPE.SHADOW_TYPE]: ShadowTypeSettingType;
   [SETTING_FIELD_TYPE.TRANSITION]: TransitionSettingType;
 };

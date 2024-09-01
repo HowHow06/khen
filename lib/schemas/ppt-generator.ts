@@ -10,7 +10,6 @@ import {
 import {
   BaseSettingItemMetaType,
   BaseSettingMetaType,
-  HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
   ShadowTypeSettingType,
 } from "../types";
@@ -72,7 +71,7 @@ const createZodSchemaFromSettingItem = (setting: BaseSettingItemMetaType) => {
         return z.custom<string>(
           (value) => {
             return Object.values(HORIZONTAL_ALIGNMENT).includes(
-              value as HorizontalAlignSettingType,
+              value as HORIZONTAL_ALIGNMENT,
             );
           },
           {

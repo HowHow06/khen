@@ -1,6 +1,5 @@
 import {
   DropdownImagesType,
-  HorizontalAlignSettingType,
   PptGenerationSettingMetaType,
   PptSettingsStateType,
   PresetsType,
@@ -42,11 +41,11 @@ export enum SETTING_FIELD_TYPE {
   TRANSITION = "transition",
 }
 
-export const HORIZONTAL_ALIGNMENT = {
-  LEFT: "left",
-  CENTER: "center",
-  RIGHT: "right",
-} as const;
+export enum HORIZONTAL_ALIGNMENT {
+  LEFT = "left",
+  CENTER = "center",
+  RIGHT = "right",
+}
 
 export const SHADOW_TYPE = {
   OUTER: "outer",
@@ -523,7 +522,7 @@ export const FONT_FACES_ITEMS: SelectionItemsType = Object.entries(
   fontFaces,
 ).map(([key, font]) => font);
 
-export const HORIZONTAL_ALIGNMENT_ITEMS: SelectionItemsType<HorizontalAlignSettingType> =
+export const HORIZONTAL_ALIGNMENT_ITEMS: SelectionItemsType<HORIZONTAL_ALIGNMENT> =
   Object.values(HORIZONTAL_ALIGNMENT).map((alignment) => {
     return {
       value: alignment,
