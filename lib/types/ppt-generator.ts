@@ -1,7 +1,6 @@
 import {
   CONTENT_TYPE,
   HORIZONTAL_ALIGNMENT,
-  IMPORTED_SETTING_TYPE,
   PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
   PPT_GENERATION_COMBINED_SECTION_SETTINGS,
   PPT_GENERATION_CONTENT_SETTINGS,
@@ -213,9 +212,6 @@ export type PptSettingsUIState = {
 } & {
   [key in TabStateNameType]: string;
 };
-
-export type ImportedSettingType =
-  (typeof IMPORTED_SETTING_TYPE)[keyof typeof IMPORTED_SETTING_TYPE];
 
 export type DropdownImagesType = {
   displayName: string;

@@ -6,7 +6,6 @@ import {
 } from "@/lib/constant";
 import { sectionSettingSchema, settingsSchema } from "@/lib/schemas";
 import {
-  ImportedSettingType,
   PptSettingsStateType,
   SectionSettingsKeyType,
   SectionSettingsType,
@@ -122,7 +121,7 @@ export const getSettingTypeFromJSON = ({
   json,
 }: {
   json: JSON;
-}): ImportedSettingType | null => {
+}): IMPORTED_SETTING_TYPE | null => {
   if (getIsValidToSchema(json, settingsSchema)) {
     return IMPORTED_SETTING_TYPE.FULL_SETTING;
   }
