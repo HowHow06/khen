@@ -547,10 +547,10 @@ export const PINYIN_TYPE_ITEMS: SelectionItemsType<PINYIN_TYPE> = Object.values(
   };
 });
 
-export const CONTENT_TYPE = {
-  MAIN: "main",
-  SECONDARY: "secondary",
-} as const;
+export enum CONTENT_TYPE {
+  MAIN = "main",
+  SECONDARY = "secondary",
+}
 
 export const DEFAULT_PRESETS: PresetsType = [
   {

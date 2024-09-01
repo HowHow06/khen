@@ -1,12 +1,12 @@
 "use client";
 import {
+  CONTENT_TYPE,
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
   TEXTBOX_GROUPING_PREFIX,
 } from "@/lib/constant";
 import {
   ContentSettingsType,
   ContentTextboxKey,
-  ContentTypeType,
   PptSettingsStateType,
   SectionSettingsKeyType,
 } from "@/lib/types";
@@ -43,7 +43,7 @@ const usePptSettingsDynamicTextboxCount = ({
 
       Object.entries(currentContentSettings).forEach(
         ([contentType, settings]) => {
-          const contentTypeKey = contentType as ContentTypeType;
+          const contentTypeKey = contentType as CONTENT_TYPE;
           const originalTextboxCount = Object.keys(settings.textbox).length;
           const differenceInTextboxCount =
             newTextboxCount - originalTextboxCount;

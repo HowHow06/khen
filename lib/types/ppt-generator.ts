@@ -152,8 +152,6 @@ export type ContentSettingsType = GroupedSettingsValueType<
   [TEXTBOX_SETTING_KEY]: ContentTextboxSettingsType;
 };
 
-export type ContentTypeType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
-
 type BasePptSettingsStateType = {
   [SETTING_CATEGORY.FILE]: SettingsValueType<
     typeof PPT_GENERATION_FILE_SETTINGS
@@ -162,12 +160,12 @@ type BasePptSettingsStateType = {
     typeof PPT_GENERATION_COMBINED_GENERAL_SETTINGS
   >;
   [SETTING_CATEGORY.COVER]: {
-    [T in ContentTypeType]: SettingsValueType<
+    [T in CONTENT_TYPE]: SettingsValueType<
       typeof PPT_GENERATION_COVER_SETTINGS
     >;
   };
   [SETTING_CATEGORY.CONTENT]: {
-    [T in ContentTypeType]: ContentSettingsType;
+    [T in CONTENT_TYPE]: ContentSettingsType;
   };
 };
 
