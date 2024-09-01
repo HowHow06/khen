@@ -1,6 +1,6 @@
 "use client";
 import { IMAGE_FILE_TYPE, SETTING_FIELD_TYPE } from "@/lib/constant";
-import { InferTypeScriptTypeFromSettingFieldType } from "@/lib/types";
+import { FieldTypeToTypeScriptType } from "@/lib/types";
 import { getBase64FromImageField } from "@/lib/utils";
 import { XCircle } from "lucide-react";
 import Image from "next/image";
@@ -13,9 +13,7 @@ type ImageDropzoneComponentProps = HTMLAttributes<HTMLInputElement> & {
   onFilesSelected: (file: File | null) => void;
   onFilesRejected?: (fileRejections: FileRejection[]) => void;
   description?: string;
-  value: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.IMAGE
-  >;
+  value: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE];
 };
 
 const ImageDropzoneComponent: React.FC<ImageDropzoneComponentProps> = ({

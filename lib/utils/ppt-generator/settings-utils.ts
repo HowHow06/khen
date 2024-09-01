@@ -3,13 +3,11 @@ import {
   LYRIC_SECTION,
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
-import { InferTypeScriptTypeFromSettingFieldType } from "@/lib/types";
+import { FieldTypeToTypeScriptType } from "@/lib/types";
 import { getBase64, getBlobFromUrl } from "@/lib/utils";
 
 export const getBase64FromImageField = async (
-  imageValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.IMAGE
-  >,
+  imageValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE],
 ): Promise<string | null> => {
   if (!imageValue) {
     return null;
@@ -42,19 +40,13 @@ export function getIsNormalLine(line: string): boolean {
 
 // Function overload signatures, to tell typescript that when hexColor is not undefined, the output must be string
 export function getColorValue(
-  hexColor: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.COLOR
-  >,
+  hexColor: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.COLOR],
 ): string;
 export function getColorValue(
-  hexColor:
-    | InferTypeScriptTypeFromSettingFieldType<typeof SETTING_FIELD_TYPE.COLOR>
-    | undefined,
+  hexColor: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.COLOR] | undefined,
 ): string | undefined;
 export function getColorValue(
-  hexColor:
-    | InferTypeScriptTypeFromSettingFieldType<typeof SETTING_FIELD_TYPE.COLOR>
-    | undefined,
+  hexColor: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.COLOR] | undefined,
 ): string | undefined {
   if (hexColor === undefined) return hexColor;
   return hexColor.replace("#", "");

@@ -23,7 +23,7 @@ import {
   BaseSettingItemMetaType,
   ContentSettingsType,
   ContentTextboxSettingsType,
-  InferTypeScriptTypeFromSettingFieldType,
+  FieldTypeToTypeScriptType,
   PptMainSectionInfo,
   PptSettingsStateType,
   SectionSettingsType,
@@ -49,12 +49,8 @@ const getPptBackgroundProp = async ({
   backgroundColor,
   backgroundImage,
 }: {
-  backgroundColor: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.COLOR
-  >;
-  backgroundImage: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.IMAGE
-  >;
+  backgroundColor: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.COLOR];
+  backgroundImage: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE];
 }): Promise<PptxGenJS.default.BackgroundProps> => {
   const backgroundProp = {
     color: backgroundColor,

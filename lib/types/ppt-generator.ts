@@ -24,7 +24,7 @@ export type ShadowTypeSettingType =
   (typeof SHADOW_TYPE)[keyof typeof SHADOW_TYPE];
 export type TransitionSettingType = ""; // TODO: implement this
 
-type FieldTypeToTypeScriptType = {
+export type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.TEXT]: string;
   [SETTING_FIELD_TYPE.BOOLEAN]: boolean;
   [SETTING_FIELD_TYPE.NUMBER]: number;
@@ -37,81 +37,50 @@ type FieldTypeToTypeScriptType = {
   [SETTING_FIELD_TYPE.TRANSITION]: TransitionSettingType;
 };
 
-export type InferTypeScriptTypeFromSettingFieldType<T> =
-  T extends keyof FieldTypeToTypeScriptType
-    ? FieldTypeToTypeScriptType[T]
-    : never;
-
 export type TextSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.TEXT;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.TEXT
-  >;
-  placeholder?: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.TEXT
-  >;
+  fieldType: SETTING_FIELD_TYPE.TEXT;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.TEXT];
+  placeholder?: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.TEXT];
 };
 export type BooleanSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.BOOLEAN;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.BOOLEAN
-  >;
+  fieldType: SETTING_FIELD_TYPE.BOOLEAN;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.BOOLEAN];
 };
 export type NumberSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.NUMBER;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.NUMBER
-  >;
-  rangeMin?: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.NUMBER
-  >;
-  rangeMax?: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.NUMBER
-  >;
+  fieldType: SETTING_FIELD_TYPE.NUMBER;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.NUMBER];
+  rangeMin?: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.NUMBER];
+  rangeMax?: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.NUMBER];
   step?: number;
 };
 export type PercentageSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.PERCENTAGE;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.PERCENTAGE
-  >;
+  fieldType: SETTING_FIELD_TYPE.PERCENTAGE;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.PERCENTAGE];
   useProportionForm?: boolean; // if true, the range will be 0.0-1.0
 };
 export type ImageSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.IMAGE;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.IMAGE
-  >;
+  fieldType: SETTING_FIELD_TYPE.IMAGE;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE];
 };
 export type ColorSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.COLOR;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.COLOR
-  >;
+  fieldType: SETTING_FIELD_TYPE.COLOR;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.COLOR];
 };
 export type FontSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.FONT;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.FONT
-  >;
+  fieldType: SETTING_FIELD_TYPE.FONT;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.FONT];
 };
 export type HorizontalAlignSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.HORIZONTAL_ALIGN
-  >;
+  fieldType: SETTING_FIELD_TYPE.HORIZONTAL_ALIGN;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.HORIZONTAL_ALIGN];
 };
 export type ShadowTypeSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.SHADOW_TYPE;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.SHADOW_TYPE
-  >;
+  fieldType: SETTING_FIELD_TYPE.SHADOW_TYPE;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.SHADOW_TYPE];
 };
 export type TransitionTypeSettingItemMetaType = {
-  fieldType: typeof SETTING_FIELD_TYPE.TRANSITION;
-  defaultValue: InferTypeScriptTypeFromSettingFieldType<
-    typeof SETTING_FIELD_TYPE.TRANSITION
-  >;
+  fieldType: SETTING_FIELD_TYPE.TRANSITION;
+  defaultValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.TRANSITION];
 };
 
 export type BaseSettingItemMetaType = {
@@ -155,7 +124,7 @@ export type SettingsValueType<
 > = {
   -readonly [K in keyof T as T[K]["isNotAvailable"] extends true
     ? never
-    : K]?: InferTypeScriptTypeFromSettingFieldType<T[K]["fieldType"]>; // key of setting: value type obtained from the infer type based on the fieldType
+    : K]?: FieldTypeToTypeScriptType[T[K]["fieldType"]]; // key of setting: value type obtained from the infer type based on the fieldType
 };
 
 export type GroupedSettingsValueType<
@@ -172,7 +141,7 @@ export type GroupedSettingsValueType<
       isNotAvailable?: false;
     }
       ? Key
-      : never]?: InferTypeScriptTypeFromSettingFieldType<T[Key]["fieldType"]>;
+      : never]?: FieldTypeToTypeScriptType[T[Key]["fieldType"]];
   };
 };
 
