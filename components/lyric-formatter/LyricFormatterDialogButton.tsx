@@ -70,7 +70,7 @@ const LyricFormatterDialogButton = (props: Props) => {
   };
 
   return (
-    <Dialog>
+    <Dialog open>
       <DialogTrigger asChild>
         <Button variant="outline">Split Lyrics By Language</Button>
       </DialogTrigger>
@@ -82,9 +82,9 @@ const LyricFormatterDialogButton = (props: Props) => {
         </DialogHeader>
         <div className="flex flex-col justify-between space-x-0 space-y-4 sm:flex-row sm:space-x-2 sm:space-y-0">
           <div className="flex flex-[2] flex-col space-y-1">
-            <div className="flex flex-wrap justify-between sm:space-x-4">
-              <div className="flex space-x-4">
-                <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap justify-between sm:gap-4">
+              <div className="flex flex-wrap gap-4">
+                <div className="flex items-center gap-2">
                   <Label className="text-nowrap">Lanaguage Count:</Label>
                   <Input
                     type="number"
@@ -97,7 +97,7 @@ const LyricFormatterDialogButton = (props: Props) => {
                     className="w-16"
                   />
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Label>Has section:</Label>
                   <Switch
                     checked={isFirstLineSection}
