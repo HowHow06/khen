@@ -411,3 +411,5 @@ export const containsString = (obj: any, targetString: string): boolean => {
   }
   return search(obj);
 };
+
+export const getIsTouchDevice = () => typeof window !== 'undefined' && 'ontouchstart' in window;

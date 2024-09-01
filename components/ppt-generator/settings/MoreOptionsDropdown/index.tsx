@@ -23,11 +23,12 @@ import {
   exportFullSettings,
   exportSectionSettings,
   generateFullSettings,
+  getIsTouchDevice,
   getJSONFromFile,
   getSettingTypeFromJSON,
 } from "@/lib/utils";
 import { MoreHorizontal } from "lucide-react";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -42,6 +43,8 @@ const MoreOptionsDropdown = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { form, settingsValues } = usePptGeneratorFormContext();
   const { reset } = form;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isTouchDevice = getIsTouchDevice();
 
   const {
     promptToGetFullSettingsImportOptions,
@@ -202,9 +205,19 @@ const MoreOptionsDropdown = ({
 
   return (
     <>
-      <DropdownMenu>
+      {" "}
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <div className="flex flex-grow flex-row">
-          <DropdownMenuTrigger asChild>
+          {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
+          <DropdownMenuTrigger
+            {...(isTouchDevice
+              ? {
+                  onPointerDown: (e) => e.preventDefault(),
+                  onClick: () => setIsMenuOpen(!isMenuOpen),
+                }
+              : undefined)}
+            asChild
+          >
             <Button variant="ghost" className="ml-auto" size={"icon"}>
               <MoreHorizontal className="h-5" />
             </Button>

@@ -3,6 +3,7 @@ import { SCREEN_SIZE, TEXT_TRANSFORM } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { CursorPosition, TextTransformType } from "@/lib/types";
 import {
+  getIsTouchDevice,
   getTextByCursorPosition,
   getTransformedTextByLines,
 } from "@/lib/utils";
@@ -11,6 +12,7 @@ import {
   convertToTraditional,
 } from "@/lib/utils/character-converter";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import {
@@ -38,6 +40,8 @@ const TextTransformDropdown = ({
   onCloseAutoFocus,
 }: Props) => {
   const screenSize = useScreenSize();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isTouchDevice = getIsTouchDevice();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
   const hasSelectedText =
     cursorPosition && cursorPosition.start !== cursorPosition.end;
@@ -122,8 +126,17 @@ const TextTransformDropdown = ({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
+        <DropdownMenuTrigger
+          {...(isTouchDevice
+            ? {
+                onPointerDown: (e) => e.preventDefault(),
+                onClick: () => setIsMenuOpen(!isMenuOpen),
+              }
+            : undefined)}
+          asChild
+        >
           <Button variant="outline">
             Transform {hasSelectedText && "Selected "}Text
             <ChevronDown className="ml-1" />

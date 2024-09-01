@@ -1,9 +1,9 @@
 "use client";
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import { CursorPosition } from "@/lib/types";
-import { getTextInsertedAtPosition } from "@/lib/utils";
+import { getIsTouchDevice, getTextInsertedAtPosition } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -25,6 +25,8 @@ const SectionInsertDropdown = ({
   cursorPosition,
   onCloseAutoFocus,
 }: Props) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isTouchDevice = getIsTouchDevice();
   const insertLyricSection = useCallback(
     ({ section }: { section: string }) => {
       const { resultText, insertedText } = getTextInsertedAtPosition({
@@ -38,8 +40,17 @@ const SectionInsertDropdown = ({
     [text, setText, cursorPosition.start],
   );
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+      {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
+      <DropdownMenuTrigger
+        {...(isTouchDevice
+          ? {
+              onPointerDown: (e) => e.preventDefault(),
+              onClick: () => setIsMenuOpen(!isMenuOpen),
+            }
+          : undefined)}
+        asChild
+      >
         <Button variant="outline">
           Insert...
           <ChevronDown className="ml-1" />

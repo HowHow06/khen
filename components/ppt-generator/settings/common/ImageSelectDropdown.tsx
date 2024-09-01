@@ -7,8 +7,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import TooltipButton from "@/components/ui/tooltip-button";
 import { DropdownImagesType } from "@/lib/types";
+import { getIsTouchDevice } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { Image } from "lucide-react";
+import { useState } from "react";
 
 type Props = Pick<
   DropdownMenuContentProps,
@@ -25,10 +27,22 @@ const ImageSelectDropdown = ({
   dropdownItemClassName,
   ...restProps
 }: Props) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isTouchDevice = getIsTouchDevice();
+
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
+        <DropdownMenuTrigger
+          {...(isTouchDevice
+            ? {
+                onPointerDown: (e) => e.preventDefault(),
+                onClick: () => setIsMenuOpen(!isMenuOpen),
+              }
+            : undefined)}
+          asChild
+        >
           <TooltipButton
             variant={"outline"}
             size={"icon"}

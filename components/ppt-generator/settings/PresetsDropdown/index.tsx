@@ -12,10 +12,12 @@ import { PresetsType } from "@/lib/types";
 import {
   combineWithDefaultSettings,
   generateFullSettings,
+  getIsTouchDevice,
   getPreset,
 } from "@/lib/utils";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -36,6 +38,8 @@ const PresetsDropdown = ({
   const { form, settingsValues } = usePptGeneratorFormContext();
   const { reset: formReset } = form;
   const { promptToGetFullSettingsImportOptions } = usePromptImportSettings();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isTouchDevice = getIsTouchDevice();
 
   const applyPreset = (
     presetName: string,
@@ -85,8 +89,18 @@ const PresetsDropdown = ({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      {" "}
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
+        <DropdownMenuTrigger
+          {...(isTouchDevice
+            ? {
+                onPointerDown: (e) => e.preventDefault(),
+                onClick: () => setIsMenuOpen(!isMenuOpen),
+              }
+            : undefined)}
+          asChild
+        >
           <Button variant={"outline"}>
             Presets
             {useIcon && <ChevronDown className="ml-1" />}
