@@ -328,17 +328,9 @@ function getIsNormalLine(line: string): boolean {
   return true;
 }
 
-function createSlidesFromLyrics({
-  pres,
-  primaryLinesArray,
-  secondaryLinesArray,
-  settingValues,
-}: {
-  pres: pptxgenjs;
-  primaryLinesArray: string[];
-  secondaryLinesArray: string[];
-  settingValues: PptSettingsStateType;
-}) {
+const getDerivedVariablesFromSettings = (
+  settingValues: PptSettingsStateType,
+) => {
   const {
     general: {
       useBackgroundColorWhenEmpty,
@@ -359,11 +351,122 @@ function createSlidesFromLyrics({
     lineCountPerTextbox ?? DEFAULT_LINE_COUNT_PER_TEXTBOX;
   const mainHasSecondaryContent = !ignoreSubcontent;
 
+  return {
+    mainIsBackgroundColorWhenEmpty,
+    mainTextboxCountPerSlide,
+    mainLinePerTextbox,
+    mainHasSecondaryContent,
+    useDifferentSettingForEachSection,
+    section,
+  };
+};
+
+const getDerivedVariablesFromSectionSettings = ({
+  settingValues,
+  currentSectionSetting,
+}: {
+  settingValues: PptSettingsStateType;
+  currentSectionSetting: SectionSettingsType;
+}) => {
+  const {
+    mainIsBackgroundColorWhenEmpty,
+    mainTextboxCountPerSlide,
+    mainLinePerTextbox,
+    mainHasSecondaryContent,
+    useDifferentSettingForEachSection,
+  } = getDerivedVariablesFromSettings(settingValues);
+
+  const isUseSectionSettings =
+    useDifferentSettingForEachSection === true &&
+    !currentSectionSetting.general?.useMainSectionSettings;
+
+  const isBackgroundColorWhenEmpty = isUseSectionSettings
+    ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
+      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
+        .defaultValue
+    : mainIsBackgroundColorWhenEmpty;
+  const hasSecondaryContent = isUseSectionSettings
+    ? !currentSectionSetting.general?.ignoreSubcontent
+    : mainHasSecondaryContent;
+  const linePerTextbox = isUseSectionSettings
+    ? currentSectionSetting.general?.lineCountPerTextbox ??
+      DEFAULT_LINE_COUNT_PER_TEXTBOX
+    : mainLinePerTextbox;
+  const textboxCountPerSlide = isUseSectionSettings
+    ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
+      DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+    : mainTextboxCountPerSlide;
+
+  const isUseSectionColor =
+    isUseSectionSettings &&
+    !currentSectionSetting.general?.useMainBackgroundColor;
+  const isUseSectionImage =
+    isUseSectionSettings &&
+    !currentSectionSetting.general?.useMainBackgroundImage;
+
+  const mainContentOption = isUseSectionSettings
+    ? currentSectionSetting.content.main
+    : settingValues.content.main;
+  const mainCoverOption = isUseSectionSettings
+    ? currentSectionSetting.cover.main
+    : settingValues.cover.main;
+
+  const toRemoveIdenticalWords =
+    hasSecondaryContent && isUseSectionSettings
+      ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
+      : settingValues.general.ignoreSubcontentWhenIdentical;
+
+  const secondaryContentOption =
+    hasSecondaryContent && isUseSectionSettings
+      ? currentSectionSetting.content.secondary
+      : settingValues.content.secondary;
+  const secondaryCoverOption =
+    hasSecondaryContent && isUseSectionSettings
+      ? currentSectionSetting.cover.secondary
+      : settingValues.cover.secondary;
+  const totalLineCountPerSlide = linePerTextbox * textboxCountPerSlide;
+
+  return {
+    isBackgroundColorWhenEmpty,
+    hasSecondaryContent,
+    linePerTextbox,
+    isUseSectionColor,
+    isUseSectionImage,
+    mainContentOption,
+    mainCoverOption,
+    toRemoveIdenticalWords,
+    secondaryContentOption,
+    secondaryCoverOption,
+    totalLineCountPerSlide,
+  };
+};
+
+const getPresSections = (pres: pptxgenjs) => {
+  return (pres as unknown as PptxGenJSType2).sections;
+};
+
+function createSlidesFromLyrics({
+  pres,
+  primaryLinesArray,
+  secondaryLinesArray,
+  settingValues,
+}: {
+  pres: pptxgenjs;
+  primaryLinesArray: string[];
+  secondaryLinesArray: string[];
+  settingValues: PptSettingsStateType;
+}) {
+  const { useDifferentSettingForEachSection, section } =
+    getDerivedVariablesFromSettings(settingValues);
+
   let mainSectionDisplayNumber = 0;
   let mainSectionCount = 0;
   let subsectionCount = 0;
-  let currentPptSectionName = "";
-  let currentPptSectionCount = 0;
+
+  let currentSectionCoverWeight = 0;
+  let currentSectionPptSectionWeight = 0;
+  let currentSectionEmptySlideWeight = 0;
+  let currentSectionFillSlideWeight = 0;
 
   let currentMainSectionInfo: PptMainSectionInfo = {
     sectionName: "",
@@ -371,16 +474,10 @@ function createSlidesFromLyrics({
     endLineIndex: -1,
   };
 
-  const mainSectionsInfo: PptMainSectionInfo[] = [];
-  let currentSlide: PptxGenJS.default.Slide | undefined = undefined;
-
-  let currentSectionCoverWeight = 0;
-  let currentSectionPptSectionWeight = 0;
-  let currentSectionEmptySlideWeight = 0;
-  let currentSectionFillSlideWeight = 0;
-
   // to track the inserted index, for inserting secondary content
   const insertedIndex: number[] = [];
+  const mainSectionsInfo: PptMainSectionInfo[] = [];
+
   primaryLinesArray.forEach((primaryLine, index, arr) => {
     if (insertedIndex.indexOf(index) !== -1) {
       // the line is inserted, skipping it
@@ -394,8 +491,15 @@ function createSlidesFromLyrics({
       mainSectionCount++;
     }
 
+    const currentlyHasNoMainSection = mainSectionCount === 0;
+    // if is useDifferentSettingForEachSection and currently not in any main section
+    // use default section settings (because the useMainSectionSettings is default true, will then use main settings)
     const currentSectionSetting =
-      section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
+      useDifferentSettingForEachSection && currentlyHasNoMainSection
+        ? getSectionSettingsInitialValue({
+            settings: PPT_GENERATION_SETTINGS_META,
+          })
+        : section?.[`${SECTION_PREFIX}${mainSectionCount}`]; // the main section count starting from 1
 
     if (
       useDifferentSettingForEachSection === true &&
@@ -404,35 +508,22 @@ function createSlidesFromLyrics({
       throw new Error("undefined section settings");
     }
 
-    const isUseSectionSettings =
-      useDifferentSettingForEachSection === true &&
-      !currentSectionSetting.general?.useMainSectionSettings;
-
-    const isBackgroundColorWhenEmpty = isUseSectionSettings
-      ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
-        PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
-          .defaultValue
-      : mainIsBackgroundColorWhenEmpty;
-    const hasSecondaryContent = isUseSectionSettings
-      ? !currentSectionSetting.general?.ignoreSubcontent
-      : mainHasSecondaryContent;
-    const linePerTextbox = isUseSectionSettings
-      ? currentSectionSetting.general?.lineCountPerTextbox ??
-        DEFAULT_LINE_COUNT_PER_TEXTBOX
-      : mainLinePerTextbox;
-    const textboxCountPerSlide = isUseSectionSettings
-      ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
-        DEFAULT_TEXTBOX_COUNT_PER_SLIDE
-      : mainTextboxCountPerSlide;
-
-    const isUseSectionColor =
-      isUseSectionSettings &&
-      !currentSectionSetting.general?.useMainBackgroundColor;
-    const isUseSectionImage =
-      isUseSectionSettings &&
-      !currentSectionSetting.general?.useMainBackgroundImage;
-
-    const totalLineCountPerSlide = linePerTextbox * textboxCountPerSlide;
+    const {
+      isBackgroundColorWhenEmpty,
+      hasSecondaryContent,
+      linePerTextbox,
+      isUseSectionColor,
+      isUseSectionImage,
+      mainContentOption,
+      mainCoverOption,
+      toRemoveIdenticalWords,
+      secondaryContentOption,
+      secondaryCoverOption,
+      totalLineCountPerSlide,
+    } = getDerivedVariablesFromSectionSettings({
+      settingValues,
+      currentSectionSetting: currentSectionSetting!,
+    });
 
     // Get the current index before manipulating the cover count and other weights
     // current index is the index of each line (of the current section),
@@ -449,24 +540,22 @@ function createSlidesFromLyrics({
       currentSectionPptSectionWeight +
       currentSectionEmptySlideWeight +
       currentSectionFillSlideWeight;
-
-    // if is new main section
-    //   if new total count is lesser than previous, round down
-    //   if new total count is more than previous, round up
-    // OR this? slideCount * CURRENT totalLineCountPerSlide
-    //          3 * 2 = 6
+    // if is new main section, recalculate the currentIndex to match the latest totalLineCountPerSlide
+    // slideCount * totalLineCountPerSlide
     if (isMainSection) {
       const existingSlideCount =
         (pres as unknown as PptxGenJSType2).slides.length || 0;
       currentIndex = existingSlideCount * totalLineCountPerSlide;
     }
 
+    // the number of line(s) to be inserted in the current slide
     const remainingLineCountBeforeInsert =
-      totalLineCountPerSlide - (currentIndex % totalLineCountPerSlide); // the number of line(s) to be inserted in the current slide
+      totalLineCountPerSlide - (currentIndex % totalLineCountPerSlide);
+    const indexInCurrentSlide = currentIndex % totalLineCountPerSlide;
+    const textboxNumber = Math.floor(indexInCurrentSlide / linePerTextbox) + 1;
 
     // 1. check if is main or sub section, just add the section to presentation instance
     if (isMainSection || isSubSection) {
-      currentPptSectionCount += 1;
       subsectionCount = isSubSection ? subsectionCount + 1 : 0;
       const identifier = isMainSection
         ? LYRIC_SECTION.SECTION
@@ -505,14 +594,15 @@ function createSlidesFromLyrics({
           startLineIndex: index,
           endLineIndex: -1,
         };
-        // mainSectionCount++;
         currentSectionPptSectionWeight = 0;
         currentSectionCoverWeight = 0;
         currentSectionEmptySlideWeight = 0;
         currentSectionFillSlideWeight = 0;
       }
 
-      const isFirstPptSection = currentPptSectionCount === 1;
+      pres.addSection({ title: currentMainSectionInfo.sectionName });
+
+      const isFirstPptSection = getPresSections(pres).length <= 1;
       // if is first ppt section, the behvaior is to not to add any slide, therefore the count should be -1
       // if it is not the first ppt section, the behavior is similar to a fillSlide (adding a new slide)
       // then weightage of each section should be equal to
@@ -521,8 +611,6 @@ function createSlidesFromLyrics({
       currentSectionPptSectionWeight += isFirstPptSection
         ? -1
         : remainingLineCountBeforeInsert - 1;
-      currentPptSectionName = sectionName;
-      pres.addSection({ title: sectionName });
       return;
     }
 
@@ -531,7 +619,7 @@ function createSlidesFromLyrics({
     // 2. check if is cover, update current line
     const isCover = primaryLine.startsWith(`${LYRIC_SECTION.MAIN_TITLE} `);
     if (isCover) {
-      const isFirstPptSection = currentPptSectionCount === 1;
+      const isFirstPptSection = getPresSections(pres).length <= 1;
       currentSectionCoverWeight += isFirstPptSection
         ? -1
         : remainingLineCountBeforeInsert - 1;
@@ -556,7 +644,7 @@ function createSlidesFromLyrics({
         isUseSectionColor,
         isUseSectionImage,
         currentSectionNumber: mainSectionCount,
-        sectionName: currentPptSectionName,
+        sectionName: currentMainSectionInfo.sectionName,
       });
       return;
     }
@@ -564,39 +652,29 @@ function createSlidesFromLyrics({
     const isFillSlide =
       primaryLine.startsWith(`${LYRIC_SECTION.FILL_SLIDE}`) && !isEmptySlide;
     if (isFillSlide) {
-      currentSectionFillSlideWeight += remainingLineCountBeforeInsert - 1;
       // weightage of each fill slide should be equal to
       // remainder from previous slide - 1 (the 1 is the default increment of index)
+      currentSectionFillSlideWeight += remainingLineCountBeforeInsert - 1;
       return;
     }
 
-    const indexInCurrentSlide = currentIndex % totalLineCountPerSlide;
     let slide = getWorkingSlide({
       pres,
       indexInCurrentSlide,
       isEmptyLine: currentLine.trim().length === 0,
       isBackgroundColorWhenEmpty,
-      sectionName: currentPptSectionName,
-      currentPresSlide: currentSlide,
+      sectionName: currentMainSectionInfo.sectionName,
       isUseSectionColor,
       isUseSectionImage,
       currentSectionNumber: mainSectionCount,
       isCover,
     });
-    currentSlide = slide; // update current slide
 
-    const textboxNumber = Math.floor(indexInCurrentSlide / linePerTextbox) + 1;
-    const mainContentOption = isUseSectionSettings
-      ? currentSectionSetting.content.main
-      : settingValues.content.main;
-    const mainCoverOption = isUseSectionSettings
-      ? currentSectionSetting.cover.main
-      : settingValues.cover.main;
-
-    insertedIndex.length = 0; // empty the array
+    // empty the array
+    insertedIndex.length = 0;
     insertedIndex.push(index);
     const textToInsert = [currentLine];
-
+    // might need to insert multiple lines if it is not cover
     if (!isCover) {
       for (let i = 1; i < linePerTextbox; i++) {
         // i = 1 to skip the current line
@@ -613,7 +691,7 @@ function createSlidesFromLyrics({
       }
     }
 
-    // add primary content
+    // add primary content OR can be title
     addTextLineToSlide({
       slide,
       text: textToInsert,
@@ -624,17 +702,6 @@ function createSlidesFromLyrics({
     });
 
     if (hasSecondaryContent) {
-      const toRemoveIdenticalWords = isUseSectionSettings
-        ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
-        : settingValues.general.ignoreSubcontentWhenIdentical;
-
-      const secondaryContentOption = isUseSectionSettings
-        ? currentSectionSetting.content.secondary
-        : settingValues.content.secondary;
-      const secondaryCoverOption = isUseSectionSettings
-        ? currentSectionSetting.cover.secondary
-        : settingValues.cover.secondary;
-
       const textToInsert: string[] = [];
       insertedIndex.forEach((i) => {
         let tempLine = secondaryLinesArray[i]?.trim() ?? "";
@@ -673,11 +740,11 @@ function createSlidesFromLyrics({
 
     const isLastLine = index === primaryLinesArray.length - 1;
     if (isLastLine) {
-      currentMainSectionInfo = {
+      const lastMainSectionInfo = {
         ...currentMainSectionInfo,
         endLineIndex: index,
       };
-      mainSectionsInfo.push(currentMainSectionInfo);
+      mainSectionsInfo.push(lastMainSectionInfo);
     }
   });
 
@@ -727,7 +794,6 @@ function getWorkingSlide({
   sectionName,
   isEmptyLine,
   isBackgroundColorWhenEmpty,
-  currentPresSlide,
   isUseSectionColor,
   isUseSectionImage,
   currentSectionNumber,
@@ -738,11 +804,13 @@ function getWorkingSlide({
   sectionName: string;
   isEmptyLine: boolean;
   isBackgroundColorWhenEmpty: boolean;
-  currentPresSlide: PptxGenJS.default.Slide | undefined;
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
 }): PptxGenJS.default.Slide {
+  const slides = (pres as unknown as PptxGenJSType2).slides;
+  const currentPresSlide =
+    slides.length > 0 ? slides[slides.length - 1] : undefined;
   const isToCreateSlide =
     currentPresSlide === undefined || indexInCurrentSlide === 0 || isCover;
 
@@ -758,7 +826,7 @@ function getWorkingSlide({
     });
   }
 
-  return currentPresSlide;
+  return currentPresSlide as unknown as PptxGenJS.default.Slide;
 }
 
 // Function overload signatures, to tell typescript that when hexColor is not undefined, the output must be string
@@ -1065,10 +1133,10 @@ export const generatePreviewConfig = async ({
     slides: slidesConfig,
   };
 
-  // console.log({
-  //   presV2,
-  //   slidesConfig,
-  // });
+  console.log({
+    presV2,
+    slidesConfig,
+  });
   return reactPptxConfig;
 };
 
