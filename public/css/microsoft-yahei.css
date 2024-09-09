@@ -2,7 +2,7 @@
   font-family: "Microsoft YaHei";
   src:
     local("Microsoft YaHei"),
-    url("/fonts/Microsoft_YaHei.tff") format("truetype");
+    url("/fonts/Microsoft_YaHei.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -11,7 +11,7 @@
   font-family: "Microsoft YaHei";
   src:
     local("Microsoft YaHei Bold"),
-    url("/fonts/Microsoft_YaHei_Bold.tff") format("truetype");
+    url("/fonts/Microsoft_YaHei_Bold.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
   font-display: swap;

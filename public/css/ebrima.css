@@ -2,7 +2,7 @@
   font-family: "Ebrima";
   src:
     local("Ebrima"),
-    url("/fonts/Ebrima.tff") format("truetype");
+    url("/fonts/Ebrima.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -11,7 +11,7 @@
   font-family: "Ebrima";
   src:
     local("Ebrima Bold"),
-    url("/fonts/Ebrima_Bold.tff") format("truetype");
+    url("/fonts/Ebrima_Bold.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
