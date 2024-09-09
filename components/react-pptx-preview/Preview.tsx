@@ -467,7 +467,9 @@ const SlidePreview = ({
         backgroundImage:
           backgroundImage && backgroundImage?.kind === "path"
             ? `url("${backgroundImage.path}")`
-            : `url("data:${backgroundImage?.data}")`,
+            : backgroundImage?.data
+              ? `url("data:${backgroundImage?.data}")`
+              : undefined,
         backgroundSize: "contain",
         position: "relative",
         ...slideStyle,
