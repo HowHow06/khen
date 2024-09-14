@@ -158,6 +158,7 @@ export type InternalSlide = {
   backgroundImage: InternalImageSrc | null;
   hidden: boolean;
   notes?: string;
+  sectionName?: string;
 };
 
 export type InternalMasterSlide = {

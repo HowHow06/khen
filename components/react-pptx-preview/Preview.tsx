@@ -513,32 +513,46 @@ const Preview = (props: {
         ? normalizeJsx(props.children)
         : props.normalizedConfig!;
 
+    const isFirstSlideOfSectionRendered: { [key in string]: boolean } = {};
+
     return (
       <div
         style={{
           width: "100%",
         }}
       >
-        {normalized.slides.map((slide, i) => (
-          <div
-            style={{
-              marginBottom: "10px",
-            }}
-            key={i}
-          >
-            <SlidePreview
-              slide={slide}
-              masterSlide={
-                (slide.masterName &&
-                  normalized.masterSlides[slide.masterName]) ||
-                undefined
-              }
-              dimensions={layoutToInches(normalized.layout)}
-              slideStyle={props.slideStyle}
-              drawBoundingBoxes={!!props.drawBoundingBoxes}
-            />
-          </div>
-        ))}
+        {normalized.slides.map((slide, i) => {
+          const shouldRenderSectionName =
+            slide.sectionName &&
+            !isFirstSlideOfSectionRendered[slide.sectionName];
+
+          // Mark this section as rendered if it is the first time
+          if (slide.sectionName) {
+            isFirstSlideOfSectionRendered[slide.sectionName] = true;
+          }
+
+          return (
+            <div
+              style={{
+                marginBottom: "10px",
+              }}
+              key={i}
+            >
+              {shouldRenderSectionName && <div>{slide.sectionName}</div>}
+              <SlidePreview
+                slide={slide}
+                masterSlide={
+                  (slide.masterName &&
+                    normalized.masterSlides[slide.masterName]) ||
+                  undefined
+                }
+                dimensions={layoutToInches(normalized.layout)}
+                slideStyle={props.slideStyle}
+                drawBoundingBoxes={!!props.drawBoundingBoxes}
+              />
+            </div>
+          );
+        })}
       </div>
     );
   } catch (e) {

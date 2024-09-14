@@ -8,6 +8,7 @@ import type { PptxGenJS as PptxGenJSType2 } from "@/lib/types/pptxgenjs";
 import {
   DataOrPathProps,
   ObjectOptions,
+  SectionProps,
 } from "@/lib/types/pptxgenjs/core-interfaces";
 import { createPptInstance } from "@/lib/utils";
 
@@ -62,6 +63,15 @@ const getPreviewTextObjectStyle = (
   };
 };
 
+const getSectionBySlideName = (sections: SectionProps[], slideName: string) => {
+  const result = sections.find(
+    (section) =>
+      section._slides.find((slide) => slide._name === slideName) !== undefined,
+  );
+
+  return result;
+};
+
 export const generatePreviewConfig = async ({
   settingValues,
   primaryLyric,
@@ -101,11 +111,15 @@ export const generatePreviewConfig = async ({
     {},
   );
 
+  const sections = presV2.sections;
   const slidesConfig = slides.map((slide) => ({
     masterName: slide._slideLayout._name || null,
     backgroundColor: slide.background?.color,
     backgroundImage: slide.background?.data,
     hidden: slide.hidden,
+    sectionName: slide._name
+      ? getSectionBySlideName(sections, slide._name)?.title
+      : undefined,
     objects: slide._slideObjects?.map((object) => ({
       kind: "text", // supposedly use `object._type` instead, but now only text type is supported. TODO: see if need to support other types
       text:
