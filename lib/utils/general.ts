@@ -412,4 +412,17 @@ export const containsString = (obj: any, targetString: string): boolean => {
   return search(obj);
 };
 
-export const getIsTouchDevice = () => typeof window !== 'undefined' && 'ontouchstart' in window;
+export const getIsTouchDevice = () =>
+  typeof window !== "undefined" && "ontouchstart" in window;
+
+export const removeNumbering = (str: string) => {
+  // Regular expression to match numbers at the beginning followed by a period and spaces
+  return str.replace(/^\d+(\.|\d+)*\s*/, "");
+};
+
+export const getBase64FromString = (str: string) => {
+  const utf8Bytes = new TextEncoder().encode(str);
+  const byteArray = Array.from(utf8Bytes); // Convert Uint8Array to a regular array
+  const base64String = btoa(String.fromCharCode(...byteArray));
+  return base64String;
+};

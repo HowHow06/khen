@@ -19,6 +19,7 @@ import {
   POINTS_TO_INCHES,
   layoutToInches,
 } from "@/lib/react-pptx-preview/util";
+import { getBase64FromString, removeNumbering } from "@/lib/utils";
 import * as React from "react";
 
 const normalizedColorToCSS = (color: HexColor | ComplexColor) => {
@@ -530,6 +531,10 @@ const Preview = (props: {
           if (slide.sectionName) {
             isFirstSlideOfSectionRendered[slide.sectionName] = true;
           }
+          const sectionNameIdentifier =
+            shouldRenderSectionName && slide.sectionName
+              ? getBase64FromString(removeNumbering(slide.sectionName.trim()))
+              : undefined;
 
           return (
             <div
@@ -538,7 +543,11 @@ const Preview = (props: {
               }}
               key={i}
             >
-              {shouldRenderSectionName && <div>{slide.sectionName}</div>}
+              {shouldRenderSectionName && (
+                <div id={`section-${sectionNameIdentifier}`}>
+                  {slide.sectionName}
+                </div>
+              )}
               <SlidePreview
                 slide={slide}
                 masterSlide={
@@ -570,4 +579,4 @@ const Preview = (props: {
     );
   }
 };
-export default Preview;
+export default React.memo(Preview);

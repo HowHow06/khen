@@ -3,7 +3,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
-import { generatePreviewConfig } from "@/lib/utils";
+import { generatePreviewConfig, getBase64FromString } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
@@ -44,6 +44,24 @@ const GeneratePreviewButton = (props: Props) => {
     }
   }, [settingsValues, mainText, secondaryText, isModalOpen]);
 
+  const onSectionChange = useCallback(
+    (section: { value: string; label: string }) => {
+      const label = section.label;
+      // remove tailing astrisks
+      const sectionNameIdentifier = getBase64FromString(
+        label.replace(/\*\s*$/, "").trim(),
+      );
+
+      const element = document.getElementById(
+        `section-${sectionNameIdentifier}`,
+      );
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    },
+    [],
+  );
+
   // update preview config on settingsValues change
   useEffect(() => {
     updatePreviewConfig();
@@ -57,7 +75,7 @@ const GeneratePreviewButton = (props: Props) => {
       >
         <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]">
           <div className="hidden h-full w-3/5 flex-col gap-2 sm:flex">
-            <PptGeneratorSettingsContent />
+            <PptGeneratorSettingsContent onSectionChange={onSectionChange} />
           </div>
           <div className="flex h-full w-full flex-col sm:w-2/5">
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>

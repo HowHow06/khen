@@ -8,14 +8,17 @@ import {
   TAB_TYPES,
 } from "@/lib/constant";
 import { SectionSettingsKeyType } from "@/lib/types";
+import { useEffect } from "react";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
 import PptGeneratorSettingsTabContent, {
   PptGeneratorSettingsTabContentProps,
 } from "./PptGeneratorSettingsTabContent";
 
-type Props = {};
+type Props = {
+  onSectionChange?: (sectionName: { value: string; label: string }) => void;
+};
 
-const PptGeneratorSettingsContent = (props: Props) => {
+const PptGeneratorSettingsContent = ({ onSectionChange }: Props) => {
   const { settingsValues, sectionItems, currentSection, setCurrentSection } =
     usePptGeneratorFormContext();
   const {
@@ -25,6 +28,18 @@ const PptGeneratorSettingsContent = (props: Props) => {
     setCurrentCoverTab,
     setSectionTabs,
   } = usePptSettingsUIContext();
+
+  useEffect(() => {
+    if (onSectionChange) {
+      const sectionItem = sectionItems.find(
+        (section) => section.value === currentSection,
+      );
+      if (!sectionItem) {
+        return;
+      }
+      onSectionChange(sectionItem);
+    }
+  }, [currentSection, onSectionChange, sectionItems]);
 
   const isDifferentSettingsBySection =
     settingsValues.general.useDifferentSettingForEachSection === true;
