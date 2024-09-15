@@ -1,6 +1,7 @@
 import FormSelect from "@/components/ui/form-select";
 import { DEFAULT_PRESETS } from "@/lib/constant";
 import { SelectionItemsType } from "@/lib/types";
+import { useEffect } from "react";
 import MoreOptionsDropdown from "../MoreOptionsDropdown";
 import PresetsDropdown from "../PresetsDropdown";
 
@@ -9,6 +10,7 @@ type Props = {
   currentSection: string;
   sectionItems: SelectionItemsType;
   setCurrentSection: (section: string) => void;
+  onSectionChange?: (sectionName: { value: string; label: string }) => void;
 };
 
 const PptGeneratorSettingHeader = ({
@@ -16,7 +18,20 @@ const PptGeneratorSettingHeader = ({
   currentSection,
   sectionItems,
   setCurrentSection,
+  onSectionChange,
 }: Props) => {
+  useEffect(() => {
+    if (onSectionChange) {
+      const sectionItem = sectionItems.find(
+        (section) => section.value === currentSection,
+      );
+      if (!sectionItem) {
+        return;
+      }
+      onSectionChange(sectionItem);
+    }
+  }, [currentSection, onSectionChange, sectionItems]);
+
   return (
     <>
       <div className="flex flex-row items-center space-x-5">
