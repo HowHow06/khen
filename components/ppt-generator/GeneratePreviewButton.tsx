@@ -2,12 +2,17 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { POPUP_TAB_TYPE } from "@/lib/constant";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { generatePreviewConfig, getBase64FromString } from "@/lib/utils";
+import { Pencil, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
 import { Button } from "../ui/button";
+import MainLyricSection from "./MainLyricSection";
+import SecondaryLyricSection from "./SecondaryLyricSection";
 import GeneratePptWithPromptButton from "./settings/GeneratePptWithPromptButton";
 import PptGeneratorSettingsContent from "./settings/PptGeneratorSettingsContent";
 
@@ -18,6 +23,9 @@ const GeneratePreviewButton = (props: Props) => {
     usePptGeneratorFormContext();
   const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTab, setCurrentTab] = useState(
+    POPUP_TAB_TYPE.SETTINGS as string,
+  );
   const [error, setError] = useState<Error>();
 
   const onGeneratePreviewClick = () => {
@@ -74,8 +82,47 @@ const GeneratePreviewButton = (props: Props) => {
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
         <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]">
-          <div className="hidden h-full w-3/5 flex-col gap-2 sm:flex">
-            <PptGeneratorSettingsContent onSectionChange={onSectionChange} />
+          <div className="hidden h-full w-3/5 gap-4 sm:flex">
+            <div>
+              <ToggleGroup
+                type="single"
+                value={currentTab}
+                onValueChange={setCurrentTab}
+                className="flex h-full flex-col items-center justify-start gap-1 pt-4"
+              >
+                <ToggleGroupItem
+                  value={POPUP_TAB_TYPE.SETTINGS}
+                  aria-label="Toggle settings"
+                >
+                  <SlidersHorizontal className="h-5 w-5" />
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value={POPUP_TAB_TYPE.LYRICS}
+                  aria-label="Toggle lyrics"
+                >
+                  <Pencil className="h-5 w-5" />
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <div className="flex h-full w-full flex-col gap-2">
+              {currentTab === POPUP_TAB_TYPE.SETTINGS && (
+                <PptGeneratorSettingsContent
+                  onSectionChange={onSectionChange}
+                />
+              )}
+              {currentTab === POPUP_TAB_TYPE.LYRICS && (
+                <ScrollArea className={"px-3"} isFillParent>
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <MainLyricSection />
+                    </div>
+                    <div>
+                      <SecondaryLyricSection />
+                    </div>
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
           </div>
           <div className="flex h-full w-full flex-col sm:w-2/5">
             <h3 className="text-xl font-semibold tracking-tight">Preview</h3>

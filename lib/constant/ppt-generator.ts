@@ -628,3 +628,8 @@ export const TAB_TYPE_UI_STATE_NAME_MAPPING = {
   [TAB_TYPES.CONTENT]: "currentContentTab",
   [TAB_TYPES.COVER]: "currentCoverTab",
 } as const;
+
+export enum POPUP_TAB_TYPE {
+  SETTINGS = "SETTINGS",
+  LYRICS = "LYRICS",
+}
