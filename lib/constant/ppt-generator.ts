@@ -86,6 +86,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   明了: "míng liǎo",
   同行: "tóng xíng",
   灭没: "miè mò",
+  伯利恒: "bó lì héng",
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
