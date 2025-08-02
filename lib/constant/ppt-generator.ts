@@ -89,6 +89,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   伯利恒: "bó lì héng",
   乐歌: "lè gē",
   沈浸: "chén jìn",
+  重回: "chóng huí",
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
