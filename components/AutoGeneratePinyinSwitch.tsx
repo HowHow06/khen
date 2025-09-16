@@ -41,7 +41,9 @@ const AutoGeneratePinyinSwitch = ({ text, setText }: Props) => {
         <Label>Auto Generate Pinyin</Label>
         <Switch
           checked={isAutoGeneratePinyinEnabled}
-          onCheckedChange={(isChecked) => setAutoGeneratePinyinEnabled(isChecked)}
+          onCheckedChange={(isChecked) =>
+            setAutoGeneratePinyinEnabled(isChecked)
+          }
         />
         {isAutoGeneratePinyinEnabled && (
           <Combobox

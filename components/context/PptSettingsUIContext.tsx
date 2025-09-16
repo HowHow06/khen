@@ -94,13 +94,13 @@ const pptSettingsUIReducer = (
         },
       };
       return { ...state, sectionTabs: newSectionTabs };
-    
+
     case "SET_AUTO_GENERATE_PINYIN_ENABLED":
       return { ...state, isAutoGeneratePinyinEnabled: action.enabled };
-    
+
     case "SET_PINYIN_TYPE":
       return { ...state, pinyinType: action.pinyinType };
-    
+
     default:
       return state;
   }
