@@ -2,8 +2,15 @@ import {
   DEFAULT_LINE_COUNT_PER_TEXTBOX,
   DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
   PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
+  PPT_GENERATION_COVER_SETTINGS,
+  SETTING_CATEGORY,
 } from "@/lib/constant";
-import { PptSettingsStateType, SectionSettingsType } from "@/lib/types";
+import {
+  ContentSettingsType,
+  PptSettingsStateType,
+  SectionSettingsType,
+  SettingsValueType,
+} from "@/lib/types";
 
 /**
  * Derived configuration for PPT generation
@@ -16,10 +23,10 @@ export interface DerivedPptConfig {
   totalLineCountPerSlide: number;
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
-  mainContentOption: any;
-  mainCoverOption: any;
-  secondaryContentOption: any;
-  secondaryCoverOption: any;
+  mainContentOption: ContentSettingsType;
+  mainCoverOption: SettingsValueType<typeof PPT_GENERATION_COVER_SETTINGS>;
+  secondaryContentOption: ContentSettingsType;
+  secondaryCoverOption: SettingsValueType<typeof PPT_GENERATION_COVER_SETTINGS>;
   toRemoveIdenticalWords: boolean;
 }
 
@@ -32,7 +39,10 @@ export interface MainPptConfig {
   linePerTextbox: number;
   hasSecondaryContent: boolean;
   useDifferentSettingForEachSection: boolean;
-  section: any;
+  content: PptSettingsStateType[SETTING_CATEGORY.CONTENT];
+  cover: PptSettingsStateType[SETTING_CATEGORY.COVER];
+  general: PptSettingsStateType[SETTING_CATEGORY.GENERAL];
+  section: PptSettingsStateType[SETTING_CATEGORY.SECTION];
 }
 
 /**
@@ -51,6 +61,9 @@ export class PptConfigurationBuilder {
         useDifferentSettingForEachSection,
         lineCountPerTextbox,
       },
+      content,
+      cover,
+      general,
       section,
     } = settingValues;
 
@@ -65,6 +78,9 @@ export class PptConfigurationBuilder {
       hasSecondaryContent: !ignoreSubcontent,
       useDifferentSettingForEachSection:
         useDifferentSettingForEachSection ?? false,
+      content,
+      cover,
+      general,
       section,
     };
   }
@@ -73,7 +89,6 @@ export class PptConfigurationBuilder {
    * Build derived configuration for a specific section
    */
   buildSectionConfig(
-    settingValues: PptSettingsStateType,
     currentSectionSetting: SectionSettingsType,
     mainConfig: MainPptConfig,
   ): DerivedPptConfig {
@@ -111,26 +126,26 @@ export class PptConfigurationBuilder {
 
     const mainContentOption = isUseSectionSettings
       ? currentSectionSetting.content.main
-      : settingValues.content.main;
+      : mainConfig.content.main;
 
     const mainCoverOption = isUseSectionSettings
       ? currentSectionSetting.cover.main
-      : settingValues.cover.main;
+      : mainConfig.cover.main;
 
     const toRemoveIdenticalWords =
       hasSecondaryContent && isUseSectionSettings
         ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical ?? false
-        : settingValues.general.ignoreSubcontentWhenIdentical ?? false;
+        : mainConfig.general.ignoreSubcontentWhenIdentical ?? false;
 
     const secondaryContentOption =
       hasSecondaryContent && isUseSectionSettings
         ? currentSectionSetting.content.secondary
-        : settingValues.content.secondary;
+        : mainConfig.content.secondary;
 
     const secondaryCoverOption =
       hasSecondaryContent && isUseSectionSettings
         ? currentSectionSetting.cover.secondary
-        : settingValues.cover.secondary;
+        : mainConfig.cover.secondary;
 
     const totalLineCountPerSlide = linePerTextbox * textboxCountPerSlide;
 
@@ -154,24 +169,9 @@ export class PptConfigurationBuilder {
    * Convenience method to build config with fallback for missing section settings
    */
   buildConfigWithFallback(
-    settingValues: PptSettingsStateType,
-    currentSectionSetting: SectionSettingsType | undefined,
+    mainConfig: MainPptConfig,
+    currentSectionSetting: SectionSettingsType,
   ): DerivedPptConfig {
-    const mainConfig = this.buildMainConfig(settingValues);
-
-    // Use default section if not provided
-    const sectionSetting = currentSectionSetting ?? {
-      general: { useMainSectionSettings: true },
-      content: {
-        main: settingValues.content.main,
-        secondary: settingValues.content.secondary,
-      },
-      cover: {
-        main: settingValues.cover.main,
-        secondary: settingValues.cover.secondary,
-      },
-    };
-
-    return this.buildSectionConfig(settingValues, sectionSetting, mainConfig);
+    return this.buildSectionConfig(currentSectionSetting, mainConfig);
   }
 }

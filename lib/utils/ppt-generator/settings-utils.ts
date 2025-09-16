@@ -1,6 +1,7 @@
 import {
   DEFAULT_FILENAME,
   LYRIC_SECTION,
+  SECTION_PREFIX,
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
 import { FieldTypeToTypeScriptType } from "@/lib/types";
@@ -76,3 +77,17 @@ export const parsePptFilename = ({
     fileNameSuffix,
   };
 };
+
+/**
+ * Get title of the master slide with background image for current section
+ */
+export function getSectionImageSlideMasterTitle(sectionNumber: number) {
+  return `${SECTION_PREFIX}${sectionNumber}_IMAGE`;
+}
+
+/**
+ * Get title of the master slide with background color for current section
+ */
+export function getSectionColorSlideMasterTitle(sectionNumber: number) {
+  return `${SECTION_PREFIX}${sectionNumber}_COLOR`;
+}
