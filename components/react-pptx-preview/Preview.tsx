@@ -542,6 +542,8 @@ const Preview = (props: {
                 marginBottom: "10px",
               }}
               key={i}
+              data-slide-index={i + 1} // custom data attributed used by line to slide mapper hook
+              id={`slide-${i + 1}`} // fallback, not used most of the time
             >
               {shouldRenderSectionName && (
                 <div id={`section-${sectionNameIdentifier}`}>

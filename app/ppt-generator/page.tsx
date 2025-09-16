@@ -1,3 +1,4 @@
+import { LineToSlideMapperProvider } from "@/components/context/LineToSlideMapperContext";
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
@@ -70,39 +71,41 @@ const PptGeneratorPage = (props: Props) => {
         </h2>
         <div className="">coming soon...</div>
       </Container>
-      <PptGeneratorFormProvider>
-        <Container>
-          <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            2. Insert Main Lyric
-          </h2>
-          <MainLyricSection />
-        </Container>
-        <Container>
-          <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            3. Insert Secondary Lyric
-          </h2>
-          <SecondaryLyricSection />
-        </Container>
-        <Container>
-          <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            4. Settings
-          </h2>
-          <PptGeneratorSettings />
-        </Container>
-        <Container>
-          <h2 className="mt-8 text-xl font-semibold tracking-tight">
-            5. Generate PPT!
-          </h2>
-          <div className="mr-2 w-full lg:w-1/2">
-            <FileNameSettings />
-            <div>
-              <Button variant="default" type="submit">
-                Generate
-              </Button>
+      <LineToSlideMapperProvider>
+        <PptGeneratorFormProvider>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              2. Insert Main Lyric
+            </h2>
+            <MainLyricSection />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              3. Insert Secondary Lyric
+            </h2>
+            <SecondaryLyricSection />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              4. Settings
+            </h2>
+            <PptGeneratorSettings />
+          </Container>
+          <Container>
+            <h2 className="mt-8 text-xl font-semibold tracking-tight">
+              5. Generate PPT!
+            </h2>
+            <div className="mr-2 w-full lg:w-1/2">
+              <FileNameSettings />
+              <div>
+                <Button variant="default" type="submit">
+                  Generate
+                </Button>
+              </div>
             </div>
-          </div>
-        </Container>
-      </PptGeneratorFormProvider>
+          </Container>
+        </PptGeneratorFormProvider>
+      </LineToSlideMapperProvider>
     </>
   );
 };

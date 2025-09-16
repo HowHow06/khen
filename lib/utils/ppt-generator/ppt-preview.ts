@@ -11,6 +11,7 @@ import {
   SectionProps,
 } from "@/lib/types/pptxgenjs/core-interfaces";
 import { createPptInstance } from "@/lib/utils";
+import { LineToSlideMapper } from "./line-to-slide-mapper";
 
 const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
   if (prop.data) {
@@ -76,10 +77,12 @@ export const generatePreviewConfig = async ({
   settingValues,
   primaryLyric,
   secondaryLyric,
+  lineMapper,
 }: {
   settingValues: PptSettingsStateType;
   primaryLyric: string;
   secondaryLyric: string;
+  lineMapper?: LineToSlideMapper;
 }): Promise<InternalPresentation> => {
   // 1. Get background prop for the presentation
   // 2. Create a new Presentation instance
@@ -88,6 +91,7 @@ export const generatePreviewConfig = async ({
     settingValues,
     primaryLyric,
     secondaryLyric,
+    lineMapper,
   });
 
   // 3.1 Convert to the real PptxGenJS type

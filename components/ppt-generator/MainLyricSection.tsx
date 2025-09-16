@@ -15,6 +15,7 @@ import GeneratePinyinDropdown from "../GeneratePinyinDropdown";
 import LyricSectionCommand from "../LyricSectionCommand";
 import SectionInsertDropdown from "../SectionInsertDropdown";
 import TextTransformDropdown from "../TextTransformDropdown";
+import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import LyricFormatterDialogButton from "../lyric-formatter/LyricFormatterDialogButton";
 
@@ -24,6 +25,8 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const { mainText, setMainText, setSecondaryText } =
     usePptGeneratorFormContext();
   const mainTextareaRef = useRef<TextareaRefType>(null);
+  const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
+
   const {
     cursorPosition,
     setCursorPosition,
@@ -45,8 +48,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     (newText: string) => {
       saveToUndoStack(mainText);
       setMainText(newText);
+      // Trigger scroll based on the position where the text change occurs
+      if (mainTextareaRef.current) {
+        const selectionStart = mainTextareaRef.current.selectionStart || 0;
+        scrollPreviewToCursorPosition(newText, selectionStart);
+      }
     },
-    [mainText, saveToUndoStack, setMainText],
+    [mainText, saveToUndoStack, setMainText, scrollPreviewToCursorPosition],
   );
 
   const setMainTextForSectionInsertion = useCallback(

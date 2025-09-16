@@ -5,9 +5,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { POPUP_TAB_TYPE } from "@/lib/constant";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
+import { PptSettingsStateType } from "@/lib/types";
 import { generatePreviewConfig, getBase64FromString } from "@/lib/utils";
 import { Pencil, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import Preview from "../react-pptx-preview/Preview";
 import { Button } from "../ui/button";
@@ -21,6 +23,7 @@ type Props = {};
 const GeneratePreviewButton = (props: Props) => {
   const { mainText, secondaryText, settingsValues } =
     usePptGeneratorFormContext();
+  const { lineMapper, clearMappings } = useLineToSlideMapperContext();
   const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState(
@@ -33,24 +36,32 @@ const GeneratePreviewButton = (props: Props) => {
   };
 
   // TODO: add settings validation check here, OR show message like 'invalid content' instead of preview
-  const updatePreviewConfig = useCallback(async () => {
-    if (!isModalOpen) {
-      return;
-    }
-    try {
-      const previewConfig = await generatePreviewConfig({
-        settingValues: settingsValues,
-        primaryLyric: mainText || "",
-        secondaryLyric: secondaryText,
-      });
+  const updatePreviewConfig = useCallback(
+    async (
+      settingsValues: PptSettingsStateType,
+      mainText: string,
+      secondaryText: string,
+    ) => {
+      try {
+        // Clear previous mappings
+        clearMappings();
 
-      setPreviewConfig(previewConfig);
-      setError(undefined);
-    } catch (error) {
-      console.warn(error);
-      setError(error as Error);
-    }
-  }, [settingsValues, mainText, secondaryText, isModalOpen]);
+        const previewConfig = await generatePreviewConfig({
+          settingValues: settingsValues,
+          primaryLyric: mainText || "",
+          secondaryLyric: secondaryText,
+          lineMapper,
+        });
+
+        setPreviewConfig(previewConfig);
+        setError(undefined);
+      } catch (error) {
+        console.warn(error);
+        setError(error as Error);
+      }
+    },
+    [lineMapper, clearMappings],
+  );
 
   const onSectionChange = useCallback(
     (section: { value: string; label: string }) => {
@@ -72,8 +83,16 @@ const GeneratePreviewButton = (props: Props) => {
 
   // update preview config on settingsValues change
   useEffect(() => {
-    updatePreviewConfig();
-  }, [updatePreviewConfig]);
+    if (isModalOpen) {
+      updatePreviewConfig(settingsValues, mainText, secondaryText);
+    }
+  }, [
+    updatePreviewConfig,
+    isModalOpen,
+    settingsValues,
+    mainText,
+    secondaryText,
+  ]);
 
   return (
     <>

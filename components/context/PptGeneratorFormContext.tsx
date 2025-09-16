@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { useAlertDialog } from "./AlertDialogContext";
+import { useLineToSlideMapperContext } from "./LineToSlideMapperContext";
 
 type PptGeneratorFormContextType = {
   mainText: string;
@@ -73,6 +74,7 @@ export const PptGeneratorFormProvider: React.FC<
   const [mainText, setMainText] = useState("");
   const [secondaryText, setSecondaryText] = useState("");
   const { showDialog } = useAlertDialog();
+  const { lineMapper, clearMappings } = useLineToSlideMapperContext();
   const form = useForm<z.infer<typeof settingsSchema>>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettingsValue,
@@ -89,79 +91,85 @@ export const PptGeneratorFormProvider: React.FC<
     });
   usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
 
-  async function onSubmit(values: z.infer<typeof settingsSchema>) {
-    const {
-      general: { ignoreSubcontent, useDifferentSettingForEachSection },
-    } = values;
-    const primaryLinesArray = mainText.split("\n");
-    const secondaryLinesArray = secondaryText.split("\n");
-    const shouldIgnoreSubcontent =
-      ignoreSubcontent && !useDifferentSettingForEachSection;
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof settingsSchema>) => {
+      const {
+        general: { ignoreSubcontent, useDifferentSettingForEachSection },
+      } = values;
+      const primaryLinesArray = mainText.split("\n");
+      const secondaryLinesArray = secondaryText.split("\n");
+      const shouldIgnoreSubcontent =
+        ignoreSubcontent && !useDifferentSettingForEachSection;
 
-    if (
-      !shouldIgnoreSubcontent &&
-      primaryLinesArray.length !== secondaryLinesArray.length
-    ) {
-      const result = await showDialog("Are you sure?", {
-        description: `There are ${primaryLinesArray.length} line(s) in the main lyrics, but there is only ${secondaryLinesArray.length} line(s) in the secondary lyrics, is this the desired behavior?`,
-      });
-      if (result === DIALOG_RESULT.CANCEL) {
-        return;
+      if (
+        !shouldIgnoreSubcontent &&
+        primaryLinesArray.length !== secondaryLinesArray.length
+      ) {
+        const result = await showDialog("Are you sure?", {
+          description: `There are ${primaryLinesArray.length} line(s) in the main lyrics, but there is only ${secondaryLinesArray.length} line(s) in the secondary lyrics, is this the desired behavior?`,
+        });
+        if (result === DIALOG_RESULT.CANCEL) {
+          return;
+        }
       }
-    }
 
-    if (process.env.NODE_ENV === "development") {
-      const submittedValue = values as PptSettingsStateType;
-      console.log("Submitted Value:", {
-        submittedValue,
-        mainText,
-        secondaryText,
+      if (process.env.NODE_ENV === "development") {
+        const submittedValue = values as PptSettingsStateType;
+        console.log("Submitted Value:", {
+          submittedValue,
+          mainText,
+          secondaryText,
+        });
+      }
+
+      clearMappings();
+      generatePpt({
+        settingValues: values as PptSettingsStateType,
+        primaryLyric: mainText || "",
+        secondaryLyric: secondaryText,
+        lineMapper,
       });
-    }
+    },
+    [mainText, secondaryText, showDialog, clearMappings, lineMapper],
+  );
 
-    generatePpt({
-      settingValues: values as PptSettingsStateType,
-      primaryLyric: mainText || "",
-      secondaryLyric: secondaryText,
-    });
-  }
+  const onInvalidSubmit = useCallback(
+    (errorsObject: FieldErrors<PptSettingsStateType>) => {
+      if (process.env.NODE_ENV === "development") {
+        console.log("Errors:", errorsObject);
+      }
+      const errors = traverseAndCollect<FieldError, true>(
+        errorsObject,
+        "message",
+        {
+          getParentObject: true,
+          getPath: true,
+        },
+      );
 
-  function onInvalidSubmit(errorsObject: FieldErrors<PptSettingsStateType>) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("Errors:", errorsObject);
-    }
-    const errors = traverseAndCollect<FieldError, true>(
-      errorsObject,
-      "message",
-      {
-        getParentObject: true,
-        getPath: true,
-      },
-    );
+      errors.forEach((error) => {
+        const pathArray = error.path.split(".");
+        const category = pathArray[0];
+        const fieldName = pathArray[pathArray.length - 1];
 
-    errors.forEach((error) => {
-      const pathArray = error.path.split(".");
-      const category = pathArray[0];
-      const fieldName = pathArray[pathArray.length - 1];
-
-      toast.error(`Error in ${category} section.`, {
-        description: `${toNormalCase(fieldName)}: ${error.message}`,
-        duration: 10 * 1000,
-        closeButton: true,
-        // action: { // TODO: focus on the field with error when button is clicked (khen-56)
-        //   label: "Goto",
-        //   onClick: () => {
-        //   },
-        // },
+        toast.error(`Error in ${category} section.`, {
+          description: `${toNormalCase(fieldName)}: ${error.message}`,
+          duration: 10 * 1000,
+          closeButton: true,
+          // action: { // TODO: focus on the field with error when button is clicked (khen-56)
+          //   label: "Goto",
+          //   onClick: () => {
+          //   },
+          // },
+        });
       });
-    });
-  }
+    },
+    [],
+  );
 
-  const submit = useCallback(form.handleSubmit(onSubmit, onInvalidSubmit), [
-    onSubmit,
-    onInvalidSubmit,
-    form.handleSubmit,
-  ]);
+  const submit = useCallback(() => {
+    form.handleSubmit(onSubmit, onInvalidSubmit)();
+  }, [form, onSubmit, onInvalidSubmit]);
 
   return (
     <PptGeneratorFormContext.Provider
