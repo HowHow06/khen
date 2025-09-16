@@ -5,7 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import { PINYIN_TYPE, PINYIN_TYPE_ITEMS } from "@/lib/constant";
 import { getPinyin } from "@/lib/utils/pinyin";
 import { debounce } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
+import { usePptSettingsUIContext } from "./context/PptSettingsUIContext";
 
 type Props = {
   text: string;
@@ -13,8 +14,11 @@ type Props = {
 };
 
 const AutoGeneratePinyinSwitch = ({ text, setText }: Props) => {
-  const [isChecked, setIsChecked] = useState(true);
-  const [pinyinType, setPinyinType] = useState(PINYIN_TYPE.WITHOUT_TONE);
+  const {
+    settingsUIState: { isAutoGeneratePinyinEnabled, pinyinType },
+    setAutoGeneratePinyinEnabled,
+    setPinyinType,
+  } = usePptSettingsUIContext();
 
   const generatePinyin = debounce(
     useCallback(() => {
@@ -26,20 +30,20 @@ const AutoGeneratePinyinSwitch = ({ text, setText }: Props) => {
   );
 
   useEffect(() => {
-    if (isChecked) {
+    if (isAutoGeneratePinyinEnabled) {
       generatePinyin();
     }
-  }, [isChecked, generatePinyin]);
+  }, [isAutoGeneratePinyinEnabled, generatePinyin]);
 
   return (
     <>
       <div className="flex min-h-11 items-center justify-start gap-3">
         <Label>Auto Generate Pinyin</Label>
         <Switch
-          checked={isChecked}
-          onCheckedChange={(isChecked) => setIsChecked(isChecked)}
+          checked={isAutoGeneratePinyinEnabled}
+          onCheckedChange={(isChecked) => setAutoGeneratePinyinEnabled(isChecked)}
         />
-        {isChecked && (
+        {isAutoGeneratePinyinEnabled && (
           <Combobox
             items={PINYIN_TYPE_ITEMS}
             selectedValue={pinyinType}

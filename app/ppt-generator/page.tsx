@@ -1,5 +1,6 @@
 import { LineToSlideMapperProvider } from "@/components/context/LineToSlideMapperContext";
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
+import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
 
 import MainLyricSection from "@/components/ppt-generator/MainLyricSection";
 import SecondaryLyricSection from "@/components/ppt-generator/SecondaryLyricSection";
@@ -72,7 +73,8 @@ const PptGeneratorPage = (props: Props) => {
         <div className="">coming soon...</div>
       </Container>
       <LineToSlideMapperProvider>
-        <PptGeneratorFormProvider>
+        <PptSettingsUIProvider>
+          <PptGeneratorFormProvider>
           <Container>
             <h2 className="mt-8 text-xl font-semibold tracking-tight">
               2. Insert Main Lyric
@@ -104,7 +106,8 @@ const PptGeneratorPage = (props: Props) => {
               </div>
             </div>
           </Container>
-        </PptGeneratorFormProvider>
+          </PptGeneratorFormProvider>
+        </PptSettingsUIProvider>
       </LineToSlideMapperProvider>
     </>
   );

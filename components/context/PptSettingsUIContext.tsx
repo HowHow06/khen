@@ -1,6 +1,7 @@
 "use client";
 import {
   CONTENT_TYPE,
+  PINYIN_TYPE,
   SETTING_CATEGORY,
   TAB_TYPE_UI_STATE_NAME_MAPPING,
   TAB_TYPES,
@@ -31,7 +32,9 @@ type PptSettingsUIAction =
     }
   | ({
       type: "SET_SECTION_TABS";
-    } & setSectionTabsProps);
+    } & setSectionTabsProps)
+  | { type: "SET_AUTO_GENERATE_PINYIN_ENABLED"; enabled: boolean }
+  | { type: "SET_PINYIN_TYPE"; pinyinType: PINYIN_TYPE };
 
 type PptSettingsUIContextType = {
   settingsUIState: PptSettingsUIState;
@@ -44,6 +47,8 @@ type PptSettingsUIContextType = {
     grouping: string;
   }) => void;
   setSectionTabs: (props: setSectionTabsProps) => void;
+  setAutoGeneratePinyinEnabled: (enabled: boolean) => void;
+  setPinyinType: (pinyinType: PINYIN_TYPE) => void;
 };
 
 const initialState: PptSettingsUIState = {
@@ -54,6 +59,8 @@ const initialState: PptSettingsUIState = {
     base: [],
   },
   sectionTabs: {},
+  isAutoGeneratePinyinEnabled: true,
+  pinyinType: PINYIN_TYPE.WITHOUT_TONE,
 };
 
 const pptSettingsUIReducer = (
@@ -87,6 +94,13 @@ const pptSettingsUIReducer = (
         },
       };
       return { ...state, sectionTabs: newSectionTabs };
+    
+    case "SET_AUTO_GENERATE_PINYIN_ENABLED":
+      return { ...state, isAutoGeneratePinyinEnabled: action.enabled };
+    
+    case "SET_PINYIN_TYPE":
+      return { ...state, pinyinType: action.pinyinType };
+    
     default:
       return state;
   }
@@ -140,6 +154,14 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
     [],
   );
 
+  const setAutoGeneratePinyinEnabled = useCallback((enabled: boolean) => {
+    return dispatch({ type: "SET_AUTO_GENERATE_PINYIN_ENABLED", enabled });
+  }, []);
+
+  const setPinyinType = useCallback((pinyinType: PINYIN_TYPE) => {
+    return dispatch({ type: "SET_PINYIN_TYPE", pinyinType });
+  }, []);
+
   return (
     <PptSettingsUIContext.Provider
       value={{
@@ -149,6 +171,8 @@ export const PptSettingsUIProvider: React.FC<PptSettingsUIProviderProps> = ({
         setAccordionsOpen,
         setCurrentCoverTab,
         setSectionTabs,
+        setAutoGeneratePinyinEnabled,
+        setPinyinType,
       }}
     >
       {children}
