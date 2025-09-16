@@ -6,6 +6,7 @@ import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
 import TextTransformDropdown from "../TextTransformDropdown";
+import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import { Textarea } from "../ui/textarea";
 
@@ -13,6 +14,9 @@ type SecondaryLyricSectionProps = {};
 
 const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
   const { secondaryText, setSecondaryText } = usePptGeneratorFormContext();
+
+  const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
+
   const textAreaRef = useRef<TextareaRefType>(null);
   const {
     cursorPosition,
@@ -21,6 +25,10 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
   } = useCursorPosition();
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSecondaryText(event.target.value);
+    if (textAreaRef.current) {
+      const selectionStart = textAreaRef.current.selectionStart || 0;
+      scrollPreviewToCursorPosition(event.target.value, selectionStart);
+    }
     cursorHandleTextChange(event);
   };
 

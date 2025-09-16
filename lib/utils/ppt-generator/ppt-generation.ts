@@ -1,10 +1,8 @@
 import {
   DEFAULT_AUTHOR,
   DEFAULT_BASE_OPTION,
-  DEFAULT_LINE_COUNT_PER_TEXTBOX,
   DEFAULT_PPT_LAYOUT,
   DEFAULT_SUBJECT,
-  DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
   DEFAULT_TITLE,
   LYRIC_SECTION,
   MASTER_SLIDE_BACKGROUND_COLOR,
@@ -38,6 +36,8 @@ import {
 } from "@/lib/utils";
 import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
+import { LineToSlideMapper, LineType } from "./line-to-slide-mapper";
+import { PptConfigurationBuilder } from "./ppt-configuration-builder";
 import {
   getBase64FromImageField,
   getColorValue,
@@ -129,39 +129,32 @@ function createPresentationInstance({
   return pres;
 }
 
+/**
+ * @deprecated Use PptConfigurationBuilder instead
+ */
+/**
+ * @deprecated Use PptConfigurationBuilder.buildMainConfig instead
+ */
 const getDerivedVariablesFromSettings = (
   settingValues: PptSettingsStateType,
 ) => {
-  const {
-    general: {
-      useBackgroundColorWhenEmpty,
-      textboxCountPerContentPerSlide,
-      ignoreSubcontent,
-      useDifferentSettingForEachSection,
-      lineCountPerTextbox,
-    },
-    section,
-  } = settingValues;
-  const mainIsBackgroundColorWhenEmpty =
-    useBackgroundColorWhenEmpty ??
-    PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
-      .defaultValue;
-  const mainTextboxCountPerSlide =
-    textboxCountPerContentPerSlide ?? DEFAULT_TEXTBOX_COUNT_PER_SLIDE;
-  const mainLinePerTextbox =
-    lineCountPerTextbox ?? DEFAULT_LINE_COUNT_PER_TEXTBOX;
-  const mainHasSecondaryContent = !ignoreSubcontent;
+  const builder = new PptConfigurationBuilder();
+  const config = builder.buildMainConfig(settingValues);
 
+  // Map to legacy property names for backward compatibility
   return {
-    mainIsBackgroundColorWhenEmpty,
-    mainTextboxCountPerSlide,
-    mainLinePerTextbox,
-    mainHasSecondaryContent,
-    useDifferentSettingForEachSection,
-    section,
+    mainIsBackgroundColorWhenEmpty: config.isBackgroundColorWhenEmpty,
+    mainTextboxCountPerSlide: config.textboxCountPerSlide,
+    mainLinePerTextbox: config.linePerTextbox,
+    mainHasSecondaryContent: config.hasSecondaryContent,
+    useDifferentSettingForEachSection: config.useDifferentSettingForEachSection,
+    section: config.section,
   };
 };
 
+/**
+ * @deprecated Use PptConfigurationBuilder instead
+ */
 const getDerivedVariablesFromSectionSettings = ({
   settingValues,
   currentSectionSetting,
@@ -169,78 +162,89 @@ const getDerivedVariablesFromSectionSettings = ({
   settingValues: PptSettingsStateType;
   currentSectionSetting: SectionSettingsType;
 }) => {
-  const {
-    mainIsBackgroundColorWhenEmpty,
-    mainTextboxCountPerSlide,
-    mainLinePerTextbox,
-    mainHasSecondaryContent,
-    useDifferentSettingForEachSection,
-  } = getDerivedVariablesFromSettings(settingValues);
-
-  const isUseSectionSettings =
-    useDifferentSettingForEachSection === true &&
-    !currentSectionSetting.general?.useMainSectionSettings;
-
-  const isBackgroundColorWhenEmpty = isUseSectionSettings
-    ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
-      PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
-        .defaultValue
-    : mainIsBackgroundColorWhenEmpty;
-  const hasSecondaryContent = isUseSectionSettings
-    ? !currentSectionSetting.general?.ignoreSubcontent
-    : mainHasSecondaryContent;
-  const linePerTextbox = isUseSectionSettings
-    ? currentSectionSetting.general?.lineCountPerTextbox ??
-      DEFAULT_LINE_COUNT_PER_TEXTBOX
-    : mainLinePerTextbox;
-  const textboxCountPerSlide = isUseSectionSettings
-    ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
-      DEFAULT_TEXTBOX_COUNT_PER_SLIDE
-    : mainTextboxCountPerSlide;
-
-  const isUseSectionColor =
-    isUseSectionSettings &&
-    !currentSectionSetting.general?.useMainBackgroundColor;
-  const isUseSectionImage =
-    isUseSectionSettings &&
-    !currentSectionSetting.general?.useMainBackgroundImage;
-
-  const mainContentOption = isUseSectionSettings
-    ? currentSectionSetting.content.main
-    : settingValues.content.main;
-  const mainCoverOption = isUseSectionSettings
-    ? currentSectionSetting.cover.main
-    : settingValues.cover.main;
-
-  const toRemoveIdenticalWords =
-    hasSecondaryContent && isUseSectionSettings
-      ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
-      : settingValues.general.ignoreSubcontentWhenIdentical;
-
-  const secondaryContentOption =
-    hasSecondaryContent && isUseSectionSettings
-      ? currentSectionSetting.content.secondary
-      : settingValues.content.secondary;
-  const secondaryCoverOption =
-    hasSecondaryContent && isUseSectionSettings
-      ? currentSectionSetting.cover.secondary
-      : settingValues.cover.secondary;
-  const totalLineCountPerSlide = linePerTextbox * textboxCountPerSlide;
-
-  return {
-    isBackgroundColorWhenEmpty,
-    hasSecondaryContent,
-    linePerTextbox,
-    isUseSectionColor,
-    isUseSectionImage,
-    mainContentOption,
-    mainCoverOption,
-    toRemoveIdenticalWords,
-    secondaryContentOption,
-    secondaryCoverOption,
-    totalLineCountPerSlide,
-  };
+  const builder = new PptConfigurationBuilder();
+  return builder.buildConfigWithFallback(settingValues, currentSectionSetting);
 };
+
+// const getDerivedVariablesFromSectionSettings = ({
+//   settingValues,
+//   currentSectionSetting,
+// }: {
+//   settingValues: PptSettingsStateType;
+//   currentSectionSetting: SectionSettingsType;
+// }) => {
+//   const {
+//     mainIsBackgroundColorWhenEmpty,
+//     mainTextboxCountPerSlide,
+//     mainLinePerTextbox,
+//     mainHasSecondaryContent,
+//     useDifferentSettingForEachSection,
+//   } = getDerivedVariablesFromSettings(settingValues);
+
+//   const isUseSectionSettings =
+//     useDifferentSettingForEachSection === true &&
+//     !currentSectionSetting.general?.useMainSectionSettings;
+
+//   const isBackgroundColorWhenEmpty = isUseSectionSettings
+//     ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
+//       PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
+//         .defaultValue
+//     : mainIsBackgroundColorWhenEmpty;
+//   const hasSecondaryContent = isUseSectionSettings
+//     ? !currentSectionSetting.general?.ignoreSubcontent
+//     : mainHasSecondaryContent;
+//   const linePerTextbox = isUseSectionSettings
+//     ? currentSectionSetting.general?.lineCountPerTextbox ??
+//       DEFAULT_LINE_COUNT_PER_TEXTBOX
+//     : mainLinePerTextbox;
+//   const textboxCountPerSlide = isUseSectionSettings
+//     ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
+//       DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+//     : mainTextboxCountPerSlide;
+
+//   const isUseSectionColor =
+//     isUseSectionSettings &&
+//     !currentSectionSetting.general?.useMainBackgroundColor;
+//   const isUseSectionImage =
+//     isUseSectionSettings &&
+//     !currentSectionSetting.general?.useMainBackgroundImage;
+
+//   const mainContentOption = isUseSectionSettings
+//     ? currentSectionSetting.content.main
+//     : settingValues.content.main;
+//   const mainCoverOption = isUseSectionSettings
+//     ? currentSectionSetting.cover.main
+//     : settingValues.cover.main;
+
+//   const toRemoveIdenticalWords =
+//     hasSecondaryContent && isUseSectionSettings
+//       ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical
+//       : settingValues.general.ignoreSubcontentWhenIdentical;
+
+//   const secondaryContentOption =
+//     hasSecondaryContent && isUseSectionSettings
+//       ? currentSectionSetting.content.secondary
+//       : settingValues.content.secondary;
+//   const secondaryCoverOption =
+//     hasSecondaryContent && isUseSectionSettings
+//       ? currentSectionSetting.cover.secondary
+//       : settingValues.cover.secondary;
+//   const totalLineCountPerSlide = linePerTextbox * textboxCountPerSlide;
+
+//   return {
+//     isBackgroundColorWhenEmpty,
+//     hasSecondaryContent,
+//     linePerTextbox,
+//     isUseSectionColor,
+//     isUseSectionImage,
+//     mainContentOption,
+//     mainCoverOption,
+//     toRemoveIdenticalWords,
+//     secondaryContentOption,
+//     secondaryCoverOption,
+//     totalLineCountPerSlide,
+//   };
+// };
 
 /**
  * Get sections from pptx instance
@@ -259,11 +263,13 @@ function createSlidesFromLyrics({
   primaryLinesArray,
   secondaryLinesArray,
   settingValues,
+  lineMapper,
 }: {
   pres: pptxgenjs;
   primaryLinesArray: string[];
   secondaryLinesArray: string[];
   settingValues: PptSettingsStateType;
+  lineMapper?: LineToSlideMapper;
 }) {
   const { useDifferentSettingForEachSection, section } =
     getDerivedVariablesFromSettings(settingValues);
@@ -282,6 +288,7 @@ function createSlidesFromLyrics({
     startLineIndex: -1,
     endLineIndex: -1,
   };
+  let currentSectionName: string | undefined;
 
   // to track the inserted index, for inserting secondary content
   const insertedIndex: number[] = [];
@@ -369,20 +376,20 @@ function createSlidesFromLyrics({
       const identifier = isMainSection
         ? LYRIC_SECTION.SECTION
         : LYRIC_SECTION.SUBSECTION;
-      let sectionName = primaryLine.replace(`${identifier} `, "");
-      const hasNumbering = startsWithNumbering(sectionName);
+      currentSectionName = primaryLine.replace(`${identifier} `, "");
+      const hasNumbering = startsWithNumbering(currentSectionName);
 
       if (hasNumbering) {
-        mainSectionDisplayNumber = extractNumber(sectionName);
+        mainSectionDisplayNumber = extractNumber(currentSectionName);
       }
 
       if (!hasNumbering && isMainSection) {
         mainSectionDisplayNumber++;
-        sectionName = `${mainSectionDisplayNumber}. ${sectionName}`;
+        currentSectionName = `${mainSectionDisplayNumber}. ${currentSectionName}`;
       }
 
       if (!hasNumbering && isSubSection) {
-        sectionName = `${mainSectionDisplayNumber}.${subsectionCount} ${sectionName}`;
+        currentSectionName = `${mainSectionDisplayNumber}.${subsectionCount} ${currentSectionName}`;
       }
 
       if (isMainSection) {
@@ -400,7 +407,7 @@ function createSlidesFromLyrics({
         }
 
         currentMainSectionInfo = {
-          sectionName,
+          sectionName: currentSectionName,
           startLineIndex: index,
           endLineIndex: -1,
         };
@@ -410,7 +417,18 @@ function createSlidesFromLyrics({
         currentSectionFillSlideWeight = 0;
       }
 
-      pres.addSection({ title: sectionName });
+      pres.addSection({ title: currentSectionName });
+
+      // Track section line mapping
+      if (lineMapper) {
+        const lineType = isMainSection ? LineType.SECTION : LineType.SUBSECTION;
+        lineMapper.addMapping(
+          index, // line number, zero based
+          lineMapper.currentSlideIndex, // zero based
+          lineType,
+          currentSectionName,
+        );
+      }
 
       const isFirstPptSection = getPresSections(pres).length <= 1;
       // if is first ppt section, the behvaior is to not to add any slide, therefore the count should be -1
@@ -433,9 +451,9 @@ function createSlidesFromLyrics({
       currentSectionCoverWeight += isFirstPptSection
         ? -1
         : remainingLineCountBeforeInsert - 1;
-      const regex = /^#[^#]*/;
+      const mainTitleRegex = /^#[^#]*/;
       const mainTitle = currentLine
-        .match(regex)?.[0]
+        .match(mainTitleRegex)?.[0]
         .replace(`${LYRIC_SECTION.MAIN_TITLE}`, "")
         .trim();
       currentLine = mainTitle || currentLine;
@@ -456,6 +474,17 @@ function createSlidesFromLyrics({
         currentSectionNumber: mainSectionCount,
         sectionName: getLastPresSection(pres)?.title || "",
       });
+
+      // Track empty slide mapping
+      if (lineMapper) {
+        lineMapper.addMapping(
+          index,
+          lineMapper.currentSlideIndex,
+          LineType.EMPTY_SLIDE,
+          currentSectionName,
+        );
+        lineMapper.incrementSlideIndex(); // point to the newly created slide
+      }
       return;
     }
 
@@ -465,10 +494,20 @@ function createSlidesFromLyrics({
       // weightage of each fill slide should be equal to
       // remainder from previous slide - 1 (the 1 is the default increment of index)
       currentSectionFillSlideWeight += remainingLineCountBeforeInsert - 1;
+
+      // Track fill slide mapping
+      if (lineMapper) {
+        lineMapper.addMapping(
+          index,
+          lineMapper.currentSlideIndex,
+          LineType.FILL_SLIDE,
+          currentSectionName,
+        );
+      }
       return;
     }
 
-    let slide = getWorkingSlide({
+    const { slide, isNewSlide } = getWorkingSlide({
       pres,
       indexInCurrentSlide,
       isEmptyLine: currentLine.trim().length === 0,
@@ -479,6 +518,21 @@ function createSlidesFromLyrics({
       currentSectionNumber: mainSectionCount,
       isCover,
     });
+
+    if (lineMapper && isNewSlide) {
+      lineMapper.incrementSlideIndex();
+    }
+
+    // Track line mapping and slide creation
+    if (lineMapper) {
+      const lineType = isCover ? LineType.COVER : LineType.NORMAL;
+      lineMapper.addMapping(
+        index,
+        lineMapper.currentSlideIndex,
+        lineType,
+        currentSectionName,
+      );
+    }
 
     // empty the array
     insertedIndex.length = 0;
@@ -498,6 +552,12 @@ function createSlidesFromLyrics({
         }
         textToInsert.push(tempText.trim());
         insertedIndex.push(targetIndex);
+      }
+
+      // Track skipped lines that were merged into this slide
+      if (lineMapper && insertedIndex.length > 1) {
+        const skippedLines = insertedIndex.slice(1); // exclude the first line
+        lineMapper.addSkippedLines(skippedLines, currentSectionName);
       }
     }
 
@@ -617,7 +677,7 @@ function getWorkingSlide({
   isUseSectionColor: boolean;
   isUseSectionImage: boolean;
   currentSectionNumber: number;
-}): PptxGenJS.default.Slide {
+}): { slide: PptxGenJS.default.Slide; isNewSlide: boolean } {
   const slides = (pres as unknown as PptxGenJSType2).slides;
   const currentPresSlide =
     slides.length > 0 ? slides[slides.length - 1] : undefined;
@@ -625,18 +685,24 @@ function getWorkingSlide({
     currentPresSlide === undefined || indexInCurrentSlide === 0 || isCover;
 
   if (isToCreateSlide) {
-    return createNewSlide({
-      pres,
-      isEmptyLine,
-      isBackgroundColorWhenEmpty,
-      isUseSectionColor,
-      isUseSectionImage,
-      currentSectionNumber,
-      sectionName,
-    });
+    return {
+      slide: createNewSlide({
+        pres,
+        isEmptyLine,
+        isBackgroundColorWhenEmpty,
+        isUseSectionColor,
+        isUseSectionImage,
+        currentSectionNumber,
+        sectionName,
+      }),
+      isNewSlide: true,
+    };
   }
 
-  return currentPresSlide as unknown as PptxGenJS.default.Slide;
+  return {
+    slide: currentPresSlide as unknown as PptxGenJS.default.Slide,
+    isNewSlide: false,
+  };
 }
 
 function getTextOptionFromContentSettings({
@@ -794,10 +860,12 @@ export const createPptInstance = async ({
   settingValues,
   primaryLyric,
   secondaryLyric,
+  lineMapper,
 }: {
   settingValues: PptSettingsStateType;
   primaryLyric: string;
   secondaryLyric: string;
+  lineMapper?: LineToSlideMapper;
 }) => {
   const {
     general: {
@@ -870,6 +938,7 @@ export const createPptInstance = async ({
     primaryLinesArray,
     secondaryLinesArray,
     settingValues,
+    lineMapper,
   });
 
   return {
@@ -886,10 +955,12 @@ export const generatePpt = async ({
   settingValues,
   primaryLyric,
   secondaryLyric,
+  lineMapper,
 }: {
   settingValues: PptSettingsStateType;
   primaryLyric: string;
   secondaryLyric: string;
+  lineMapper?: LineToSlideMapper;
 }) => {
   const {
     general: { separateSectionsToFiles },
@@ -909,6 +980,7 @@ export const generatePpt = async ({
     settingValues,
     primaryLyric,
     secondaryLyric,
+    lineMapper,
   });
 
   // 4. Save the Presentation
