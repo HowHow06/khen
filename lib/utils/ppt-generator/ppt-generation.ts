@@ -383,12 +383,20 @@ function createSlidesFromLyrics({
         mainSectionDisplayNumber = extractNumber(currentSectionName);
       }
 
-      if (!hasNumbering && isMainSection) {
+      if (
+        !hasNumbering &&
+        isMainSection &&
+        settingValues.general.sectionsAutoNumbering
+      ) {
         mainSectionDisplayNumber++;
         currentSectionName = `${mainSectionDisplayNumber}. ${currentSectionName}`;
       }
 
-      if (!hasNumbering && isSubSection) {
+      if (
+        !hasNumbering &&
+        isSubSection &&
+        settingValues.general.sectionsAutoNumbering
+      ) {
         currentSectionName = `${mainSectionDisplayNumber}.${subsectionCount} ${currentSectionName}`;
       }
 
