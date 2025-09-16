@@ -15,7 +15,6 @@ import {
   BaseSettingItemMetaType,
   ContentSettingsType,
   ContentTextboxSettingsType,
-  PptMainSectionInfo,
   PptSettingsStateType,
   SectionSettingsType,
   SettingsValueType,
@@ -34,6 +33,7 @@ import {
   MainPptConfig,
   PptConfigurationBuilder,
 } from "./ppt-configuration-builder";
+import { ProcessingContext } from "./processing-context";
 import {
   getColorValue,
   getIsNormalLine,
@@ -60,23 +60,6 @@ export interface LineInfo {
   classification: LineClassification;
   processedText: string;
   isCover: boolean;
-}
-
-/**
- * Processing context to encapsulate all state variables
- */
-export interface ProcessingContext {
-  mainSectionDisplayNumber: number;
-  mainSectionCount: number;
-  subsectionDisplayNumber: number;
-  currentSectionCoverWeight: number;
-  currentSectionPptSectionWeight: number;
-  currentSectionEmptySlideWeight: number;
-  currentSectionFillSlideWeight: number;
-  currentMainSectionInfo: PptMainSectionInfo;
-  currentSectionName?: string;
-  insertedIndex: number[];
-  mainSectionsInfo: PptMainSectionInfo[];
 }
 
 /**
@@ -109,12 +92,12 @@ export function createSlidesFromLyricsRefactored({
   // Initialize configuration and context
   const configBuilder = new PptConfigurationBuilder();
   const mainConfig = configBuilder.buildMainConfig(settingValues);
-  const context = createInitialContext();
+  const context = new ProcessingContext();
 
   // Process each line
   primaryLinesArray.forEach((primaryLine, index, arr) => {
     // Skip if line was already processed (merged into previous slide)
-    if (context.insertedIndex.indexOf(index) !== -1) {
+    if (context.hasInsertedIndex(index)) {
       return;
     }
 
@@ -199,29 +182,6 @@ export function createSlidesFromLyricsRefactored({
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
-
-/**
- * Creates the initial processing context
- */
-function createInitialContext(): ProcessingContext {
-  return {
-    mainSectionDisplayNumber: 0,
-    mainSectionCount: 0,
-    subsectionDisplayNumber: 0,
-    currentSectionCoverWeight: 0,
-    currentSectionPptSectionWeight: 0,
-    currentSectionEmptySlideWeight: 0,
-    currentSectionFillSlideWeight: 0,
-    currentMainSectionInfo: {
-      sectionName: "",
-      startLineIndex: -1,
-      endLineIndex: -1,
-    },
-    currentSectionName: undefined,
-    insertedIndex: [],
-    mainSectionsInfo: [],
-  };
-}
 
 /**
  * Classifies a line and returns its type and processed text
@@ -334,38 +294,39 @@ function processSectionLine(
     lineInfo.classification === LineClassification.SUB_SECTION;
 
   if (isMainSection) {
-    context.mainSectionCount++;
+    context.incrementMainSectionCount();
   }
 
   // Update subsection count
-  context.subsectionDisplayNumber = isSubSection
-    ? context.subsectionDisplayNumber + 1
-    : 0;
+  if (isSubSection) {
+    context.incrementSubsectionDisplayNumber();
+  } else {
+    context.setSubsectionDisplayNumber(0);
+  }
 
   // Process section name
   let sectionName = lineInfo.processedText;
   const hasNumbering = startsWithNumbering(sectionName);
 
   if (hasNumbering) {
-    context.mainSectionDisplayNumber = extractNumber(sectionName);
+    context.setMainSectionDisplayNumber(extractNumber(sectionName));
   }
 
   // Add auto-numbering if needed
   if (!hasNumbering && settingValues.general.sectionsAutoNumbering) {
     if (isMainSection) {
-      context.mainSectionDisplayNumber++;
+      context.incrementMainSectionDisplayNumber();
       sectionName = `${context.mainSectionDisplayNumber}. ${sectionName}`;
     } else {
       sectionName = `${context.mainSectionDisplayNumber}.${context.subsectionDisplayNumber} ${sectionName}`;
     }
   }
 
-  context.currentSectionName = sectionName;
+  context.setCurrentSectionName(sectionName);
 
   // Handle main section finalization
   if (isMainSection) {
-    const isPreviousSectionDefault =
-      context.currentMainSectionInfo.sectionName === "";
+    const isPreviousSectionDefault = context.isCurrentMainSectionDefault();
     if (!isPreviousSectionDefault) {
       // since this is now a new section
       // calculate the endLineIndex for previous section
@@ -374,20 +335,17 @@ function processSectionLine(
         ...context.currentMainSectionInfo,
         endLineIndex: index - 1,
       };
-      context.mainSectionsInfo.push(previousMainSectionInfo);
+      context.addToMainSectionsInfo(previousMainSectionInfo);
     }
 
-    context.currentMainSectionInfo = {
+    context.setCurrentMainSectionInfo({
       sectionName,
       startLineIndex: index,
       endLineIndex: -1,
-    };
+    });
 
-    // Reset section weights
-    context.currentSectionPptSectionWeight = 0;
-    context.currentSectionCoverWeight = 0;
-    context.currentSectionEmptySlideWeight = 0;
-    context.currentSectionFillSlideWeight = 0;
+    // Reset section weights when there is a new main section
+    context.resetSectionWeights();
   }
 
   // Add section to presentation
@@ -414,7 +372,7 @@ function processSectionLine(
   const weightValue = isFirstPptSection
     ? -1
     : position.remainingLineCountBeforeInsert - 1; // Will be updated in position calculation
-  context.currentSectionPptSectionWeight += weightValue;
+  context.addToCurrentSectionPptSectionWeight(weightValue);
 }
 
 /**
@@ -435,10 +393,7 @@ function calculateSlidePosition(
   // therefore the currenIndex of first slide should be 0 & 1; second slide should be 2 & 3 etc.
   let currentIndexInSection =
     index -
-    (context.mainSectionsInfo.length > 0
-      ? context.mainSectionsInfo[context.mainSectionsInfo.length - 1]
-          .endLineIndex + 1
-      : 0) +
+    (context.hasMainSections() ? context.getLastMainSectionEndIndex() + 1 : 0) +
     context.currentSectionCoverWeight +
     context.currentSectionPptSectionWeight +
     context.currentSectionEmptySlideWeight +
@@ -476,7 +431,7 @@ function getCurrentSectionSetting(
   mainConfig: MainPptConfig,
   context: ProcessingContext,
 ): SectionSettingsType | undefined {
-  const currentlyHasNoMainSection = context.mainSectionCount === 0;
+  const currentlyHasNoMainSection = context.hasNoMainSection();
   // if is useDifferentSettingForEachSection and currently not in any main section
   // use default section settings
   // (because the useMainSectionSettings is default true, will then use main settings, so sectionSetting doesn't matter here)
@@ -552,10 +507,11 @@ function processSpecialSlide(
   lineMapper?: LineToSlideMapper,
 ): void {
   if (lineInfo.classification === LineClassification.EMPTY_SLIDE) {
-    context.currentSectionEmptySlideWeight +=
+    context.addToCurrentSectionEmptySlideWeight(
       config.totalLineCountPerSlide +
-      position.remainingLineCountBeforeInsert -
-      1;
+        position.remainingLineCountBeforeInsert -
+        1,
+    );
 
     // weightage of each empty slide should be equal to
     // line per slide + remainder from previous slide - 1 (the 1 is the default increment of index)
@@ -581,8 +537,9 @@ function processSpecialSlide(
   } else if (lineInfo.classification === LineClassification.FILL_SLIDE) {
     // weightage of each fill slide should be equal to
     // remainder from previous slide - 1 (the 1 is the default increment of index)
-    context.currentSectionFillSlideWeight +=
-      position.remainingLineCountBeforeInsert - 1;
+    context.addToCurrentSectionFillSlideWeight(
+      position.remainingLineCountBeforeInsert - 1,
+    );
 
     if (lineMapper) {
       lineMapper.addMapping(
@@ -656,7 +613,7 @@ function getTextOptionFromContentSettings({
   const defaultTextbox = PPT_GENERATION_CONTENT_TEXTBOX_SETTINGS;
 
   if (targetTextbox === undefined) {
-    throw new Error(`undefiend target textbox settings: ${textboxKey}`);
+    throw new Error(`undefined target textbox settings: ${String(textboxKey)}`);
   }
 
   // NOTE: targetTextbox might be undefined because
@@ -819,9 +776,9 @@ function processContentLine({
   // Handle cover weight update
   if (isCover) {
     const isFirstPptSection = getPresSections(pres).length <= 1;
-    context.currentSectionCoverWeight += isFirstPptSection
-      ? -1
-      : position.remainingLineCountBeforeInsert - 1;
+    context.addToCurrentSectionCoverWeight(
+      isFirstPptSection ? -1 : position.remainingLineCountBeforeInsert - 1,
+    );
   }
 
   // Get or create slide - you would need to implement or import this function
@@ -853,18 +810,19 @@ function processContentLine({
   }
 
   // Prepare text content
-  context.insertedIndex.length = 0;
-  context.insertedIndex.push(index);
+  context.clearInsertedIndex();
+  context.addToInsertedIndex(index);
   const textToInsert = [lineInfo.processedText];
 
   // Collect additional lines if not cover
   if (!isCover) {
+    // TODO: follow best practice, avoid mutate parameter
     collectAdditionalLines(
       primaryLinesArray,
       index,
       config.linePerTextbox,
       textToInsert,
-      context.insertedIndex,
+      context,
     );
 
     // Track skipped lines
@@ -914,7 +872,7 @@ function collectAdditionalLines(
   startIndex: number,
   linePerTextbox: number,
   textToInsert: string[],
-  insertedIndex: number[],
+  context: ProcessingContext,
 ): void {
   for (let i = 1; i < linePerTextbox; i++) {
     const targetIndex = startIndex + i;
@@ -928,7 +886,7 @@ function collectAdditionalLines(
     }
 
     textToInsert.push(tempText.trim());
-    insertedIndex.push(targetIndex);
+    context.addToInsertedIndex(targetIndex);
   }
 }
 
@@ -978,11 +936,11 @@ function finalizeLastSection(
   context: ProcessingContext,
   lastIndex: number,
 ): void {
-  if (context.currentMainSectionInfo.sectionName !== "") {
+  if (!context.isCurrentMainSectionDefault()) {
     const lastMainSectionInfo = {
       ...context.currentMainSectionInfo,
       endLineIndex: lastIndex,
     };
-    context.mainSectionsInfo.push(lastMainSectionInfo);
+    context.addToMainSectionsInfo(lastMainSectionInfo);
   }
 }
