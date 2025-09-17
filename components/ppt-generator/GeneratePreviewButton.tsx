@@ -7,7 +7,7 @@ import { POPUP_TAB_TYPE } from "@/lib/constant";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { PptSettingsStateType } from "@/lib/types";
 import { generatePreviewConfig, getBase64FromString } from "@/lib/utils";
-import { Pencil, SlidersHorizontal } from "lucide-react";
+import { Grid3X3, Pencil, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
@@ -15,6 +15,7 @@ import Preview from "../react-pptx-preview/Preview";
 import { Button } from "../ui/button";
 import MainLyricSection from "./MainLyricSection";
 import SecondaryLyricSection from "./SecondaryLyricSection";
+import SlideGridView from "./SlideGridView";
 import GeneratePptWithPromptButton from "./settings/GeneratePptWithPromptButton";
 import PptGeneratorSettingsContent from "./settings/PptGeneratorSettingsContent";
 
@@ -101,7 +102,11 @@ const GeneratePreviewButton = (props: Props) => {
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
         <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]">
-          <div className="hidden h-full w-3/5 gap-4 sm:flex">
+          <div
+            className={`hidden h-full gap-4 sm:flex ${
+              currentTab === POPUP_TAB_TYPE.GRID_VIEW ? "w-full" : "w-3/5"
+            }`}
+          >
             <div>
               <ToggleGroup
                 type="single"
@@ -121,9 +126,15 @@ const GeneratePreviewButton = (props: Props) => {
                 >
                   <Pencil className="h-5 w-5" />
                 </ToggleGroupItem>
+                <ToggleGroupItem
+                  value={POPUP_TAB_TYPE.GRID_VIEW}
+                  aria-label="Toggle grid view"
+                >
+                  <Grid3X3 className="h-5 w-5" />
+                </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className="flex h-full w-full flex-col gap-2">
+            <div className={"flex h-full w-full flex-col gap-2"}>
               {currentTab === POPUP_TAB_TYPE.SETTINGS && (
                 <PptGeneratorSettingsContent
                   onSectionChange={onSectionChange}
@@ -141,36 +152,44 @@ const GeneratePreviewButton = (props: Props) => {
                   </div>
                 </ScrollArea>
               )}
-            </div>
-          </div>
-          <div className="flex h-full w-full flex-col sm:w-2/5">
-            <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
-            <span className="text-xs">
-              Note: might not display properly if the font isn&apos;t locally
-              installed. Shadow, glow and outline won&apos;t be displayed here.
-            </span>
-            <div className="flex-grow overflow-y-auto">
-              {error ? (
-                <div>
-                  Working on the preview, meanwhile please check your
-                  settings...
+              {currentTab === POPUP_TAB_TYPE.GRID_VIEW && (
+                <div className="h-full w-full">
+                  <SlideGridView normalizedConfig={previewConfig} />
                 </div>
-              ) : (
-                // NOTE: very important to add scroll area because the default scroll bar will affect the width of the component
-                <ScrollArea className={"px-3"} isFillParent>
-                  <Preview
-                    normalizedConfig={previewConfig}
-                    drawBoundingBoxes={false}
-                  />
-                </ScrollArea>
               )}
             </div>
-            <div className="flex justify-end">
-              <div className="hidden sm:block">
-                <GeneratePptWithPromptButton />
+          </div>
+          {currentTab !== POPUP_TAB_TYPE.GRID_VIEW && (
+            <div className="flex h-full w-full flex-col sm:w-2/5">
+              <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
+              <span className="text-xs">
+                Note: might not display properly if the font isn&apos;t locally
+                installed. Shadow, glow and outline won&apos;t be displayed
+                here.
+              </span>
+              <div className="flex-grow overflow-y-auto">
+                {error ? (
+                  <div>
+                    Working on the preview, meanwhile please check your
+                    settings...
+                  </div>
+                ) : (
+                  // NOTE: very important to add scroll area because the default scroll bar will affect the width of the component
+                  <ScrollArea className={"px-3"} isFillParent>
+                    <Preview
+                      normalizedConfig={previewConfig}
+                      drawBoundingBoxes={false}
+                    />
+                  </ScrollArea>
+                )}
+              </div>
+              <div className="flex justify-end gap-2">
+                <div className="hidden sm:block">
+                  <GeneratePptWithPromptButton />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
 
