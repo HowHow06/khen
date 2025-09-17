@@ -49,12 +49,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       saveToUndoStack(mainText);
       setMainText(newText);
       // Trigger scroll based on the position where the text change occurs
-      if (mainTextareaRef.current) {
+      // Only enable scroll behavior on non-mobile devices
+      if (mainTextareaRef.current && !isExtraSmallScreen) {
         const selectionStart = mainTextareaRef.current.selectionStart || 0;
         scrollPreviewToCursorPosition(newText, selectionStart);
       }
     },
-    [mainText, saveToUndoStack, setMainText, scrollPreviewToCursorPosition],
+    [mainText, saveToUndoStack, setMainText, scrollPreviewToCursorPosition, isExtraSmallScreen],
   );
 
   const setMainTextForSectionInsertion = useCallback(

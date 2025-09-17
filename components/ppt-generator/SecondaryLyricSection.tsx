@@ -1,5 +1,7 @@
 "use client";
+import { SCREEN_SIZE } from "@/lib/constant/general";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
+import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { TextareaRefType } from "@/lib/types";
 import { useRef } from "react";
 import ClearTextButton from "../ClearTextButton";
@@ -16,6 +18,8 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
   const { secondaryText, setSecondaryText } = usePptGeneratorFormContext();
 
   const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
+  const screenSize = useScreenSize();
+  const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
 
   const textAreaRef = useRef<TextareaRefType>(null);
   const {
@@ -23,9 +27,11 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
     handleSelect: cursorHandleSelect,
     handleTextChange: cursorHandleTextChange,
   } = useCursorPosition();
+
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSecondaryText(event.target.value);
-    if (textAreaRef.current) {
+    // Only enable scroll behavior on non-mobile devices
+    if (textAreaRef.current && !isExtraSmallScreen) {
       const selectionStart = textAreaRef.current.selectionStart || 0;
       scrollPreviewToCursorPosition(event.target.value, selectionStart);
     }
