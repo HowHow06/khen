@@ -15,17 +15,12 @@ const SlideGridItem = ({
   slideIndex,
   masterSlide,
   dimensions,
-  maxHeight = 120,
 }: {
   slide: InternalSlide;
   slideIndex: number;
   masterSlide?: any;
   dimensions: [number, number];
-  maxHeight?: number;
 }) => {
-  const aspectRatio = dimensions[0] / dimensions[1];
-  const width = maxHeight * aspectRatio;
-
   return (
     <div className="flex h-full w-full flex-col items-center gap-2">
       <div className="w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-lg">
