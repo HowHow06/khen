@@ -11,7 +11,7 @@ import { Grid3X3, Pencil, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
-import Preview from "../react-pptx-preview/Preview";
+import VerticalPreview from "../react-pptx-preview/VerticalPreview";
 import { Button } from "../ui/button";
 import MainLyricSection from "./MainLyricSection";
 import SecondaryLyricSection from "./SecondaryLyricSection";
@@ -176,7 +176,7 @@ const GeneratePreviewButton = (props: Props) => {
                 ) : (
                   // NOTE: very important to add scroll area because the default scroll bar will affect the width of the component
                   <ScrollArea className={"px-3"} isFillParent>
-                    <Preview
+                    <VerticalPreview
                       normalizedConfig={previewConfig}
                       drawBoundingBoxes={false}
                     />

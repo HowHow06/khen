@@ -7,7 +7,7 @@ import { getBase64FromString, removeNumbering } from "@/lib/utils";
 import * as React from "react";
 import SlidePreview from "./SlidePreview";
 
-const Preview = (props: {
+const VerticalPreview = (props: {
   children?: React.ReactElement<PresentationProps>;
   slideStyle?: React.CSSProperties;
   drawBoundingBoxes?: boolean;
@@ -90,4 +90,4 @@ const Preview = (props: {
     );
   }
 };
-export default React.memo(Preview);
+export default React.memo(VerticalPreview);
