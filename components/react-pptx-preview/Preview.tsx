@@ -1,81 +1,11 @@
 "use client";
 import { PresentationProps } from "@/lib/react-pptx-preview/nodes";
-import type {
-  InternalMasterSlide,
-  InternalPresentation,
-  InternalSlide,
-} from "@/lib/react-pptx-preview/normalizer";
+import type { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { normalizeJsx } from "@/lib/react-pptx-preview/normalizer";
-import { SlideObjectPreview } from "@/lib/react-pptx-preview/SlideObjectPreview";
-import {
-  layoutToInches,
-  normalizedColorToCSS,
-  useResize,
-} from "@/lib/react-pptx-preview/util";
+import { layoutToInches } from "@/lib/react-pptx-preview/util";
 import { getBase64FromString, removeNumbering } from "@/lib/utils";
 import * as React from "react";
-
-const SlidePreview = ({
-  slide,
-  masterSlide,
-  dimensions,
-  slideStyle,
-  drawBoundingBoxes,
-}: {
-  slide: InternalSlide;
-  masterSlide?: InternalMasterSlide;
-  dimensions: [number, number];
-  slideStyle?: React.CSSProperties;
-  drawBoundingBoxes: boolean;
-}) => {
-  const ref = React.useRef<HTMLDivElement>(null);
-  const { width } = useResize(ref);
-
-  const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
-  const backgroundImage = slide.backgroundImage ?? masterSlide?.backgroundImage;
-
-  return (
-    <div
-      ref={ref}
-      className="ring-1 ring-inset"
-      style={{
-        width: "100%",
-        height: width / (dimensions[0] / dimensions[1]),
-        backgroundColor: backgroundColor
-          ? normalizedColorToCSS(backgroundColor)
-          : "white",
-        backgroundImage:
-          backgroundImage && backgroundImage?.kind === "path"
-            ? `url("${backgroundImage.path}")`
-            : backgroundImage?.data
-              ? `url("data:${backgroundImage?.data}")`
-              : undefined,
-        backgroundSize: "contain",
-        position: "relative",
-        ...slideStyle,
-      }}
-    >
-      {masterSlide?.objects?.map((o, i) => (
-        <SlideObjectPreview
-          key={i}
-          object={o}
-          dimensions={dimensions}
-          slideWidth={width}
-          drawBoundingBoxes={drawBoundingBoxes}
-        />
-      ))}
-      {slide.objects.map((o, i) => (
-        <SlideObjectPreview
-          key={i}
-          object={o}
-          dimensions={dimensions}
-          slideWidth={width}
-          drawBoundingBoxes={drawBoundingBoxes}
-        />
-      ))}
-    </div>
-  );
-};
+import SlidePreview from "./SlidePreview";
 
 const Preview = (props: {
   children?: React.ReactElement<PresentationProps>;
