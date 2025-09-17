@@ -55,7 +55,13 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         scrollPreviewToCursorPosition(newText, selectionStart);
       }
     },
-    [mainText, saveToUndoStack, setMainText, scrollPreviewToCursorPosition, isExtraSmallScreen],
+    [
+      mainText,
+      saveToUndoStack,
+      setMainText,
+      scrollPreviewToCursorPosition,
+      isExtraSmallScreen,
+    ],
   );
 
   const setMainTextForSectionInsertion = useCallback(
