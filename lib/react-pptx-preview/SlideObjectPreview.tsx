@@ -9,7 +9,11 @@ import type {
 } from "@/lib/react-pptx-preview/normalizer";
 import { POINTS_TO_INCHES } from "@/lib/react-pptx-preview/util";
 import * as React from "react";
-import { calculatePercentage, normalizedColorToCSS, normalizeBorderToCSS } from "./utils";
+import {
+  calculatePercentage,
+  normalizeBorderToCSS,
+  normalizedColorToCSS,
+} from "./util";
 
 const SlideObjectShape = ({ shape }: { shape: InternalShape }) => {
   const baseStyle = {
@@ -237,9 +241,7 @@ const TextPreview = ({
   return <div>{children}</div>;
 };
 
-const constrainObjectFit = (
-  sizing: any,
-): "contain" | "cover" | undefined => {
+const constrainObjectFit = (sizing: any): "contain" | "cover" | undefined => {
   const fit = sizing?.fit;
   if (fit === "contain" || fit === "cover") {
     return fit;
