@@ -3,6 +3,68 @@ import ReactIs from "react-is";
 import { isReactPPTXComponent } from "./nodes";
 import { InternalPresentation } from "./normalizer";
 
+import type {
+  ComplexColor,
+  HexColor,
+} from "@/lib/react-pptx-preview/normalizer";
+
+/**
+ * Converts normalized color objects to CSS color strings
+ */
+export const normalizedColorToCSS = (
+  color: HexColor | ComplexColor,
+): string => {
+  if (typeof color === "string") {
+    return color.startsWith("#") ? color : `#${color}`;
+  } else {
+    const r = parseInt(color.color.substring(0, 2), 16);
+    const g = parseInt(color.color.substring(2, 4), 16);
+    const b = parseInt(color.color.substring(4, 6), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${1 - color.alpha / 100})`;
+  }
+};
+
+/**
+ * Calculates percentage value for positioning and sizing
+ */
+export const calculatePercentage = (value: any, total: number): number =>
+  typeof value === "number" ? (value / total) * 100 : parseInt(value, 10);
+
+/**
+ * Hook to track element resize and return width/height
+ */
+export const useResize = (myRef: React.RefObject<HTMLElement>) => {
+  const [width, setWidth] = React.useState(0);
+  const [height, setHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (myRef.current) {
+        setWidth(myRef.current.offsetWidth);
+        setHeight(myRef.current.offsetHeight);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [myRef]);
+
+  return { width, height };
+};
+
+/**
+ * Utility for normalizing border styles in tables
+ */
+export const normalizeBorderToCSS = (style: any) =>
+  `${style.borderWidth ?? 0}px solid ${
+    style.borderColor ? normalizedColorToCSS(style.borderColor) : "transparent"
+  }`;
+
 export const POINTS_TO_INCHES = 1 / 72;
 
 export const layoutToInches = (
