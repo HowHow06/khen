@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   IMPORTED_SETTING_TYPE,
   MAIN_SECTION_NAME,
@@ -37,8 +38,8 @@ import {
   getJSONFromFile,
   getSettingTypeFromJSON,
 } from "@/lib/utils";
-import { MoreHorizontal } from "lucide-react";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChevronDown, ChevronUp, MoreHorizontal, Type, X } from "lucide-react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type Props = {
@@ -59,12 +60,54 @@ const MoreOptionsDropdown = ({
   const [fontFileName, setFontFileName] = useState("");
   const [fontFamilyName, setFontFamilyName] = useState("");
   const [pendingFontFile, setPendingFontFile] = useState<File | null>(null);
+  const [importedFonts, setImportedFonts] = useState<string[]>([]);
+  const [isFontIndicatorCollapsed, setIsFontIndicatorCollapsed] =
+    useState(false);
   const isTouchDevice = getIsTouchDevice();
 
   const {
     promptToGetFullSettingsImportOptions,
     promptToGetSettingsExportOptions,
   } = usePromptImportSettings();
+
+  // Sync imported fonts from DOM on mount and whenever needed
+  useEffect(() => {
+    const syncFontsFromDOM = () => {
+      const styleElements = document.querySelectorAll(
+        'style[id^="custom-font-"]',
+      );
+      const fonts: string[] = [];
+
+      styleElements.forEach((style) => {
+        const styleId = style.id;
+        // Extract font name from style content
+        const content = style.textContent || "";
+        const match = content.match(/font-family:\s*"([^"]+)"/);
+        if (match && match[1]) {
+          fonts.push(match[1]);
+        }
+      });
+
+      setImportedFonts(fonts);
+    };
+
+    // Sync on mount
+    syncFontsFromDOM();
+
+    // Optional: Set up a MutationObserver to watch for style tag changes
+    const observer = new MutationObserver(() => {
+      syncFontsFromDOM();
+    });
+
+    observer.observe(document.head, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -164,6 +207,14 @@ const MoreOptionsDropdown = ({
           `Font "${fontFamilyName}" imported successfully! You can now use it in your settings.`,
         );
 
+        // Add to imported fonts list
+        setImportedFonts((prev) => {
+          if (!prev.includes(fontFamilyName)) {
+            return [...prev, fontFamilyName];
+          }
+          return prev;
+        });
+
         // Close modal and reset state
         setIsFontModalOpen(false);
         setPendingFontFile(null);
@@ -187,6 +238,19 @@ const MoreOptionsDropdown = ({
     setPendingFontFile(null);
     setFontFamilyName("");
     setFontFileName("");
+  };
+
+  const handleRemoveFont = (fontName: string) => {
+    // Remove the style tag
+    const styleId = `custom-font-${fontName.replace(/\s+/g, "-").toLowerCase()}`;
+    const existingStyle = document.getElementById(styleId);
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+
+    // Remove from imported fonts list
+    setImportedFonts((prev) => prev.filter((font) => font !== fontName));
+    toast.success(`Font "${fontName}" removed.`);
   };
 
   const applyFullSettings = ({
@@ -438,6 +502,55 @@ const MoreOptionsDropdown = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Floating Custom Fonts Indicator */}
+      {importedFonts.length > 0 && (
+        <div className="fixed bottom-4 right-4 z-50 w-64 rounded-lg border bg-background shadow-lg">
+          <div
+            className="flex cursor-pointer items-center justify-between border-b p-3"
+            onClick={() =>
+              setIsFontIndicatorCollapsed(!isFontIndicatorCollapsed)
+            }
+          >
+            <div className="flex items-center gap-2">
+              <Type className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold">
+                Custom Fonts ({importedFonts.length})
+              </span>
+            </div>
+            {isFontIndicatorCollapsed ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </div>
+          {!isFontIndicatorCollapsed && (
+            <ScrollArea className="max-h-48 p-2">
+              <div className="space-y-1">
+                {importedFonts.map((fontName) => (
+                  <div
+                    key={fontName}
+                    className="flex items-center justify-between rounded-md bg-muted/50 px-2 py-1.5 text-xs hover:bg-muted"
+                  >
+                    <span className="truncate font-medium">{fontName}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-5 w-5 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFont(fontName);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
+      )}
     </>
   );
 };
