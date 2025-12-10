@@ -14,6 +14,9 @@ Creating PowerPoint presentations for each praise and worship session can be dau
 
 ## 🚀 Getting Started
 
+
+**Note**: This project is using Node.js version **18.20.2**. Recommended compatible versions are **18.17.0+** or **20.3.0+** (as required by Next.js 14).
+
 Setting up Khen is straightforward, ensuring you can get up and running with minimal fuss:
 
 1. **Clone the Repository**
