@@ -110,6 +110,7 @@ const renderInputField = (
         notFoundLabel="Font not found."
         defaultLabel="Select font..."
         className="col-span-6 w-full text-xs"
+        allowAddNew={true}
       />
     );
   }

@@ -1,11 +1,21 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   IMPORTED_SETTING_TYPE,
   MAIN_SECTION_NAME,
@@ -41,9 +51,14 @@ const MoreOptionsDropdown = ({
   currentSectionName,
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fontFileInputRef = useRef<HTMLInputElement>(null);
   const { form, settingsValues } = usePptGeneratorFormContext();
   const { reset } = form;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+  const [fontFileName, setFontFileName] = useState("");
+  const [fontFamilyName, setFontFamilyName] = useState("");
+  const [pendingFontFile, setPendingFontFile] = useState<File | null>(null);
   const isTouchDevice = getIsTouchDevice();
 
   const {
@@ -53,6 +68,125 @@ const MoreOptionsDropdown = ({
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleImportFontClick = () => {
+    fontFileInputRef.current?.click();
+  };
+
+  const handleFontFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (!file) {
+      return;
+    }
+
+    // Check if file is a font file
+    const validFontTypes = [
+      "font/woff",
+      "font/woff2",
+      "font/ttf",
+      "font/otf",
+      "application/x-font-woff",
+      "application/x-font-woff2",
+      "application/x-font-ttf",
+      "application/x-font-otf",
+      "application/font-woff",
+      "application/font-woff2",
+    ];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    const validExtensions = ["woff", "woff2", "ttf", "otf"];
+
+    if (
+      !validExtensions.includes(fileExtension || "") &&
+      !validFontTypes.includes(file.type)
+    ) {
+      toast.error(
+        "Invalid font file format. Please use .woff, .woff2, .ttf, or .otf files.",
+      );
+      event.target.value = "";
+      return;
+    }
+
+    // Store file and show modal for font name input
+    setPendingFontFile(file);
+    const defaultFontName = file.name.replace(/\.(woff2?|ttf|otf)$/i, "");
+    setFontFileName(file.name);
+    setFontFamilyName(defaultFontName);
+    setIsFontModalOpen(true);
+
+    event.target.value = "";
+  };
+
+  const handleFontImportConfirm = async () => {
+    if (!pendingFontFile || !fontFamilyName.trim()) {
+      toast.warning("Please enter a font family name.");
+      return;
+    }
+
+    const file = pendingFontFile;
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+
+    try {
+      // Read file as data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+
+        // Determine font format
+        let format = "woff2";
+        if (fileExtension === "woff") format = "woff";
+        else if (fileExtension === "ttf") format = "truetype";
+        else if (fileExtension === "otf") format = "opentype";
+
+        // Create and inject @font-face CSS
+        const styleId = `custom-font-${fontFamilyName.replace(/\s+/g, "-").toLowerCase()}`;
+
+        // Remove existing style tag if font already exists
+        const existingStyle = document.getElementById(styleId);
+        if (existingStyle) {
+          existingStyle.remove();
+        }
+
+        const style = document.createElement("style");
+        style.id = styleId;
+        style.textContent = `
+          @font-face {
+            font-family: "${fontFamilyName}";
+            src: url("${dataUrl}") format("${format}");
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+          }
+        `;
+        document.head.appendChild(style);
+
+        toast.success(
+          `Font "${fontFamilyName}" imported successfully! You can now use it in your settings.`,
+        );
+
+        // Close modal and reset state
+        setIsFontModalOpen(false);
+        setPendingFontFile(null);
+        setFontFamilyName("");
+        setFontFileName("");
+      };
+
+      reader.onerror = () => {
+        toast.error("Error reading font file.");
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error importing font:", error);
+      toast.error("Failed to import font.");
+    }
+  };
+
+  const handleFontModalCancel = () => {
+    setIsFontModalOpen(false);
+    setPendingFontFile(null);
+    setFontFamilyName("");
+    setFontFileName("");
   };
 
   const applyFullSettings = ({
@@ -205,7 +339,6 @@ const MoreOptionsDropdown = ({
 
   return (
     <>
-      {" "}
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <div className="flex flex-grow flex-row">
           {/* Bug in scrolling, refer to https://github.com/radix-ui/primitives/issues/2418#issuecomment-1926605763 */}
@@ -230,6 +363,9 @@ const MoreOptionsDropdown = ({
           <DropdownMenuItem onSelect={handleExportClick}>
             Export Settings
           </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleImportFontClick}>
+            Import Custom Font
+          </DropdownMenuItem>
         </DropdownMenuContent>
         {/* Hidden file input for importing settings */}
         <input
@@ -239,7 +375,69 @@ const MoreOptionsDropdown = ({
           style={{ display: "none" }}
           accept=".json"
         />
+        {/* Hidden file input for importing custom fonts */}
+        <input
+          type="file"
+          ref={fontFileInputRef}
+          onChange={handleFontFileChange}
+          style={{ display: "none" }}
+          accept=".woff,.woff2,.ttf,.otf"
+        />
       </DropdownMenu>
+
+      {/* Custom Font Name Modal */}
+      <Dialog open={isFontModalOpen} onOpenChange={setIsFontModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Custom Font</DialogTitle>
+            <DialogDescription>
+              Enter a name for the font family to use in your settings.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="font-file-name">Font File</Label>
+              <Input
+                id="font-file-name"
+                value={fontFileName}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="font-family-name">
+                Font Family Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="font-family-name"
+                value={fontFamilyName}
+                onChange={(e) => setFontFamilyName(e.target.value)}
+                placeholder="e.g., 'Montserrat', 'Custom Handwriting'"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleFontImportConfirm();
+                  }
+                }}
+              />
+              <p className="text-xs text-muted-foreground">
+                This is the name you&apos;ll use in your PPT settings to apply
+                this font.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleFontModalCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleFontImportConfirm}
+              disabled={!fontFamilyName.trim()}
+            >
+              Import Font
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

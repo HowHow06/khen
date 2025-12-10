@@ -28,6 +28,7 @@ export type ComboxBoxProps = {
   hasNoSearch?: boolean;
   onItemSelect?: (value: string) => void;
   allowDeselect?: boolean;
+  allowAddNew?: boolean;
 };
 
 export function Combobox({
@@ -39,8 +40,15 @@ export function Combobox({
   hasNoSearch = false,
   onItemSelect = () => {},
   allowDeselect = false,
+  allowAddNew = false,
 }: ComboxBoxProps) {
   const [open, setOpen] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [itemsList, setItemsList] = React.useState(items);
+
+  React.useEffect(() => {
+    setItemsList(items);
+  }, [items]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +60,7 @@ export function Combobox({
           className={cn("w-[200px] justify-between", className)}
         >
           {selectedValue
-            ? items.find(
+            ? itemsList.find(
                 (item) =>
                   item.value.toLowerCase() === selectedValue.toLowerCase(),
               )?.label
@@ -64,12 +72,36 @@ export function Combobox({
         <Command>
           {!hasNoSearch && (
             <>
-              <CommandInput placeholder={defaultLabel} />
-              <CommandEmpty>{notFoundLabel}</CommandEmpty>
+              <CommandInput
+                placeholder={defaultLabel}
+                value={searchValue}
+                onValueChange={setSearchValue}
+              />
+              <CommandEmpty>
+                {allowAddNew && searchValue.trim() ? (
+                  <div
+                    className="cursor-pointer px-2 py-1.5 text-sm hover:bg-accent"
+                    onClick={() => {
+                      const newItem = {
+                        value: searchValue.trim(),
+                        label: searchValue.trim(),
+                      };
+                      setItemsList([...itemsList, newItem]);
+                      onItemSelect(searchValue.trim());
+                      setSearchValue("");
+                      setOpen(false);
+                    }}
+                  >
+                    Add &quot;{searchValue.trim()}&quot;
+                  </div>
+                ) : (
+                  notFoundLabel
+                )}
+              </CommandEmpty>
             </>
           )}
           <CommandGroup className="max-h-56">
-            {items.map((item) => (
+            {itemsList.map((item) => (
               <CommandItem
                 key={item.value}
                 value={item.value}
