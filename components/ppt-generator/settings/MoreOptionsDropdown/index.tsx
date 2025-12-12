@@ -22,6 +22,7 @@ import {
   MAIN_SECTION_NAME,
   SETTING_CATEGORY,
 } from "@/lib/constant";
+import { useCustomFonts } from "@/lib/hooks/use-custom-fonts";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import {
   PptSettingsStateType,
@@ -38,7 +39,6 @@ import {
   getJSONFromFile,
   getSettingTypeFromJSON,
 } from "@/lib/utils";
-import { useCustomFonts } from "@/lib/hooks/use-custom-fonts";
 import { ChevronDown, ChevronUp, MoreHorizontal, Type, X } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

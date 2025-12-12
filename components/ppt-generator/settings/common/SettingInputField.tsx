@@ -12,8 +12,12 @@ import {
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useCustomFonts } from "@/lib/hooks/use-custom-fonts";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import { BaseSettingItemMetaType, ScreenSizeType, SelectionItemsType } from "@/lib/types";
-import { ReactNode, useMemo } from "react";
+import {
+  BaseSettingItemMetaType,
+  ScreenSizeType,
+  SelectionItemsType,
+} from "@/lib/types";
+import { ReactNode } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import ImageSelectDropdown from "./ImageSelectDropdown";
@@ -183,7 +187,9 @@ const SettingInputField = ({
   const screenSize = useScreenSize();
   const customFonts = useCustomFonts();
 
-  return <>{renderInputField(settingItemMeta, field, screenSize, customFonts)}</>;
+  return (
+    <>{renderInputField(settingItemMeta, field, screenSize, customFonts)}</>
+  );
 };
 
 export default SettingInputField;
