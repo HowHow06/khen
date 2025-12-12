@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -77,30 +77,28 @@ export function Combobox({
                 value={searchValue}
                 onValueChange={setSearchValue}
               />
-              <CommandEmpty>
-                {allowAddNew && searchValue.trim() ? (
-                  <div
-                    className="cursor-pointer px-2 py-1.5 text-sm hover:bg-accent"
-                    onClick={() => {
-                      const newItem = {
-                        value: searchValue.trim(),
-                        label: searchValue.trim(),
-                      };
-                      setItemsList([...itemsList, newItem]);
-                      onItemSelect(searchValue.trim());
-                      setSearchValue("");
-                      setOpen(false);
-                    }}
-                  >
-                    Add &quot;{searchValue.trim()}&quot;
-                  </div>
-                ) : (
-                  notFoundLabel
-                )}
-              </CommandEmpty>
+              <CommandEmpty>{notFoundLabel}</CommandEmpty>
             </>
           )}
           <CommandGroup className="max-h-56">
+            {allowAddNew && searchValue.trim() && (
+              <CommandItem
+                value={`__add_new__${searchValue.trim()}`}
+                onSelect={() => {
+                  const newItem = {
+                    value: searchValue.trim(),
+                    label: searchValue.trim(),
+                  };
+                  setItemsList([...itemsList, newItem]);
+                  onItemSelect(searchValue.trim());
+                  setSearchValue("");
+                  setOpen(false);
+                }}
+                className="font-semibold text-primary"
+              >
+                Add &quot;{searchValue.trim()}&quot;
+              </CommandItem>
+            )}
             {itemsList.map((item) => (
               <CommandItem
                 key={item.value}
@@ -116,14 +114,6 @@ export function Combobox({
                   setOpen(false);
                 }}
               >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    selectedValue.toLowerCase() === item.value.toLowerCase()
-                      ? "opacity-100"
-                      : "opacity-0",
-                  )}
-                />
                 {item.label}
               </CommandItem>
             ))}
