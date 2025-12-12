@@ -50,6 +50,22 @@ export function Combobox({
     setItemsList(items);
   }, [items]);
 
+  // Add selected value to list if it's not already present (custom value)
+  React.useEffect(() => {
+    if (selectedValue && allowAddNew) {
+      const isValueInList = itemsList.some(
+        (item) => item.value.toLowerCase() === selectedValue.toLowerCase(),
+      );
+
+      if (!isValueInList) {
+        setItemsList((prev) => [
+          ...prev,
+          { value: selectedValue, label: selectedValue },
+        ]);
+      }
+    }
+  }, [selectedValue, allowAddNew, itemsList]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
