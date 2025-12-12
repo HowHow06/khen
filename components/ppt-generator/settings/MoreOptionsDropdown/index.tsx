@@ -38,6 +38,7 @@ import {
   getJSONFromFile,
   getSettingTypeFromJSON,
 } from "@/lib/utils";
+import { useCustomFonts } from "@/lib/hooks/use-custom-fonts";
 import { ChevronDown, ChevronUp, MoreHorizontal, Type, X } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -70,44 +71,13 @@ const MoreOptionsDropdown = ({
     promptToGetSettingsExportOptions,
   } = usePromptImportSettings();
 
-  // Sync imported fonts from DOM on mount and whenever needed
+  // Use custom hook to sync imported fonts from DOM
+  const customFonts = useCustomFonts();
+
+  // Update local state when custom fonts change
   useEffect(() => {
-    const syncFontsFromDOM = () => {
-      const styleElements = document.querySelectorAll(
-        'style[id^="custom-font-"]',
-      );
-      const fonts: string[] = [];
-
-      styleElements.forEach((style) => {
-        const styleId = style.id;
-        // Extract font name from style content
-        const content = style.textContent || "";
-        const match = content.match(/font-family:\s*"([^"]+)"/);
-        if (match && match[1]) {
-          fonts.push(match[1]);
-        }
-      });
-
-      setImportedFonts(fonts);
-    };
-
-    // Sync on mount
-    syncFontsFromDOM();
-
-    // Optional: Set up a MutationObserver to watch for style tag changes
-    const observer = new MutationObserver(() => {
-      syncFontsFromDOM();
-    });
-
-    observer.observe(document.head, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+    setImportedFonts(customFonts);
+  }, [customFonts]);
 
   const handleImportClick = () => {
     fileInputRef.current?.click();

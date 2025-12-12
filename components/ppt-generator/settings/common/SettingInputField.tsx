@@ -10,9 +10,10 @@ import {
   SHADOW_TYPE_ITEMS,
 } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
+import { useCustomFonts } from "@/lib/hooks/use-custom-fonts";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import { BaseSettingItemMetaType, ScreenSizeType } from "@/lib/types";
-import { ReactNode } from "react";
+import { BaseSettingItemMetaType, ScreenSizeType, SelectionItemsType } from "@/lib/types";
+import { ReactNode, useMemo } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import ImageSelectDropdown from "./ImageSelectDropdown";
@@ -26,6 +27,7 @@ const renderInputField = (
   settingItemMeta: BaseSettingItemMetaType,
   field: ControllerRenderProps<FieldValues, string>,
   screenSize: ScreenSizeType,
+  customFonts: string[],
 ): ReactNode => {
   if (settingItemMeta.fieldType === "boolean") {
     return <Switch checked={field.value} onCheckedChange={field.onChange} />;
@@ -102,15 +104,22 @@ const renderInputField = (
   }
 
   if (settingItemMeta.fieldType === "font") {
+    // Combine default fonts with custom imported fonts
+    const customFontItems: SelectionItemsType = customFonts.map((font) => ({
+      value: font,
+      label: `${font} (Custom)`,
+    }));
+
+    const allFontItems = [...FONT_FACES_ITEMS, ...customFontItems];
+
     return (
       <Combobox
-        items={FONT_FACES_ITEMS}
+        items={allFontItems}
         selectedValue={field.value}
         onItemSelect={field.onChange}
         notFoundLabel="Font not found."
         defaultLabel="Select font..."
         className="col-span-6 w-full text-xs"
-        allowAddNew={true}
       />
     );
   }
@@ -172,8 +181,9 @@ const SettingInputField = ({
   field,
 }: SettingInputFieldProps) => {
   const screenSize = useScreenSize();
+  const customFonts = useCustomFonts();
 
-  return <>{renderInputField(settingItemMeta, field, screenSize)}</>;
+  return <>{renderInputField(settingItemMeta, field, screenSize, customFonts)}</>;
 };
 
 export default SettingInputField;
