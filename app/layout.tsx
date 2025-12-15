@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   },
   description:
     "A web-based tool suite designed for efficiency and ease of use, featuring a standout PPT Generator tool aimed at simplifying the creation of PowerPoint presentations for church praise and worship songs.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
