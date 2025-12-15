@@ -120,7 +120,7 @@ export const OptionsDialogProvider: React.FC<OptionsDialogProviderProps> = ({
         {/* <DialogTrigger asChild>
         <Button variant="outline">Show Dialog</Button>
       </DialogTrigger> */}
-        <DialogContent className=" w-5/6 sm:max-w-[425px]">
+        <DialogContent className=" w-5/6 sm:max-w-[425px]" aria-describedby={description ? undefined : "no-description"}>
           <DialogHeader>
             <DialogTitle>{message}</DialogTitle>
             {description && (

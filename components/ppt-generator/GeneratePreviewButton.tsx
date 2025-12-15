@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { POPUP_TAB_TYPE } from "@/lib/constant";
@@ -101,7 +101,8 @@ const GeneratePreviewButton = (props: Props) => {
         open={isModalOpen}
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
-        <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]">
+        <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]" aria-describedby={undefined}>
+          <DialogTitle className="sr-only">PPT Preview and Settings</DialogTitle>
           <div
             className={`hidden h-full gap-4 sm:flex ${
               currentTab === POPUP_TAB_TYPE.GRID_VIEW ? "w-full" : "w-3/5"

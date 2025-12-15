@@ -74,7 +74,7 @@ const LyricFormatterDialogButton = (props: Props) => {
       <DialogTrigger asChild>
         <Button variant="outline">Split Lyrics By Language</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[80vw] sm:max-w-[60vw]">
+      <DialogContent className="max-w-[80vw] sm:max-w-[60vw]" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="text-left">
             Multi-languages Lyric Formatter
