@@ -34,7 +34,13 @@ const renderInputField = (
   customFonts: string[],
 ): ReactNode => {
   if (settingItemMeta.fieldType === "boolean") {
-    return <Switch checked={field.value} onCheckedChange={field.onChange} />;
+    return (
+      <Switch
+        checked={field.value}
+        onCheckedChange={field.onChange}
+        disabled={settingItemMeta.isReadOnly}
+      />
+    );
   }
 
   if (settingItemMeta.fieldType === "number") {
@@ -58,6 +64,7 @@ const renderInputField = (
           field.onChange(value);
         }}
         step={settingItemMeta.step}
+        disabled={settingItemMeta.isReadOnly}
       />
     );
   }
@@ -102,6 +109,7 @@ const renderInputField = (
           color={field.value}
           onChange={field.onChange}
           showColorPicker={screenSize !== SCREEN_SIZE.XS}
+          // TODO: implement disabled
         />
       </div>
     );
@@ -124,6 +132,7 @@ const renderInputField = (
         notFoundLabel="Font not found."
         defaultLabel="Select font..."
         className="col-span-6 w-full text-xs"
+        // TODO: implement disabled
       />
     );
   }
@@ -136,6 +145,7 @@ const renderInputField = (
         onItemSelect={field.onChange}
         className="col-span-6 w-full text-xs"
         hasNoSearch
+        // TODO: implement disabled
       />
     );
   }
@@ -148,6 +158,7 @@ const renderInputField = (
         onItemSelect={field.onChange}
         className="col-span-6 w-full text-xs"
         hasNoSearch
+        // TODO: implement disabled
       />
     );
   }
@@ -173,6 +184,17 @@ const renderInputField = (
 
           field.onChange(value);
         }}
+        disabled={settingItemMeta.isReadOnly}
+      />
+    );
+  }
+
+  if (settingItemMeta.fieldType === "text") {
+    return (
+      <Input
+        {...field}
+        className="col-span-2 text-xs"
+        disabled={settingItemMeta.isReadOnly}
       />
     );
   }

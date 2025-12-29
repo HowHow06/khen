@@ -21,6 +21,7 @@ export const onsiteChinesePreset: PptSettingsStateType = {
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
     textboxCountPerContentPerSlide: 2,
+    presetChosen: "onsiteChinesePreset",
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -134,6 +135,7 @@ export const liveChinesePreset: PptSettingsStateType = {
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
     textboxCountPerContentPerSlide: 1,
+    presetChosen: "liveChinesePreset",
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -248,6 +250,7 @@ export const onsiteEnglishPreset: PptSettingsStateType = {
     sectionsAutoNumbering: true,
     textboxCountPerContentPerSlide: 1,
     lineCountPerTextbox: 2,
+    presetChosen: "onsiteEnglishPreset",
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {
@@ -362,6 +365,7 @@ export const liveEnglishPreset: PptSettingsStateType = {
     ignoreSubcontentWhenIdentical: true,
     sectionsAutoNumbering: true,
     textboxCountPerContentPerSlide: 1,
+    presetChosen: "liveEnglishPreset",
   },
   [SETTING_CATEGORY.COVER]: {
     [CONTENT_TYPE.MAIN]: {

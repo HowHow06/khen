@@ -1,7 +1,12 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { DEFAULT_PRESETS } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
@@ -30,6 +35,7 @@ const PptGeneratorSettings = () => {
         open={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
       >
+        <SheetTitle className="sr-only">Settings</SheetTitle>
         <SheetTrigger asChild>
           <Button onClick={toggleSettingSidebar} variant="outline">
             {isSettingsOpen ? "Close" : "Open"} Settings

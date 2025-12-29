@@ -30,6 +30,9 @@ const SettingFormField = ({
   ) {
     return;
   }
+  if (typeof settingField.isHidden === "boolean" && settingField.isHidden) {
+    return;
+  }
 
   if (settingField.isNotAvailable) {
     return;
@@ -59,7 +62,7 @@ const SettingFormField = ({
             {/* <FormDescription className="col-span-6">
                       This is description.
                     </FormDescription> */}
-            <FormMessage className="col-span-6 " />
+            <FormMessage className="col-span-6" />
           </FormItem>
         )}
       />

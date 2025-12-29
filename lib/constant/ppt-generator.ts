@@ -219,6 +219,13 @@ const PPT_GENERATION_SECTION_SETTINGS = {
 } as const;
 
 export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
+  presetChosen: {
+    fieldDisplayName: "Starter Preset",
+    fieldType: SETTING_FIELD_TYPE.TEXT,
+    defaultValue: "asdasd",
+    isReadOnly: true,
+    // isHidden: true,
+  },
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
