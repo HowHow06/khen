@@ -34,7 +34,7 @@ export const calculatePercentage = (value: any, total: number): number =>
 /**
  * Hook to track element resize and return width/height
  */
-export const useResize = (myRef: React.RefObject<HTMLElement>) => {
+export const useResize = (myRef: React.RefObject<HTMLElement | null>) => {
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
 
@@ -107,7 +107,7 @@ export function flattenChildren(
       if (ReactIs.isFragment(node)) {
         acc.push(
           ...flattenChildren(
-            node.props.children,
+            (node.props as any).children,
             keys.concat(node.key || nodeIndex),
           ),
         );
@@ -122,7 +122,7 @@ export function flattenChildren(
           } else {
             // A component that could return/contain react-pptx components,
             // traverse the tree some more
-            let children = node.props.children;
+            let children = (node.props as any).children;
             if (node.type instanceof Function) {
               children = (node.type as React.FunctionComponent<any>)(
                 node.props,

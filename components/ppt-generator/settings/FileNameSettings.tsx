@@ -39,6 +39,7 @@ const FileNameSettings = (props: Props) => {
                 <FormControl>
                   <Input
                     {...field}
+                    value={field.value as string}
                     className="col-span-3 text-sm"
                     type="text"
                     placeholder={

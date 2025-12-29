@@ -167,7 +167,7 @@ export const generatSectionSettingZodSchema = (
   const coverSchema = generateZodSchemaObjectFromSettings({
     settings: settingsMeta.cover,
   });
-  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.object(coverSchema));
+  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.string(), z.object(coverSchema));
 
   // Content section schema-------------------
   const contentSchema = generateZodSchemaObjectFromSettings({
@@ -178,8 +178,8 @@ export const generatSectionSettingZodSchema = (
     settings: settingsMeta.contentTextbox,
   });
 
-  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
-  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.object(contentSchema));
+  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.string(), z.object(textBoxSchema));
+  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.string(), z.object(contentSchema));
 
   return z.object(sectionSchema);
 };
@@ -208,19 +208,19 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       const textBoxSchema = generateZodSchemaObjectFromSettings({
         settings: metaData.contentTextbox,
       });
-      contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.object(textBoxSchema));
-      schemaObject[category] = z.record(z.object(contentSchema));
+      contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.string(), z.object(textBoxSchema));
+      schemaObject[category] = z.record(z.string(), z.object(contentSchema));
     }
 
     if (category === SETTING_CATEGORY.COVER) {
       const coverSchema = generateZodSchemaObjectFromSettings({
         settings,
       });
-      schemaObject[category] = z.record(z.object(coverSchema));
+      schemaObject[category] = z.record(z.string(), z.object(coverSchema));
     }
 
     if (category === SETTING_CATEGORY.SECTION) {
-      schemaObject[category] = z.record(sectionSettingSchema).optional();
+      schemaObject[category] = z.record(z.string(), sectionSettingSchema).optional();
     }
   });
   return z.object(schemaObject);

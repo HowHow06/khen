@@ -259,7 +259,7 @@ export const normalizeText = (t: TextChild): InternalTextPart[] => {
             link = { slide: props.slide, tooltip: props.tooltip };
           }
         }
-        const { children, style, rtlMode, lang } = el.props;
+        const { children, style, rtlMode, lang } = el.props as any;
         return textParts.concat({
           text: children,
           rtlMode,
@@ -309,11 +309,12 @@ const normalizeTextType = (
   node: React.ReactElement,
   normalizedCoordinates: Record<string, `${number}%` | number>,
 ) => {
-  const style = node.props.style;
+  const props = node.props as any;
+  const style = props.style;
   return {
     text:
-      node.props.children !== undefined
-        ? normalizeText(node.props.children)
+      props.children !== undefined
+        ? normalizeText(props.children)
         : [],
     style: {
       ...style,

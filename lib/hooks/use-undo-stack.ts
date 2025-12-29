@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useEffect, useState } from "react";
 
 type Props<T> = {
-  ref: RefObject<HTMLElement>; // Accept a generic ref to an HTML element
+  ref: RefObject<HTMLElement | null>; // Accept a generic ref to an HTML element
   onTextUpdate: (text: T) => void;
   textValue: T;
   disableShortcut?: boolean;

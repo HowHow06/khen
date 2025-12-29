@@ -12,7 +12,7 @@ const VerticalPreview = (props: {
   slideStyle?: React.CSSProperties;
   drawBoundingBoxes?: boolean;
   normalizedConfig?: InternalPresentation;
-}): JSX.Element | null => {
+}): React.JSX.Element | null => {
   if (!props.children && !props.normalizedConfig) {
     return null;
   }

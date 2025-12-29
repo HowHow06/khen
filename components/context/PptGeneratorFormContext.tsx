@@ -95,9 +95,10 @@ export const PptGeneratorFormProvider: React.FC<
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof settingsSchema>) => {
+      const submittedValues = values as PptSettingsStateType;
       const {
         general: { ignoreSubcontent, useDifferentSettingForEachSection },
-      } = values;
+      } = submittedValues;
       const primaryLinesArray = mainText.split("\n");
       const secondaryLinesArray = secondaryText.split("\n");
       const shouldIgnoreSubcontent =
@@ -116,9 +117,8 @@ export const PptGeneratorFormProvider: React.FC<
       }
 
       if (process.env.NODE_ENV === "development") {
-        const submittedValue = values as PptSettingsStateType;
         console.log("Submitted Value:", {
-          submittedValue,
+          submittedValues,
           mainText,
           secondaryText,
         });
@@ -126,7 +126,7 @@ export const PptGeneratorFormProvider: React.FC<
 
       clearMappings();
       generatePpt({
-        settingValues: values as PptSettingsStateType,
+        settingValues: submittedValues,
         primaryLyric: mainText || "",
         secondaryLyric: secondaryText,
         lineMapper,
