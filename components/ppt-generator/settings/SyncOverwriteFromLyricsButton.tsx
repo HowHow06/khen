@@ -41,7 +41,7 @@ const SyncOverwriteFromLyricsButton = () => {
 
   return (
     <TooltipButton
-      tooltipText="Sync settings from lyrics overwrites"
+      tooltipText="Sync settings from lyrics overwrites, will strip away the existing lyrics overwrites after sync"
       variant="ghost"
       size="icon"
       type="button"
