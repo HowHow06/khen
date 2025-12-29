@@ -167,7 +167,10 @@ export const generatSectionSettingZodSchema = (
   const coverSchema = generateZodSchemaObjectFromSettings({
     settings: settingsMeta.cover,
   });
-  sectionSchema[SETTING_CATEGORY.COVER] = z.record(z.string(), z.object(coverSchema));
+  sectionSchema[SETTING_CATEGORY.COVER] = z.record(
+    z.string(),
+    z.object(coverSchema),
+  );
 
   // Content section schema-------------------
   const contentSchema = generateZodSchemaObjectFromSettings({
@@ -178,8 +181,14 @@ export const generatSectionSettingZodSchema = (
     settings: settingsMeta.contentTextbox,
   });
 
-  contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.string(), z.object(textBoxSchema));
-  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(z.string(), z.object(contentSchema));
+  contentSchema[TEXTBOX_SETTING_KEY] = z.record(
+    z.string(),
+    z.object(textBoxSchema),
+  );
+  sectionSchema[SETTING_CATEGORY.CONTENT] = z.record(
+    z.string(),
+    z.object(contentSchema),
+  );
 
   return z.object(sectionSchema);
 };
@@ -208,7 +217,10 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
       const textBoxSchema = generateZodSchemaObjectFromSettings({
         settings: metaData.contentTextbox,
       });
-      contentSchema[TEXTBOX_SETTING_KEY] = z.record(z.string(), z.object(textBoxSchema));
+      contentSchema[TEXTBOX_SETTING_KEY] = z.record(
+        z.string(),
+        z.object(textBoxSchema),
+      );
       schemaObject[category] = z.record(z.string(), z.object(contentSchema));
     }
 
@@ -220,7 +232,9 @@ const generateSettingZodSchema = (metaData: PptGenerationSettingMetaType) => {
     }
 
     if (category === SETTING_CATEGORY.SECTION) {
-      schemaObject[category] = z.record(z.string(), sectionSettingSchema).optional();
+      schemaObject[category] = z
+        .record(z.string(), sectionSettingSchema)
+        .optional();
     }
   });
   return z.object(schemaObject);

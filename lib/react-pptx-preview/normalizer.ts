@@ -312,10 +312,7 @@ const normalizeTextType = (
   const props = node.props as any;
   const style = props.style;
   return {
-    text:
-      props.children !== undefined
-        ? normalizeText(props.children)
-        : [],
+    text: props.children !== undefined ? normalizeText(props.children) : [],
     style: {
       ...style,
       ...normalizedCoordinates,

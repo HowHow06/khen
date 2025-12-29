@@ -50,7 +50,7 @@ const FileNameSettings = (props: Props) => {
                     }
                   />
                 </FormControl>
-                <FormMessage className="col-span-6 " />
+                <FormMessage className="col-span-6" />
               </FormItem>
             )}
           />
