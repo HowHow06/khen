@@ -130,6 +130,11 @@ export const PPT_GENERATION_FILE_SETTINGS = {
 } as const;
 
 const PPT_GENERATION_GENERAL_SETTINGS = {
+  autoOutputOverwrite: {
+    fieldDisplayName: "Add Overwrite Syntax to Lyrics Automatically",
+    fieldType: SETTING_FIELD_TYPE.BOOLEAN,
+    defaultValue: false,
+  },
   mainBackgroundImage: {
     fieldDisplayName: "Main Background Image",
     fieldType: SETTING_FIELD_TYPE.IMAGE,
@@ -224,7 +229,8 @@ export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.TEXT,
     defaultValue: "asdasd",
     isReadOnly: true,
-    // isHidden: true,
+    tips: "This field is needed for inline overwrite, we need to know the base preset to apply the overwrites correctly.",
+    isHidden: true,
   },
   useBackgroundColorWhenEmpty: {
     fieldDisplayName: "Use Background Color for Empty Slides",

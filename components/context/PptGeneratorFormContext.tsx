@@ -1,6 +1,7 @@
 "use client";
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
+import useAutoOutputOverwrite from "@/lib/hooks/use-auto-output-overwrite";
 import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
 import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dynamic-textbox-count";
 import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
@@ -90,6 +91,7 @@ export const PptGeneratorFormProvider: React.FC<
       formReset: form.reset,
     });
   usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
+  useAutoOutputOverwrite({ settingsValues, mainText, setMainText });
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof settingsSchema>) => {
