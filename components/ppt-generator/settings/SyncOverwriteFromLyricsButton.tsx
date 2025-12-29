@@ -1,14 +1,17 @@
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import TooltipButton from "@/components/ui/tooltip-button";
 import { PptSettingsStateType } from "@/lib/types";
-import { parseAllOverwritesFromLyrics } from "@/lib/utils/ppt-generator/lyrics-overwrite";
+import {
+  parseAllOverwritesFromLyrics,
+  removeAllOverwritesFromLyrics,
+} from "@/lib/utils/ppt-generator/lyrics-overwrite";
 import { mergeOverwritesWithSettings } from "@/lib/utils/ppt-generator/settings-diff";
 import { RefreshCcw } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
 const SyncOverwriteFromLyricsButton = () => {
-  const { form, mainText } = usePptGeneratorFormContext();
+  const { form, mainText, setMainText } = usePptGeneratorFormContext();
   const { reset, getValues } = form;
 
   const handleSync = useCallback(() => {
@@ -36,12 +39,17 @@ const SyncOverwriteFromLyricsButton = () => {
     console.log("mergedSettings", mergedSettings);
 
     reset(mergedSettings);
+
+    // Remove overwrites from lyrics after syncing
+    const strippedLyrics = removeAllOverwritesFromLyrics(mainText);
+    setMainText(strippedLyrics);
+
     toast.success("Settings synced from lyrics overwrites");
-  }, [mainText, getValues, reset]);
+  }, [mainText, getValues, reset, setMainText]);
 
   return (
     <TooltipButton
-      tooltipText="Sync settings from lyrics overwrites, will strip away the existing lyrics overwrites after sync"
+      tooltipText="Sync settings from lyrics overwrites, will remove away the existing lyrics overwrites after sync"
       variant="ghost"
       size="icon"
       type="button"
