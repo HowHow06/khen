@@ -102,7 +102,11 @@ export function insertOrUpdateSectionOverwritesInLyrics(
     const currentLine = lines[i];
 
     // If we haven't seen a section yet and this is a JSON line, it's a global overwrite to replace
-    if (!hasInsertedGlobalOverwrite && sectionNumber === 0 && isOverwriteJsonLine(currentLine)) {
+    if (
+      !hasInsertedGlobalOverwrite &&
+      sectionNumber === 0 &&
+      isOverwriteJsonLine(currentLine)
+    ) {
       // Skip the old global overwrite line
       i++;
       continue;
@@ -111,7 +115,11 @@ export function insertOrUpdateSectionOverwritesInLyrics(
     // Check if this is a section header
     if (isSectionHeader(currentLine)) {
       // Insert global overwrite before the first section
-      if (!hasInsertedGlobalOverwrite && sectionNumber === 0 && globalOverwriteJson) {
+      if (
+        !hasInsertedGlobalOverwrite &&
+        sectionNumber === 0 &&
+        globalOverwriteJson
+      ) {
         resultLines.push(globalOverwriteJson);
         hasInsertedGlobalOverwrite = true;
       }
