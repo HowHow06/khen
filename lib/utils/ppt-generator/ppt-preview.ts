@@ -12,6 +12,8 @@ import {
 } from "@/lib/types/pptxgenjs/core-interfaces";
 import { createPptInstance } from "@/lib/utils";
 import { LineToSlideMapper } from "./line-to-slide-mapper";
+import { removeAllOverwritesFromLyrics } from "./lyrics-overwrite";
+import { mergeOverwritesFromLyrics } from "./settings-diff";
 
 const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
   if (prop.data) {
@@ -84,13 +86,20 @@ export const generatePreviewConfig = async ({
   secondaryLyric: string;
   lineMapper?: LineToSlideMapper;
 }): Promise<InternalPresentation> => {
+  // Merge inline overwrites from lyrics with settings
+  const mergedSettings = mergeOverwritesFromLyrics(settingValues, primaryLyric);
+
+  // Strip overwrite JSON lines from lyrics before processing
+  const strippedPrimaryLyric = removeAllOverwritesFromLyrics(primaryLyric);
+  const strippedSecondaryLyric = removeAllOverwritesFromLyrics(secondaryLyric);
+
   // 1. Get background prop for the presentation
   // 2. Create a new Presentation instance
   // 3. Create Slides in the Presentation
   const { pres } = await createPptInstance({
-    settingValues,
-    primaryLyric,
-    secondaryLyric,
+    settingValues: mergedSettings,
+    primaryLyric: strippedPrimaryLyric,
+    secondaryLyric: strippedSecondaryLyric,
     lineMapper,
   });
 

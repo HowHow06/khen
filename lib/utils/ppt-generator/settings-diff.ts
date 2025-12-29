@@ -5,8 +5,14 @@ import {
 } from "@/lib/types";
 import {
   combineWithDefaultSettings,
+  deepCopy,
+  deepMerge,
   generateSectionSettingsFromFullSettings,
 } from "@/lib/utils";
+import {
+  ParsedLyricsOverwrites,
+  parseAllOverwritesFromLyrics,
+} from "./lyrics-overwrite";
 import { getPreset } from "./settings-generator";
 
 // Fields to ignore when computing the diff (e.g., image fields, internal fields)
@@ -106,6 +112,13 @@ export function getGlobalSettingsOverwrite(
     }
   }
 
+  if (Object.keys(globalOverwrite).length !== 0) {
+    return (globalOverwrite.general = {
+      ...globalOverwrite.general,
+      presetChosen: presetName,
+    });
+  }
+
   return globalOverwrite;
 }
 
@@ -137,21 +150,8 @@ export function getSettingsOverwrite(
 
   const diff = computeDiff(settingsToCompare, presetToCompare);
 
-  // Always include the preset name in the overwrite
-  if (diff) {
-    diff.general = {
-      ...diff.general,
-      presetChosen: presetName,
-    };
-    return diff;
-  }
-
   // Even if no diff, return the preset name
-  return {
-    general: {
-      presetChosen: presetName,
-    },
-  };
+  return diff;
 }
 
 /**
@@ -184,6 +184,8 @@ export function getSectionSettingsOverwrite(
   const presetWithDefaults = combineWithDefaultSettings(presetSettings);
   const presetSectionSettings =
     generateSectionSettingsFromFullSettings(presetWithDefaults);
+  // default to using main section settings
+  presetSectionSettings.general.useMainSectionSettings = true;
 
   // Compute the diff between current section settings and preset section settings
   const diff = computeDiff(
@@ -191,21 +193,7 @@ export function getSectionSettingsOverwrite(
     presetSectionSettings as Record<string, any>,
   );
 
-  // Always include the preset name in the overwrite
-  if (diff) {
-    diff.general = {
-      ...diff.general,
-      presetChosen: sectionPresetName,
-    };
-    return diff;
-  }
-
-  // Even if no diff, return the preset name
-  return {
-    general: {
-      presetChosen: sectionPresetName,
-    },
-  };
+  return diff;
 }
 
 /**
@@ -306,4 +294,121 @@ export function parseSettingsOverwriteFromJson(
   } catch {
     return null;
   }
+}
+
+/**
+ * Merge the parsed overwrites from lyrics with the current settings.
+ * This applies both global overwrites and section-specific overwrites.
+ *
+ * The merge priority (lowest to highest):
+ * 1. Default settings
+ * 2. Preset settings (from global overwrite's presetChosen or settings' presetChosen)
+ * 3. Current settings
+ * 4. Global overwrite from lyrics (for general settings)
+ * 5. Section overwrite from lyrics (for each section's settings)
+ *
+ * @param settings - The current settings
+ * @param primaryLyric - The primary lyrics text containing overwrites
+ * @returns The merged settings with overwrites applied
+ */
+export function mergeOverwritesFromLyrics(
+  settings: PptSettingsStateType,
+  primaryLyric: string,
+): PptSettingsStateType {
+  const parsedOverwrites = parseAllOverwritesFromLyrics(primaryLyric);
+  return mergeOverwritesWithSettings(settings, parsedOverwrites);
+}
+
+/**
+ * Merge parsed overwrites with the settings.
+ *
+ * @param settings - The current settings
+ * @param parsedOverwrites - The parsed overwrites from lyrics
+ * @returns The merged settings
+ */
+export function mergeOverwritesWithSettings(
+  settings: PptSettingsStateType,
+  parsedOverwrites: ParsedLyricsOverwrites,
+): PptSettingsStateType {
+  const { globalOverwrite, sectionOverwrites } = parsedOverwrites;
+
+  // Start with a deep copy of the current settings
+  let mergedSettings = deepCopy(settings);
+
+  // Apply global overwrite to general settings
+  if (globalOverwrite && Object.keys(globalOverwrite).length > 0) {
+    mergedSettings = deepMerge(
+      mergedSettings,
+      globalOverwrite,
+    ) as PptSettingsStateType;
+  }
+
+  // Apply section-specific overwrites
+  if (sectionOverwrites.size > 0) {
+    const useDifferentSettingForEachSection =
+      mergedSettings.general?.useDifferentSettingForEachSection === true;
+
+    for (const [sectionKey, sectionOverwrite] of sectionOverwrites) {
+      if (!sectionOverwrite || Object.keys(sectionOverwrite).length === 0) {
+        continue;
+      }
+
+      if (useDifferentSettingForEachSection) {
+        // Merge into section-specific settings
+        if (!mergedSettings.section) {
+          mergedSettings.section = {};
+        }
+
+        const existingSectionSettings =
+          mergedSettings.section[sectionKey] || {};
+
+        // For section settings, the overwrite structure matches the section settings structure
+        // We need to merge the overwrite into the section settings
+        const mergedSectionSettings = deepMerge(
+          existingSectionSettings,
+          sectionOverwrite,
+        ) as SectionSettingsType;
+
+        mergedSettings.section[sectionKey] = mergedSectionSettings;
+      } else {
+        // When not using different settings per section,
+        // apply the first section's overwrite to the main settings (excluding section-specific fields)
+        // This handles the case where the overwrite was generated from main settings
+        const { general, ...otherCategories } = sectionOverwrite;
+
+        if (general) {
+          // Merge general settings, but skip section-specific fields
+          const {
+            useMainSectionSettings,
+            useMainBackgroundColor,
+            useMainBackgroundImage,
+            ...generalToMerge
+          } = general;
+          if (Object.keys(generalToMerge).length > 0) {
+            mergedSettings.general = {
+              ...mergedSettings.general,
+              ...generalToMerge,
+            };
+          }
+        }
+
+        // Merge other categories (content, etc.)
+        for (const [category, categoryValue] of Object.entries(
+          otherCategories,
+        )) {
+          if (categoryValue && typeof categoryValue === "object") {
+            (mergedSettings as any)[category] = deepMerge(
+              (mergedSettings as any)[category] || {},
+              categoryValue,
+            );
+          }
+        }
+
+        // Only apply the first section's overwrite to main settings
+        break;
+      }
+    }
+  }
+
+  return mergedSettings;
 }

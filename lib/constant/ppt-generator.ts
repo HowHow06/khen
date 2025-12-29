@@ -227,7 +227,7 @@ export const PPT_GENERATION_SHARED_GENERAL_SETTINGS = {
   presetChosen: {
     fieldDisplayName: "Starter Preset",
     fieldType: SETTING_FIELD_TYPE.TEXT,
-    defaultValue: "asdasd",
+    defaultValue: "",
     isReadOnly: true,
     tips: "This field is needed for inline overwrite, we need to know the base preset to apply the overwrites correctly.",
     isHidden: true,

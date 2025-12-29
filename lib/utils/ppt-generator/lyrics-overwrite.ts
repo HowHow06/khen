@@ -227,3 +227,78 @@ export function extractOverwriteFromLyrics(
 
   return null;
 }
+
+/**
+ * Parse result containing global overwrite and section-specific overwrites.
+ */
+export type ParsedLyricsOverwrites = {
+  globalOverwrite: Record<string, any> | null;
+  sectionOverwrites: Map<SectionSettingsKeyType, Record<string, any> | null>;
+};
+
+/**
+ * Parse all overwrites from the lyrics.
+ * Returns both the global overwrite (before first section) and section-specific overwrites.
+ *
+ * @param lyrics - The lyrics text
+ * @returns Object containing globalOverwrite and sectionOverwrites map
+ */
+export function parseAllOverwritesFromLyrics(
+  lyrics: string,
+): ParsedLyricsOverwrites {
+  const lines = lyrics.split("\n");
+  let globalOverwrite: Record<string, any> | null = null;
+  const sectionOverwrites = new Map<
+    SectionSettingsKeyType,
+    Record<string, any> | null
+  >();
+
+  let i = 0;
+  let sectionNumber = 0;
+  let hasSeenSection = false;
+
+  while (i < lines.length) {
+    const currentLine = lines[i];
+
+    // Check for global overwrite (JSON line before first section)
+    if (!hasSeenSection && isOverwriteJsonLine(currentLine)) {
+      try {
+        globalOverwrite = JSON.parse(currentLine.trim());
+      } catch {
+        // Invalid JSON, skip
+      }
+      i++;
+      continue;
+    }
+
+    // Check if this is a section header
+    if (isSectionHeader(currentLine)) {
+      hasSeenSection = true;
+      sectionNumber++;
+      const sectionKey =
+        `${SECTION_PREFIX}${sectionNumber}` as SectionSettingsKeyType;
+
+      i++;
+
+      // Check if the next line is an overwrite JSON
+      if (i < lines.length && isOverwriteJsonLine(lines[i])) {
+        try {
+          const overwrite = JSON.parse(lines[i].trim());
+          sectionOverwrites.set(sectionKey, overwrite);
+        } catch {
+          sectionOverwrites.set(sectionKey, null);
+        }
+        i++;
+      } else {
+        sectionOverwrites.set(sectionKey, null);
+      }
+    } else {
+      i++;
+    }
+  }
+
+  return {
+    globalOverwrite,
+    sectionOverwrites,
+  };
+}

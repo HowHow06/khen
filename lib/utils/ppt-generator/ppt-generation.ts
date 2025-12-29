@@ -13,6 +13,8 @@ import jszip from "jszip";
 import pptxgenjs from "pptxgenjs";
 import { createSlidesFromLyricsRefactored } from "./create-slides-from-lyrics-v2";
 import { LineToSlideMapper } from "./line-to-slide-mapper";
+import { removeAllOverwritesFromLyrics } from "./lyrics-overwrite";
+import { mergeOverwritesFromLyrics } from "./settings-diff";
 import {
   getBase64FromImageField,
   getSectionColorSlideMasterTitle,
@@ -202,9 +204,16 @@ export const generatePpt = async ({
   secondaryLyric: string;
   lineMapper?: LineToSlideMapper;
 }) => {
+  // Merge inline overwrites from lyrics with settings
+  const mergedSettings = mergeOverwritesFromLyrics(settingValues, primaryLyric);
+
+  // Strip overwrite JSON lines from lyrics before processing
+  const strippedPrimaryLyric = removeAllOverwritesFromLyrics(primaryLyric);
+  const strippedSecondaryLyric = removeAllOverwritesFromLyrics(secondaryLyric);
+
   const {
     general: { separateSectionsToFiles },
-  } = settingValues;
+  } = mergedSettings;
 
   // 1. Get background prop for the presentation
   // 2. Create a new Presentation instance
@@ -217,18 +226,18 @@ export const generatePpt = async ({
     primaryLinesArray,
     secondaryLinesArray,
   } = await createPptInstance({
-    settingValues,
-    primaryLyric,
-    secondaryLyric,
+    settingValues: mergedSettings,
+    primaryLyric: strippedPrimaryLyric,
+    secondaryLyric: strippedSecondaryLyric,
     lineMapper,
   });
 
   // 4. Save the Presentation
   const { fileName, cleanFileName, fileNamePrefix, fileNameSuffix } =
     parsePptFilename({
-      filename: settingValues.file.filename,
-      prefix: settingValues.file.filenamePrefix,
-      suffix: settingValues.file.filenameSuffix,
+      filename: mergedSettings.file.filename,
+      prefix: mergedSettings.file.filenamePrefix,
+      suffix: mergedSettings.file.filenameSuffix,
     });
   if (!separateSectionsToFiles) {
     pres.writeFile({ fileName: fileName });
@@ -257,7 +266,7 @@ export const generatePpt = async ({
         pres: tempPres,
         primaryLinesArray: tempPrimaryLinesArray,
         secondaryLinesArray: tempSecondaryLinesArray,
-        settingValues,
+        settingValues: mergedSettings,
       });
 
       const fileContent = await tempPres.write();
