@@ -4,6 +4,7 @@ import { SelectionItemsType } from "@/lib/types";
 import { useEffect } from "react";
 import MoreOptionsDropdown from "../MoreOptionsDropdown";
 import PresetsDropdown from "../PresetsDropdown";
+import SyncOverwriteFromLyricsButton from "../SyncOverwriteFromLyricsButton";
 
 type Props = {
   isDifferentSettingsBySection: boolean;
@@ -41,6 +42,7 @@ const PptGeneratorSettingHeader = ({
           currentSectionName={currentSection}
           presets={DEFAULT_PRESETS}
         />
+        <SyncOverwriteFromLyricsButton />
         <MoreOptionsDropdown
           hasSectionSettings={isDifferentSettingsBySection}
           currentSectionName={currentSection}

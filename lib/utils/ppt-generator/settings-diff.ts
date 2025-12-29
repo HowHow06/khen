@@ -1,4 +1,8 @@
 import {
+  MAIN_SECTION_NAME,
+  PPT_GENERATION_SETTINGS_META,
+} from "@/lib/constant";
+import {
   PptSettingsStateType,
   SectionSettingsKeyType,
   SectionSettingsType,
@@ -9,11 +13,15 @@ import {
   deepMerge,
   generateSectionSettingsFromFullSettings,
 } from "@/lib/utils";
+import { generateFullSettings } from "./import-export-settings";
 import {
   ParsedLyricsOverwrites,
   parseAllOverwritesFromLyrics,
 } from "./lyrics-overwrite";
-import { getPreset } from "./settings-generator";
+import {
+  getPreset,
+  getSectionSettingsInitialValue,
+} from "./settings-generator";
 
 // Fields to ignore when computing the diff (e.g., image fields, internal fields)
 const FIELDS_TO_IGNORE = [
@@ -113,10 +121,10 @@ export function getGlobalSettingsOverwrite(
   }
 
   if (Object.keys(globalOverwrite).length !== 0) {
-    return (globalOverwrite.general = {
+    globalOverwrite.general = {
       ...globalOverwrite.general,
       presetChosen: presetName,
-    });
+    };
   }
 
   return globalOverwrite;
@@ -260,6 +268,12 @@ export function getAllSectionOverwrites(
     } else {
       // Section has its own settings, compute section-specific overwrite
       const sectionOverwrite = getSectionSettingsOverwrite(sectionSettings);
+      if (sectionOverwrite) {
+        sectionOverwrite.general = {
+          ...sectionOverwrite.general,
+          presetChosen: sectionSettings.general?.presetChosen,
+        };
+      }
       sectionOverwrites.set(sectionKey, sectionOverwrite);
     }
   }
@@ -331,12 +345,31 @@ export function mergeOverwritesWithSettings(
   parsedOverwrites: ParsedLyricsOverwrites,
 ): PptSettingsStateType {
   const { globalOverwrite, sectionOverwrites } = parsedOverwrites;
+  console.log("parsedOverwrites", parsedOverwrites);
 
   // Start with a deep copy of the current settings
   let mergedSettings = deepCopy(settings);
 
   // Apply global overwrite to general settings
   if (globalOverwrite && Object.keys(globalOverwrite).length > 0) {
+    // Check if globalOverwrite has a presetChosen - if so, apply the preset first
+    const globalPresetChosen = globalOverwrite.general?.presetChosen;
+    if (globalPresetChosen) {
+      const preset = getPreset(globalPresetChosen);
+      if (preset) {
+        // Apply preset like applyPreset with isApplyToSection=false, isPreserveUseDifferentSetting=false, isPreserveExistingSectionSetting=false
+        mergedSettings = generateFullSettings({
+          newSettings: combineWithDefaultSettings(preset),
+          originalSettings: mergedSettings,
+          targetSectionName: MAIN_SECTION_NAME,
+          isApplyToSection: false,
+          isPreserveUseDifferentSetting: false,
+          isPreserveExistingSectionSetting: false,
+        });
+      }
+    }
+
+    // Now apply the remaining overwrites on top
     mergedSettings = deepMerge(
       mergedSettings,
       globalOverwrite,
@@ -345,70 +378,53 @@ export function mergeOverwritesWithSettings(
 
   // Apply section-specific overwrites
   if (sectionOverwrites.size > 0) {
-    const useDifferentSettingForEachSection =
-      mergedSettings.general?.useDifferentSettingForEachSection === true;
-
     for (const [sectionKey, sectionOverwrite] of sectionOverwrites) {
+      // Merge into section-specific settings
+      if (!mergedSettings.section) {
+        mergedSettings.section = {};
+      }
+
+      if (!mergedSettings.section[sectionKey]) {
+        mergedSettings.section[sectionKey] = getSectionSettingsInitialValue({
+          settings: PPT_GENERATION_SETTINGS_META,
+        });
+      }
+
       if (!sectionOverwrite || Object.keys(sectionOverwrite).length === 0) {
         continue;
       }
 
-      if (useDifferentSettingForEachSection) {
-        // Merge into section-specific settings
-        if (!mergedSettings.section) {
-          mergedSettings.section = {};
+      // Check if sectionOverwrite has a presetChosen - if so, construct section settings from preset first
+      const sectionPresetChosen = sectionOverwrite.general?.presetChosen;
+      if (sectionPresetChosen) {
+        const preset = getPreset(sectionPresetChosen);
+        if (preset) {
+          const sectionName = sectionKey as SectionSettingsKeyType;
+
+          mergedSettings = generateFullSettings({
+            newSettings: combineWithDefaultSettings(preset),
+            originalSettings: mergedSettings,
+            targetSectionName: sectionName,
+            isApplyToSection: true,
+            isPreserveUseDifferentSetting: true,
+            isPreserveExistingSectionSetting: true,
+          });
         }
-
-        const existingSectionSettings =
-          mergedSettings.section[sectionKey] || {};
-
-        // For section settings, the overwrite structure matches the section settings structure
-        // We need to merge the overwrite into the section settings
-        const mergedSectionSettings = deepMerge(
-          existingSectionSettings,
-          sectionOverwrite,
-        ) as SectionSettingsType;
-
-        mergedSettings.section[sectionKey] = mergedSectionSettings;
-      } else {
-        // When not using different settings per section,
-        // apply the first section's overwrite to the main settings (excluding section-specific fields)
-        // This handles the case where the overwrite was generated from main settings
-        const { general, ...otherCategories } = sectionOverwrite;
-
-        if (general) {
-          // Merge general settings, but skip section-specific fields
-          const {
-            useMainSectionSettings,
-            useMainBackgroundColor,
-            useMainBackgroundImage,
-            ...generalToMerge
-          } = general;
-          if (Object.keys(generalToMerge).length > 0) {
-            mergedSettings.general = {
-              ...mergedSettings.general,
-              ...generalToMerge,
-            };
-          }
-        }
-
-        // Merge other categories (content, etc.)
-        for (const [category, categoryValue] of Object.entries(
-          otherCategories,
-        )) {
-          if (categoryValue && typeof categoryValue === "object") {
-            (mergedSettings as any)[category] = deepMerge(
-              (mergedSettings as any)[category] || {},
-              categoryValue,
-            );
-          }
-        }
-
-        // Only apply the first section's overwrite to main settings
-        break;
       }
+
+      let baseSectionSettings: SectionSettingsType =
+        mergedSettings.section![sectionKey] || {};
+
+      // Merge the overwrite into the section settings
+      const mergedSectionSettings = deepMerge(
+        baseSectionSettings,
+        sectionOverwrite,
+      ) as SectionSettingsType;
+
+      mergedSettings.section![sectionKey] = mergedSectionSettings;
     }
   }
 
+  console.log("logging mergedSettings", mergedSettings);
   return mergedSettings;
 }

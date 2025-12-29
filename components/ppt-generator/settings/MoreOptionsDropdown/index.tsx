@@ -38,6 +38,8 @@ import {
   getIsTouchDevice,
   getJSONFromFile,
   getSettingTypeFromJSON,
+  mergeOverwritesWithSettings,
+  parseAllOverwritesFromLyrics,
 } from "@/lib/utils";
 import { ChevronDown, ChevronUp, MoreHorizontal, Type, X } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -54,7 +56,7 @@ const MoreOptionsDropdown = ({
 }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fontFileInputRef = useRef<HTMLInputElement>(null);
-  const { form, settingsValues } = usePptGeneratorFormContext();
+  const { form, settingsValues, mainText } = usePptGeneratorFormContext();
   const { reset } = form;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFontModalOpen, setIsFontModalOpen] = useState(false);
@@ -371,6 +373,32 @@ const MoreOptionsDropdown = ({
     exportSettings({ isExportSectionSettings, isIncludeSectionSettings });
   };
 
+  const handleSyncOverwrites = () => {
+    const parsedOverwrites = parseAllOverwritesFromLyrics(mainText);
+
+    // Check if there are any overwrites to sync
+    const hasGlobalOverwrite =
+      parsedOverwrites.globalOverwrite &&
+      Object.keys(parsedOverwrites.globalOverwrite).length > 0;
+    const hasSectionOverwrites = Array.from(
+      parsedOverwrites.sectionOverwrites.values(),
+    ).some((overwrite) => overwrite && Object.keys(overwrite).length > 0);
+
+    if (!hasGlobalOverwrite && !hasSectionOverwrites) {
+      toast.info("No inline overwrites found in lyrics");
+      return;
+    }
+
+    const currentSettings = settingsValues;
+    const mergedSettings = mergeOverwritesWithSettings(
+      currentSettings,
+      parsedOverwrites,
+    );
+
+    reset(mergedSettings);
+    toast.success("Settings synced from lyrics overwrites");
+  };
+
   return (
     <>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -399,6 +427,9 @@ const MoreOptionsDropdown = ({
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleImportFontClick}>
             Import Custom Font
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleSyncOverwrites}>
+            Sync Overwrites (preserve inline overwrites)
           </DropdownMenuItem>
         </DropdownMenuContent>
         {/* Hidden file input for importing settings */}
