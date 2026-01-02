@@ -9,12 +9,14 @@ interface LineToSlideMapperContextType {
   clearMappings: () => void;
   getSlideIndexForLine: (lineNumber: number) => number | null;
   scrollPreviewToSlideForLine: (lineNumber: number) => boolean;
+  scrollPreviewToSlideIndex: (slideIndex: number) => boolean;
   scrollPreviewToCursorPosition: (
     text: string,
     cursorPosition: number,
   ) => number | null;
   getAllMappings: () => any[];
   getLinesForSlide: (slideIndex: number) => any[];
+  getFirstLineForSlide: (slideIndex: number) => number | null;
 }
 
 const LineToSlideMapperContext = createContext<

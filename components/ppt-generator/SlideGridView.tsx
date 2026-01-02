@@ -15,15 +15,20 @@ const SlideGridItem = ({
   slideIndex,
   masterSlide,
   dimensions,
+  onDoubleClick,
 }: {
   slide: InternalSlide;
   slideIndex: number;
   masterSlide?: any;
   dimensions: [number, number];
+  onDoubleClick?: (slideIndex: number) => void;
 }) => {
   return (
     <div className="flex h-full w-full flex-col items-center gap-2">
-      <div className="w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-lg">
+      <div
+        className="w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+        onDoubleClick={() => onDoubleClick?.(slideIndex)}
+      >
         <SlidePreview
           slide={slide}
           masterSlide={masterSlide}
@@ -41,9 +46,10 @@ const SlideGridItem = ({
 
 interface Props {
   normalizedConfig?: InternalPresentation;
+  onSlideDoubleClick?: (slideIndex: number) => void;
 }
 
-const SlideGridView = ({ normalizedConfig }: Props) => {
+const SlideGridView = ({ normalizedConfig, onSlideDoubleClick }: Props) => {
   if (!normalizedConfig) {
     return (
       <div className="flex h-40 items-center justify-center text-gray-500">
@@ -111,6 +117,7 @@ const SlideGridView = ({ normalizedConfig }: Props) => {
                           : undefined
                       }
                       dimensions={dimensions}
+                      onDoubleClick={onSlideDoubleClick}
                     />
                   ))}
                 </div>

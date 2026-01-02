@@ -24,13 +24,19 @@ type Props = {};
 const GeneratePreviewButton = (props: Props) => {
   const { mainText, secondaryText, settingsValues } =
     usePptGeneratorFormContext();
-  const { lineMapper, clearMappings } = useLineToSlideMapperContext();
+  const {
+    lineMapper,
+    clearMappings,
+    getFirstLineForSlide,
+    scrollPreviewToSlideForLine,
+  } = useLineToSlideMapperContext();
   const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState(
     POPUP_TAB_TYPE.SETTINGS as string,
   );
   const [error, setError] = useState<Error>();
+  const [pendingFocusLine, setPendingFocusLine] = useState<number | null>(null);
 
   const onGeneratePreviewClick = () => {
     setIsModalOpen(true);
@@ -82,6 +88,52 @@ const GeneratePreviewButton = (props: Props) => {
     [],
   );
 
+  /**
+   * Handle double-click on a slide in the grid view
+   * Switches to LYRICS tab and focuses the textarea at the corresponding line
+   */
+  const handleSlideDoubleClick = useCallback(
+    (slideIndex: number) => {
+      const lineNumber = getFirstLineForSlide(slideIndex);
+      if (lineNumber !== null) {
+        setPendingFocusLine(lineNumber);
+      }
+      // Switch to lyrics tab
+      setCurrentTab(POPUP_TAB_TYPE.LYRICS);
+    },
+    [getFirstLineForSlide],
+  );
+
+  // Effect to focus the textarea when switching to LYRICS tab with a pending focus line
+  useEffect(() => {
+    if (currentTab === POPUP_TAB_TYPE.LYRICS && pendingFocusLine !== null) {
+      // Calculate cursor position from line number
+      const lines = mainText.split("\n");
+      let cursorPosition = 0;
+      for (let i = 0; i < pendingFocusLine && i < lines.length; i++) {
+        cursorPosition += lines[i].length + 1; // +1 for newline
+      }
+      // Use setTimeout to ensure the textarea is rendered
+      setTimeout(() => {
+        scrollPreviewToSlideForLine(pendingFocusLine);
+
+        const textarea = document.querySelector(
+          "#preview-main-lyric-section-div textarea",
+        ) as HTMLTextAreaElement | null;
+        if (textarea) {
+          textarea.focus();
+          textarea.setSelectionRange(cursorPosition, cursorPosition);
+          // Scroll the textarea to show the cursor position
+          const lineHeight =
+            parseInt(getComputedStyle(textarea).lineHeight) || 20;
+          textarea.scrollTop = pendingFocusLine * lineHeight;
+        }
+
+        setPendingFocusLine(null);
+      }, 100);
+    }
+  }, [currentTab, pendingFocusLine, mainText]);
+
   // update preview config on settingsValues change
   useEffect(() => {
     if (isModalOpen) {
@@ -101,8 +153,13 @@ const GeneratePreviewButton = (props: Props) => {
         open={isModalOpen}
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
-        <DialogContent className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]" aria-describedby={undefined}>
-          <DialogTitle className="sr-only">PPT Preview and Settings</DialogTitle>
+        <DialogContent
+          className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]"
+          aria-describedby={undefined}
+        >
+          <DialogTitle className="sr-only">
+            PPT Preview and Settings
+          </DialogTitle>
           <div
             className={`hidden h-full gap-4 sm:flex ${
               currentTab === POPUP_TAB_TYPE.GRID_VIEW ? "w-full" : "w-3/5"
@@ -144,7 +201,7 @@ const GeneratePreviewButton = (props: Props) => {
               {currentTab === POPUP_TAB_TYPE.LYRICS && (
                 <ScrollArea className={"px-3"} isFillParent>
                   <div className="flex flex-col gap-4">
-                    <div>
+                    <div id="preview-main-lyric-section-div">
                       <MainLyricSection />
                     </div>
                     <div>
@@ -155,7 +212,10 @@ const GeneratePreviewButton = (props: Props) => {
               )}
               {currentTab === POPUP_TAB_TYPE.GRID_VIEW && (
                 <div className="h-full w-full">
-                  <SlideGridView normalizedConfig={previewConfig} />
+                  <SlideGridView
+                    normalizedConfig={previewConfig}
+                    onSlideDoubleClick={handleSlideDoubleClick}
+                  />
                 </div>
               )}
             </div>

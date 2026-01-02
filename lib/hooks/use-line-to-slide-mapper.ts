@@ -25,15 +25,11 @@ export const useLineToSlideMapper = () => {
   );
 
   /**
-   * Scroll to the slide containing the specified line
+   * Scroll to a specific slide by its index
    */
-  const scrollPreviewToSlideForLine = useCallback(
-    (lineNumber: number): boolean => {
-      const slideIndex = getSlideIndexForLine(lineNumber);
-      if (slideIndex === null) return false;
-
+  const scrollPreviewToSlideIndex = useCallback(
+    (slideIndex: number): boolean => {
       // Find the slide element using the slide index
-      // This depends on how slides are rendered in your Preview component
       const slideElement = document.querySelector(
         `[data-slide-index="${slideIndex}"]`,
       );
@@ -43,21 +39,30 @@ export const useLineToSlideMapper = () => {
       }
 
       // Fallback: try to find by slide ID
-      const slideId = lineMapperRef.current.getSlideIdForLine(lineNumber);
-      if (slideId) {
-        const slideElementById = document.getElementById(slideId);
-        if (slideElementById) {
-          slideElementById.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-          return true;
-        }
+      const slideElementById = document.getElementById(`slide-${slideIndex}`);
+      if (slideElementById) {
+        slideElementById.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        return true;
       }
 
       return false;
     },
-    [getSlideIndexForLine],
+    [],
+  );
+
+  /**
+   * Scroll to the slide containing the specified line
+   */
+  const scrollPreviewToSlideForLine = useCallback(
+    (lineNumber: number): boolean => {
+      const slideIndex = getSlideIndexForLine(lineNumber);
+      if (slideIndex === null) return false;
+      return scrollPreviewToSlideIndex(slideIndex);
+    },
+    [getSlideIndexForLine, scrollPreviewToSlideIndex],
   );
 
   /**
@@ -93,13 +98,31 @@ export const useLineToSlideMapper = () => {
     return lineMapperRef.current.getLinesForSlide(slideIndex);
   }, []);
 
+  /**
+   * Get the first line number for a specific slide index
+   */
+  const getFirstLineForSlide = useCallback(
+    (slideIndex: number): number | null => {
+      const lines = lineMapperRef.current.getLinesForSlide(slideIndex);
+      if (lines.length === 0) return null;
+      // Sort by line number and return the first one
+      const sortedLines = [...lines].sort(
+        (a, b) => a.lineNumber - b.lineNumber,
+      );
+      return sortedLines[0].lineNumber;
+    },
+    [],
+  );
+
   return {
     lineMapper: lineMapperRef.current,
     clearMappings,
     getSlideIndexForLine,
     scrollPreviewToSlideForLine,
+    scrollPreviewToSlideIndex,
     getAllMappings,
     getLinesForSlide,
+    getFirstLineForSlide,
     scrollPreviewToCursorPosition,
   };
 };
