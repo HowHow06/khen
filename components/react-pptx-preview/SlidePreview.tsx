@@ -36,7 +36,7 @@ const SlidePreview = ({
   return (
     <div
       ref={ref}
-      className={`ring-1 ring-inset ${className}`}
+      className={`whitespace-pre-wrap ring-1 ring-inset ${className}`}
       style={{
         width: "100%",
         height: width / (dimensions[0] / dimensions[1]),
