@@ -72,6 +72,7 @@ export enum LYRIC_SECTION {
   SECONDARY_TITLE = "##",
   EMPTY_SLIDE = "***",
   FILL_SLIDE = "**",
+  METADATA = "@",
 }
 
 export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
@@ -151,6 +152,7 @@ const PPT_GENERATION_GENERAL_SETTINGS = {
     fieldType: SETTING_FIELD_TYPE.BOOLEAN,
     defaultValue: false,
     tips: "Separate sections into different files and download them as a zip file.",
+    isHidden: true, // DEPRECATED feature, not maintained anymore
   },
   sectionsAutoNumbering: {
     fieldDisplayName: "Section Auto Numbering",

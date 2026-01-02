@@ -11,6 +11,7 @@ export interface ProcessingContextData {
   currentSectionPptSectionWeight: number;
   currentSectionEmptySlideWeight: number;
   currentSectionFillSlideWeight: number;
+  currentSectionMetadataWeight: number;
   currentMainSectionInfo: PptMainSectionInfo;
   currentSectionName?: string;
   insertedIndex: number[];
@@ -32,6 +33,7 @@ export class ProcessingContext {
       currentSectionPptSectionWeight: 0,
       currentSectionEmptySlideWeight: 0,
       currentSectionFillSlideWeight: 0,
+      currentSectionMetadataWeight: 0,
       currentMainSectionInfo: {
         sectionName: "",
         startLineIndex: -1,
@@ -70,6 +72,10 @@ export class ProcessingContext {
 
   get currentSectionFillSlideWeight(): number {
     return this.data.currentSectionFillSlideWeight;
+  }
+
+  get currentSectionMetadataWeight(): number {
+    return this.data.currentSectionMetadataWeight;
   }
 
   get currentMainSectionInfo(): PptMainSectionInfo {
@@ -127,6 +133,10 @@ export class ProcessingContext {
 
   addToCurrentSectionFillSlideWeight(value: number): void {
     this.data.currentSectionFillSlideWeight += value;
+  }
+
+  addToCurrentSectionMetadataWeight(value: number): void {
+    this.data.currentSectionMetadataWeight += value;
   }
 
   setCurrentMainSectionInfo(info: PptMainSectionInfo): void {

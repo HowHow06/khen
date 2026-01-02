@@ -244,6 +244,7 @@ export const generatePpt = async ({
   }
 
   // 5. If need to separate ppt by section, recreate each ppt and put into zip
+  // DEPRECATED feature, not maintained anymore
   if (separateSectionsToFiles) {
     var zip = new jszip();
     const fileContent = await pres.write();

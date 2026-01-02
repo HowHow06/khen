@@ -97,9 +97,9 @@ export class PptConfigurationBuilder {
       !currentSectionSetting.general?.useMainSectionSettings;
 
     const isBackgroundColorWhenEmpty = isUseSectionSettings
-      ? currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
+      ? (currentSectionSetting.general?.useBackgroundColorWhenEmpty ??
         PPT_GENERATION_COMBINED_GENERAL_SETTINGS.useBackgroundColorWhenEmpty
-          .defaultValue
+          .defaultValue)
       : mainConfig.isBackgroundColorWhenEmpty;
 
     const hasSecondaryContent = isUseSectionSettings
@@ -107,13 +107,13 @@ export class PptConfigurationBuilder {
       : mainConfig.hasSecondaryContent;
 
     const linePerTextbox = isUseSectionSettings
-      ? currentSectionSetting.general?.lineCountPerTextbox ??
-        DEFAULT_LINE_COUNT_PER_TEXTBOX
+      ? (currentSectionSetting.general?.lineCountPerTextbox ??
+        DEFAULT_LINE_COUNT_PER_TEXTBOX)
       : mainConfig.linePerTextbox;
 
     const textboxCountPerSlide = isUseSectionSettings
-      ? currentSectionSetting.general?.textboxCountPerContentPerSlide ??
-        DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+      ? (currentSectionSetting.general?.textboxCountPerContentPerSlide ??
+        DEFAULT_TEXTBOX_COUNT_PER_SLIDE)
       : mainConfig.textboxCountPerSlide;
 
     const isUseSectionColor =
@@ -134,8 +134,9 @@ export class PptConfigurationBuilder {
 
     const toRemoveIdenticalWords =
       hasSecondaryContent && isUseSectionSettings
-        ? currentSectionSetting.general?.ignoreSubcontentWhenIdentical ?? false
-        : mainConfig.general.ignoreSubcontentWhenIdentical ?? false;
+        ? (currentSectionSetting.general?.ignoreSubcontentWhenIdentical ??
+          false)
+        : (mainConfig.general.ignoreSubcontentWhenIdentical ?? false);
 
     const secondaryContentOption =
       hasSecondaryContent && isUseSectionSettings
@@ -163,15 +164,5 @@ export class PptConfigurationBuilder {
       secondaryCoverOption,
       toRemoveIdenticalWords,
     };
-  }
-
-  /**
-   * Convenience method to build config with fallback for missing section settings
-   */
-  buildConfigWithFallback(
-    mainConfig: MainPptConfig,
-    currentSectionSetting: SectionSettingsType,
-  ): DerivedPptConfig {
-    return this.buildSectionConfig(currentSectionSetting, mainConfig);
   }
 }

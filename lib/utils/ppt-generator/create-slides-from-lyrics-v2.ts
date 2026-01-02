@@ -51,6 +51,7 @@ export enum LineClassification {
   EMPTY_SLIDE = "EMPTY_SLIDE",
   FILL_SLIDE = "FILL_SLIDE",
   NORMAL = "NORMAL",
+  METADATA = "METADATA",
 }
 
 /**
@@ -114,9 +115,9 @@ export function createSlidesFromLyricsRefactored({
     }
 
     // Build configuration for current section/line
-    const currentRelevantConfig = configBuilder.buildConfigWithFallback(
-      mainConfig,
+    const currentRelevantConfig = configBuilder.buildSectionConfig(
       currentSectionSetting!,
+      mainConfig,
     );
 
     // Calculate slide position
@@ -142,7 +143,7 @@ export function createSlidesFromLyricsRefactored({
       return;
     }
 
-    // Handle special slides (empty, fill)
+    // Handle special slides (empty, fill, metadata)
     if (isSpecialSlide(lineInfo.classification)) {
       processSpecialSlide(
         lineInfo,
@@ -237,6 +238,15 @@ function classifyLine(line: string): LineInfo {
     };
   }
 
+  if (line.startsWith(`${LYRIC_SECTION.METADATA}`)) {
+    return {
+      classification: LineClassification.METADATA,
+      // process text to remove the entire line of metadata
+      processedText: "",
+      isCover: false,
+    };
+  }
+
   return {
     classification: LineClassification.NORMAL,
     processedText: trimmedLine,
@@ -257,7 +267,8 @@ function isSection(classification: LineClassification): boolean {
 function isSpecialSlide(classification: LineClassification): boolean {
   return (
     classification === LineClassification.EMPTY_SLIDE ||
-    classification === LineClassification.FILL_SLIDE
+    classification === LineClassification.FILL_SLIDE ||
+    classification === LineClassification.METADATA
   );
 }
 
@@ -397,7 +408,8 @@ function calculateSlidePosition(
     context.currentSectionCoverWeight +
     context.currentSectionPptSectionWeight +
     context.currentSectionEmptySlideWeight +
-    context.currentSectionFillSlideWeight;
+    context.currentSectionFillSlideWeight +
+    context.currentSectionMetadataWeight;
 
   // if is new main section, recalculate the currentIndexInSection to match the latest totalLineCountPerSlide using the formula:
   // slideCount * totalLineCountPerSlide (of the current section)
@@ -495,7 +507,7 @@ function createNewSlide({
 }
 
 /**
- * Processes special slides (empty and fill slides)
+ * Processes special slides (empty, fill, and metadata slides)
  */
 function processSpecialSlide(
   lineInfo: LineInfo,
@@ -534,7 +546,10 @@ function processSpecialSlide(
       );
       lineMapper.incrementSlideIndex();
     }
-  } else if (lineInfo.classification === LineClassification.FILL_SLIDE) {
+    return;
+  }
+
+  if (lineInfo.classification === LineClassification.FILL_SLIDE) {
     // weightage of each fill slide should be equal to
     // remainder from previous slide - 1 (the 1 is the default increment of index)
     context.addToCurrentSectionFillSlideWeight(
@@ -549,6 +564,22 @@ function processSpecialSlide(
         context.currentSectionName,
       );
     }
+    return;
+  }
+
+  if (lineInfo.classification === LineClassification.METADATA) {
+    // -1 is the default increment of index
+    context.addToCurrentSectionMetadataWeight(-1);
+
+    if (lineMapper) {
+      lineMapper.addMapping(
+        index,
+        lineMapper.currentSlideIndex,
+        LineType.METADATA,
+        context.currentSectionName,
+      );
+    }
+    return;
   }
 }
 

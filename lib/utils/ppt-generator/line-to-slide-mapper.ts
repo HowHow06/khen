@@ -19,6 +19,7 @@ export enum LineType {
   COVER = "cover",
   EMPTY_SLIDE = "empty_slide",
   FILL_SLIDE = "fill_slide",
+  METADATA = "metadata",
   SKIPPED = "skipped", // line was merged into previous slide
 }
 
