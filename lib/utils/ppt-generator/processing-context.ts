@@ -152,6 +152,7 @@ export class ProcessingContext {
     this.data.currentSectionCoverWeight = 0;
     this.data.currentSectionEmptySlideWeight = 0;
     this.data.currentSectionFillSlideWeight = 0;
+    this.data.currentSectionMetadataWeight = 0;
   }
 
   clearInsertedIndex(): void {
