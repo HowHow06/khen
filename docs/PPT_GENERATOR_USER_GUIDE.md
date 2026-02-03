@@ -412,6 +412,8 @@ Click **"Open Settings"** to access the comprehensive settings panel. Settings a
 Controls global presentation settings:
 
 - **Use Different Settings for Each Section** - Enable this to have unique formatting for different song sections (e.g., different colors for verse vs chorus)
+  - **Common use case:** When ONE song has lyrics that are too long and needs a smaller font size while other songs are fine with the default settings
+  - Allows you to customize settings per section without affecting the entire presentation
 - Slide dimensions and layout
 - Default fonts and sizes
 - Transition effects
@@ -623,6 +625,27 @@ Once you've entered your lyrics and configured your settings:
 - Manual line breaks in your input text are respected
 - Always preview after changing these settings to see the distribution
 
+### Handling Long Lyrics
+
+When lyrics are too long and the slide format breaks or text overflows:
+
+**Step-by-step approach:**
+
+1. **Break lines into smaller phrases** - Split long lyric lines into shorter, meaningful phrases that are easier to read
+2. **Split content across slides** - Add line breaks to distribute lyrics across 2 or more slides naturally
+3. **Reduce font size** - As a last resort, decrease the font size in Content Settings
+
+**For individual problematic songs:**
+
+If only **one song** in your presentation has formatting issues:
+
+1. Enable **"Use Different Settings for Each Section"** in General Settings
+2. Click on that specific song section in the settings sidebar
+3. Customize the font size or other settings for that section only
+4. Other songs will maintain their original formatting
+
+This approach prevents you from making everything smaller when only one song needs adjustment.
+
 ### Troubleshooting
 
 **Pinyin not generating?**
@@ -636,6 +659,21 @@ Once you've entered your lyrics and configured your settings:
 - Adjust font size in Content Settings
 - Check lines per slide setting
 - Consider using section-specific settings for problematic sections
+
+**Lyrics too long and breaking the format?**
+
+If your lyrics are too long and the slide format breaks, try these solutions in order:
+
+1. **Break lines into smaller, meaningful phrases** - Edit your lyrics to split long lines into shorter, natural phrases
+2. **Split into 2 slides** - Add a blank line or adjust line breaks to distribute lyrics across multiple slides
+3. **Reduce font size** - If the above doesn't work, make the font size smaller in Content Settings
+
+**If this happens to only ONE specific song:**
+
+1. Enable **"Use Different Settings for Each Section"** in General Settings
+2. Navigate to that specific song section in the settings sidebar
+3. Adjust the font size or other settings for that section only
+4. This way, other songs maintain their original formatting while the problematic song gets custom settings
 
 **Cover not appearing?**
 
