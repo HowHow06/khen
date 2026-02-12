@@ -1,4 +1,4 @@
-import { getIsTouchDevice } from "@/lib/utils";
+import { getIsTouchDevice } from "@/lib/utils/general";
 import { getPinyin } from "@/lib/utils/pinyin";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";

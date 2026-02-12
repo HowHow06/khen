@@ -193,3 +193,56 @@ const { lineMapper } = useLineToSlideMapperContext();
 - Generic reusable components → `components/ui/`
 - PPT generator-specific components → `components/ppt-generator/`
 - Context providers → `components/context/`
+
+## Import Patterns & Circular Dependency Prevention
+
+**IMPORTANT:** This codebase does NOT use barrel files (index.ts) in `lib/utils/`. All imports must be from specific files to prevent circular dependency issues.
+
+### Import Rules
+
+1. **Always import from specific files, never from directory paths:**
+   ```typescript
+   // ✅ Correct
+   import { cn, deepMerge } from "@/lib/utils/general";
+   import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
+   import { generatePptSettingsInitialState } from "@/lib/utils/ppt-generator/settings-generator";
+   
+   // ❌ Wrong - barrel imports are NOT available
+   import { cn } from "@/lib/utils";
+   import { generatePpt } from "@/lib/utils/ppt-generator";
+   ```
+
+2. **Files in `lib/constant/` should NEVER import from `lib/utils/` directory path**
+   - Import directly: `../utils/general`, `../utils/ppt-generator/specific-file`
+
+3. **Files in `lib/types/` should NEVER import from `lib/utils/` or `lib/schemas/`**
+   - Types should be self-contained or only depend on constants
+
+### Safe Import Hierarchy
+
+```
+lib/constant/  →  can import from: lib/types/, lib/utils/general.ts (specific file only)
+lib/types/     →  can import from: lib/constant/
+lib/schemas/   →  can import from: lib/constant/, lib/types/
+lib/utils/     →  can import from: lib/constant/, lib/types/, lib/schemas/, other specific util files
+lib/hooks/     →  can import from: anything in lib/
+lib/presets/   →  can import from: anything in lib/
+```
+
+### Utility File Locations
+
+- `lib/utils/general.ts` - General utilities (cn, deepMerge, deepCopy, etc.)
+- `lib/utils/ppt-generator/ppt-generation.ts` - PPT generation (generatePpt, createPptInstance)
+- `lib/utils/ppt-generator/ppt-preview.ts` - Preview generation (generatePreviewConfig)
+- `lib/utils/ppt-generator/settings-generator.ts` - Settings generation (generatePptSettingsInitialState, getPreset, etc.)
+- `lib/utils/ppt-generator/settings-diff.ts` - Settings comparison and merging
+- `lib/utils/ppt-generator/settings-utils.ts` - Settings utilities (parsePptFilename, getBase64FromImageField)
+- `lib/utils/ppt-generator/import-export-settings.ts` - Settings import/export (exportFullSettings, generateFullSettings)
+- `lib/utils/ppt-generator/lyrics-overwrite.ts` - Lyrics overwrite parsing
+
+### Debugging Circular Dependencies
+
+If you see errors like `Cannot access 'X' before initialization`:
+1. Trace the import chain from the error stack
+2. Check if any module is importing from a directory path instead of a specific file
+3. Replace with direct file imports

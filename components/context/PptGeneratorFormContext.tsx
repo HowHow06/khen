@@ -7,14 +7,13 @@ import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dyna
 import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
+import { toNormalCase, traverseAndCollect } from "@/lib/utils/general";
+import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
 import {
   combineWithDefaultSettings,
-  generatePpt,
   generatePptSettingsInitialState,
   getPreset,
-  toNormalCase,
-  traverseAndCollect,
-} from "@/lib/utils";
+} from "@/lib/utils/ppt-generator/settings-generator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, {
   Dispatch,

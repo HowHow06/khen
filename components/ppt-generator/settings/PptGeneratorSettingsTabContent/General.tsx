@@ -2,7 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
 import { PPT_GENERATION_SETTINGS_META, SETTING_CATEGORY } from "@/lib/constant";
 import { BaseSettingMetaType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import { useMemo } from "react";
 import BaseSettings from "../BaseSettings";
 import { TabContentBaseProp } from "./types";

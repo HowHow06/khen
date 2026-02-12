@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SelectionItemsType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 
 type FormSelectProps = {
   items: SelectionItemsType;

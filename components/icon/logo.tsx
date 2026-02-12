@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 type Props = {};
 
 const Logo = ({ className }: Props & React.HTMLAttributes<SVGElement>) => {

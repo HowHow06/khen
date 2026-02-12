@@ -13,12 +13,8 @@ import {
   SectionSettingsKeyType,
   SelectionItemsType,
 } from "../types";
-import {
-  deepCompare,
-  deepCopy,
-  getLinesStartingWith,
-  getSectionSettingsInitialValue,
-} from "../utils";
+import { deepCompare, deepCopy, getLinesStartingWith } from "../utils/general";
+import { getSectionSettingsInitialValue } from "../utils/ppt-generator/settings-generator";
 
 type Props = {
   mainText: string;

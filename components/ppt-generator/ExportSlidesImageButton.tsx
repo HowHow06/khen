@@ -6,7 +6,8 @@ import {
 } from "@/lib/react-pptx-preview/normalizer";
 import { SlideObjectPreview } from "@/lib/react-pptx-preview/SlideObjectPreview";
 import { layoutToInches, normalizedColorToCSS } from "@/lib/react-pptx-preview/util";
-import { generatePreviewConfig, removeNumbering } from "@/lib/utils";
+import { removeNumbering } from "@/lib/utils/general";
+import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
 import html2canvas from "html2canvas";
 import { ImageDown, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";

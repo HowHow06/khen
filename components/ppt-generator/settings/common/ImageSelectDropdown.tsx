@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import TooltipButton from "@/components/ui/tooltip-button";
 import { DropdownImagesType } from "@/lib/types";
-import { getIsTouchDevice } from "@/lib/utils";
+import { getIsTouchDevice } from "@/lib/utils/general";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { Image } from "lucide-react";
 import { useState } from "react";

@@ -29,18 +29,16 @@ import {
   SectionSettingsKeyType,
   SectionSettingsType,
 } from "@/lib/types";
+import { deepCopy, getIsTouchDevice, getJSONFromFile } from "@/lib/utils/general";
 import {
-  combineWithDefaultSettings,
-  deepCopy,
   exportFullSettings,
   exportSectionSettings,
   generateFullSettings,
-  getIsTouchDevice,
-  getJSONFromFile,
   getSettingTypeFromJSON,
-  mergeOverwritesWithSettings,
-  parseAllOverwritesFromLyrics,
-} from "@/lib/utils";
+} from "@/lib/utils/ppt-generator/import-export-settings";
+import { parseAllOverwritesFromLyrics } from "@/lib/utils/ppt-generator/lyrics-overwrite";
+import { mergeOverwritesWithSettings } from "@/lib/utils/ppt-generator/settings-diff";
+import { combineWithDefaultSettings } from "@/lib/utils/ppt-generator/settings-generator";
 import { ChevronDown, ChevronUp, MoreHorizontal, Type, X } from "lucide-react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

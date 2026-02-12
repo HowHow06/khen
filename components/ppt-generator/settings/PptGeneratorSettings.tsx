@@ -10,7 +10,7 @@ import {
 import { DEFAULT_PRESETS } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import ExportSlidesImageButton from "../ExportSlidesImageButton";
@@ -30,7 +30,7 @@ const PptGeneratorSettings = () => {
     settingsValues.general.useDifferentSettingForEachSection === true;
 
   return (
-    <div className="flex flex-row space-x-2">
+    <div className="flex flex-wrap gap-2">
       <Sheet
         modal={isExtraSmallScreen ? true : false}
         open={isSettingsOpen}

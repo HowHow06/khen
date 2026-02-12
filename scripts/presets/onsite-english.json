@@ -1,0 +1,115 @@
+{
+  "file": {
+    "filenamePrefix": "",
+    "filenameSuffix": ""
+  },
+  "general": {
+    "mainBackgroundImage": null,
+    "mainBackgroundColor": "#000000",
+    "separateSectionsToFiles": false,
+    "useBackgroundColorWhenEmpty": true,
+    "ignoreSubcontent": true,
+    "ignoreSubcontentWhenIdentical": true,
+    "sectionsAutoNumbering": true,
+    "textboxCountPerContentPerSlide": 1,
+    "lineCountPerTextbox": 2,
+    "presetChosen": "onsiteEnglishPreset"
+  },
+  "cover": {
+    "main": {
+      "coverTitlePositionY": 44,
+      "coverTitleFont": "Segoe Print",
+      "coverTitleFontSize": 72,
+      "coverTitleFontColor": "#FFFFFF"
+    },
+    "secondary": {
+      "coverTitlePositionY": 0,
+      "coverTitleFont": "Ebrima",
+      "coverTitleFontSize": 1,
+      "coverTitleFontColor": "#FFFFFF"
+    }
+  },
+  "content": {
+    "main": {
+      "text": {
+        "bold": true,
+        "fontColor": "#FFFFFF",
+        "font": "Ebrima",
+        "fontSize": 44,
+        "charSpacing": -1,
+        "align": "center",
+        "lineSpacingMultiple": 1.5
+      },
+      "glow": {
+        "hasGlow": false,
+        "glowSize": 7,
+        "glowColor": "#000000",
+        "glowOpacity": 0.4
+      },
+      "outline": {
+        "hasOutline": false,
+        "outlineWeight": 0,
+        "outlineColor": "#000000"
+      },
+      "shadow": {
+        "hasShadow": true,
+        "shadowType": "outer",
+        "shadowColor": "#000000",
+        "shadowBlur": 3,
+        "shadowOffset": 3,
+        "shadowAngle": 45,
+        "shadowOpacity": 0.5
+      },
+      "textbox": {
+        "textbox1": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 45
+        },
+        "textbox2": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 58
+        }
+      }
+    },
+    "secondary": {
+      "text": {
+        "bold": true,
+        "fontColor": "#ffffff",
+        "font": "Ebrima",
+        "fontSize": 31,
+        "charSpacing": 0,
+        "align": "center"
+      },
+      "glow": {
+        "hasGlow": false,
+        "glowSize": 7,
+        "glowColor": "#000000",
+        "glowOpacity": 0.4
+      },
+      "outline": {
+        "hasOutline": false,
+        "outlineWeight": 0,
+        "outlineColor": "#000000"
+      },
+      "shadow": {
+        "hasShadow": true,
+        "shadowType": "outer",
+        "shadowColor": "#000000",
+        "shadowBlur": 3,
+        "shadowOffset": 3,
+        "shadowAngle": 45,
+        "shadowOpacity": 0.5
+      },
+      "textbox": {
+        "textbox1": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 39
+        },
+        "textbox2": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 69
+        }
+      }
+    }
+  }
+}

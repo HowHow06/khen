@@ -8,7 +8,7 @@ import {
   TEXTBOX_GROUPING_PREFIX,
   TEXTBOX_SETTING_KEY,
 } from "@/lib/constant";
-import { cn, groupByAsObject } from "@/lib/utils";
+import { cn, groupByAsObject } from "@/lib/utils/general";
 import { useMemo } from "react";
 import ContentTypeTabsList from "../ContentTypeTabsList";
 import GroupedBaseSettings from "../GroupedBaseSettings";

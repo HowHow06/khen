@@ -17,7 +17,7 @@ import {
   SectionSettingsType,
   SettingsValueType,
 } from "@/lib/types";
-import { deepMerge } from "@/lib/utils";
+import { deepMerge } from "@/lib/utils/general";
 
 /**
  * Get default values based on given settings meta (except)

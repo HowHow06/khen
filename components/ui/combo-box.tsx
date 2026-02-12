@@ -17,7 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { SelectionItemsType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 
 export type ComboxBoxProps = {
   items: SelectionItemsType;

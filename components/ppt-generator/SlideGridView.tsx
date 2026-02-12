@@ -5,7 +5,7 @@ import {
   InternalSlide,
 } from "@/lib/react-pptx-preview/normalizer";
 import { layoutToInches } from "@/lib/react-pptx-preview/util";
-import { getBase64FromString, removeNumbering } from "@/lib/utils";
+import { getBase64FromString, removeNumbering } from "@/lib/utils/general";
 import SlidePreview from "../react-pptx-preview/SlidePreview";
 import { ScrollArea } from "../ui/scroll-area";
 

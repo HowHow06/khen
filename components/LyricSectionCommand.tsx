@@ -1,6 +1,6 @@
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import { CursorPosition } from "@/lib/types";
-import { getTextInsertedAtPosition } from "@/lib/utils";
+import { getTextInsertedAtPosition } from "@/lib/utils/general";
 import { useCallback } from "react";
 import {
   CommandDialog,

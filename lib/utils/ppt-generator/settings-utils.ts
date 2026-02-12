@@ -5,7 +5,7 @@ import {
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
 import { FieldTypeToTypeScriptType } from "@/lib/types";
-import { getBase64, getBlobFromUrl } from "@/lib/utils";
+import { getBase64, getBlobFromUrl } from "@/lib/utils/general";
 
 export const getBase64FromImageField = async (
   imageValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE],

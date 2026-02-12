@@ -1,0 +1,93 @@
+{
+  "general": {
+    "mainBackgroundColor": "#000000",
+    "sectionsAutoNumbering": true,
+    "lineCountPerTextbox": 1,
+    "textboxCountPerContentPerSlide": 2,
+    "useBackgroundColorWhenEmpty": true,
+    "ignoreSubcontent": false,
+    "ignoreSubcontentWhenIdentical": true
+  },
+  "file": {
+    "filename": "Sample Presentation",
+    "filenamePrefix": "",
+    "filenameSuffix": ""
+  },
+  "content": {
+    "main": {
+      "text": {
+        "mainFontFace": "Microsoft YaHei",
+        "mainFontSize": 44,
+        "mainFontColor": "#FFFFFF",
+        "mainFontBold": false,
+        "mainFontItalic": false,
+        "mainTextAlign": "center"
+      },
+      "shadow": {
+        "mainShadowType": "outer",
+        "mainShadowColor": "#000000",
+        "mainShadowBlur": 3,
+        "mainShadowOffset": 3,
+        "mainShadowAngle": 45,
+        "mainShadowOpacity": 0.5
+      },
+      "glow": {},
+      "outline": {},
+      "textbox": {
+        "textbox1": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 20,
+          "textboxWidth": 100,
+          "textboxHeight": 25
+        },
+        "textbox2": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 55,
+          "textboxWidth": 100,
+          "textboxHeight": 25
+        }
+      }
+    },
+    "secondary": {
+      "text": {
+        "mainFontFace": "Microsoft YaHei",
+        "mainFontSize": 32,
+        "mainFontColor": "#CCCCCC",
+        "mainFontBold": false,
+        "mainFontItalic": false,
+        "mainTextAlign": "center"
+      },
+      "shadow": {},
+      "glow": {},
+      "outline": {},
+      "textbox": {
+        "textbox1": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 20,
+          "textboxWidth": 100,
+          "textboxHeight": 25
+        },
+        "textbox2": {
+          "textboxPositionX": 0,
+          "textboxPositionY": 55,
+          "textboxWidth": 100,
+          "textboxHeight": 25
+        }
+      }
+    }
+  },
+  "cover": {
+    "main": {
+      "coverTitlePositionY": 0,
+      "coverTitleFont": "Microsoft YaHei",
+      "coverTitleFontSize": 80,
+      "coverTitleFontColor": "#FFFFFF"
+    },
+    "secondary": {
+      "coverTitlePositionY": 0,
+      "coverTitleFont": "Microsoft YaHei",
+      "coverTitleFontSize": 60,
+      "coverTitleFontColor": "#CCCCCC"
+    }
+  }
+}

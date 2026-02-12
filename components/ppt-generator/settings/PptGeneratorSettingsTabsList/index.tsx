@@ -2,7 +2,7 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SETTING_CATEGORY } from "@/lib/constant";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 
 type Props = {};
 

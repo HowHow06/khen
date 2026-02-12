@@ -10,9 +10,9 @@ import {
   ObjectOptions,
   SectionProps,
 } from "@/lib/types/pptxgenjs/core-interfaces";
-import { createPptInstance } from "@/lib/utils";
 import { LineToSlideMapper } from "./line-to-slide-mapper";
 import { removeAllOverwritesFromLyrics } from "./lyrics-overwrite";
+import { createPptInstance } from "./ppt-generation";
 import { mergeOverwritesFromLyrics } from "./settings-diff";
 
 const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
@@ -152,9 +152,9 @@ export const generatePreviewConfig = async ({
     slides: slidesConfig,
   };
 
-  console.log({
-    presV2,
-    slidesConfig,
-  });
+  // console.log({
+  //   presV2,
+  //   slidesConfig,
+  // });
   return reactPptxConfig;
 };

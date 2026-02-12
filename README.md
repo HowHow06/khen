@@ -54,7 +54,11 @@ The application will be available at `http://localhost:3000` or the port specifi
 
 ## 📚 Documentation: PPT Generator Tool
 
-For more detailed information on each tool within Khen, including walkthroughs and tips, refer to the [guide](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4).
+For more detailed information on each tool within Khen, including walkthroughs and tips, refer to:
+
+- [PPT Generator User Guide](./docs/PPT_GENERATOR_USER_GUIDE.md) - Comprehensive guide for the web application
+- [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md) - Command-line interface for offline PPT generation
+- [External Guide](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4) - Additional training materials
 
 ## 🙌 Contributing
 

@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef } from "react";
 import { LYRIC_SECTION } from "../constant";
 import { PptSettingsStateType, SectionSettingsKeyType } from "../types";
-import { deepCompare, getLinesStartingWith } from "../utils";
+import { deepCompare, getLinesStartingWith } from "../utils/general";
+import { insertOrUpdateSectionOverwritesInLyrics, removeAllOverwritesFromLyrics } from "../utils/ppt-generator/lyrics-overwrite";
 import {
   getAllSectionOverwrites,
   getGlobalSettingsOverwrite,
-  insertOrUpdateSectionOverwritesInLyrics,
-  removeAllOverwritesFromLyrics,
   settingsOverwriteToJson,
-} from "../utils/ppt-generator";
+} from "../utils/ppt-generator/settings-diff";
 
 type Props = {
   settingsValues: PptSettingsStateType;

@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import React, { HTMLAttributes, useCallback } from "react";
 import { Accept, FileRejection, useDropzone } from "react-dropzone";
 
