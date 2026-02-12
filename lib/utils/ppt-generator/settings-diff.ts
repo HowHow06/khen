@@ -421,6 +421,6 @@ export function mergeOverwritesWithSettings(
     }
   }
 
-  console.log("logging mergedSettings", mergedSettings);
+  // console.log("logging mergedSettings", mergedSettings);
   return mergedSettings;
 }

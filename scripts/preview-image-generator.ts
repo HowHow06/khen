@@ -5,6 +5,56 @@
 
 import { chromium } from "playwright";
 import path from "path";
+import fs from "fs/promises";
+import { fileURLToPath } from "url";
+
+// Get the project root directory (where public folder is located)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "..");
+
+/**
+ * Load font CSS files and embed fonts as base64 data URLs
+ */
+async function loadFontCSS(): Promise<string> {
+  const cssFiles = ["microsoft-yahei.css", "ebrima.css"];
+  const fontCSSParts: string[] = [];
+
+  for (const cssFile of cssFiles) {
+    try {
+      const cssPath = path.join(PROJECT_ROOT, "public", "css", cssFile);
+      let cssContent = await fs.readFile(cssPath, "utf-8");
+
+      // Find all font URLs and replace with base64 data URLs
+      const urlMatches = cssContent.matchAll(/url\("([^"]+)"\)/g);
+      for (const match of urlMatches) {
+        const urlPath = match[1];
+        if (urlPath.startsWith("/fonts/")) {
+          const fontPath = path.join(PROJECT_ROOT, "public", urlPath);
+          try {
+            const fontData = await fs.readFile(fontPath);
+            const base64 = fontData.toString("base64");
+            const mimeType = urlPath.endsWith(".woff2")
+              ? "font/woff2"
+              : "font/woff";
+            cssContent = cssContent.replace(
+              `url("${urlPath}")`,
+              `url("data:${mimeType};base64,${base64}")`
+            );
+          } catch {
+            // Font file not found, keep original URL (will use local font)
+          }
+        }
+      }
+
+      fontCSSParts.push(cssContent);
+    } catch {
+      // CSS file not found, skip
+    }
+  }
+
+  return fontCSSParts.join("\n");
+}
 
 // Types from the preview system
 interface InternalTextPart {
@@ -94,8 +144,13 @@ function normalizedColorToCSS(color: string | { type: string; color: string; alp
   }
 }
 
+// Calculate percentage - value can be inches (number) or already a percentage string
 function calculatePercentage(value: number | string, total: number): number {
-  return typeof value === "number" ? (value / total) * 100 : parseInt(String(value), 10);
+  if (typeof value === "number") {
+    return (value / total) * 100;
+  }
+  // If it's a string like "50%", parse the number
+  return parseInt(String(value), 10);
 }
 
 function escapeHtml(text: string): string {
@@ -113,33 +168,35 @@ function removeNumbering(text: string): string {
   return text.replace(/^\d+(\.\d+)*\.?\s*/, "").trim();
 }
 
-function getTextStyleCSS(
-  style: InternalSlideObject["style"],
+// Convert points to pixels based on slide dimensions
+function pointsToPx(points: number, dimensions: [number, number], slideWidth: number): number {
+  return ((points * POINTS_TO_INCHES) / dimensions[0]) * slideWidth;
+}
+
+function getTextPartStyleCSS(
+  style: any,
   dimensions: [number, number],
   slideWidth: number
 ): string {
-  const pointsToPx = (points: number) =>
-    ((points * POINTS_TO_INCHES) / dimensions[0]) * slideWidth;
-
   const styles: string[] = [];
 
   if (style.fontSize) {
-    styles.push(`font-size: ${pointsToPx(style.fontSize)}px`);
+    styles.push(`font-size: ${pointsToPx(style.fontSize, dimensions, slideWidth)}px`);
   }
   if (style.color) {
     styles.push(`color: ${normalizedColorToCSS(style.color)}`);
   }
   if (style.fontFace) {
-    styles.push(`font-family: "${style.fontFace}", sans-serif`);
+    styles.push(`font-family: '${style.fontFace}', sans-serif`);
   }
   if (style.bold) {
     styles.push("font-weight: bold");
   }
   if (style.charSpacing) {
-    styles.push(`letter-spacing: ${pointsToPx(style.charSpacing)}px`);
+    styles.push(`letter-spacing: ${pointsToPx(style.charSpacing, dimensions, slideWidth)}px`);
   }
   if (style.lineSpacing) {
-    styles.push(`line-height: ${pointsToPx(style.lineSpacing)}px`);
+    styles.push(`line-height: ${pointsToPx(style.lineSpacing, dimensions, slideWidth)}px`);
   }
 
   return styles.join("; ");
@@ -150,52 +207,59 @@ function renderTextObject(
   dimensions: [number, number],
   slideWidth: number
 ): string {
-  if (object.kind !== "text" || !object.text) return "";
+  if (object.kind !== "text" || !object.text || object.text.length === 0) return "";
 
+  // Calculate positions - x, y, w might be percentage strings like "30%" or numbers (inches)
   const xPct = calculatePercentage(object.style.x, dimensions[0]);
   const yPct = calculatePercentage(object.style.y, dimensions[1]);
   const wPct = calculatePercentage(object.style.w, dimensions[0]);
-  const hPct = calculatePercentage(object.style.h, dimensions[1]);
+  
+  // Height might be 0 or undefined - in that case, let it auto-size
+  const rawH = object.style.h;
+  const hasHeight = rawH !== undefined && rawH !== 0 && rawH !== "0" && rawH !== "0%";
+  const hPct = hasHeight ? calculatePercentage(rawH, dimensions[1]) : 0;
 
-  const containerStyle = getTextStyleCSS(object.style, dimensions, slideWidth);
+  // Get container style - this includes font size, color, etc.
+  const containerStyleCSS = getTextPartStyleCSS(object.style, dimensions, slideWidth);
 
-  let verticalAlign = "center";
-  if (object.style.verticalAlign === "top") verticalAlign = "flex-start";
-  if (object.style.verticalAlign === "bottom") verticalAlign = "flex-end";
+  // Determine horizontal alignment
+  const textAlign = object.style.align || "center";
 
+  // Render text parts - merge container styles with part-specific styles
+  // Part styles override container styles
   const textParts = object.text
     .map((part) => {
-      const partStyle = getTextStyleCSS(
-        part.style as InternalSlideObject["style"],
-        dimensions,
-        slideWidth
-      );
-      return `<div style="${partStyle}">${escapeHtml(part.text)}</div>`;
+      // Merge object.style with part.style (part overrides)
+      const mergedStyle = { ...object.style, ...part.style };
+      const partStyleCSS = getTextPartStyleCSS(mergedStyle, dimensions, slideWidth);
+      return `<span style="${partStyleCSS}">${escapeHtml(part.text)}</span>`;
     })
     .join("");
 
-  return `
-    <div style="
-      position: absolute;
-      left: ${xPct}%;
-      top: ${yPct}%;
-      width: ${wPct}%;
-      height: ${hPct}%;
-      box-sizing: border-box;
-    ">
-      <div style="
-        ${containerStyle};
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        text-align: ${object.style.align || "left"};
-        justify-content: ${object.style.align || "left"};
-        align-items: ${verticalAlign};
-      ">
-        ${textParts}
-      </div>
-    </div>
-  `;
+  // If height is 0, don't constrain height - let text flow naturally
+  const heightStyle = hasHeight ? `height: ${hPct}%;` : "";
+
+  // Build clean inline styles without newlines
+  // Use transform to offset text upward by half line height for better vertical centering
+  // This aligns the center of the text with the y position rather than the top
+  const outerStyles = [
+    "position: absolute",
+    `left: ${xPct}%`,
+    `top: ${yPct}%`,
+    `width: ${wPct}%`,
+    hasHeight ? `height: ${hPct}%` : "",
+    "box-sizing: border-box",
+    "transform: translateY(-50%)", // Center text on y position
+  ].filter(Boolean).join("; ");
+
+  const innerStyles = [
+    containerStyleCSS,
+    "width: 100%",
+    "line-height: 1.2", // Consistent line height
+    `text-align: ${textAlign}`,
+  ].filter(Boolean).join("; ");
+
+  return `<div style="${outerStyles}"><div style="${innerStyles}">${textParts}</div></div>`;
 }
 
 function renderSlide(
@@ -204,38 +268,56 @@ function renderSlide(
   dimensions: [number, number],
   slideWidth: number
 ): string {
+  // Get background from slide or master slide
   const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
-  const backgroundImage = slide.backgroundImage ?? masterSlide?.backgroundImage;
+  const slideBackgroundImage = slide.backgroundImage;
+  const masterBackgroundImage = masterSlide?.backgroundImage;
 
   let bgImageStyle = "";
-  if (backgroundImage) {
-    if (typeof backgroundImage === "string") {
-      bgImageStyle = `background-image: url("data:${backgroundImage}");`;
-    } else if (backgroundImage.kind === "path" && backgroundImage.path) {
-      bgImageStyle = `background-image: url("${backgroundImage.path}");`;
-    } else if (backgroundImage.data) {
-      bgImageStyle = `background-image: url("data:${backgroundImage.data}");`;
+  
+  // Check slide background image first
+  if (slideBackgroundImage) {
+    if (typeof slideBackgroundImage === "string") {
+      // Already a data URL or path
+      if (slideBackgroundImage.startsWith("data:") || slideBackgroundImage.startsWith("image/")) {
+        bgImageStyle = `background-image: url("data:${slideBackgroundImage}");`;
+      } else {
+        bgImageStyle = `background-image: url("${slideBackgroundImage}");`;
+      }
+    }
+  } else if (masterBackgroundImage) {
+    // Check master slide background image
+    if (masterBackgroundImage.kind === "path" && masterBackgroundImage.path) {
+      bgImageStyle = `background-image: url("${masterBackgroundImage.path}");`;
+    } else if (masterBackgroundImage.data) {
+      bgImageStyle = `background-image: url("data:${masterBackgroundImage.data}");`;
     }
   }
 
   const aspectRatio = dimensions[0] / dimensions[1];
   const slideHeight = slideWidth / aspectRatio;
 
+  // Render master slide objects first (background elements)
   const masterObjects = masterSlide?.objects
     ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
     .join("") ?? "";
 
+  // Render slide objects on top
   const slideObjects = slide.objects
     ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
     .join("") ?? "";
+
+  // Default to black background if no color specified (common for PPT slides)
+  const bgColor = backgroundColor ? normalizedColorToCSS(backgroundColor) : "#000000";
 
   return `
     <div style="
       width: ${slideWidth}px;
       height: ${slideHeight}px;
-      background-color: ${backgroundColor ? normalizedColorToCSS(backgroundColor) : "white"};
+      background-color: ${bgColor};
       ${bgImageStyle}
       background-size: cover;
+      background-position: center;
       position: relative;
       white-space: pre-wrap;
       overflow: hidden;
@@ -248,9 +330,9 @@ function renderSlide(
   `;
 }
 
-function generatePreviewHtml(config: InternalPresentation): string {
+function generatePreviewHtml(config: InternalPresentation, fontCSS: string): string {
   const dimensions = layoutToInches(config.layout);
-  const slideWidth = 320;
+  const slideWidth = 480; // Increased from 320 for better visibility
 
   // Group slides by section
   const slidesBySection: Record<string, Array<{ slide: InternalSlide; index: number }>> = {};
@@ -324,8 +406,8 @@ function generatePreviewHtml(config: InternalPresentation): string {
           </div>
           <div style="
             display: grid;
-            grid-template-columns: repeat(5, ${slideWidth}px);
-            gap: 16px;
+            grid-template-columns: repeat(4, ${slideWidth}px);
+            gap: 20px;
           ">
             ${slidesHtml}
           </div>
@@ -340,12 +422,15 @@ function generatePreviewHtml(config: InternalPresentation): string {
     <head>
       <meta charset="UTF-8">
       <style>
+        /* Embedded font definitions */
+        ${fontCSS}
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: system-ui, -apple-system, sans-serif;
           background-color: #09090b;
           padding: 40px;
-          width: 1800px;
+          width: 2100px;
         }
       </style>
     </head>
@@ -375,35 +460,26 @@ export async function generatePreviewImage(
   config: InternalPresentation,
   outputPath: string
 ): Promise<string> {
-  const html = generatePreviewHtml(config);
+  // Load font CSS with embedded base64 fonts
+  const fontCSS = await loadFontCSS();
+  const html = generatePreviewHtml(config, fontCSS);
 
   // Launch browser and capture screenshot
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
   // Set content and wait for rendering
-  await page.setContent(html, { waitUntil: "networkidle" });
+  await page.setContent(html, { waitUntil: "domcontentloaded" });
+  
+  // Wait for fonts to load and content to render
+  await page.waitForTimeout(500);
 
-  // Get the body dimensions to capture the full content
-  const bodyHandle = await page.$("body");
-  const boundingBox = await bodyHandle?.boundingBox();
-
-  if (!boundingBox) {
-    await browser.close();
-    throw new Error("Failed to get page dimensions");
-  }
-
-  // Take screenshot
+  // Take full page screenshot
   const screenshotPath = outputPath.endsWith(".png") ? outputPath : `${outputPath}.png`;
 
   await page.screenshot({
     path: screenshotPath,
-    clip: {
-      x: 0,
-      y: 0,
-      width: Math.ceil(boundingBox.width),
-      height: Math.ceil(boundingBox.height),
-    },
+    fullPage: true,
   });
 
   await browser.close();
