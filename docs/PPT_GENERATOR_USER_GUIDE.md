@@ -11,6 +11,7 @@
 7. [Toolbar Functions](#toolbar-functions)
 8. [Settings](#settings)
 9. [Generating Your Presentation](#generating-your-presentation)
+   - [Export Image](#export-image)
 10. [Tips and Best Practices](#tips-and-best-practices)
 
 ---
@@ -26,6 +27,7 @@ The **Khen PPT Generator** is a specialized tool designed to simplify the creati
 - Special syntax for covers, sections, and page breaks
 - Customizable formatting and styling settings
 - Live preview of slides
+- Export slides as image (PNG) for quick sharing
 - Export to PowerPoint (.pptx) format
 
 ---
@@ -529,10 +531,40 @@ Once you've entered your lyrics and configured your settings:
    - Settings
    - Section markers
 
-3. **Generate PPT** - Click the final generate button to:
+3. **Export Image** - Click this button to export all slides as a single image
+   - Creates a PNG image with all slides arranged in a grid layout
+   - Useful for quick sharing or review without opening PowerPoint
+   - See [Export Image](#export-image) section below for more details
+
+4. **Generate PPT** - Click the final generate button to:
    - Create your PowerPoint presentation
    - Download the .pptx file
    - Open it in PowerPoint, Google Slides, or compatible software
+
+### Export Image
+
+The **Export Image** button (located next to the Preview button) allows you to export all your slides as a single PNG image. This feature is useful for:
+
+- **Quick sharing** - Share a visual overview of your presentation via messaging apps or email without sending a PPT file
+- **Review and approval** - Send a preview image to worship leaders or team members for quick feedback
+- **Documentation** - Keep a visual record of your presentation layouts
+- **Social media** - Share song arrangements on social platforms
+
+**How to use:**
+
+1. Enter your lyrics and configure settings as usual
+2. Click the **Export Image** button (next to the Preview button)
+3. Wait for the export to complete (a loading indicator will show)
+4. The PNG file will automatically download to your device
+
+**Export includes:**
+
+- All slides organized by section (Slides, Verse 1, Verse 2, Chorus, etc.)
+- Section headers with slide counts
+- Slide thumbnails with slide numbers
+- Dark themed layout for easy viewing
+
+**Note:** The Export Image button is disabled until you have entered lyrics in the main lyric field.
 
 ---
 
@@ -754,7 +786,8 @@ The Khen PPT Generator streamlines the creation of multilingual worship presenta
 2. **Providing special syntax** for structure and formatting
 3. **Offering comprehensive customization** through settings
 4. **Enabling preview and iteration** before final generation
-5. **Exporting professional PowerPoint** presentations ready for worship services
+5. **Exporting slides as images** for quick sharing and review
+6. **Exporting professional PowerPoint** presentations ready for worship services
 
 Whether you're preparing for weekly services, special events, or teaching sessions, this tool helps you create polished, readable lyrics presentations efficiently.
 

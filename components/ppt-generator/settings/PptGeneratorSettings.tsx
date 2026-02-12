@@ -13,6 +13,7 @@ import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
+import ExportSlidesImageButton from "../ExportSlidesImageButton";
 import GeneratePreviewButton from "../GeneratePreviewButton";
 import PptGeneratorSettingsContent from "./PptGeneratorSettingsContent";
 import PresetsDropdown from "./PresetsDropdown";
@@ -75,6 +76,7 @@ const PptGeneratorSettings = () => {
         </SheetContent>
       </Sheet>
       <GeneratePreviewButton />
+      <ExportSlidesImageButton />
       {/* Add presets dropdown at mobile screen size to ease configuration process*/}
       {isExtraSmallScreen && (
         <PresetsDropdown
