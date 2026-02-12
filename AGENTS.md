@@ -193,3 +193,48 @@ const { lineMapper } = useLineToSlideMapperContext();
 - Generic reusable components → `components/ui/`
 - PPT generator-specific components → `components/ppt-generator/`
 - Context providers → `components/context/`
+
+## Import Patterns & Circular Dependency Prevention
+
+This codebase has barrel files (index.ts) that re-export from multiple modules. This can cause circular dependency issues when modules at the "bottom" of the dependency chain import from barrel files.
+
+### The Problem
+
+Circular dependencies occur when:
+1. `lib/constant/` imports from `lib/utils/` (barrel)
+2. `lib/utils/index.ts` exports from `lib/utils/ppt-generator/`
+3. `lib/utils/ppt-generator/` exports from files that import `lib/schemas/`
+4. `lib/schemas/` uses constants from `lib/constant/` at module initialization time
+
+This creates a loop where constants can't be accessed before they're initialized.
+
+### Prevention Rules
+
+1. **Files in `lib/constant/` should NEVER import from barrel files (`@/lib/utils`, `../utils`)**
+   - Instead, import directly from specific files: `../utils/general`, `../utils/ppt-generator/specific-file`
+
+2. **Files in `lib/types/` should NEVER import from `lib/utils/` or `lib/schemas/`**
+   - Types should be self-contained or only depend on constants
+
+3. **Files in `lib/schemas/` should avoid top-level code that uses constants**
+   - If schemas need constants, consider lazy initialization or moving the schema generation into functions
+
+4. **When adding new exports to barrel files**, check if any "upstream" modules (constant, types) might indirectly import them
+
+### Safe Import Hierarchy
+
+```
+lib/constant/  →  can import from: lib/types/, lib/utils/general.ts (specific file only)
+lib/types/     →  can import from: lib/constant/
+lib/schemas/   →  can import from: lib/constant/, lib/types/
+lib/utils/     →  can import from: lib/constant/, lib/types/, lib/schemas/, other utils
+lib/hooks/     →  can import from: anything in lib/
+lib/presets/   →  can import from: anything in lib/
+```
+
+### Debugging Circular Dependencies
+
+If you see errors like `Cannot access 'X' before initialization`:
+1. Trace the import chain from the error stack
+2. Look for barrel file imports in `lib/constant/` or `lib/types/`
+3. Replace barrel imports with direct file imports

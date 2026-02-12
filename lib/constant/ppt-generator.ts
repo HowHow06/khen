@@ -5,7 +5,7 @@ import {
   PresetsType,
   SelectionItemsType,
 } from "../types";
-import { getValueFromPath } from "../utils";
+import { getValueFromPath } from "../utils/general";
 import { convertToTraditional } from "../utils/character-converter";
 import { fontFaces } from "./font-face";
 
