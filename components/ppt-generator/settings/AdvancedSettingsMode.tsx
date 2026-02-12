@@ -2,7 +2,6 @@
 
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -472,11 +471,11 @@ const AdvancedSettingsMode = () => {
         </div>
 
         {/* Code editor with line numbers */}
-        <div className="relative flex h-[calc(100%-36px)] min-w-0">
+        <div className="relative flex h-[calc(100%-36px)] min-w-0 overflow-hidden">
           {/* Line numbers */}
           <div
             ref={lineNumbersRef}
-            className="pointer-events-none w-10 shrink-0 select-none overflow-hidden border-r border-slate-800 bg-slate-900/30 py-3 text-right"
+            className="pointer-events-none w-10 shrink-0 select-none overflow-y-auto border-r border-slate-800 bg-slate-900/30 py-3 text-right"
             style={{ fontFamily: MONO_FONT }}
           >
             {Array.from({ length: lineCount }, (_, i) => (
@@ -497,7 +496,7 @@ const AdvancedSettingsMode = () => {
           </div>
 
           {/* Textarea */}
-          <ScrollArea className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 overflow-auto">
             <textarea
               ref={textareaRef}
               value={jsonText}
@@ -507,17 +506,19 @@ const AdvancedSettingsMode = () => {
               onKeyUp={handleSelect}
               onClick={handleSelect}
               spellCheck={false}
+              wrap="off"
               className={cn(
-                "h-full min-h-[350px] w-full resize-none bg-transparent p-2 text-xs leading-[1.625rem] text-slate-200 outline-none",
+                "h-full min-h-[350px] min-w-full resize-none bg-transparent p-2 text-xs leading-[1.625rem] text-slate-200 outline-none",
                 "placeholder:text-slate-600"
               )}
               style={{
                 fontFamily: MONO_FONT,
                 tabSize: 2,
+                whiteSpace: "pre",
               }}
               placeholder="Paste or type your JSON settings here..."
             />
-          </ScrollArea>
+          </div>
         </div>
 
         {/* Subtle gradient overlay at bottom */}
