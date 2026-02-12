@@ -49,15 +49,16 @@ This will:
 
 ## Command Line Options
 
-| Option        | Short | Required | Default                       | Description                                               |
-| ------------- | ----- | -------- | ----------------------------- | --------------------------------------------------------- |
-| `--main`      | `-m`  | Yes      | -                             | Path to the main lyrics file                              |
-| `--secondary` | `-s`  | No       | Same as main                  | Path to secondary lyrics file (e.g., pinyin, translation) |
-| `--config`    | `-c`  | No       | Default settings              | Path to a settings JSON file                              |
-| `--output`    | `-o`  | No       | Current directory (`.`)       | Output directory for generated files                      |
-| `--filename`  | `-f`  | No       | Auto-generated with timestamp | Output filename (without extension)                       |
-| `--preview`   | `-p`  | No       | `false`                       | Generate preview JSON instead of PPT                      |
-| `--help`      | `-h`  | No       | -                             | Display help message                                      |
+| Option          | Short | Required | Default                       | Description                                               |
+| --------------- | ----- | -------- | ----------------------------- | --------------------------------------------------------- |
+| `--main`        | `-m`  | Yes      | -                             | Path to the main lyrics file                              |
+| `--secondary`   | `-s`  | No       | Same as main                  | Path to secondary lyrics file (e.g., pinyin, translation) |
+| `--auto-pinyin` | `-y`  | No       | `false`                       | Auto-generate pinyin as secondary lyrics from main lyrics |
+| `--config`      | `-c`  | No       | Default settings              | Path to a settings JSON file                              |
+| `--output`      | `-o`  | No       | Current directory (`.`)       | Output directory for generated files                      |
+| `--filename`    | `-f`  | No       | Auto-generated with timestamp | Output filename (without extension)                       |
+| `--preview`     | `-p`  | No       | `false`                       | Generate preview image (PNG) instead of PPT               |
+| `--help`        | `-h`  | No       | -                             | Display help message                                      |
 
 ### View Help
 
@@ -88,6 +89,18 @@ npx tsx scripts/generate-ppt-from-lyrics.ts \
   --main songs/chinese-song.txt \
   --secondary songs/chinese-song-pinyin.txt
 ```
+
+### Auto-Generate Pinyin
+
+Automatically generate pinyin romanization from Chinese lyrics:
+
+```bash
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main songs/chinese-song.txt \
+  --auto-pinyin
+```
+
+This is particularly useful for Chinese songs when you don't have a separate pinyin file. The pinyin is generated using the `pinyin-pro` library with tone marks removed.
 
 ### Custom Output Location
 
@@ -128,6 +141,17 @@ npx tsx scripts/generate-ppt-from-lyrics.ts \
   --main songs/chinese-hymn.txt \
   --secondary songs/chinese-hymn-pinyin.txt \
   --config church-settings.json \
+  --output ./sunday-service \
+  --filename "2024-01-07 Hymns"
+```
+
+Or with auto-generated pinyin:
+
+```bash
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main songs/chinese-hymn.txt \
+  --auto-pinyin \
+  --config scripts/presets/onsite-chinese.json \
   --output ./sunday-service \
   --filename "2024-01-07 Hymns"
 ```

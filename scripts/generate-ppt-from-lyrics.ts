@@ -9,6 +9,7 @@
  * Options:
  *   --main, -m        Path to main lyrics file (required)
  *   --secondary, -s   Path to secondary lyrics file (optional)
+ *   --auto-pinyin, -y Auto-generate pinyin as secondary lyrics (optional)
  *   --config, -c      Path to settings JSON file (optional)
  *   --output, -o      Output directory (default: current directory)
  *   --filename, -f    Output filename without extension (optional)
@@ -18,6 +19,7 @@
  * Examples:
  *   npx tsx scripts/generate-ppt-from-lyrics.ts --main lyrics.txt
  *   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt -s pinyin.txt -o ./output
+ *   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt --auto-pinyin
  *   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt -c settings.json --preview
  */
 
@@ -29,6 +31,7 @@ import { parseArgs } from "util";
 interface CliOptions {
   main: string;
   secondary?: string;
+  autoPinyin: boolean;
   config?: string;
   output: string;
   filename?: string;
@@ -42,6 +45,7 @@ function parseCliArgs(): CliOptions {
     options: {
       main: { type: "string", short: "m" },
       secondary: { type: "string", short: "s" },
+      "auto-pinyin": { type: "boolean", short: "y", default: false },
       config: { type: "string", short: "c" },
       output: { type: "string", short: "o", default: "." },
       filename: { type: "string", short: "f" },
@@ -54,6 +58,7 @@ function parseCliArgs(): CliOptions {
   return {
     main: values.main as string,
     secondary: values.secondary as string | undefined,
+    autoPinyin: values["auto-pinyin"] as boolean,
     config: values.config as string | undefined,
     output: values.output as string,
     filename: values.filename as string | undefined,
@@ -73,6 +78,7 @@ Usage:
 Options:
   --main, -m        Path to main lyrics file (required)
   --secondary, -s   Path to secondary lyrics file (optional, uses main if not provided)
+  --auto-pinyin, -y Auto-generate pinyin as secondary lyrics from main lyrics
   --config, -c      Path to settings JSON file (optional)
   --output, -o      Output directory (default: current directory)
   --filename, -f    Output filename without extension (optional)
@@ -86,6 +92,9 @@ Examples:
   # With secondary lyrics (e.g., pinyin)
   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt -s pinyin.txt
 
+  # Auto-generate pinyin as secondary lyrics
+  npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt --auto-pinyin
+
   # With custom settings and output directory
   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt -c settings.json -o ./output
 
@@ -95,7 +104,7 @@ Examples:
   # Full example with all options
   npx tsx scripts/generate-ppt-from-lyrics.ts \\
     --main lyrics.txt \\
-    --secondary pinyin.txt \\
+    --auto-pinyin \\
     --config settings.json \\
     --output ./output \\
     --filename "My Presentation"
@@ -399,6 +408,12 @@ async function main(): Promise<void> {
     if (options.secondary) {
       console.log(`Reading secondary lyrics from: ${options.secondary}`);
       secondaryLyric = await readFile(options.secondary, "utf-8");
+    } else if (options.autoPinyin) {
+      // Auto-generate pinyin from primary lyrics
+      console.log("Auto-generating pinyin as secondary lyrics...");
+      const { getPinyin } = await import("../lib/utils/pinyin");
+      secondaryLyric = getPinyin({ text: primaryLyric, hasTone: false });
+      console.log("Pinyin generated successfully.");
     } else {
       console.log("No secondary lyrics file provided, using main lyrics.");
       secondaryLyric = primaryLyric;
