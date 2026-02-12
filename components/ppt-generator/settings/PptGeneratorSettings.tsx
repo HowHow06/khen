@@ -30,7 +30,7 @@ const PptGeneratorSettings = () => {
     settingsValues.general.useDifferentSettingForEachSection === true;
 
   return (
-    <div className="flex flex-row space-x-2">
+    <div className="flex flex-wrap gap-2">
       <Sheet
         modal={isExtraSmallScreen ? true : false}
         open={isSettingsOpen}
