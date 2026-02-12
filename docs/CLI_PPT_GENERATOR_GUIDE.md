@@ -8,6 +8,7 @@ This guide explains how to use the command-line interface (CLI) script to genera
 - [Quick Start](#quick-start)
 - [Command Line Options](#command-line-options)
 - [Usage Examples](#usage-examples)
+- [Built-in Presets](#built-in-presets)
 - [Configuration File](#configuration-file)
 - [Lyrics File Format](#lyrics-file-format)
 - [Preview Mode](#preview-mode)
@@ -130,6 +131,63 @@ npx tsx scripts/generate-ppt-from-lyrics.ts \
   --output ./sunday-service \
   --filename "2024-01-07 Hymns"
 ```
+
+---
+
+## Built-in Presets
+
+The CLI comes with pre-configured presets for common use cases. These are located in `scripts/presets/`.
+
+### Available Presets
+
+| Preset | File | Use Case |
+|--------|------|----------|
+| Onsite Chinese | `onsite-chinese.json` | Full-screen projection for Chinese songs with pinyin |
+| Live Chinese | `live-chinese.json` | Green screen overlay for live streaming Chinese songs |
+| Onsite English | `onsite-english.json` | Full-screen projection for English songs |
+| Live English | `live-english.json` | Green screen overlay for live streaming English songs |
+
+### Using Presets
+
+```bash
+# Chinese song for onsite projection
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main lyrics.txt \
+  --config scripts/presets/onsite-chinese.json
+
+# Chinese song for live streaming
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main lyrics.txt \
+  --config scripts/presets/live-chinese.json
+
+# English song for onsite projection
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main lyrics.txt \
+  --config scripts/presets/onsite-english.json
+
+# English song for live streaming
+npx tsx scripts/generate-ppt-from-lyrics.ts \
+  --main lyrics.txt \
+  --config scripts/presets/live-english.json
+```
+
+### Preset Characteristics
+
+**Onsite Presets:**
+- Solid black background
+- White text with drop shadow
+- Centered positioning for projection screens
+
+**Live Presets:**
+- Green screen background with black cover overlay
+- Text positioned at bottom of screen
+- Filename automatically appends `(live)` suffix
+
+**Chinese vs English:**
+- Chinese presets use Microsoft YaHei font with 2 textboxes (for lyrics + pinyin)
+- English presets use Ebrima/Segoe Print fonts with single textbox
+
+You can copy any preset and customize it to match your specific needs.
 
 ---
 
