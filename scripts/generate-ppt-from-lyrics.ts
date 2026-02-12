@@ -12,7 +12,7 @@
  *   --config, -c      Path to settings JSON file (optional)
  *   --output, -o      Output directory (default: current directory)
  *   --filename, -f    Output filename without extension (optional)
- *   --preview, -p     Generate preview JSON instead of PPT (optional)
+ *   --preview, -p     Generate preview image (PNG) instead of PPT (optional)
  *   --help, -h        Show help
  *
  * Examples:
@@ -76,7 +76,7 @@ Options:
   --config, -c      Path to settings JSON file (optional)
   --output, -o      Output directory (default: current directory)
   --filename, -f    Output filename without extension (optional)
-  --preview, -p     Generate preview JSON instead of PPT (optional)
+  --preview, -p     Generate preview image (PNG) instead of PPT (optional)
   --help, -h        Show this help message
 
 Examples:
@@ -89,7 +89,7 @@ Examples:
   # With custom settings and output directory
   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt -c settings.json -o ./output
 
-  # Generate preview JSON instead of PPT
+  # Generate preview image instead of PPT
   npx tsx scripts/generate-ppt-from-lyrics.ts -m lyrics.txt --preview
 
   # Full example with all options
@@ -122,21 +122,21 @@ async function main(): Promise<void> {
   // Dynamic imports - order matters to avoid circular dependency
   // First load constants (no deps on utils)
   const constantModule = await import("../lib/constant/ppt-generator");
-  const PPT_GENERATION_SETTINGS_META = constantModule.PPT_GENERATION_SETTINGS_META;
+  const PPT_GENERATION_SETTINGS_META =
+    constantModule.PPT_GENERATION_SETTINGS_META;
 
   // Load utility functions with careful ordering
   const { deepMerge } = await import("../lib/utils/general");
-  const { removeAllOverwritesFromLyrics } = await import(
-    "../lib/utils/ppt-generator/lyrics-overwrite"
-  );
-  const { mergeOverwritesFromLyrics } = await import(
-    "../lib/utils/ppt-generator/settings-diff"
-  );
+  const { removeAllOverwritesFromLyrics } =
+    await import("../lib/utils/ppt-generator/lyrics-overwrite");
+  const { mergeOverwritesFromLyrics } =
+    await import("../lib/utils/ppt-generator/settings-diff");
 
   // Inline implementation of settings generation to avoid circular dependency
   const SETTING_CATEGORY = constantModule.SETTING_CATEGORY;
   const CONTENT_TYPE = constantModule.CONTENT_TYPE;
-  const DEFAULT_TEXTBOX_COUNT_PER_SLIDE = constantModule.DEFAULT_TEXTBOX_COUNT_PER_SLIDE;
+  const DEFAULT_TEXTBOX_COUNT_PER_SLIDE =
+    constantModule.DEFAULT_TEXTBOX_COUNT_PER_SLIDE;
   const DEFAULT_GROUPING_NAME = constantModule.DEFAULT_GROUPING_NAME;
   const TEXTBOX_GROUPING_PREFIX = constantModule.TEXTBOX_GROUPING_PREFIX;
 
@@ -151,7 +151,7 @@ async function main(): Promise<void> {
   // Simplified settings generator (inline to avoid circular deps)
   function getInitialValuesFromSettings(
     settingsMeta: Record<string, any>,
-    hasGrouping = false
+    hasGrouping = false,
   ): Record<string, any> {
     const resultValues: any = {};
     Object.entries(settingsMeta).forEach(([key, setting]: [string, any]) => {
@@ -176,7 +176,7 @@ async function main(): Promise<void> {
 
   function getTextboxSettingsInitialValues(
     textboxSettingsMeta: Record<string, any>,
-    textboxCount: number = DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+    textboxCount: number = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
   ): Record<string, any> {
     const textBoxInitialState: Record<string, any> = {};
     Array.from({ length: textboxCount }).forEach((_, index) => {
@@ -188,7 +188,7 @@ async function main(): Promise<void> {
 
   function generatePptSettingsInitialState(
     settings: Record<string, any>,
-    textboxCount: number = DEFAULT_TEXTBOX_COUNT_PER_SLIDE
+    textboxCount: number = DEFAULT_TEXTBOX_COUNT_PER_SLIDE,
   ): PptSettingsStateType {
     const initialState: PptSettingsStateType = {
       [SETTING_CATEGORY.GENERAL]: {},
@@ -208,14 +208,13 @@ async function main(): Promise<void> {
         case SETTING_CATEGORY.GENERAL:
         case SETTING_CATEGORY.FILE:
           initialState[category] = getInitialValuesFromSettings(
-            settingsMeta as Record<string, any>
+            settingsMeta as Record<string, any>,
           );
           break;
         case SETTING_CATEGORY.COVER:
           Object.values(CONTENT_TYPE).forEach((contentType) => {
-            (initialState[category] as any)[contentType] = getInitialValuesFromSettings(
-              settingsMeta as Record<string, any>
-            );
+            (initialState[category] as any)[contentType] =
+              getInitialValuesFromSettings(settingsMeta as Record<string, any>);
           });
           break;
         case SETTING_CATEGORY.CONTENT:
@@ -223,11 +222,11 @@ async function main(): Promise<void> {
             (initialState[category] as any)[contentType] = {
               ...getInitialValuesFromSettings(
                 settingsMeta as Record<string, any>,
-                true
+                true,
               ),
               textbox: getTextboxSettingsInitialValues(
                 settings.contentTextbox,
-                textboxCount
+                textboxCount,
               ),
             };
           });
@@ -239,32 +238,30 @@ async function main(): Promise<void> {
   }
 
   function combineWithDefaultSettings(
-    settingsValue: PptSettingsStateType
+    settingsValue: PptSettingsStateType,
   ): PptSettingsStateType {
     const defaultInitialState = generatePptSettingsInitialState(
-      PPT_GENERATION_SETTINGS_META
+      PPT_GENERATION_SETTINGS_META,
     );
     const result = deepMerge(
       defaultInitialState,
-      settingsValue
+      settingsValue,
     ) as PptSettingsStateType;
     return result;
   }
 
   // Now we can safely load the rest
-  const { createPptInstance } = await import(
-    "../lib/utils/ppt-generator/ppt-generation"
-  );
-  const { parsePptFilename } = await import(
-    "../lib/utils/ppt-generator/settings-utils"
-  );
+  const { createPptInstance } =
+    await import("../lib/utils/ppt-generator/ppt-generation");
+  const { parsePptFilename } =
+    await import("../lib/utils/ppt-generator/settings-utils");
 
   // Load settings from JSON file or use defaults
   async function loadSettings(
-    configPath?: string
+    configPath?: string,
   ): Promise<PptSettingsStateType> {
     const defaultSettings = combineWithDefaultSettings(
-      generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META)
+      generatePptSettingsInitialState(PPT_GENERATION_SETTINGS_META),
     );
 
     if (!configPath) {
@@ -274,7 +271,7 @@ async function main(): Promise<void> {
     try {
       const configContent = await readFile(configPath, "utf-8");
       const userSettings = JSON.parse(
-        configContent
+        configContent,
       ) as Partial<PptSettingsStateType>;
 
       // Merge user settings with defaults
@@ -300,7 +297,7 @@ async function main(): Promise<void> {
       } as PptSettingsStateType;
     } catch (error) {
       console.warn(
-        `Warning: Could not load config file "${configPath}". Using defaults.`
+        `Warning: Could not load config file "${configPath}". Using defaults.`,
       );
       if (error instanceof Error) {
         console.warn(`  Reason: ${error.message}`);
@@ -309,53 +306,48 @@ async function main(): Promise<void> {
     }
   }
 
-  // Generate preview JSON
+  // Import preview image generator
+  const { generatePreviewImage } = await import("./preview-image-generator");
+  const { generatePreviewConfig } =
+    await import("../lib/utils/ppt-generator/ppt-preview");
+
+  // Generate preview image
   async function generatePreview(
     settings: PptSettingsStateType,
     primaryLyric: string,
-    secondaryLyric: string
-  ): Promise<object> {
-    const mergedSettings = mergeOverwritesFromLyrics(settings as any, primaryLyric);
-    const strippedPrimary = removeAllOverwritesFromLyrics(primaryLyric);
-    const strippedSecondary = removeAllOverwritesFromLyrics(secondaryLyric);
+    secondaryLyric: string,
+    outputDir: string,
+    customFilename?: string,
+  ): Promise<string> {
+    console.log("Generating preview configuration...");
 
-    const { pres } = await createPptInstance({
-      settingValues: mergedSettings,
-      primaryLyric: strippedPrimary,
-      secondaryLyric: strippedSecondary,
+    // Generate the internal presentation config (same as web app)
+    const previewConfig = await generatePreviewConfig({
+      settingValues: settings as any,
+      primaryLyric,
+      secondaryLyric,
     });
 
-    // Extract slide information for preview
-    const presAny = pres as any;
-    const slides = presAny.slides || [];
-    const sections = presAny.sections || [];
+    if (!previewConfig || previewConfig.slides.length === 0) {
+      throw new Error("No slides to preview");
+    }
 
-    return {
-      layout: presAny.layout,
-      slideCount: slides.length,
-      sections: sections.map((section: any) => ({
-        title: section.title,
-        slideCount: section._slides?.length || 0,
-      })),
-      slides: slides.map((slide: any, index: number) => ({
-        index: index + 1,
-        name: slide._name,
-        objectCount: slide._slideObjects?.length || 0,
-        hasBackground: !!slide.background,
-      })),
-      settings: {
-        general: {
-          useDifferentSettingForEachSection:
-            mergedSettings.general.useDifferentSettingForEachSection,
-          sectionsAutoNumbering: mergedSettings.general.sectionsAutoNumbering,
-        },
-        file: {
-          filename: mergedSettings.file.filename,
-          filenamePrefix: mergedSettings.file.filenamePrefix,
-          filenameSuffix: mergedSettings.file.filenameSuffix,
-        },
-      },
-    };
+    console.log(`Found ${previewConfig.slides.length} slides`);
+    console.log("Rendering preview image with Playwright...");
+
+    // Generate filename
+    const filename = customFilename
+      ? `${customFilename}-preview.png`
+      : `preview-${Date.now()}.png`;
+    const outputPath = path.join(outputDir, filename);
+
+    // Generate the preview image
+    const imagePath = await generatePreviewImage(
+      previewConfig as any,
+      outputPath,
+    );
+
+    return imagePath;
   }
 
   // Generate PPT file
@@ -364,9 +356,12 @@ async function main(): Promise<void> {
     primaryLyric: string,
     secondaryLyric: string,
     outputDir: string,
-    customFilename?: string
+    customFilename?: string,
   ): Promise<string> {
-    const mergedSettings = mergeOverwritesFromLyrics(settings as any, primaryLyric);
+    const mergedSettings = mergeOverwritesFromLyrics(
+      settings as any,
+      primaryLyric,
+    );
     const strippedPrimary = removeAllOverwritesFromLyrics(primaryLyric);
     const strippedSecondary = removeAllOverwritesFromLyrics(secondaryLyric);
 
@@ -424,21 +419,16 @@ async function main(): Promise<void> {
     }
 
     if (options.preview) {
-      // Generate preview JSON
-      console.log("Generating preview...");
-      const preview = await generatePreview(
+      // Generate preview image
+      console.log("Generating preview image...");
+      const previewPath = await generatePreview(
         settings,
         primaryLyric,
-        secondaryLyric
+        secondaryLyric,
+        options.output,
+        options.filename,
       );
-
-      const previewFilename = options.filename
-        ? `${options.filename}-preview.json`
-        : `preview-${Date.now()}.json`;
-      const previewPath = path.join(options.output, previewFilename);
-
-      await writeFile(previewPath, JSON.stringify(preview, null, 2));
-      console.log(`Preview saved to: ${previewPath}`);
+      console.log(`Preview image saved to: ${previewPath}`);
     } else {
       // Generate PPT
       console.log("Generating PPT...");
@@ -447,7 +437,7 @@ async function main(): Promise<void> {
         primaryLyric,
         secondaryLyric,
         options.output,
-        options.filename
+        options.filename,
       );
       console.log(`PPT saved to: ${outputPath}`);
     }

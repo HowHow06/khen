@@ -310,9 +310,10 @@ Preview mode generates a JSON file containing information about the slides that 
 
 - Verifying your lyrics file is structured correctly
 - Checking how many slides will be generated
+- Sharing a visual preview without opening PowerPoint
 - Debugging issues with your configuration
 
-### Generate Preview
+### Generate Preview Image
 
 ```bash
 npx tsx scripts/generate-ppt-from-lyrics.ts \
@@ -322,32 +323,19 @@ npx tsx scripts/generate-ppt-from-lyrics.ts \
 
 ### Preview Output
 
-The preview JSON contains:
+The preview generates a **PNG image** showing all slides in a grid layout, organized by section. The image includes:
 
-```json
-{
-  "layout": "LAYOUT_16x9",
-  "slideCount": 12,
-  "sections": [
-    { "title": "Verse 1", "slideCount": 3 },
-    { "title": "Chorus", "slideCount": 2 }
-  ],
-  "slides": [
-    { "index": 1, "name": "Slide 1", "objectCount": 2, "hasBackground": false },
-    { "index": 2, "name": "Slide 2", "objectCount": 4, "hasBackground": false }
-  ],
-  "settings": {
-    "general": {
-      "useDifferentSettingForEachSection": false,
-      "sectionsAutoNumbering": true
-    },
-    "file": {
-      "filename": "worship",
-      "filenamePrefix": "",
-      "filenameSuffix": ""
-    }
-  }
-}
+- A header with "Khen PPT Preview" title and slide count
+- Slides grouped by section with section headers
+- Each slide rendered with actual text styling and positioning
+- Slide numbers for reference
+
+This is the same visual output as the "Export Image" button in the web application.
+
+**Note:** Preview image generation requires Playwright. If not installed, run:
+
+```bash
+npx playwright install chromium
 ```
 
 ---

@@ -8,16 +8,14 @@ import {
   SectionSettingsType,
 } from "@/lib/types";
 import { deepCopy, deepMerge } from "@/lib/utils/general";
-import {
-  combineWithDefaultSettings,
-  generateSectionSettingsFromFullSettings,
-} from "./settings-generator";
 import { generateFullSettings } from "./import-export-settings";
 import {
   ParsedLyricsOverwrites,
   parseAllOverwritesFromLyrics,
 } from "./lyrics-overwrite";
 import {
+  combineWithDefaultSettings,
+  generateSectionSettingsFromFullSettings,
   getPreset,
   getSectionSettingsInitialValue,
 } from "./settings-generator";
@@ -344,7 +342,6 @@ export function mergeOverwritesWithSettings(
   parsedOverwrites: ParsedLyricsOverwrites,
 ): PptSettingsStateType {
   const { globalOverwrite, sectionOverwrites } = parsedOverwrites;
-  console.log("parsedOverwrites", parsedOverwrites);
 
   // Start with a deep copy of the current settings
   let mergedSettings = deepCopy(settings);
