@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BaseSettingItemMetaType } from "@/lib/types";
-import { cn, toNormalCase } from "@/lib/utils";
+import { cn, toNormalCase } from "@/lib/utils/general";
 import BaseSettings from "./BaseSettings";
 
 type Props = {

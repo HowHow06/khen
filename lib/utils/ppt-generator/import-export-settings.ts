@@ -10,11 +10,11 @@ import {
   SectionSettingsKeyType,
   SectionSettingsType,
 } from "@/lib/types";
+import { deepCopy } from "@/lib/utils/general";
 import {
-  deepCopy,
   generateSectionSettingsFromFullSettings,
   getSectionSettingsInitialValue,
-} from "@/lib/utils";
+} from "./settings-generator";
 import { ZodError, ZodSchema } from "zod";
 
 export const exportFullSettings = ({

@@ -6,7 +6,7 @@ import {
   getIsTouchDevice,
   getTextByCursorPosition,
   getTransformedTextByLines,
-} from "@/lib/utils";
+} from "@/lib/utils/general";
 import {
   convertToSimplified,
   convertToTraditional,

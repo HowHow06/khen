@@ -1,6 +1,6 @@
 import { useMemo, useRef } from "react";
 import { PptSettingsStateType } from "../types";
-import { deepCompare, deepCopy } from "../utils";
+import { deepCompare, deepCopy } from "../utils/general";
 import useDebouncedValue from "./use-debounced-value";
 
 type Props = {

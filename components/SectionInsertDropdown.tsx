@@ -1,7 +1,7 @@
 "use client";
 import { LYRIC_SECTION_ITEMS } from "@/lib/constant";
 import { CursorPosition } from "@/lib/types";
-import { getIsTouchDevice, getTextInsertedAtPosition } from "@/lib/utils";
+import { getIsTouchDevice, getTextInsertedAtPosition } from "@/lib/utils/general";
 import { ChevronDown } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "./ui/button";

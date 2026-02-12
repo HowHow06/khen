@@ -1,7 +1,7 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { BaseSettingMetaType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import SettingFormField from "./common/SettingFormField";
 
 type BaseSettingsProps = {

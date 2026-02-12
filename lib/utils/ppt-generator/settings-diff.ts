@@ -7,12 +7,11 @@ import {
   SectionSettingsKeyType,
   SectionSettingsType,
 } from "@/lib/types";
+import { deepCopy, deepMerge } from "@/lib/utils/general";
 import {
   combineWithDefaultSettings,
-  deepCopy,
-  deepMerge,
   generateSectionSettingsFromFullSettings,
-} from "@/lib/utils";
+} from "./settings-generator";
 import { generateFullSettings } from "./import-export-settings";
 import {
   ParsedLyricsOverwrites,

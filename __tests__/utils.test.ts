@@ -4,7 +4,8 @@ import {
   SETTING_CATEGORY,
 } from "@/lib/constant";
 import { PptSettingsStateType } from "@/lib/types";
-import { deepMerge, generatePptSettingsInitialState } from "@/lib/utils";
+import { deepMerge } from "@/lib/utils/general";
+import { generatePptSettingsInitialState } from "@/lib/utils/ppt-generator/settings-generator";
 
 describe("deepMerge Functionality", () => {
   it("should merge nested values", () => {

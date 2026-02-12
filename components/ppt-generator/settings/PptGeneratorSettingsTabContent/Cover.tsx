@@ -6,7 +6,7 @@ import {
   PPT_GENERATION_SETTINGS_META,
   SETTING_CATEGORY,
 } from "@/lib/constant";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import BaseSettings from "../BaseSettings";
 import ContentTypeTabsList from "../ContentTypeTabsList";
 import { TabContentWithInnerTabProp } from "./types";

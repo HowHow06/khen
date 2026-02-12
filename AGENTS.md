@@ -196,30 +196,27 @@ const { lineMapper } = useLineToSlideMapperContext();
 
 ## Import Patterns & Circular Dependency Prevention
 
-This codebase has barrel files (index.ts) that re-export from multiple modules. This can cause circular dependency issues when modules at the "bottom" of the dependency chain import from barrel files.
+**IMPORTANT:** This codebase does NOT use barrel files (index.ts) in `lib/utils/`. All imports must be from specific files to prevent circular dependency issues.
 
-### The Problem
+### Import Rules
 
-Circular dependencies occur when:
-1. `lib/constant/` imports from `lib/utils/` (barrel)
-2. `lib/utils/index.ts` exports from `lib/utils/ppt-generator/`
-3. `lib/utils/ppt-generator/` exports from files that import `lib/schemas/`
-4. `lib/schemas/` uses constants from `lib/constant/` at module initialization time
+1. **Always import from specific files, never from directory paths:**
+   ```typescript
+   // ✅ Correct
+   import { cn, deepMerge } from "@/lib/utils/general";
+   import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
+   import { generatePptSettingsInitialState } from "@/lib/utils/ppt-generator/settings-generator";
+   
+   // ❌ Wrong - barrel imports are NOT available
+   import { cn } from "@/lib/utils";
+   import { generatePpt } from "@/lib/utils/ppt-generator";
+   ```
 
-This creates a loop where constants can't be accessed before they're initialized.
+2. **Files in `lib/constant/` should NEVER import from `lib/utils/` directory path**
+   - Import directly: `../utils/general`, `../utils/ppt-generator/specific-file`
 
-### Prevention Rules
-
-1. **Files in `lib/constant/` should NEVER import from barrel files (`@/lib/utils`, `../utils`)**
-   - Instead, import directly from specific files: `../utils/general`, `../utils/ppt-generator/specific-file`
-
-2. **Files in `lib/types/` should NEVER import from `lib/utils/` or `lib/schemas/`**
+3. **Files in `lib/types/` should NEVER import from `lib/utils/` or `lib/schemas/`**
    - Types should be self-contained or only depend on constants
-
-3. **Files in `lib/schemas/` should avoid top-level code that uses constants**
-   - If schemas need constants, consider lazy initialization or moving the schema generation into functions
-
-4. **When adding new exports to barrel files**, check if any "upstream" modules (constant, types) might indirectly import them
 
 ### Safe Import Hierarchy
 
@@ -227,14 +224,25 @@ This creates a loop where constants can't be accessed before they're initialized
 lib/constant/  →  can import from: lib/types/, lib/utils/general.ts (specific file only)
 lib/types/     →  can import from: lib/constant/
 lib/schemas/   →  can import from: lib/constant/, lib/types/
-lib/utils/     →  can import from: lib/constant/, lib/types/, lib/schemas/, other utils
+lib/utils/     →  can import from: lib/constant/, lib/types/, lib/schemas/, other specific util files
 lib/hooks/     →  can import from: anything in lib/
 lib/presets/   →  can import from: anything in lib/
 ```
+
+### Utility File Locations
+
+- `lib/utils/general.ts` - General utilities (cn, deepMerge, deepCopy, etc.)
+- `lib/utils/ppt-generator/ppt-generation.ts` - PPT generation (generatePpt, createPptInstance)
+- `lib/utils/ppt-generator/ppt-preview.ts` - Preview generation (generatePreviewConfig)
+- `lib/utils/ppt-generator/settings-generator.ts` - Settings generation (generatePptSettingsInitialState, getPreset, etc.)
+- `lib/utils/ppt-generator/settings-diff.ts` - Settings comparison and merging
+- `lib/utils/ppt-generator/settings-utils.ts` - Settings utilities (parsePptFilename, getBase64FromImageField)
+- `lib/utils/ppt-generator/import-export-settings.ts` - Settings import/export (exportFullSettings, generateFullSettings)
+- `lib/utils/ppt-generator/lyrics-overwrite.ts` - Lyrics overwrite parsing
 
 ### Debugging Circular Dependencies
 
 If you see errors like `Cannot access 'X' before initialization`:
 1. Trace the import chain from the error stack
-2. Look for barrel file imports in `lib/constant/` or `lib/types/`
-3. Replace barrel imports with direct file imports
+2. Check if any module is importing from a directory path instead of a specific file
+3. Replace with direct file imports

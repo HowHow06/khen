@@ -10,7 +10,8 @@ import {
   PptSettingsStateType,
   SectionSettingsKeyType,
 } from "@/lib/types";
-import { deepCompare, deepCopy, getInitialTextboxSettings } from "@/lib/utils";
+import { deepCompare, deepCopy } from "@/lib/utils/general";
+import { getInitialTextboxSettings } from "@/lib/utils/ppt-generator/settings-generator";
 import { useCallback, useEffect } from "react";
 import { UseFormReset } from "react-hook-form";
 import usePrevious from "./use-previous";

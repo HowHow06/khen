@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import usePromptImportSettings from "@/lib/hooks/use-prompt-import-settings";
 import { PresetsType } from "@/lib/types";
+import { getIsTouchDevice } from "@/lib/utils/general";
+import { generateFullSettings } from "@/lib/utils/ppt-generator/import-export-settings";
 import {
   combineWithDefaultSettings,
-  generateFullSettings,
-  getIsTouchDevice,
   getPreset,
-} from "@/lib/utils";
+} from "@/lib/utils/ppt-generator/settings-generator";
 import { DropdownMenuContentProps } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";

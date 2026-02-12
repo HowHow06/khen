@@ -10,7 +10,7 @@ import {
 import { DEFAULT_PRESETS } from "@/lib/constant";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import ExportSlidesImageButton from "../ExportSlidesImageButton";

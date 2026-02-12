@@ -1,7 +1,7 @@
 "use client";
 import { IMAGE_FILE_TYPE, SETTING_FIELD_TYPE } from "@/lib/constant";
 import { FieldTypeToTypeScriptType } from "@/lib/types";
-import { getBase64FromImageField } from "@/lib/utils";
+import { getBase64FromImageField } from "@/lib/utils/ppt-generator/settings-utils";
 import { XCircle } from "lucide-react";
 import Image from "next/image";
 import React, { HTMLAttributes, useCallback, useEffect, useState } from "react";

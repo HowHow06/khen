@@ -10,7 +10,7 @@ import {
   ObjectOptions,
   SectionProps,
 } from "@/lib/types/pptxgenjs/core-interfaces";
-import { createPptInstance } from "@/lib/utils";
+import { createPptInstance } from "./ppt-generation";
 import { LineToSlideMapper } from "./line-to-slide-mapper";
 import { removeAllOverwritesFromLyrics } from "./lyrics-overwrite";
 import { mergeOverwritesFromLyrics } from "./settings-diff";

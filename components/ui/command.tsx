@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import * as React from "react";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import { ScrollArea } from "./scroll-area";
 
 const Command = React.forwardRef<

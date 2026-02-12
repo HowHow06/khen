@@ -5,7 +5,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { BaseSettingItemMetaType, PptSettingsStateType } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/general";
 import { Control, FieldValues } from "react-hook-form";
 import SettingInputField from "./SettingInputField";
 import SettingLabel from "./SettingLabel";

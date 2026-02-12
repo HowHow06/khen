@@ -3,7 +3,7 @@ import { PresentationProps } from "@/lib/react-pptx-preview/nodes";
 import type { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { normalizeJsx } from "@/lib/react-pptx-preview/normalizer";
 import { layoutToInches } from "@/lib/react-pptx-preview/util";
-import { getBase64FromString, removeNumbering } from "@/lib/utils";
+import { getBase64FromString, removeNumbering } from "@/lib/utils/general";
 import * as React from "react";
 import SlidePreview from "./SlidePreview";
 

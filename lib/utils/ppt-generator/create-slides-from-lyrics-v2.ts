@@ -22,10 +22,10 @@ import {
 import type { PptxGenJS as PptxGenJSType2 } from "@/lib/types/pptxgenjs";
 import {
   extractNumber,
-  getSectionSettingsInitialValue,
   removeIdenticalWords,
   startsWithNumbering,
-} from "@/lib/utils";
+} from "@/lib/utils/general";
+import { getSectionSettingsInitialValue } from "./settings-generator";
 import pptxgenjs from "pptxgenjs";
 import { LineToSlideMapper, LineType } from "./line-to-slide-mapper";
 import {
