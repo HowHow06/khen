@@ -241,9 +241,9 @@ const AdvancedSettingsMode = () => {
   );
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-w-0 flex-col overflow-hidden">
       {/* Header */}
-      <div className="relative mb-4 overflow-hidden rounded-xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+      <div className="relative mb-4 overflow-hidden rounded-xl border border-cyan-500/20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-3">
         {/* Animated background grid */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -260,35 +260,35 @@ const AdvancedSettingsMode = () => {
         <div className="pointer-events-none absolute -left-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl" />
 
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 animate-pulse rounded-lg bg-cyan-500/20 blur-md" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-500/30 bg-slate-900/80">
-                <Terminal className="h-5 w-5 text-cyan-400" />
+        <div className="relative flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="relative shrink-0">
+              <div className="absolute inset-0 animate-pulse rounded-md bg-cyan-500/20 blur-md" />
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-md border border-cyan-500/30 bg-slate-900/80">
+                <Terminal className="h-4 w-4 text-cyan-400" />
               </div>
             </div>
-            <div>
-              <h3 className="font-semibold tracking-tight text-slate-100">
+            <div className="min-w-0">
+              <h3 className="truncate text-sm font-semibold tracking-tight text-slate-100">
                 Advanced Mode
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="truncate text-[10px] text-slate-400">
                 Direct JSON configuration editor
               </p>
             </div>
           </div>
 
           {/* Status indicator */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             {hasUnsavedChanges && (
-              <span className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-400">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+              <span className="flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-400">
+                <span className="h-1 w-1 animate-pulse rounded-full bg-amber-400" />
                 Unsaved
               </span>
             )}
             <span
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs transition-all duration-300",
+                "flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] transition-all duration-300",
                 validation.isValid
                   ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                   : "border border-red-500/30 bg-red-500/10 text-red-400"
@@ -296,12 +296,12 @@ const AdvancedSettingsMode = () => {
             >
               {validation.isValid ? (
                 <>
-                  <Check className="h-3 w-3" />
+                  <Check className="h-2.5 w-2.5" />
                   Valid
                 </>
               ) : (
                 <>
-                  <AlertCircle className="h-3 w-3" />
+                  <AlertCircle className="h-2.5 w-2.5" />
                   Invalid
                 </>
               )}
@@ -311,7 +311,7 @@ const AdvancedSettingsMode = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-1.5">
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -321,11 +321,11 @@ const AdvancedSettingsMode = () => {
                 onClick={applySettings}
                 disabled={!validation.isValid || !hasUnsavedChanges}
                 className={cn(
-                  "gap-1.5 border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300",
+                  "h-8 gap-1 px-2 text-xs border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300",
                   isAnimating && "animate-pulse"
                 )}
               >
-                <Zap className="h-3.5 w-3.5" />
+                <Zap className="h-3 w-3" />
                 Apply
               </Button>
             </TooltipTrigger>
@@ -338,9 +338,9 @@ const AdvancedSettingsMode = () => {
                 variant="outline"
                 size="sm"
                 onClick={resetToFormValues}
-                className="gap-1.5"
+                className="h-8 gap-1 px-2 text-xs"
               >
-                <RotateCcw className="h-3.5 w-3.5" />
+                <RotateCcw className="h-3 w-3" />
                 Reset
               </Button>
             </TooltipTrigger>
@@ -356,9 +356,9 @@ const AdvancedSettingsMode = () => {
                 size="sm"
                 onClick={formatJson}
                 disabled={!validation.isValid}
-                className="gap-1.5"
+                className="h-8 gap-1 px-2 text-xs"
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkles className="h-3 w-3" />
                 Format
               </Button>
             </TooltipTrigger>
@@ -371,9 +371,9 @@ const AdvancedSettingsMode = () => {
                 variant="ghost"
                 size="sm"
                 onClick={copyToClipboard}
-                className="gap-1.5"
+                className="h-8 gap-1 px-2 text-xs"
               >
-                <Copy className="h-3.5 w-3.5" />
+                <Copy className="h-3 w-3" />
                 Copy
               </Button>
             </TooltipTrigger>
@@ -388,9 +388,9 @@ const AdvancedSettingsMode = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleImportClick}
-                className="gap-1.5"
+                className="h-8 gap-1 px-2 text-xs"
               >
-                <Upload className="h-3.5 w-3.5" />
+                <Upload className="h-3 w-3" />
                 Import
               </Button>
             </TooltipTrigger>
@@ -403,9 +403,9 @@ const AdvancedSettingsMode = () => {
                 variant="ghost"
                 size="sm"
                 onClick={exportToFile}
-                className="gap-1.5"
+                className="h-8 gap-1 px-2 text-xs"
               >
-                <Download className="h-3.5 w-3.5" />
+                <Download className="h-3 w-3" />
                 Export
               </Button>
             </TooltipTrigger>
@@ -424,17 +424,17 @@ const AdvancedSettingsMode = () => {
 
       {/* Error display */}
       {!validation.isValid && validation.error && (
-        <div className="mb-3 rounded-lg border border-red-500/30 bg-red-500/5 p-3">
-          <div className="flex items-start gap-2 text-sm text-red-400">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
+        <div className="mb-2 rounded-lg border border-red-500/30 bg-red-500/5 p-2">
+          <div className="flex items-start gap-1.5 text-xs text-red-400">
+            <AlertCircle className="mt-0.5 h-3 w-3 shrink-0" />
+            <div className="min-w-0">
               <span className="font-medium">Syntax Error</span>
               {validation.errorLine && (
                 <span className="ml-1 text-red-400/70">
                   (line {validation.errorLine})
                 </span>
               )}
-              <p className="mt-0.5 text-xs text-red-400/80">
+              <p className="mt-0.5 truncate text-[10px] text-red-400/80">
                 {validation.error}
               </p>
             </div>
@@ -445,7 +445,7 @@ const AdvancedSettingsMode = () => {
       {/* Editor */}
       <div
         className={cn(
-          "relative flex-1 overflow-hidden rounded-xl border transition-all duration-300",
+          "relative min-w-0 flex-1 overflow-hidden rounded-xl border transition-all duration-300",
           validation.isValid
             ? "border-slate-700/50 bg-slate-950"
             : "border-red-500/30 bg-slate-950",
@@ -453,17 +453,17 @@ const AdvancedSettingsMode = () => {
         )}
       >
         {/* Editor header bar */}
-        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/50 px-4 py-2">
-          <div className="flex items-center gap-2">
-            <Code2 className="h-4 w-4 text-slate-500" />
+        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/50 px-3 py-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <Code2 className="h-3.5 w-3.5 shrink-0 text-slate-500" />
             <span
-              className="text-xs text-slate-500"
+              className="truncate text-xs text-slate-500"
               style={{ fontFamily: MONO_FONT }}
             >
               settings.json
             </span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-slate-500">
+          <div className="flex shrink-0 items-center gap-2 text-[10px] text-slate-500">
             <span style={{ fontFamily: MONO_FONT }}>
               Ln {cursorLine}, Col 1
             </span>
@@ -472,18 +472,18 @@ const AdvancedSettingsMode = () => {
         </div>
 
         {/* Code editor with line numbers */}
-        <div className="relative flex h-[calc(100%-40px)]">
+        <div className="relative flex h-[calc(100%-36px)] min-w-0">
           {/* Line numbers */}
           <div
             ref={lineNumbersRef}
-            className="pointer-events-none w-12 shrink-0 select-none overflow-hidden border-r border-slate-800 bg-slate-900/30 py-3 text-right"
+            className="pointer-events-none w-10 shrink-0 select-none overflow-hidden border-r border-slate-800 bg-slate-900/30 py-3 text-right"
             style={{ fontFamily: MONO_FONT }}
           >
             {Array.from({ length: lineCount }, (_, i) => (
               <div
                 key={i + 1}
                 className={cn(
-                  "px-2 text-xs leading-[1.625rem]",
+                  "px-1.5 text-[10px] leading-[1.625rem]",
                   cursorLine === i + 1
                     ? "bg-slate-800/50 text-cyan-400"
                     : "text-slate-600",
@@ -497,7 +497,7 @@ const AdvancedSettingsMode = () => {
           </div>
 
           {/* Textarea */}
-          <ScrollArea className="flex-1">
+          <ScrollArea className="min-w-0 flex-1">
             <textarea
               ref={textareaRef}
               value={jsonText}
@@ -508,7 +508,7 @@ const AdvancedSettingsMode = () => {
               onClick={handleSelect}
               spellCheck={false}
               className={cn(
-                "h-full min-h-[400px] w-full resize-none bg-transparent p-3 text-sm leading-[1.625rem] text-slate-200 outline-none",
+                "h-full min-h-[350px] w-full resize-none bg-transparent p-2 text-xs leading-[1.625rem] text-slate-200 outline-none",
                 "placeholder:text-slate-600"
               )}
               style={{
@@ -521,12 +521,12 @@ const AdvancedSettingsMode = () => {
         </div>
 
         {/* Subtle gradient overlay at bottom */}
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-slate-950 to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-950 to-transparent" />
       </div>
 
       {/* Footer tips */}
-      <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-        <span className="rounded border border-slate-700 bg-slate-800 px-1.5 py-0.5 font-mono text-[10px]">
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500">
+        <span className="rounded border border-slate-700 bg-slate-800 px-1 py-0.5 font-mono">
           Ctrl+V
         </span>
         <span>to paste</span>

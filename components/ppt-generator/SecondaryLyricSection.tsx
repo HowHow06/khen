@@ -39,42 +39,44 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
   };
 
   return (
-    <>
-      <div className="">
-        <div className="my-2 flex flex-wrap gap-2">
-          <TextTransformDropdown
-            text={secondaryText}
-            setText={setSecondaryText}
-            cursorPosition={cursorPosition}
-            onCloseAutoFocus={(event) => {
-              event.preventDefault();
-              if (textAreaRef.current && cursorPosition) {
-                textAreaRef.current.setSelectionRange(
-                  cursorPosition.start,
-                  cursorPosition.end,
-                );
-                textAreaRef.current.focus();
-              }
-            }}
-          />
-          <FindAndReplaceButton
-            text={secondaryText}
-            setText={setSecondaryText}
-            align="start"
-          />
-          <CopyToClipboardButton text={secondaryText} />
-          <ClearTextButton text={secondaryText} setText={setSecondaryText} />
-        </div>
-        <Textarea
-          placeholder="Insert the secondary lyrics here."
-          className="min-h-96 md:min-h-[15rem]"
-          ref={textAreaRef}
-          value={secondaryText}
-          onChange={handleTextChange}
-          onSelect={cursorHandleSelect}
+    <div className="space-y-3">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-muted/30 p-1.5">
+        <TextTransformDropdown
+          text={secondaryText}
+          setText={setSecondaryText}
+          cursorPosition={cursorPosition}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            if (textAreaRef.current && cursorPosition) {
+              textAreaRef.current.setSelectionRange(
+                cursorPosition.start,
+                cursorPosition.end,
+              );
+              textAreaRef.current.focus();
+            }
+          }}
         />
+        <div className="mx-1 h-6 w-px bg-border" />
+        <FindAndReplaceButton
+          text={secondaryText}
+          setText={setSecondaryText}
+          align="start"
+        />
+        <CopyToClipboardButton text={secondaryText} />
+        <ClearTextButton text={secondaryText} setText={setSecondaryText} />
       </div>
-    </>
+
+      {/* Textarea */}
+      <Textarea
+        placeholder="Insert the secondary lyrics here (e.g., pinyin, translations)."
+        className="min-h-72 resize-y border-2 focus-visible:ring-1 md:min-h-[14rem]"
+        ref={textAreaRef}
+        value={secondaryText}
+        onChange={handleTextChange}
+        onSelect={cursorHandleSelect}
+      />
+    </div>
   );
 };
 

@@ -4,7 +4,7 @@ import Logo from "../icon/logo";
 import ThemeSwitcher from "../theme/ThemeSwitcher";
 import { Button } from "../ui/button";
 import Container from "../ui/container";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import KhenNavigationMenu from "./KhenNavigationMenu";
 
 type Props = {};
@@ -19,79 +19,71 @@ const routes = [
 
 const Header = (props: Props) => {
   return (
-    <header>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
       <Container>
         <div className="flex h-16 w-full items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <Sheet>
-              <SheetTrigger>
-                <Menu className="h-6 w-6 md:hidden" />
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4">
+              <SheetContent side="left" className="w-[280px]">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <div className="flex items-center gap-2 pb-6 pt-2">
+                  <Logo className="h-7 w-7" />
+                  <span className="font-display text-xl font-semibold">
+                    Khen
+                  </span>
+                </div>
+                <nav className="flex flex-col gap-1">
                   {routes.map((route, i) => (
                     <Link
                       key={i}
                       href={route.href}
-                      className="block px-2 py-1 text-base"
+                      className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                       {route.label}
                     </Link>
                   ))}
-                  <Link
-                    href="/"
-                    className="block px-2 py-1 text-base"
-                    aria-label="Sign In"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/"
-                    className="block px-2 py-1 text-base"
-                    aria-label="Sign Up"
-                  >
-                    Sign Up
-                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>
-            <Link href="/" className="ml-4 flex items-center space-x-2 lg:ml-0">
-              <Logo />
-              <h1 className="text-xl font-bold">Khen</h1>
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            >
+              <Logo className="h-8 w-8" />
+              <span className="font-display text-xl font-semibold tracking-tight">
+                Khen
+              </span>
             </Link>
           </div>
-          <div className="flex items-center divide-x">
-            <div className="hidden md:block">
-              <KhenNavigationMenu routes={routes} />
-            </div>
 
-            <div className="flex items-center space-x-2 pl-2 ">
+          <div className="flex items-center gap-1">
+            <nav className="hidden md:block">
+              <KhenNavigationMenu routes={routes} />
+            </nav>
+
+            <div className="flex items-center gap-1 border-l pl-3 ml-3">
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label="Contact Me"
+                className="h-9 w-9 rounded-full"
                 asChild
               >
                 <Link
-                  href={`https://www.linkedin.com/in/howard-lim-hl06/`}
+                  href="https://www.linkedin.com/in/howard-lim-hl06/"
                   target="_blank"
                 >
-                  <Linkedin className="h-6 w-6" />
+                  <Linkedin className="h-4 w-4" />
                   <span className="sr-only">Contact Me</span>
                 </Link>
               </Button>
               <ThemeSwitcher />
-              {/* TODO: auth to be implemented */}
-              {/* <Button
-                variant="ghost"
-                className="hidden md:inline"
-                aria-label="Sign In"
-              >
-                Sign In
-              </Button>
-              <Button aria-label="Sign Up" className="hidden md:inline">
-                Sign Up
-              </Button> */}
             </div>
           </div>
         </div>

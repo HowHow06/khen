@@ -4,7 +4,8 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
-import { InterFont } from "@/lib/utils/fonts";
+import { fontVariables } from "@/lib/utils/fonts";
+import { cn } from "@/lib/utils/general";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -28,14 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={InterFont.className}>
+    <html lang="en" suppressHydrationWarning className={fontVariables}>
+      <body className={cn("min-h-screen flex flex-col")}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AlertDialogProvider>
             <OptionsDialogProvider>
               <Header />
-              {children}
-              <Toaster expand={true} />
+              <main className="flex-1">{children}</main>
+              <Toaster expand={true} richColors />
               <Footer />
             </OptionsDialogProvider>
           </AlertDialogProvider>

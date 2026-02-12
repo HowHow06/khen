@@ -8,6 +8,7 @@ import GeneratePptSection from "@/components/ppt-generator/settings/GeneratePptS
 import PptGeneratorSettings from "@/components/ppt-generator/settings/PptGeneratorSettings";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
+import { ArrowDown, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -16,88 +17,131 @@ export const metadata: Metadata = {
   description:
     "A tool to generator PPT by inserting lyrics, simplifying the creation of PowerPoint presentations for church praise and worship songs.",
 };
+
 type Props = {};
+
+// Section wrapper component for consistent styling
+const Section = ({
+  children,
+  step,
+  title,
+  id,
+  className = "",
+}: {
+  children: React.ReactNode;
+  step: number;
+  title: string;
+  id?: string;
+  className?: string;
+}) => (
+  <section
+    id={id}
+    className={`rounded-2xl border bg-card/50 p-6 shadow-sm transition-all hover:shadow-md ${className}`}
+  >
+    <div className="mb-5 flex items-center gap-3">
+      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+        {step}
+      </span>
+      <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+    </div>
+    {children}
+  </section>
+);
 
 const PptGeneratorPage = (props: Props) => {
   return (
     <>
-      {" "}
-      {/* Font File: credit to https://github.com/pjobson/Microsoft-365-Fonts */}
-      {/* https://github.com/vercel/next.js/discussions/40345#discussioncomment-10145316 */}
-      {/* https://stackoverflow.com/questions/36178001/how-to-lazy-load-web-font-declared-by-font-face */}
+      {/* Font imports for PPT rendering */}
       <style
         dangerouslySetInnerHTML={{
           __html: `@import url(/css/microsoft-yahei.css);
         @import url(/css/ebrima.css);`,
         }}
       />
-      <Container className="max-w-screen-xl py-8 text-center lg:py-16">
-        <h1 className="text-primary-900 mb-4 text-3xl font-extrabold leading-none tracking-tight md:text-4xl lg:text-5xl">
-          Khen PPT Generator
-        </h1>
-        <p className="text-primary-500 mb-8 text-base font-normal sm:px-16 lg:text-xl xl:px-48">
-          Generate PPT Slides for your songs at ease!
-        </p>
-        <div className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-x-4 sm:space-y-0 lg:mb-8">
-          <Button
-            // variant="ghost"
-            variant="outline"
-            className="px-5 py-6"
-            asChild
-          >
-            <Link href={"#search-lyrics"}>Get Started!</Link>
-          </Button>
-          {/* <Button
-                variant="outline"
-                className="px-5 py-6 text-center text-base font-medium"
-              >
-                <svg
-                  className="-ml-1 mr-2 h-5 w-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
-                </svg>
-                Watch video
-              </Button> */}
-        </div>
-      </Container>
-      <Container>
-        <h2
-          className="mt-8 text-xl font-semibold tracking-tight"
-          id="search-lyrics"
-        >
-          1. Search Lyrics
-        </h2>
-        <div className="">coming soon...</div>
-      </Container>
+
+      {/* Hero Section */}
+      <div className="relative overflow-hidden border-b bg-gradient-to-b from-muted/50 to-background">
+        {/* Subtle background pattern */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
+            backgroundSize: "32px 32px",
+          }}
+        />
+
+        <Container className="relative py-16 text-center lg:py-24">
+          <div className="mx-auto max-w-3xl">
+            {/* Badge */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-1.5 text-sm backdrop-blur-sm">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-muted-foreground">
+                Create beautiful presentations in minutes
+              </span>
+            </div>
+
+            {/* Main heading */}
+            <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+              <span className="text-gradient">PPT Generator</span>
+            </h1>
+
+            <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground">
+              Transform your worship lyrics into stunning PowerPoint slides with
+              ease. Perfect for church services and praise events.
+            </p>
+
+            <Button size="lg" className="gap-2 px-8" asChild>
+              <Link href="#main-lyric">
+                Get Started
+                <ArrowDown className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </Container>
+      </div>
+
+      {/* Main Content */}
       <LineToSlideMapperProvider>
         <PptSettingsUIProvider>
           <PptGeneratorFormProvider>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                2. Insert Main Lyric
-              </h2>
-              <MainLyricSection />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                3. Insert Secondary Lyric
-              </h2>
-              <SecondaryLyricSection />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                4. Settings
-              </h2>
-              <PptGeneratorSettings />
-            </Container>
-            <Container>
-              <h2 className="mt-8 text-xl font-semibold tracking-tight">
-                5. Generate PPT!
-              </h2>
-              <GeneratePptSection />
+            <Container className="py-12 lg:py-16">
+              <div className="space-y-8">
+                {/* Search Section - Coming Soon */}
+                <Section step={1} title="Search Lyrics" id="search-lyrics">
+                  <div className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed text-muted-foreground">
+                    <span className="text-sm">Coming soon...</span>
+                  </div>
+                </Section>
+
+                {/* Main Lyric Section */}
+                <Section step={2} title="Insert Main Lyric" id="main-lyric">
+                  <MainLyricSection />
+                </Section>
+
+                {/* Secondary Lyric Section */}
+                <Section
+                  step={3}
+                  title="Insert Secondary Lyric"
+                  id="secondary-lyric"
+                >
+                  <SecondaryLyricSection />
+                </Section>
+
+                {/* Settings Section */}
+                <Section step={4} title="Settings" id="settings">
+                  <PptGeneratorSettings />
+                </Section>
+
+                {/* Generate Section */}
+                <Section
+                  step={5}
+                  title="Generate PPT!"
+                  id="generate"
+                  className="bg-primary/[0.02]"
+                >
+                  <GeneratePptSection />
+                </Section>
+              </div>
             </Container>
           </PptGeneratorFormProvider>
         </PptSettingsUIProvider>

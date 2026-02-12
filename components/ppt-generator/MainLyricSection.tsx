@@ -109,8 +109,9 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   };
 
   return (
-    <div className="">
-      <div className="my-2 flex flex-wrap gap-2">
+    <div className="space-y-3">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-1.5 rounded-lg border bg-muted/30 p-1.5">
         <SectionInsertDropdown
           text={mainText}
           setText={setMainTextForSectionInsertion}
@@ -124,18 +125,22 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           onCloseAutoFocus={setTextareaSelectionOnDropdownClose}
         />
         <GeneratePinyinDropdown setText={setSecondaryText} text={mainText} />
+        <div className="mx-1 h-6 w-px bg-border" />
         <FindAndReplaceButton text={mainText} setText={setMainTextHandler} />
         <CopyToClipboardButton text={mainText} />
         <ClearTextButton text={mainText} setText={setMainTextHandler} />
+        <div className="mx-1 h-6 w-px bg-border" />
         <LyricFormatterDialogButton />
       </div>
-      <div className="mb-1">
-        <AutoGeneratePinyinSwitch text={mainText} setText={setSecondaryText} />
-      </div>
+
+      {/* Auto-generate toggle */}
+      <AutoGeneratePinyinSwitch text={mainText} setText={setSecondaryText} />
+
+      {/* Textarea */}
       <Textarea
         ref={mainTextareaRef}
-        placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? "" : `Press '/' for insert command.`}`}
-        className="min-h-96 md:min-h-[30rem]"
+        placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? "" : `Press '/' for quick commands.`}`}
+        className="min-h-96 resize-y border-2 focus-visible:ring-1 md:min-h-[28rem]"
         value={mainText}
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}

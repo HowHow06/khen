@@ -1,70 +1,60 @@
+import { Linkedin } from "lucide-react";
 import Link from "next/link";
 import Logo from "../icon/logo";
+import { Button } from "../ui/button";
 import Container from "../ui/container";
 
 type Props = {};
 
 const Footer = (props: Props) => {
   return (
-    <>
-      <Container>
-        <footer className="bg-background-900 my-4">
-          <div className="mx-auto w-full max-w-screen-xl py-4 md:py-8">
-            <hr className="border-primary-200 my-6 sm:mx-auto lg:my-8" />
-            <div className="sm:flex sm:items-center sm:justify-between">
-              <Link
-                href="/"
-                className="mb-4 flex items-center space-x-3 sm:mb-0 rtl:space-x-reverse"
-              >
-                <Logo className="h-8" />
-                <span className="self-center whitespace-nowrap text-2xl font-semibold ">
-                  Khen
-                </span>
-              </Link>
-              <ul className="text-secondary-500 mb-6 flex flex-wrap items-center text-sm font-medium sm:mb-0">
-                {/* <li>
-                  <a href="#" className="me-4 hover:underline md:me-6">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="me-4 hover:underline md:me-6">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="me-4 hover:underline md:me-6">
-                    Licensing
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:underline">
-                    Contact
-                  </a>
-                </li> */}
-                <li>
-                  <Link
-                    href={`https://www.linkedin.com/in/howard-lim-hl06/`}
-                    target="_blank"
-                    className="hover:underline"
-                  >
-                    My LinkedIn
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <hr className="border-primary-200 my-6 sm:mx-auto lg:my-8" />
-            <span className="block text-sm text-muted-foreground sm:text-center">
-              © {new Date().getFullYear()}{" "}
-              <a href="https://flowbite.com/" className="hover:underline">
+    <footer className="mt-auto border-t bg-muted/30">
+      <Container className="py-12">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-between">
+          {/* Brand */}
+          <div className="flex flex-col items-center gap-3 md:items-start">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            >
+              <Logo className="h-8 w-8" />
+              <span className="font-display text-xl font-semibold tracking-tight">
                 Khen
-              </a>
-              . All Rights Reserved.
-            </span>
+              </span>
+            </Link>
+            <p className="max-w-xs text-center text-sm text-muted-foreground md:text-left">
+              Simplifying the creation of worship presentations
+            </p>
           </div>
-        </footer>
+
+          {/* Links */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-muted-foreground hover:text-foreground"
+              asChild
+            >
+              <Link
+                href="https://www.linkedin.com/in/howard-lim-hl06/"
+                target="_blank"
+              >
+                <Linkedin className="h-4 w-4" />
+                Connect on LinkedIn
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-8 border-t pt-6">
+          <p className="text-center text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Khen. Made with care for worship teams
+            everywhere.
+          </p>
+        </div>
       </Container>
-    </>
+    </footer>
   );
 };
 
