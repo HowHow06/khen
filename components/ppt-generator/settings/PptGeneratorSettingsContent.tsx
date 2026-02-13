@@ -1,7 +1,6 @@
 "use client";
 import { usePptGeneratorFormContext } from "@/components/context/PptGeneratorFormContext";
 import { usePptSettingsUIContext } from "@/components/context/PptSettingsUIContext";
-import { Button } from "@/components/ui/button";
 import {
   MAIN_SECTION_NAME,
   PPT_GENERATION_SHARED_GENERAL_SETTINGS,
@@ -9,8 +8,6 @@ import {
   TAB_TYPES,
 } from "@/lib/constant";
 import { SectionSettingsKeyType } from "@/lib/types";
-import { cn } from "@/lib/utils/general";
-import { Code2, Layers } from "lucide-react";
 import { useState } from "react";
 import AdvancedSettingsMode from "./AdvancedSettingsMode";
 import PptGeneratorSettingHeader from "./PptGeneratorSettingHeader";
@@ -140,51 +137,18 @@ const PptGeneratorSettingsContent = ({ onSectionChange }: Props) => {
 
   return (
     <>
-      {/* Mode Toggle */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center rounded-lg border bg-muted/30 p-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSettingsMode("visual")}
-            className={cn(
-              "gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-              settingsMode === "visual"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Layers className="h-3.5 w-3.5" />
-            Visual
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSettingsMode("advanced")}
-            className={cn(
-              "gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
-              settingsMode === "advanced"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <Code2 className="h-3.5 w-3.5" />
-            Advanced
-          </Button>
-        </div>
-      </div>
+      <PptGeneratorSettingHeader
+        isDifferentSettingsBySection={isDifferentSettingsBySection}
+        currentSection={currentSection}
+        sectionItems={sectionItems}
+        setCurrentSection={setCurrentSection}
+        onSectionChange={onSectionChange}
+        settingsMode={settingsMode}
+        setSettingsMode={setSettingsMode}
+      />
 
       {settingsMode === "visual" ? (
-        <>
-          <PptGeneratorSettingHeader
-            isDifferentSettingsBySection={isDifferentSettingsBySection}
-            currentSection={currentSection}
-            sectionItems={sectionItems}
-            setCurrentSection={setCurrentSection}
-            onSectionChange={onSectionChange}
-          />
-          <PptGeneratorSettingsTabContent {...settingsContentProps} />
-        </>
+        <PptGeneratorSettingsTabContent {...settingsContentProps} />
       ) : (
         <AdvancedSettingsMode />
       )}
