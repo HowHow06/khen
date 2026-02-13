@@ -29,8 +29,16 @@ export const useLineToSlideMapper = () => {
    */
   const scrollPreviewToSlideIndex = useCallback(
     (slideIndex: number): boolean => {
-      // Find the slide element using the slide index
-      const slideElement = document.querySelector(
+      // Only search within the main preview modal to avoid Quick Preview interference
+      const mainPreviewContainer = document.getElementById("main-preview-modal");
+      
+      // If main preview modal is not open, don't scroll
+      if (!mainPreviewContainer) {
+        return false;
+      }
+
+      // Find the slide element using the slide index within the main preview modal
+      const slideElement = mainPreviewContainer.querySelector(
         `[data-slide-index="${slideIndex}"]`,
       );
       if (slideElement) {
@@ -38,8 +46,8 @@ export const useLineToSlideMapper = () => {
         return true;
       }
 
-      // Fallback: try to find by slide ID
-      const slideElementById = document.getElementById(`slide-${slideIndex}`);
+      // Fallback: try to find by slide ID within main preview modal
+      const slideElementById = mainPreviewContainer.querySelector(`#slide-${slideIndex}`);
       if (slideElementById) {
         slideElementById.scrollIntoView({
           behavior: "smooth",

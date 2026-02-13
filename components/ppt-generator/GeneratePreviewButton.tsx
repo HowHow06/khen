@@ -282,7 +282,7 @@ const GeneratePreviewButton = (props: Props) => {
                     settings...
                   </div>
                 ) : (
-                  <ScrollArea className="px-3" isFillParent>
+                  <ScrollArea className="px-3" isFillParent id="main-preview-modal">
                     <VerticalPreview
                       normalizedConfig={previewConfig}
                       drawBoundingBoxes={false}
@@ -323,7 +323,7 @@ const GeneratePreviewButton = (props: Props) => {
                       Working on the preview...
                     </div>
                   ) : (
-                    <ScrollArea className="h-full px-4" isFillParent>
+                    <ScrollArea className="h-full px-4" isFillParent id="main-preview-modal">
                       <div className="py-4">
                         <VerticalPreview
                           normalizedConfig={previewConfig}
