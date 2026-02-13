@@ -3,12 +3,13 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils/general";
 import { POPUP_TAB_TYPE } from "@/lib/constant";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { PptSettingsStateType } from "@/lib/types";
 import { getBase64FromString } from "@/lib/utils/general";
 import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
-import { Grid3X3, Pencil, SlidersHorizontal } from "lucide-react";
+import { Eye, Grid3X3, Pencil, Settings2, SlidersHorizontal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
@@ -148,6 +149,23 @@ const GeneratePreviewButton = (props: Props) => {
     secondaryText,
   ]);
 
+  // Mobile tab options with preview
+  const MOBILE_TAB = {
+    PREVIEW: "preview",
+    LYRICS: POPUP_TAB_TYPE.LYRICS,
+    SETTINGS: POPUP_TAB_TYPE.SETTINGS,
+    GRID: POPUP_TAB_TYPE.GRID_VIEW,
+  };
+
+  const [mobileTab, setMobileTab] = useState(MOBILE_TAB.PREVIEW);
+
+  // Sync mobile tab with desktop tab when switching
+  useEffect(() => {
+    if (mobileTab !== MOBILE_TAB.PREVIEW) {
+      setCurrentTab(mobileTab);
+    }
+  }, [mobileTab]);
+
   return (
     <>
       <Dialog
@@ -155,16 +173,19 @@ const GeneratePreviewButton = (props: Props) => {
         onOpenChange={(isOpen) => setIsModalOpen(isOpen)}
       >
         <DialogContent
-          className="flex h-[85vh] w-[80vw] max-w-[80vw] sm:w-[70vw]"
+          className="flex h-[90vh] max-h-[90vh] w-[95vw] max-w-[95vw] flex-col p-0 sm:h-[85vh] sm:w-[80vw] sm:max-w-[80vw] sm:flex-row sm:p-6"
           aria-describedby={undefined}
         >
           <DialogTitle className="sr-only">
             PPT Preview and Settings
           </DialogTitle>
+
+          {/* ===== DESKTOP LAYOUT ===== */}
           <div
-            className={`hidden h-full gap-4 sm:flex ${
+            className={cn(
+              "hidden h-full gap-4 sm:flex",
               currentTab === POPUP_TAB_TYPE.GRID_VIEW ? "w-full" : "w-3/5"
-            }`}
+            )}
           >
             <div>
               <ToggleGroup
@@ -193,14 +214,14 @@ const GeneratePreviewButton = (props: Props) => {
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
-            <div className={"flex h-full w-full flex-col gap-2"}>
+            <div className="flex h-full w-full flex-col gap-2">
               {currentTab === POPUP_TAB_TYPE.SETTINGS && (
                 <PptGeneratorSettingsContent
                   onSectionChange={onSectionChange}
                 />
               )}
               {currentTab === POPUP_TAB_TYPE.LYRICS && (
-                <ScrollArea className={"px-3"} isFillParent>
+                <ScrollArea className="px-3" isFillParent>
                   <div className="flex flex-col gap-4">
                     <div id="preview-main-lyric-section-div">
                       <MainLyricSection />
@@ -221,23 +242,24 @@ const GeneratePreviewButton = (props: Props) => {
               )}
             </div>
           </div>
+
+          {/* Desktop Preview Panel */}
           {currentTab !== POPUP_TAB_TYPE.GRID_VIEW && (
-            <div className="flex h-full w-full flex-col sm:w-2/5">
+            <div className="hidden h-full w-2/5 flex-col sm:flex">
               <h3 className="text-xl font-semibold tracking-tight">Preview</h3>
-              <span className="text-xs">
+              <span className="text-xs text-muted-foreground">
                 Note: might not display properly if the font isn&apos;t locally
                 installed. Shadow, glow and outline won&apos;t be displayed
                 here.
               </span>
               <div className="flex-grow overflow-y-auto">
                 {error ? (
-                  <div>
+                  <div className="p-4 text-muted-foreground">
                     Working on the preview, meanwhile please check your
                     settings...
                   </div>
                 ) : (
-                  // NOTE: very important to add scroll area because the default scroll bar will affect the width of the component
-                  <ScrollArea className={"px-3"} isFillParent>
+                  <ScrollArea className="px-3" isFillParent>
                     <VerticalPreview
                       normalizedConfig={previewConfig}
                       drawBoundingBoxes={false}
@@ -245,13 +267,153 @@ const GeneratePreviewButton = (props: Props) => {
                   </ScrollArea>
                 )}
               </div>
-              <div className="flex justify-end gap-2">
-                <div className="hidden sm:block">
-                  <GeneratePptWithPromptButton />
-                </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <GeneratePptWithPromptButton />
               </div>
             </div>
           )}
+
+          {/* ===== MOBILE LAYOUT ===== */}
+          <div className="flex h-full flex-col sm:hidden">
+            {/* Mobile Header */}
+            <div className="flex items-center justify-between border-b bg-background px-4 py-3">
+              <h3 className="text-lg font-semibold tracking-tight">
+                {mobileTab === MOBILE_TAB.PREVIEW && "Preview"}
+                {mobileTab === MOBILE_TAB.LYRICS && "Edit Lyrics"}
+                {mobileTab === MOBILE_TAB.SETTINGS && "Settings"}
+                {mobileTab === MOBILE_TAB.GRID && "All Slides"}
+              </h3>
+              {mobileTab === MOBILE_TAB.PREVIEW && (
+                <span className="text-[10px] text-muted-foreground">
+                  Fonts may vary
+                </span>
+              )}
+            </div>
+
+            {/* Mobile Content Area */}
+            <div className="flex-1 overflow-hidden">
+              {/* Preview Tab */}
+              <div
+                className={cn(
+                  "h-full transition-opacity duration-200",
+                  mobileTab === MOBILE_TAB.PREVIEW
+                    ? "opacity-100"
+                    : "pointer-events-none absolute opacity-0"
+                )}
+              >
+                {error ? (
+                  <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
+                    Working on the preview...
+                  </div>
+                ) : (
+                  <ScrollArea className="h-full px-4" isFillParent>
+                    <div className="py-4">
+                      <VerticalPreview
+                        normalizedConfig={previewConfig}
+                        drawBoundingBoxes={false}
+                      />
+                    </div>
+                  </ScrollArea>
+                )}
+              </div>
+
+              {/* Lyrics Tab */}
+              <div
+                className={cn(
+                  "h-full transition-opacity duration-200",
+                  mobileTab === MOBILE_TAB.LYRICS
+                    ? "opacity-100"
+                    : "pointer-events-none absolute opacity-0"
+                )}
+              >
+                <ScrollArea className="h-full px-4" isFillParent>
+                  <div className="flex flex-col gap-6 py-4">
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-muted-foreground">
+                        Main Lyrics
+                      </h4>
+                      <div id="mobile-preview-main-lyric-section-div">
+                        <MainLyricSection />
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="mb-2 text-sm font-medium text-muted-foreground">
+                        Secondary Lyrics
+                      </h4>
+                      <SecondaryLyricSection />
+                    </div>
+                  </div>
+                </ScrollArea>
+              </div>
+
+              {/* Settings Tab */}
+              <div
+                className={cn(
+                  "h-full transition-opacity duration-200",
+                  mobileTab === MOBILE_TAB.SETTINGS
+                    ? "opacity-100"
+                    : "pointer-events-none absolute opacity-0"
+                )}
+              >
+                <div className="h-full overflow-auto px-4 py-4">
+                  <PptGeneratorSettingsContent
+                    onSectionChange={onSectionChange}
+                  />
+                </div>
+              </div>
+
+              {/* Grid Tab */}
+              <div
+                className={cn(
+                  "h-full transition-opacity duration-200",
+                  mobileTab === MOBILE_TAB.GRID
+                    ? "opacity-100"
+                    : "pointer-events-none absolute opacity-0"
+                )}
+              >
+                <div className="h-full px-4 py-4">
+                  <SlideGridView
+                    normalizedConfig={previewConfig}
+                    onSlideDoubleClick={(index) => {
+                      handleSlideDoubleClick(index);
+                      setMobileTab(MOBILE_TAB.LYRICS);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Bottom Navigation */}
+            <div className="border-t bg-background/95 px-2 pb-2 pt-2 backdrop-blur-sm">
+              <div className="flex items-center justify-around rounded-2xl bg-muted/50 p-1">
+                {[
+                  { id: MOBILE_TAB.PREVIEW, icon: Eye, label: "Preview" },
+                  { id: MOBILE_TAB.LYRICS, icon: Pencil, label: "Lyrics" },
+                  { id: MOBILE_TAB.SETTINGS, icon: Settings2, label: "Settings" },
+                  { id: MOBILE_TAB.GRID, icon: Grid3X3, label: "Grid" },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setMobileTab(tab.id)}
+                    className={cn(
+                      "flex flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-2 transition-all duration-200",
+                      mobileTab === tab.id
+                        ? "bg-background text-primary shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <tab.icon
+                      className={cn(
+                        "h-5 w-5 transition-transform duration-200",
+                        mobileTab === tab.id && "scale-110"
+                      )}
+                    />
+                    <span className="text-[10px] font-medium">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
