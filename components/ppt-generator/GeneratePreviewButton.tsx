@@ -251,11 +251,16 @@ const GeneratePreviewButton = (props: Props) => {
                 </ScrollArea>
               )}
               {currentTab === POPUP_TAB_TYPE.GRID_VIEW && (
-                <div className="h-full w-full">
-                  <SlideGridView
-                    normalizedConfig={previewConfig}
-                    onSlideDoubleClick={handleSlideDoubleClick}
-                  />
+                <div className="flex h-full w-full flex-col">
+                  <div className="min-h-0 flex-1">
+                    <SlideGridView
+                      normalizedConfig={previewConfig}
+                      onSlideDoubleClick={handleSlideDoubleClick}
+                    />
+                  </div>
+                  <div className="flex justify-end border-t pt-2">
+                    <GeneratePptWithPromptButton />
+                  </div>
                 </div>
               )}
             </div>
