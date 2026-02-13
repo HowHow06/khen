@@ -293,84 +293,60 @@ const GeneratePreviewButton = (props: Props) => {
             {/* Mobile Content Area */}
             <div className="flex-1 overflow-hidden">
               {/* Preview Tab */}
-              <div
-                className={cn(
-                  "h-full transition-opacity duration-200",
-                  mobileTab === MOBILE_TAB.PREVIEW
-                    ? "opacity-100"
-                    : "pointer-events-none absolute opacity-0"
-                )}
-              >
-                {error ? (
-                  <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
-                    Working on the preview...
-                  </div>
-                ) : (
-                  <ScrollArea className="h-full px-4" isFillParent>
-                    <div className="py-4">
-                      <VerticalPreview
-                        normalizedConfig={previewConfig}
-                        drawBoundingBoxes={false}
-                      />
+              {mobileTab === MOBILE_TAB.PREVIEW && (
+                <div className="h-full">
+                  {error ? (
+                    <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
+                      Working on the preview...
                     </div>
-                  </ScrollArea>
-                )}
-              </div>
+                  ) : (
+                    <ScrollArea className="h-full px-4" isFillParent>
+                      <div className="py-4">
+                        <VerticalPreview
+                          normalizedConfig={previewConfig}
+                          drawBoundingBoxes={false}
+                        />
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+              )}
 
               {/* Lyrics Tab */}
-              <div
-                className={cn(
-                  "h-full transition-opacity duration-200",
-                  mobileTab === MOBILE_TAB.LYRICS
-                    ? "opacity-100"
-                    : "pointer-events-none absolute opacity-0"
-                )}
-              >
-                <ScrollArea className="h-full px-4" isFillParent>
-                  <div className="flex flex-col gap-6 py-4">
-                    <div>
-                      <h4 className="mb-2 text-sm font-medium text-muted-foreground">
-                        Main Lyrics
-                      </h4>
-                      <div id="mobile-preview-main-lyric-section-div">
-                        <MainLyricSection />
+              {mobileTab === MOBILE_TAB.LYRICS && (
+                <div className="h-full">
+                  <ScrollArea className="h-full px-4" isFillParent>
+                    <div className="flex flex-col gap-6 py-4">
+                      <div>
+                        <h4 className="mb-2 text-sm font-medium text-muted-foreground">
+                          Main Lyrics
+                        </h4>
+                        <div id="mobile-preview-main-lyric-section-div">
+                          <MainLyricSection />
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="mb-2 text-sm font-medium text-muted-foreground">
+                          Secondary Lyrics
+                        </h4>
+                        <SecondaryLyricSection />
                       </div>
                     </div>
-                    <div>
-                      <h4 className="mb-2 text-sm font-medium text-muted-foreground">
-                        Secondary Lyrics
-                      </h4>
-                      <SecondaryLyricSection />
-                    </div>
-                  </div>
-                </ScrollArea>
-              </div>
+                  </ScrollArea>
+                </div>
+              )}
 
               {/* Settings Tab */}
-              <div
-                className={cn(
-                  "h-full transition-opacity duration-200",
-                  mobileTab === MOBILE_TAB.SETTINGS
-                    ? "opacity-100"
-                    : "pointer-events-none absolute opacity-0"
-                )}
-              >
+              {mobileTab === MOBILE_TAB.SETTINGS && (
                 <div className="h-full overflow-auto px-4 py-4">
                   <PptGeneratorSettingsContent
                     onSectionChange={onSectionChange}
                   />
                 </div>
-              </div>
+              )}
 
               {/* Grid Tab */}
-              <div
-                className={cn(
-                  "h-full transition-opacity duration-200",
-                  mobileTab === MOBILE_TAB.GRID
-                    ? "opacity-100"
-                    : "pointer-events-none absolute opacity-0"
-                )}
-              >
+              {mobileTab === MOBILE_TAB.GRID && (
                 <div className="h-full px-4 py-4">
                   <SlideGridView
                     normalizedConfig={previewConfig}
@@ -380,7 +356,7 @@ const GeneratePreviewButton = (props: Props) => {
                     }}
                   />
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Mobile Bottom Navigation */}
