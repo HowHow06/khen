@@ -9,7 +9,14 @@ import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { PptSettingsStateType } from "@/lib/types";
 import { getBase64FromString } from "@/lib/utils/general";
 import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
-import { Eye, Grid3X3, Pencil, Settings2, SlidersHorizontal } from "lucide-react";
+import {
+  Download,
+  Eye,
+  Grid3X3,
+  Pencil,
+  Settings2,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
@@ -43,6 +50,17 @@ const GeneratePreviewButton = (props: Props) => {
   const onGeneratePreviewClick = () => {
     setIsModalOpen(true);
   };
+
+  // Listen for custom event to open preview (from MiniPreviewPanel)
+  useEffect(() => {
+    const handleOpenPreview = () => {
+      setIsModalOpen(true);
+    };
+    window.addEventListener('openFullPreview', handleOpenPreview);
+    return () => {
+      window.removeEventListener('openFullPreview', handleOpenPreview);
+    };
+  }, []);
 
   // TODO: add settings validation check here, OR show message like 'invalid content' instead of preview
   const updatePreviewConfig = useCallback(
@@ -359,8 +377,20 @@ const GeneratePreviewButton = (props: Props) => {
               )}
             </div>
 
-            {/* Mobile Bottom Navigation */}
-            <div className="border-t bg-background/95 px-2 pb-2 pt-2 backdrop-blur-sm">
+            {/* Mobile Bottom Bar with Download + Navigation */}
+            <div className="border-t bg-background/95 px-3 pb-3 pt-2 backdrop-blur-sm">
+              {/* Download button - prominent CTA */}
+              <div className="mb-2">
+                <GeneratePptWithPromptButton
+                  className="w-full gap-2 shadow-lg"
+                  size="lg"
+                >
+                  <Download className="h-4 w-4" />
+                  Download PPT
+                </GeneratePptWithPromptButton>
+              </div>
+
+              {/* Tab Navigation */}
               <div className="flex items-center justify-around rounded-2xl bg-muted/50 p-1">
                 {[
                   { id: MOBILE_TAB.PREVIEW, icon: Eye, label: "Preview" },
@@ -393,8 +423,15 @@ const GeneratePreviewButton = (props: Props) => {
         </DialogContent>
       </Dialog>
 
-      <Button variant="outline" type="button" onClick={onGeneratePreviewClick}>
-        Preview
+      <Button
+        variant="outline"
+        type="button"
+        onClick={onGeneratePreviewClick}
+        data-preview-button="true"
+        className="gap-2"
+      >
+        <Eye className="h-4 w-4" />
+        Edit & Preview
       </Button>
     </>
   );

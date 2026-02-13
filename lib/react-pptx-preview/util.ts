@@ -33,24 +33,41 @@ export const calculatePercentage = (value: any, total: number): number =>
 
 /**
  * Hook to track element resize and return width/height
+ * Uses ResizeObserver for accurate measurements during CSS transitions
  */
 export const useResize = (myRef: React.RefObject<HTMLElement | null>) => {
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
 
   React.useEffect(() => {
+    const element = myRef.current;
+    if (!element) return;
+
     const handleResize = () => {
-      if (myRef.current) {
-        setWidth(myRef.current.offsetWidth);
-        setHeight(myRef.current.offsetHeight);
-      }
+      setWidth(element.offsetWidth);
+      setHeight(element.offsetHeight);
     };
 
+    // Initial measurement
     handleResize();
+
+    // Use ResizeObserver for element-specific size changes (CSS transitions, etc.)
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(element);
+    }
+
+    // Also listen to window resize as fallback
     window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
   }, [myRef]);
 

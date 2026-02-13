@@ -2,6 +2,7 @@
 import { PPT_GENERATION_SETTINGS_META } from "@/lib/constant";
 import { DIALOG_RESULT } from "@/lib/constant/general";
 import useAutoOutputOverwrite from "@/lib/hooks/use-auto-output-overwrite";
+import { useLocalStoragePersistence } from "@/lib/hooks/use-local-storage-persistence";
 import useMemoizedSettingsValues from "@/lib/hooks/use-memoized-settings-values";
 import usePptSettingsDynamicTextboxCount from "@/lib/hooks/use-ppt-settings-dynamic-textbox-count";
 import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
@@ -9,6 +10,11 @@ import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
 import { toNormalCase, traverseAndCollect } from "@/lib/utils/general";
 import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
+import {
+  getLyricsSummary,
+  LyricWarning,
+  validateLyrics,
+} from "@/lib/utils/ppt-generator/lyric-validation";
 import {
   combineWithDefaultSettings,
   generatePptSettingsInitialState,
@@ -22,6 +28,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 import {
@@ -36,6 +43,14 @@ import { Form } from "../ui/form";
 import { useAlertDialog } from "./AlertDialogContext";
 import { useLineToSlideMapperContext } from "./LineToSlideMapperContext";
 
+type LyricsSummary = {
+  lineCount: number;
+  songCount: number;
+  subsectionCount: number;
+  hasCover: boolean;
+  estimatedSlides: number;
+};
+
 type PptGeneratorFormContextType = {
   mainText: string;
   secondaryText: string;
@@ -47,6 +62,12 @@ type PptGeneratorFormContextType = {
   currentSection: string;
   setCurrentSection: Dispatch<SetStateAction<string>>;
   submit: () => void;
+  // New additions for UX improvements
+  lyricsSummary: LyricsSummary;
+  lyricWarnings: LyricWarning[];
+  clearSavedSession: () => void;
+  saveLastPreset: (presetName: string) => void;
+  getLastPreset: () => string | null;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -91,6 +112,31 @@ export const PptGeneratorFormProvider: React.FC<
     });
   usePptSettingsDynamicTextboxCount({ settingsValues, formReset: form.reset });
   useAutoOutputOverwrite({ settingsValues, mainText, setMainText });
+
+  // Session persistence
+  const {
+    clearSavedData: clearSavedSession,
+    saveLastPreset,
+    getLastPreset,
+  } = useLocalStoragePersistence({
+    mainText,
+    secondaryText,
+    settingsValues,
+    setMainText,
+    setSecondaryText,
+    formReset: form.reset,
+  });
+
+  // Lyrics summary and warnings (memoized for performance)
+  const lyricsSummary = useMemo(
+    () => getLyricsSummary(mainText),
+    [mainText]
+  );
+
+  const lyricWarnings = useMemo(
+    () => validateLyrics(mainText),
+    [mainText]
+  );
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof settingsSchema>) => {
@@ -185,6 +231,12 @@ export const PptGeneratorFormProvider: React.FC<
         currentSection,
         setCurrentSection,
         submit,
+        // New additions
+        lyricsSummary,
+        lyricWarnings,
+        clearSavedSession,
+        saveLastPreset,
+        getLastPreset,
       }}
     >
       <Form {...form}>

@@ -131,15 +131,56 @@ The settings system is a complex, type-safe configuration architecture:
 ### Lyrics Processing
 
 Lines are classified into types:
-- **MAIN_SECTION** - Section headers starting with `#`
-- **SUB_SECTION** - Subsection headers
-- **COVER** - Cover slide indicators
-- **EMPTY_SLIDE** - Creates blank slide
-- **FILL_SLIDE** - Fills remaining textboxes
+- **COVER** - Cover/title slide (`# Title ## Subtitle`)
+- **MAIN_SECTION** - Song section headers (`----`)
+- **SUB_SECTION** - Subsection headers (`---`)
+- **EMPTY_SLIDE** - Creates blank slide (`***`)
+- **FILL_SLIDE** - Page break/fills remaining textboxes (`**`)
 - **NORMAL** - Regular lyric lines
-- **METADATA** - Metadata lines (not rendered)
+- **METADATA** - Metadata lines (`@key: value`, not rendered)
 
 The system supports Chinese characters with automatic pinyin generation (using `pinyin-pro` library) and OpenCC for traditional/simplified Chinese conversion.
+
+### Lyric Syntax Reference
+
+**IMPORTANT:** This syntax is critical for correct slide generation. For full details, see `docs/PPT_GENERATOR_USER_GUIDE.md`.
+
+| Syntax | Purpose | Example |
+|--------|---------|---------|
+| `# Title ## Subtitle` | Cover/title slide (both on same line) | `# 奇异恩典 ## Amazing Grace` |
+| `----` or `---- Name` | Song section (separates songs in medley) | `---- Song 2: How Great Thou Art` |
+| `---` or `--- Name` | Subsection (verse, chorus, bridge) | `--- Verse 1` |
+| `***` | Empty/blank slide | `***` |
+| `**` | Page break/fill slide | `**` |
+| `@key: value` | Metadata (not rendered) | `@author: John Newton` |
+| `{...}` | JSON settings overwrite (after `----`) | `{"general":{"presetChosen":"Large"}}` |
+
+**Key Rules:**
+1. **Cover slides** use `# Main Title ## Secondary Title` format - both must be on the **same line**
+2. **Song sections** (`----`) separate different songs in a medley or mark major divisions
+3. **Subsections** (`---`) mark verse, chorus, bridge, etc. within a song
+4. Order matters: check for `----` before `---` (since `----` starts with `---`)
+
+**Example Lyrics Structure:**
+```
+# 奇异恩典 ## Amazing Grace
+--- Verse 1
+奇异恩典 何等甘甜
+我罪已得赦免
+--- Chorus
+赞美主 赞美主
+全地都当赞美主
+***
+---- Song 2
+# 如鹰展翅上腾 ## On Eagle's Wings
+--- Verse 1
+那等候耶和华的
+```
+
+**Related Files:**
+- `lib/utils/ppt-generator/lyric-validation.ts` - Lyric syntax detection and validation
+- `lib/utils/ppt-generator/create-slides-from-lyrics-v2.ts` - Main processing logic
+- `docs/PPT_GENERATOR_USER_GUIDE.md` - Full user documentation
 
 ## Working with Settings
 

@@ -1,11 +1,13 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
+import { FileText, Lightbulb } from "lucide-react";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import AutoGeneratePinyinSwitch from "../AutoGeneratePinyinSwitch";
 import ClearTextButton from "../ClearTextButton";
@@ -18,6 +20,30 @@ import TextTransformDropdown from "../TextTransformDropdown";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
 import LyricFormatterDialogButton from "../lyric-formatter/LyricFormatterDialogButton";
+
+// Example template for empty state
+// Syntax: # Title ## Subtitle = Cover, ---- = Song section, --- = Subsection, *** = Empty slide
+const EXAMPLE_TEMPLATE = `---- 奇异恩典
+# 奇异恩典 ## Amazing Grace
+--- Verse 1
+奇异恩典 何等甘甜
+我罪已得赦免
+前我失丧 今被寻回
+瞎眼今得看见
+--- Verse 2
+如此恩典 使我敬畏
+使我心得安慰
+初信之时 即蒙恩惠
+真是何等宝贵
+--- Chorus
+赞美主 赞美主
+全地都当赞美主
+从日出之地 到日落之处
+赞美主名
+--- Ending
+奇异恩典 何等甘甜
+我罪已得赦免
+***`;
 
 type MainLyricSectionProps = {};
 
@@ -108,6 +134,11 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
     }
   };
 
+  // Handle loading example template
+  const loadExampleTemplate = useCallback(() => {
+    setMainTextHandler(EXAMPLE_TEMPLATE);
+  }, [setMainTextHandler]);
+
   return (
     <div className="space-y-3">
       {/* Toolbar */}
@@ -136,6 +167,39 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       {/* Auto-generate toggle */}
       <AutoGeneratePinyinSwitch text={mainText} setText={setSecondaryText} />
 
+      {/* Empty state with template */}
+      {!mainText.trim() && (
+        <div className="rounded-xl border-2 border-dashed bg-muted/20 p-6 text-center">
+          <FileText className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
+          <h4 className="mb-2 font-medium">No lyrics yet</h4>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Paste your lyrics below or start with an example template
+          </p>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadExampleTemplate}
+              className="gap-2"
+            >
+              <Lightbulb className="h-4 w-4" />
+              Load Example Template
+            </Button>
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium">Quick syntax:</span>{" "}
+              <code className="rounded bg-muted px-1 py-0.5"># Title ## Subtitle</code>{" "}
+              Cover slide{" "}
+              <code className="rounded bg-muted px-1 py-0.5">----</code> New
+              song{" "}
+              <code className="rounded bg-muted px-1 py-0.5">---</code>{" "}
+              Subsection{" "}
+              <code className="rounded bg-muted px-1 py-0.5">***</code> Empty
+              slide
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Textarea */}
       <Textarea
         ref={mainTextareaRef}
@@ -146,6 +210,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         onSelect={cursorHandleSelect}
         onKeyDown={handleKeyDown}
       />
+
       <LyricSectionCommand
         open={showCommand}
         onOpenChange={setShowCommand}
