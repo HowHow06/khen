@@ -16,17 +16,21 @@ const SlideGridItem = ({
   masterSlide,
   dimensions,
   onDoubleClick,
+  hasOverflow,
 }: {
   slide: InternalSlide;
   slideIndex: number;
   masterSlide?: any;
   dimensions: [number, number];
   onDoubleClick?: (slideIndex: number) => void;
+  hasOverflow?: boolean;
 }) => {
   return (
     <div className="flex h-full w-full flex-col items-center gap-2">
       <div
-        className="w-full cursor-pointer overflow-hidden rounded-lg border-2 border-transparent shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+        className={`relative w-full cursor-pointer overflow-hidden rounded-lg border-2 shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-lg ${
+          hasOverflow ? "border-amber-400/50" : "border-transparent"
+        }`}
         onDoubleClick={() => onDoubleClick?.(slideIndex)}
       >
         <SlidePreview
@@ -36,8 +40,16 @@ const SlideGridItem = ({
           drawBoundingBoxes={false}
           className="h-full w-full"
         />
+        {hasOverflow && (
+          <div
+            className="absolute right-1 top-1 flex items-center rounded bg-amber-500/90 px-1 py-0.5 text-[8px] font-semibold text-white"
+            title="Text may wrap on this slide"
+          >
+            ⚠
+          </div>
+        )}
       </div>
-      <span className="rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600">
+      <span className="rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
         Slide {slideIndex}
       </span>
     </div>
@@ -47,9 +59,10 @@ const SlideGridItem = ({
 interface Props {
   normalizedConfig?: InternalPresentation;
   onSlideDoubleClick?: (slideIndex: number) => void;
+  overflowSlideIndices?: Set<number>;
 }
 
-const SlideGridView = ({ normalizedConfig, onSlideDoubleClick }: Props) => {
+const SlideGridView = ({ normalizedConfig, onSlideDoubleClick, overflowSlideIndices }: Props) => {
   if (!normalizedConfig) {
     return (
       <div className="flex h-40 items-center justify-center text-gray-500">
@@ -118,6 +131,7 @@ const SlideGridView = ({ normalizedConfig, onSlideDoubleClick }: Props) => {
                       }
                       dimensions={dimensions}
                       onDoubleClick={onSlideDoubleClick}
+                      hasOverflow={overflowSlideIndices?.has(index)}
                     />
                   ))}
                 </div>

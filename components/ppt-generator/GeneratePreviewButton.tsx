@@ -31,7 +31,7 @@ import PptGeneratorSettingsContent from "./settings/PptGeneratorSettingsContent"
 type Props = {};
 
 const GeneratePreviewButton = (props: Props) => {
-  const { mainText, secondaryText, settingsValues } =
+  const { mainText, secondaryText, settingsValues, overflowSlideIndices } =
     usePptGeneratorFormContext();
   const {
     lineMapper,
@@ -256,6 +256,7 @@ const GeneratePreviewButton = (props: Props) => {
                     <SlideGridView
                       normalizedConfig={previewConfig}
                       onSlideDoubleClick={handleSlideDoubleClick}
+                      overflowSlideIndices={overflowSlideIndices}
                     />
                   </div>
                   <div className="flex justify-end border-t pt-2">
@@ -286,6 +287,7 @@ const GeneratePreviewButton = (props: Props) => {
                     <VerticalPreview
                       normalizedConfig={previewConfig}
                       drawBoundingBoxes={false}
+                      overflowSlideIndices={overflowSlideIndices}
                     />
                   </ScrollArea>
                 )}
@@ -328,6 +330,7 @@ const GeneratePreviewButton = (props: Props) => {
                         <VerticalPreview
                           normalizedConfig={previewConfig}
                           drawBoundingBoxes={false}
+                          overflowSlideIndices={overflowSlideIndices}
                         />
                       </div>
                     </ScrollArea>
@@ -377,6 +380,7 @@ const GeneratePreviewButton = (props: Props) => {
                       handleSlideDoubleClick(index);
                       setMobileTab(MOBILE_TAB.LYRICS);
                     }}
+                    overflowSlideIndices={overflowSlideIndices}
                   />
                 </div>
               )}

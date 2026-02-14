@@ -12,6 +12,7 @@ const VerticalPreview = (props: {
   slideStyle?: React.CSSProperties;
   drawBoundingBoxes?: boolean;
   normalizedConfig?: InternalPresentation;
+  overflowSlideIndices?: Set<number>;
 }): React.JSX.Element | null => {
   if (!props.children && !props.normalizedConfig) {
     return null;
@@ -45,14 +46,18 @@ const VerticalPreview = (props: {
               ? getBase64FromString(removeNumbering(slide.sectionName.trim()))
               : undefined;
 
+          const slideIndex = i + 1;
+          const hasOverflow = props.overflowSlideIndices?.has(slideIndex);
+
           return (
             <div
               style={{
                 marginBottom: "10px",
+                position: "relative",
               }}
               key={i}
-              data-slide-index={i + 1} // custom data attributed used by line to slide mapper hook
-              id={`slide-${i + 1}`} // fallback, not used most of the time
+              data-slide-index={slideIndex} // custom data attributed used by line to slide mapper hook
+              id={`slide-${slideIndex}`} // fallback, not used most of the time
             >
               {shouldRenderSectionName && (
                 <div id={`section-${sectionNameIdentifier}`}>
@@ -70,6 +75,28 @@ const VerticalPreview = (props: {
                 slideStyle={props.slideStyle}
                 drawBoundingBoxes={!!props.drawBoundingBoxes}
               />
+              {hasOverflow && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 4,
+                    backgroundColor: "rgba(245, 158, 11, 0.9)",
+                    color: "white",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: "2px 6px",
+                    borderRadius: 4,
+                    zIndex: 10,
+                  }}
+                  title="Text may wrap on this slide"
+                >
+                  ⚠ Overflow
+                </div>
+              )}
             </div>
           );
         })}

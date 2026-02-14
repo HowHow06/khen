@@ -62,12 +62,17 @@ type PptGeneratorFormContextType = {
   currentSection: string;
   setCurrentSection: Dispatch<SetStateAction<string>>;
   submit: () => void;
-  // New additions for UX improvements
+  // UX improvements
   lyricsSummary: LyricsSummary;
   lyricWarnings: LyricWarning[];
   clearSavedSession: () => void;
   saveLastPreset: (presetName: string) => void;
   getLastPreset: () => string | null;
+  // Overflow detection
+  overflowWarnings: LyricWarning[];
+  overflowSlideIndices: Set<number>;
+  setOverflowWarnings: (warnings: LyricWarning[]) => void;
+  setOverflowSlideIndices: (indices: Set<number>) => void;
 };
 
 const PptGeneratorFormContext = createContext<
@@ -136,6 +141,12 @@ export const PptGeneratorFormProvider: React.FC<
   const lyricWarnings = useMemo(
     () => validateLyrics(mainText),
     [mainText]
+  );
+
+  // Overflow detection state (set by HiddenOverflowDetector in PptGeneratorContent)
+  const [overflowWarnings, setOverflowWarnings] = useState<LyricWarning[]>([]);
+  const [overflowSlideIndices, setOverflowSlideIndices] = useState<Set<number>>(
+    new Set()
   );
 
   const onSubmit = useCallback(
@@ -231,12 +242,17 @@ export const PptGeneratorFormProvider: React.FC<
         currentSection,
         setCurrentSection,
         submit,
-        // New additions
+        // UX improvements
         lyricsSummary,
         lyricWarnings,
         clearSavedSession,
         saveLastPreset,
         getLastPreset,
+        // Overflow detection
+        overflowWarnings,
+        overflowSlideIndices,
+        setOverflowWarnings,
+        setOverflowSlideIndices,
       }}
     >
       <Form {...form}>

@@ -10,6 +10,7 @@ import { PptSettingsStateType } from "@/lib/types";
 import { cn } from "@/lib/utils/general";
 import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
 import {
+  AlertTriangle,
   ChevronRight,
   Eye,
   Layers,
@@ -27,7 +28,7 @@ type Props = {
 };
 
 const MiniPreviewPanel = ({ onOpenFullPreview }: Props) => {
-  const { mainText, secondaryText, settingsValues, lyricsSummary } =
+  const { mainText, secondaryText, settingsValues, lyricsSummary, overflowWarnings, overflowSlideIndices } =
     usePptGeneratorFormContext();
   const { lineMapper } = useLineToSlideMapperContext();
   const screenSize = useScreenSize();
@@ -163,6 +164,15 @@ const MiniPreviewPanel = ({ onOpenFullPreview }: Props) => {
                     {lyricsSummary.estimatedSlides}
                   </Badge>
                 )}
+                {overflowWarnings.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="border-amber-500/50 text-xs text-amber-600 dark:text-amber-400"
+                  >
+                    <AlertTriangle className="mr-1 h-3 w-3" />
+                    {overflowWarnings.length}
+                  </Badge>
+                )}
               </div>
               <div className="flex items-center gap-1">
                 <Button
@@ -209,6 +219,7 @@ const MiniPreviewPanel = ({ onOpenFullPreview }: Props) => {
                     <VerticalPreview
                       normalizedConfig={previewConfig}
                       drawBoundingBoxes={false}
+                      overflowSlideIndices={overflowSlideIndices}
                     />
                   </div>
                 </ScrollArea>

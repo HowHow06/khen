@@ -4,7 +4,8 @@ import { LineToSlideMapperProvider } from "@/components/context/LineToSlideMappe
 import { PptGeneratorFormProvider } from "@/components/context/PptGeneratorFormContext";
 import { PptSettingsUIProvider } from "@/components/context/PptSettingsUIContext";
 import Container from "@/components/ui/container";
-import { useCallback, useRef, useState } from "react";
+import { useCallback } from "react";
+import HiddenOverflowDetector from "./HiddenOverflowDetector";
 import MainLyricSection from "./MainLyricSection";
 import MiniPreviewPanel from "./MiniPreviewPanel";
 import SecondaryLyricSection from "./SecondaryLyricSection";
@@ -91,6 +92,9 @@ const PptGeneratorContent = () => {
 
           {/* Mini Preview Panel - floating on desktop */}
           <MiniPreviewPanel onOpenFullPreview={handleOpenFullPreview} />
+
+          {/* Hidden overflow detection - always mounted */}
+          <HiddenOverflowDetector />
         </PptGeneratorFormProvider>
       </PptSettingsUIProvider>
     </LineToSlideMapperProvider>
