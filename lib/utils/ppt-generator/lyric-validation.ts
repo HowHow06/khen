@@ -18,6 +18,42 @@ export type LyricWarning = {
   suggestion?: string;
 };
 
+const DEFAULT_WRAP_CHECK_WIDTH = 860;
+const DEFAULT_WRAP_CHECK_FONT_SIZE = 72;
+const DEFAULT_WRAP_CHECK_LINE_HEIGHT_MULTIPLIER = 1.2;
+
+const isLikelyWrappedInPreview = (line: string): boolean => {
+  const text = line.trim();
+  if (!text || typeof document === "undefined") {
+    return false;
+  }
+
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.pointerEvents = "none";
+  probe.style.left = "-99999px";
+  probe.style.top = "-99999px";
+  probe.style.width = `${DEFAULT_WRAP_CHECK_WIDTH}px`;
+  probe.style.fontSize = `${DEFAULT_WRAP_CHECK_FONT_SIZE}px`;
+  probe.style.fontWeight = "700";
+  probe.style.lineHeight = `${DEFAULT_WRAP_CHECK_LINE_HEIGHT_MULTIPLIER}`;
+  probe.style.whiteSpace = "normal";
+  probe.style.wordBreak = "break-word";
+  probe.style.overflowWrap = "break-word";
+  probe.textContent = text;
+
+  document.body.appendChild(probe);
+
+  const computedLineHeight =
+    parseFloat(getComputedStyle(probe).lineHeight) ||
+    DEFAULT_WRAP_CHECK_FONT_SIZE * DEFAULT_WRAP_CHECK_LINE_HEIGHT_MULTIPLIER;
+  const wrapped = probe.clientHeight > computedLineHeight * 1.4;
+
+  document.body.removeChild(probe);
+  return wrapped;
+};
+
 /**
  * Check if a line is a cover/title slide
  * Cover slides use: # <Main Title> ## <Secondary Title>
@@ -115,6 +151,17 @@ export const validateLyrics = (lyrics: string): LyricWarning[] => {
       openBracketLine = lineNumber;
     } else if (trimmedLine.includes("}") && openBracketLine !== null) {
       openBracketLine = null;
+    }
+
+    // Heuristic wrap check: warn if a line is likely to wrap in preview text boxes.
+    if (!isSpecialMarker(trimmedLine) && isLikelyWrappedInPreview(trimmedLine)) {
+      warnings.push({
+        type: "warning",
+        lineNumber,
+        message: `Line ${lineNumber} may wrap in preview`,
+        suggestion:
+          "Consider splitting this line with **, shortening the text, or lowering font size.",
+      });
     }
   }
 

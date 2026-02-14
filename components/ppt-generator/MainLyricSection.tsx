@@ -7,7 +7,7 @@ import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
-import { FileText, Lightbulb } from "lucide-react";
+import { AlertTriangle, FileText, Lightbulb } from "lucide-react";
 import { KeyboardEvent, useCallback, useRef, useState } from "react";
 import AutoGeneratePinyinSwitch from "../AutoGeneratePinyinSwitch";
 import ClearTextButton from "../ClearTextButton";
@@ -48,7 +48,7 @@ const EXAMPLE_TEMPLATE = `---- 奇异恩典
 type MainLyricSectionProps = {};
 
 const MainLyricSection = ({}: MainLyricSectionProps) => {
-  const { mainText, setMainText, setSecondaryText } =
+  const { mainText, setMainText, setSecondaryText, lyricWarnings } =
     usePptGeneratorFormContext();
   const mainTextareaRef = useRef<TextareaRefType>(null);
   const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
@@ -210,6 +210,23 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         onSelect={cursorHandleSelect}
         onKeyDown={handleKeyDown}
       />
+
+      {lyricWarnings.length > 0 && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-700/50 dark:bg-amber-950/30 dark:text-amber-200">
+          <div className="mb-1 flex items-center gap-1.5 font-medium">
+            <AlertTriangle className="h-4 w-4" />
+            Lyrics warnings ({lyricWarnings.length})
+          </div>
+          <ul className="space-y-1">
+            {lyricWarnings.map((warning, index) => (
+              <li key={`${warning.message}-${warning.lineNumber ?? index}`}>
+                • {warning.message}
+                {warning.suggestion ? ` — ${warning.suggestion}` : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <LyricSectionCommand
         open={showCommand}
