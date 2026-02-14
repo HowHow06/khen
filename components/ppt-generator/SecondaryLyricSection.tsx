@@ -10,7 +10,7 @@ import FindAndReplaceButton from "../FindAndReplaceButton";
 import TextTransformDropdown from "../TextTransformDropdown";
 import { useLineToSlideMapperContext } from "../context/LineToSlideMapperContext";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
-import { Textarea } from "../ui/textarea";
+import { LineNumberedTextarea } from "../ui/line-numbered-textarea";
 
 type SecondaryLyricSectionProps = {};
 
@@ -68,7 +68,7 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
       </div>
 
       {/* Textarea */}
-      <Textarea
+      <LineNumberedTextarea
         placeholder="Insert the secondary lyrics here (e.g., pinyin, translations)."
         className="min-h-72 resize-y border-2 focus-visible:ring-1 md:min-h-[14rem]"
         ref={textAreaRef}

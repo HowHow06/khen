@@ -1,14 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { LineNumberedTextarea } from "@/components/ui/line-numbered-textarea";
 import { SCREEN_SIZE } from "@/lib/constant/general";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import useUndoStack from "@/lib/hooks/use-undo-stack";
 import { TextareaRefType } from "@/lib/types";
 import { AlertTriangle, FileText, Lightbulb } from "lucide-react";
-import { KeyboardEvent, useCallback, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useMemo, useRef, useState } from "react";
 import AutoGeneratePinyinSwitch from "../AutoGeneratePinyinSwitch";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
@@ -62,6 +62,17 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const [showCommand, setShowCommand] = useState<boolean>(false);
   const screenSize = useScreenSize();
   const isExtraSmallScreen = screenSize === SCREEN_SIZE.XS;
+
+  // Build highlight set from overflow warnings for the line number gutter
+  const overflowLineNumbers = useMemo(
+    () =>
+      new Set(
+        overflowWarnings
+          .map((w) => w.lineNumber)
+          .filter((n): n is number => n !== undefined),
+      ),
+    [overflowWarnings],
+  );
 
   const { saveToUndoStack } = useUndoStack<string>({
     ref: mainTextareaRef,
@@ -201,7 +212,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       )}
 
       {/* Textarea */}
-      <Textarea
+      <LineNumberedTextarea
         ref={mainTextareaRef}
         placeholder={`Insert the main lyrics here. ${isExtraSmallScreen ? "" : `Press '/' for quick commands.`}`}
         className="min-h-96 resize-y border-2 focus-visible:ring-1 md:min-h-[28rem]"
@@ -209,6 +220,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}
         onKeyDown={handleKeyDown}
+        highlightLines={overflowLineNumbers}
       />
 
       {/* Overflow warnings */}
