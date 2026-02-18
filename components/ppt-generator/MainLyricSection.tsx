@@ -221,6 +221,7 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
         onSelect={cursorHandleSelect}
         onKeyDown={handleKeyDown}
         highlightLines={overflowLineNumbers}
+        noWrap
       />
 
       {/* Overflow warnings */}

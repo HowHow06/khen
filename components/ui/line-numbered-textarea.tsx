@@ -7,12 +7,14 @@ export interface LineNumberedTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   /** Set of 1-based line numbers to highlight (e.g. overflow warnings) */
   highlightLines?: Set<number>;
+  /** Prevent text wrapping and enable horizontal scroll */
+  noWrap?: boolean;
 }
 
 const LineNumberedTextarea = React.forwardRef<
   HTMLTextAreaElement,
   LineNumberedTextareaProps
->(({ className, highlightLines, value, onChange, onScroll, ...props }, ref) => {
+>(({ className, highlightLines, noWrap, value, onChange, onScroll, ...props }, ref) => {
   const gutterRef = React.useRef<HTMLDivElement>(null);
   const internalRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -92,6 +94,10 @@ const LineNumberedTextarea = React.forwardRef<
         )}
         style={{
           paddingLeft: `calc(${gutterWidth} + 0.75rem)`,
+          ...(noWrap && {
+            whiteSpace: "nowrap",
+            overflowX: "auto",
+          }),
         }}
         ref={mergedRef}
         value={value}

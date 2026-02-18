@@ -75,6 +75,7 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
         value={secondaryText}
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}
+        noWrap
       />
     </div>
   );
