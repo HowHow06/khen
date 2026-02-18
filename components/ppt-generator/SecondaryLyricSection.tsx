@@ -3,7 +3,8 @@ import { SCREEN_SIZE } from "@/lib/constant/general";
 import useCursorPosition from "@/lib/hooks/use-cursor-position";
 import { useScreenSize } from "@/lib/hooks/use-screen-size";
 import { TextareaRefType } from "@/lib/types";
-import { useRef } from "react";
+import { AlertTriangle } from "lucide-react";
+import { useMemo, useRef } from "react";
 import ClearTextButton from "../ClearTextButton";
 import CopyToClipboardButton from "../CopyToClipboardButton";
 import FindAndReplaceButton from "../FindAndReplaceButton";
@@ -15,7 +16,8 @@ import { LineNumberedTextarea } from "../ui/line-numbered-textarea";
 type SecondaryLyricSectionProps = {};
 
 const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
-  const { secondaryText, setSecondaryText } = usePptGeneratorFormContext();
+  const { secondaryText, setSecondaryText, secondaryOverflowWarnings } =
+    usePptGeneratorFormContext();
 
   const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
   const screenSize = useScreenSize();
@@ -27,6 +29,17 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
     handleSelect: cursorHandleSelect,
     handleTextChange: cursorHandleTextChange,
   } = useCursorPosition();
+
+  // Build highlight set from overflow warnings for the line number gutter
+  const overflowLineNumbers = useMemo(
+    () =>
+      new Set(
+        secondaryOverflowWarnings
+          .map((w) => w.lineNumber)
+          .filter((n): n is number => n !== undefined),
+      ),
+    [secondaryOverflowWarnings],
+  );
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSecondaryText(event.target.value);
@@ -75,8 +88,36 @@ const SecondaryLyricSection = ({}: SecondaryLyricSectionProps) => {
         value={secondaryText}
         onChange={handleTextChange}
         onSelect={cursorHandleSelect}
+        highlightLines={overflowLineNumbers}
         noWrap
       />
+
+      {/* Overflow warnings */}
+      {secondaryOverflowWarnings.length > 0 && (
+        <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="h-3.5 w-3.5" />
+            <span>
+              {secondaryOverflowWarnings.length} secondary lyric line
+              {secondaryOverflowWarnings.length > 1 ? "s" : ""} may wrap on
+              slide
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {secondaryOverflowWarnings.map((warning) => (
+              <span
+                key={`secondary-${warning.lineNumber}`}
+                className="inline-flex items-center rounded-md bg-amber-500/10 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300"
+              >
+                Line {warning.lineNumber}
+              </span>
+            ))}
+          </div>
+          <p className="text-[10px] text-amber-600/70 dark:text-amber-400/70">
+            Consider splitting long lines for better slide readability
+          </p>
+        </div>
+      )}
     </div>
   );
 };

@@ -6,8 +6,11 @@ import {
   layoutToInches,
   POINTS_TO_INCHES,
 } from "@/lib/react-pptx-preview/util";
+import {
+  LineToSlideMapper,
+  LineType,
+} from "@/lib/utils/ppt-generator/line-to-slide-mapper";
 import { LyricWarning } from "@/lib/utils/ppt-generator/lyric-validation";
-import { LineToSlideMapper, LineType } from "@/lib/utils/ppt-generator/line-to-slide-mapper";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const MEASUREMENT_SLIDE_WIDTH = 800; // Fixed reference width in pixels
@@ -21,14 +24,16 @@ export const useTextOverflowDetection = ({
   previewConfig,
   lineMapper,
   mainLines,
+  secondaryLines,
 }: {
   previewConfig: InternalPresentation | undefined;
   lineMapper: LineToSlideMapper;
   mainLines: string[];
+  secondaryLines: string[];
 }) => {
   const [overflowWarnings, setOverflowWarnings] = useState<LyricWarning[]>([]);
   const [overflowSlideIndices, setOverflowSlideIndices] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -91,10 +96,7 @@ export const useTextOverflowDetection = ({
         if (textObj.kind !== "text") continue;
 
         // Compute textbox pixel width from percentage/inches
-        const wPercentage = calculatePercentage(
-          textObj.style.w,
-          dimensions[0]
-        );
+        const wPercentage = calculatePercentage(textObj.style.w, dimensions[0]);
         const textboxPxWidth = (wPercentage / 100) * slideWidth;
 
         // Get the base text object style (parent-level styles)
@@ -183,17 +185,40 @@ export const useTextOverflowDetection = ({
 
       // Match wrapping text to line numbers using the original lyrics
       // This avoids the mapping issue with interleaved secondary text objects
-      if (wrappingTexts.size > 0 && mainLines) {
+      if (wrappingTexts.size > 0) {
         for (const mapping of lineMappings) {
-          const originalLine = mainLines[mapping.lineNumber]?.trim();
-          if (originalLine && wrappingTexts.has(originalLine)) {
-            warnings.push({
-              type: "warning",
-              message: `Text wraps on slide ${slideIndex}`,
-              lineNumber: mapping.lineNumber + 1, // Convert to 1-based
-              suggestion:
-                "Consider splitting into shorter lines for better readability",
-            });
+          const lineIdx = mapping.lineNumber;
+
+          // Check main lines
+          if (mainLines && lineIdx >= 0 && lineIdx < mainLines.length) {
+            const originalLine = mainLines[lineIdx]?.trim();
+            if (originalLine && wrappingTexts.has(originalLine)) {
+              warnings.push({
+                type: "warning",
+                message: `Line ${lineIdx + 1} may wrap`,
+                lineNumber: lineIdx + 1, // Convert to 1-based
+                contentType: "main",
+              });
+              overflowSlides.add(slideIndex);
+            }
+          }
+
+          // Check secondary lines
+          if (
+            secondaryLines &&
+            lineIdx >= 0 &&
+            lineIdx < secondaryLines.length
+          ) {
+            const secondaryLine = secondaryLines[lineIdx]?.trim();
+            if (secondaryLine && wrappingTexts.has(secondaryLine)) {
+              warnings.push({
+                type: "warning",
+                message: `Line ${lineIdx + 1} may wrap`,
+                lineNumber: lineIdx + 1, // Convert to 1-based
+                contentType: "secondary",
+              });
+              overflowSlides.add(slideIndex);
+            }
           }
         }
       }
@@ -204,7 +229,7 @@ export const useTextOverflowDetection = ({
 
     setOverflowWarnings(warnings);
     setOverflowSlideIndices(overflowSlides);
-  }, [previewConfig, lineMapper, mainLines]);
+  }, [previewConfig, lineMapper, mainLines, secondaryLines]);
 
   // Run measurement when previewConfig changes (debounced)
   useEffect(() => {

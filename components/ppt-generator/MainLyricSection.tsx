@@ -48,7 +48,7 @@ const EXAMPLE_TEMPLATE = `---- 奇异恩典
 type MainLyricSectionProps = {};
 
 const MainLyricSection = ({}: MainLyricSectionProps) => {
-  const { mainText, setMainText, setSecondaryText, overflowWarnings } =
+  const { mainText, setMainText, setSecondaryText, mainOverflowWarnings } =
     usePptGeneratorFormContext();
   const mainTextareaRef = useRef<TextareaRefType>(null);
   const { scrollPreviewToCursorPosition } = useLineToSlideMapperContext();
@@ -67,11 +67,11 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
   const overflowLineNumbers = useMemo(
     () =>
       new Set(
-        overflowWarnings
+        mainOverflowWarnings
           .map((w) => w.lineNumber)
           .filter((n): n is number => n !== undefined),
       ),
-    [overflowWarnings],
+    [mainOverflowWarnings],
   );
 
   const { saveToUndoStack } = useUndoStack<string>({
@@ -226,17 +226,17 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
       />
 
       {/* Overflow warnings */}
-      {overflowWarnings.length > 0 && (
+      {mainOverflowWarnings.length > 0 && (
         <div className="space-y-1.5 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
           <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-3.5 w-3.5" />
             <span>
-              {overflowWarnings.length} line
-              {overflowWarnings.length > 1 ? "s" : ""} may wrap on slide
+              {mainOverflowWarnings.length} main lyric line
+              {mainOverflowWarnings.length > 1 ? "s" : ""} may wrap on slide
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {overflowWarnings.map((warning) => (
+            {mainOverflowWarnings.map((warning) => (
               <span
                 key={warning.lineNumber}
                 className="inline-flex items-center rounded-md bg-amber-500/10 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300"

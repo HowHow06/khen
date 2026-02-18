@@ -9,12 +9,12 @@ import usePptSettingsSections from "@/lib/hooks/use-ppt-settings-sections";
 import { settingsSchema } from "@/lib/schemas";
 import { PptSettingsStateType, SelectionItemsType } from "@/lib/types";
 import { toNormalCase, traverseAndCollect } from "@/lib/utils/general";
-import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
 import {
-  getLyricsSummary,
   LyricWarning,
+  getLyricsSummary,
   validateLyrics,
 } from "@/lib/utils/ppt-generator/lyric-validation";
+import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
 import {
   combineWithDefaultSettings,
   generatePptSettingsInitialState,
@@ -73,6 +73,9 @@ type PptGeneratorFormContextType = {
   overflowSlideIndices: Set<number>;
   setOverflowWarnings: (warnings: LyricWarning[]) => void;
   setOverflowSlideIndices: (indices: Set<number>) => void;
+  // Separated overflow warnings by content type
+  mainOverflowWarnings: LyricWarning[];
+  secondaryOverflowWarnings: LyricWarning[];
 };
 
 const PptGeneratorFormContext = createContext<
@@ -133,20 +136,27 @@ export const PptGeneratorFormProvider: React.FC<
   });
 
   // Lyrics summary and warnings (memoized for performance)
-  const lyricsSummary = useMemo(
-    () => getLyricsSummary(mainText),
-    [mainText]
-  );
+  const lyricsSummary = useMemo(() => getLyricsSummary(mainText), [mainText]);
 
-  const lyricWarnings = useMemo(
-    () => validateLyrics(mainText),
-    [mainText]
-  );
+  const lyricWarnings = useMemo(() => validateLyrics(mainText), [mainText]);
 
   // Overflow detection state (set by HiddenOverflowDetector in PptGeneratorContent)
   const [overflowWarnings, setOverflowWarnings] = useState<LyricWarning[]>([]);
   const [overflowSlideIndices, setOverflowSlideIndices] = useState<Set<number>>(
-    new Set()
+    new Set(),
+  );
+
+  // Separated overflow warnings by content type (computed from overflowWarnings)
+  const mainOverflowWarnings = useMemo(
+    () =>
+      overflowWarnings.filter(
+        (w) => w.contentType === "main" || !w.contentType,
+      ),
+    [overflowWarnings],
+  );
+  const secondaryOverflowWarnings = useMemo(
+    () => overflowWarnings.filter((w) => w.contentType === "secondary"),
+    [overflowWarnings],
   );
 
   const onSubmit = useCallback(
@@ -253,6 +263,8 @@ export const PptGeneratorFormProvider: React.FC<
         overflowSlideIndices,
         setOverflowWarnings,
         setOverflowSlideIndices,
+        mainOverflowWarnings,
+        secondaryOverflowWarnings,
       }}
     >
       <Form {...form}>

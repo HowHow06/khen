@@ -1,11 +1,11 @@
 "use client";
 
-import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { useTextOverflowDetection } from "@/lib/hooks/use-text-overflow-detection";
+import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
+import { LineToSlideMapper } from "@/lib/utils/ppt-generator/line-to-slide-mapper";
 import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
-import { LineToSlideMapper } from "@/lib/utils/ppt-generator/line-to-slide-mapper";
 
 const DEBOUNCE_MS = 800;
 
@@ -27,8 +27,7 @@ const HiddenOverflowDetector = () => {
   // so we don't interfere with the main one used for scroll-to-slide
   const overflowMapperRef = useRef<LineToSlideMapper>(new LineToSlideMapper());
 
-  const [previewConfig, setPreviewConfig] =
-    useState<InternalPresentation>();
+  const [previewConfig, setPreviewConfig] = useState<InternalPresentation>();
 
   // Generate preview config independently (debounced)
   useEffect(() => {
@@ -65,16 +64,20 @@ const HiddenOverflowDetector = () => {
     setOverflowSlideIndices,
   ]);
 
-  // Split mainText into lines for text content matching
+  // Split mainText and secondaryText into lines for text content matching
   const mainLines = useMemo(() => mainText.split("\n"), [mainText]);
+  const secondaryLines = useMemo(
+    () => secondaryText.split("\n"),
+    [secondaryText],
+  );
 
   // Run overflow detection on previewConfig
-  const { overflowWarnings, overflowSlideIndices } =
-    useTextOverflowDetection({
-      previewConfig,
-      lineMapper: overflowMapperRef.current,
-      mainLines,
-    });
+  const { overflowWarnings, overflowSlideIndices } = useTextOverflowDetection({
+    previewConfig,
+    lineMapper: overflowMapperRef.current,
+    mainLines,
+    secondaryLines,
+  });
 
   // Push results to context
   useEffect(() => {

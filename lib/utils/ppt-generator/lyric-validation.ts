@@ -16,6 +16,8 @@ export type LyricWarning = {
   message: string;
   lineNumber?: number;
   suggestion?: string;
+  /** Indicates whether this warning is for main or secondary content */
+  contentType?: "main" | "secondary";
 };
 
 /**
@@ -137,7 +139,7 @@ export const validateLyrics = (lyrics: string): LyricWarning[] => {
  */
 export const estimateSlideCount = (
   mainLyrics: string,
-  linesPerSlide: number = 2
+  linesPerSlide: number = 2,
 ): number => {
   const lines = mainLyrics.split("\n");
   let slideCount = 0;
@@ -225,7 +227,7 @@ export const estimateSlideCount = (
  * Get a summary of the lyrics content
  */
 export const getLyricsSummary = (
-  mainLyrics: string
+  mainLyrics: string,
 ): {
   lineCount: number;
   songCount: number;
