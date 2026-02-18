@@ -198,11 +198,12 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
             </Button>
             <div className="text-xs text-muted-foreground">
               <span className="font-medium">Quick syntax:</span>{" "}
-              <code className="rounded bg-muted px-1 py-0.5"># Title ## Subtitle</code>{" "}
+              <code className="rounded bg-muted px-1 py-0.5">
+                # Title ## Subtitle
+              </code>{" "}
               Cover slide{" "}
               <code className="rounded bg-muted px-1 py-0.5">----</code> New
-              song{" "}
-              <code className="rounded bg-muted px-1 py-0.5">---</code>{" "}
+              song <code className="rounded bg-muted px-1 py-0.5">---</code>{" "}
               Subsection{" "}
               <code className="rounded bg-muted px-1 py-0.5">***</code> Empty
               slide
@@ -230,7 +231,8 @@ const MainLyricSection = ({}: MainLyricSectionProps) => {
           <div className="flex items-center gap-1.5 text-xs font-medium text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-3.5 w-3.5" />
             <span>
-              {overflowWarnings.length} line{overflowWarnings.length > 1 ? "s" : ""} may wrap on slide
+              {overflowWarnings.length} line
+              {overflowWarnings.length > 1 ? "s" : ""} may wrap on slide
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5">
