@@ -93,6 +93,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   重回: "chóng huí",
   声乐: "shēng yuè",
   圣乐: "shèng yuè",
+  一宿: "yī xiǔ", 
 };
 
 const CUSTOM_PINYIN_MAP = CUSTOM_PINYIN_MAP_SIMPLIFIED as {
