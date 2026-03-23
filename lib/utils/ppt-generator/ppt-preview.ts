@@ -25,7 +25,7 @@ const getPreviewImageSrcFromPresImage = (prop: DataOrPathProps) => {
   if (prop.path) {
     return {
       kind: "path",
-      data: prop.path,
+      path: prop.path,
     };
   }
 
@@ -128,7 +128,9 @@ export const generatePreviewConfig = async ({
   const slidesConfig = slides.map((slide) => ({
     masterName: slide._slideLayout._name || null,
     backgroundColor: slide.background?.color,
-    backgroundImage: slide.background?.data,
+    backgroundImage: slide.background
+      ? getPreviewImageSrcFromPresImage(slide.background)
+      : null,
     hidden: slide.hidden,
     sectionName: slide._name
       ? getSectionBySlideName(sections, slide._name)?.title
