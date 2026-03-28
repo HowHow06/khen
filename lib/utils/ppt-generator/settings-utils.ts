@@ -23,7 +23,12 @@ export const getBase64FromImageField = async (
     }
   }
 
-  return await getBase64(image);
+  try {
+    return await getBase64(image);
+  } catch (error) {
+    console.error("Failed to convert image to base64:", error);
+    return null;
+  }
 };
 
 /**

@@ -6,6 +6,7 @@ import {
   MASTER_SLIDE_BACKGROUND_COLOR,
   MASTER_SLIDE_BACKGROUND_IMAGE,
   PPT_GENERATION_COMBINED_GENERAL_SETTINGS,
+  SECTION_PREFIX,
   SETTING_FIELD_TYPE,
 } from "@/lib/constant";
 import { FieldTypeToTypeScriptType, PptSettingsStateType } from "@/lib/types";
@@ -36,9 +37,12 @@ const getPptBackgroundProp = async ({
     return backgroundProp;
   }
   const imageBase64 = await getBase64FromImageField(backgroundImage);
+  if (!imageBase64) {
+    return backgroundProp;
+  }
   return {
     ...backgroundProp,
-    data: imageBase64 as string,
+    data: imageBase64,
   };
 };
 
@@ -137,7 +141,14 @@ export const createPptInstance = async ({
   const sectionsBackgroundProp: (PptxGenJS.default.BackgroundProps | null)[] =
     [];
   if (useDifferentSettingForEachSection === true && section) {
-    for (const [sectionName, sectionSetting] of Object.entries(section)) {
+    const sortedSectionEntries = Object.entries(section).sort(
+      ([keyA], [keyB]) => {
+        const numA = parseInt(keyA.replace(SECTION_PREFIX, ""), 10);
+        const numB = parseInt(keyB.replace(SECTION_PREFIX, ""), 10);
+        return numA - numB;
+      },
+    );
+    for (const [sectionName, sectionSetting] of sortedSectionEntries) {
       if (
         sectionSetting.general?.useMainSectionSettings ||
         (sectionSetting.general?.useMainBackgroundColor &&
