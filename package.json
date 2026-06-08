@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "jest",
+    "test:cli": "tsx scripts/test-khen-ppt-cli.ts",
     "type-check": "tsc",
     "check": "npm run lint && npm run type-check"
   },

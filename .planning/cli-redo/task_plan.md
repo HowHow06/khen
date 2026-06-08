@@ -6,7 +6,7 @@ Build and document an AI-agent-friendly CLI version of Khen's PPT generator that
 
 ## Current Phase
 
-Phase 11
+Phase 12
 
 ## Phases
 
@@ -100,6 +100,16 @@ Phase 11
 - [x] Run lint, TypeScript, Jest, and CLI smoke checks
 - **Status:** complete
 
+### Phase 12: Playwright-Backed CLI Smoke Test Script
+
+- [x] Add a real CLI smoke script that shells out to `npx tsx scripts/khen-ppt.ts`
+- [x] Verify `analyze --report --json` keeps stdout quiet, writes report JSON, writes preview PNG, and detects real `TEXT_WRAP` warnings through Playwright
+- [x] Verify `batch --report --json` keeps stdout quiet, writes combined JSON, and creates variant PPTX files
+- [x] Add `npm run test:cli` for future agents and maintainers
+- [x] Document when to use Jest versus `test:cli`
+- [x] Run the new smoke test outside the sandbox when `tsx` or Chromium is blocked by sandbox permissions
+- **Status:** complete
+
 ## Key Questions
 
 1. What CLI work already exists, and should it be continued or replaced?
@@ -121,19 +131,22 @@ Phase 11
 | Suppress stdout when `--report` is provided                          | Report files are easier for agents to consume than noisy terminal JSON                                                                           |
 | Port web wrap detection into a CLI utility                           | The web UI already flags overlong lines; CLI reports need the same signal for agents                                                             |
 | Report all wrapped text, including cover text                        | User wants agents/users to decide whether to manually break or accept each wrap                                                                  |
+| Add a real `test:cli` script outside Jest                            | Jest mocks the overflow detector because sandboxed Chromium is unreliable; the CLI smoke proves the actual terminal + Playwright path works      |
 
 ## Errors Encountered
 
-| Error                                                           | Attempt | Resolution                                                                                 |
-| --------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| Bundled Python has no `markitdown` module                       | 1       | Used direct PPTX OOXML/zip parsing instead                                                 |
-| Local `soffice`, `libreoffice`, and `pdftoppm` were unavailable | 1       | Captured text/style metadata from OOXML and noted visual render limitation                 |
-| `tsx` failed in sandbox with `listen EPERM` on IPC pipe         | 1       | Reran smoke tests outside sandbox with approval                                            |
-| Golden fixture PPTX hash does not match byte-for-byte yet       | 1       | Confirmed slide count and extracted slide text match; byte determinism remains future work |
-| `npm run lint` fails because `next lint` is not supported here  | 1       | TypeScript and Jest checks passed; lint script needs a future package-script update        |
-| Playwright `page.evaluate` saw `__name is not defined`          | 1       | Switched browser-side detector to raw JavaScript string evaluation                         |
-| Jest sandbox cannot launch Chromium                             | 1       | Added test-only detector injection and kept real browser verification as CLI smoke         |
-| ESLint 9/Next 16 flat config surfaced React Compiler errors     | 1       | Kept Next lint rules but disabled compiler-only rules that block existing legacy patterns  |
+| Error                                                           | Attempt | Resolution                                                                                                                                      |
+| --------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bundled Python has no `markitdown` module                       | 1       | Used direct PPTX OOXML/zip parsing instead                                                                                                      |
+| Local `soffice`, `libreoffice`, and `pdftoppm` were unavailable | 1       | Captured text/style metadata from OOXML and noted visual render limitation                                                                      |
+| `tsx` failed in sandbox with `listen EPERM` on IPC pipe         | 1       | Reran smoke tests outside sandbox with approval                                                                                                 |
+| Golden fixture PPTX hash does not match byte-for-byte yet       | 1       | Confirmed slide count and extracted slide text match; byte determinism remains future work                                                      |
+| `npm run lint` fails because `next lint` is not supported here  | 1       | TypeScript and Jest checks passed; lint script needs a future package-script update                                                             |
+| Playwright `page.evaluate` saw `__name is not defined`          | 1       | Switched browser-side detector to raw JavaScript string evaluation                                                                              |
+| Jest sandbox cannot launch Chromium                             | 1       | Added test-only detector injection and kept real browser verification as CLI smoke                                                              |
+| ESLint 9/Next 16 flat config surfaced React Compiler errors     | 1       | Kept Next lint rules but disabled compiler-only rules that block existing legacy patterns                                                       |
+| Jest does not prove real Playwright text measurement            | 1       | Added `npm run test:cli`, a separate smoke test that shells out to the CLI and runs the real browser-backed detector                            |
+| New `test:cli` initially assumed all variants have 19 slides    | 1       | Relaxed batch smoke to require successful non-empty PPTX outputs and positive slide counts because live presets legitimately change slide count |
 
 ## Notes
 

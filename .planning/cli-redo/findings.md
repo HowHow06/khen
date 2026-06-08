@@ -146,6 +146,13 @@
 - Normalized PPTX comparison remains useful but is not current priority. Keep it documented as a TODO rather than implementing now.
 - Current `.eslintrc.json` is legacy config while the project uses ESLint 9 and Next 16. The existing `npm run lint` script uses `next lint`, which fails before linting.
 
+## 2026-06-08 CLI Smoke Test Finding
+
+- Jest workflow tests intentionally inject a fake overflow detector because sandboxed test runs cannot reliably launch Chromium.
+- This means Jest verifies report plumbing and fixture expectations, but does not prove the real CLI command, `tsx` runner, Playwright text measurement, preview PNG generation, or PPTX file writing all work together.
+- A separate `npm run test:cli` script should shell out to `npx tsx scripts/khen-ppt.ts` so it behaves like an AI agent using the tool from the terminal.
+- The smoke test should keep stdout quiet for commands using `--report`, then read the report JSON files to assert `TEXT_WRAP` warnings, preview outputs, and batch PPTX outputs.
+
 ---
 
 _Update this file after every 2 view/browser/search operations._

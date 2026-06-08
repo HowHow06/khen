@@ -41,6 +41,14 @@ Use `warnings[]` in the report to find text that needs inspection. `TEXT_WRAP` w
 
 For full CLI behavior, presets, report schema, preview-grid usage, and fixture verification, read [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md).
 
+To verify the real agent workflow end to end, run:
+
+```bash
+npm run test:cli
+```
+
+This smoke test shells out to the CLI, runs the real Playwright-backed text-wrap detector, writes ignored outputs under `tmp/khen-cli-redo/test-cli`, and checks report JSON plus generated PPTX files.
+
 ## Getting Started
 
 **Node.js requirement:** `>=20.9.0`
@@ -94,6 +102,7 @@ For more detailed information on each tool within Khen, including walkthroughs a
 npm run dev          # Start the Next.js dev server
 npm run build        # Build static export
 npm test             # Run Jest tests
+npm run test:cli     # Run real CLI smoke tests with Playwright
 npm run lint         # Run ESLint
 npm run type-check   # Run TypeScript checks
 npm run check        # Run lint and type-check

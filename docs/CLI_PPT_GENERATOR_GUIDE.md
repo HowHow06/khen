@@ -327,6 +327,29 @@ Expected behavior:
 - `overflowSlideIndices[]` includes slides with wrapped lyric or cover text.
 - The preview grid marks wrapped slides with the amber `WRAP` badge.
 
+## Testing The CLI
+
+Use the fast test suite while editing parser, report, preset, or workflow logic:
+
+```bash
+npm test -- --runInBand
+```
+
+Use the real CLI smoke test before relying on the tool end to end:
+
+```bash
+npm run test:cli
+```
+
+`npm run test:cli` shells out to `npx tsx scripts/khen-ppt.ts` instead of importing workflow functions. It verifies:
+
+- `analyze --report --json` writes report JSON and preview PNG while keeping stdout quiet.
+- The real Playwright-backed detector reports `TEXT_WRAP` warnings for the wrapped-line fixture.
+- `batch --report --json` writes a combined report while keeping stdout quiet.
+- Batch variants create non-empty PPTX files.
+
+The smoke test writes ignored files under `tmp/khen-cli-redo/test-cli/<timestamp>`. If it fails with `listen EPERM` or a Chromium launch error inside an agent sandbox, rerun it with permission for `tsx`/Playwright. That sandbox failure is different from a CLI logic failure.
+
 ## Future TODOs
 
 - Add normalized PPTX comparison for generated decks: slide count, text, fonts, sizes, colors, and layout. Byte-for-byte PPTX equality is still not the priority because zip metadata and generated IDs can differ even when the deck is visually equivalent.
