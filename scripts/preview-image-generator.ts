@@ -296,6 +296,7 @@ function renderSlide(
   masterSlide: InternalMasterSlide | undefined,
   dimensions: [number, number],
   slideWidth: number,
+  hasOverflow = false,
 ): string {
   // Get background from slide or master slide
   const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
@@ -358,10 +359,28 @@ function renderSlide(
       white-space: pre-wrap;
       overflow: hidden;
       border-radius: 8px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+      box-shadow: ${hasOverflow ? "0 0 0 4px rgba(245, 158, 11, 0.95), 0 0 0 1px rgba(0,0,0,0.1)" : "0 0 0 1px rgba(0,0,0,0.1)"};
     ">
       ${masterObjects}
       ${slideObjects}
+      ${
+        hasOverflow
+          ? `<div style="
+              position: absolute;
+              right: 10px;
+              top: 10px;
+              background: rgba(245, 158, 11, 0.95);
+              color: #111827;
+              font-family: system-ui, -apple-system, sans-serif;
+              font-size: 14px;
+              font-weight: 700;
+              line-height: 1;
+              padding: 7px 9px;
+              border-radius: 9999px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+            ">WRAP</div>`
+          : ""
+      }
     </div>
   `;
 }
@@ -369,6 +388,7 @@ function renderSlide(
 function generatePreviewHtml(
   config: InternalPresentation,
   fontCSS: string,
+  options: { overflowSlideIndices?: Set<number> } = {},
 ): string {
   const dimensions = layoutToInches(config.layout);
   const slideWidth = 480; // Increased from 320 for better visibility
@@ -395,6 +415,7 @@ function generatePreviewHtml(
           const masterSlide = slide.masterName
             ? config.masterSlides[slide.masterName]
             : undefined;
+          const hasOverflow = options.overflowSlideIndices?.has(index) ?? false;
 
           return `
             <div style="
@@ -408,7 +429,7 @@ function generatePreviewHtml(
                 border-radius: 8px;
                 overflow: hidden;
               ">
-                ${renderSlide(slide, masterSlide, dimensions, slideWidth)}
+                ${renderSlide(slide, masterSlide, dimensions, slideWidth, hasOverflow)}
               </div>
               <span style="
                 font-size: 11px;
@@ -501,10 +522,11 @@ function generatePreviewHtml(
 export async function generatePreviewImage(
   config: InternalPresentation,
   outputPath: string,
+  options: { overflowSlideIndices?: Set<number> } = {},
 ): Promise<string> {
   // Load font CSS with embedded base64 fonts
   const fontCSS = await loadFontCSS();
-  const html = generatePreviewHtml(config, fontCSS);
+  const html = generatePreviewHtml(config, fontCSS, options);
 
   // Launch browser and capture screenshot
   const browser = await chromium.launch();

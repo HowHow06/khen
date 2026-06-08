@@ -1,6 +1,7 @@
 # Findings & Decisions
 
 ## Requirements
+
 - Create a CLI version of Khen's PPT generator, either by continuing existing work or starting over.
 - CLI is primarily for AI agents replicating the current web workflow.
 - Current human workflow: paste formatted main lyrics, auto-generate secondary pinyin lyrics, apply presets globally or per song section, inspect preview/validation, adjust lyrics, generate PPT, repeat for onsite and online presets.
@@ -10,6 +11,7 @@
 - New acceptance criterion from user: verification input `.planning/cli-redo/verification/test-input.txt` should generate the same PPTX as `.planning/cli-redo/verification/20240101 PNW.pptx` when the default/global preset is `Default Onsite Chinese` and the second song section overrides to `Default Onsite English`.
 
 ## Research Findings
+
 - Repository already contains an incomplete/previous CLI track:
   - `scripts/generate-ppt-from-lyrics.ts`
   - `scripts/preview-image-generator.ts`
@@ -85,19 +87,22 @@
   - The sandbox blocks `tsx` IPC pipe creation with `listen EPERM`; this is an environment limitation, not necessarily an app bug.
 
 ## Technical Decisions
-| Decision | Rationale |
-|----------|-----------|
-| Planning files are the only intended modifications in this session | Keeps faith with "dont modify yet" while still producing requested plan artifacts |
-| Treat the new verification PPTX as a golden fixture | User explicitly expects the generated PPTX to match the provided reference deck in bytes and look |
-| Note deterministic PPTX generation as a requirement/risk | Byte-for-byte PPTX equality can fail due to timestamps, generated relationship IDs, or zip metadata even when slides look identical |
+
+| Decision                                                           | Rationale                                                                                                                           |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Planning files are the only intended modifications in this session | Keeps faith with "dont modify yet" while still producing requested plan artifacts                                                   |
+| Treat the new verification PPTX as a golden fixture                | User explicitly expects the generated PPTX to match the provided reference deck in bytes and look                                   |
+| Note deterministic PPTX generation as a requirement/risk           | Byte-for-byte PPTX equality can fail due to timestamps, generated relationship IDs, or zip metadata even when slides look identical |
 
 ## Issues Encountered
-| Issue | Resolution |
-|-------|------------|
-| `python -m markitdown` unavailable in bundled Python | Parsed PPTX directly via zip/XML instead |
+
+| Issue                                                                                     | Resolution                                                                     |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `python -m markitdown` unavailable in bundled Python                                      | Parsed PPTX directly via zip/XML instead                                       |
 | Local render tools for PPTX thumbnails unavailable (`soffice`, `libreoffice`, `pdftoppm`) | Did not produce thumbnails; captured text/style/layout observations from OOXML |
 
 ## Resources
+
 - Planning directory: `/Users/holim/Workspaces/my-repo/khen/.planning/cli-redo`
 - Sample PPTX: `/Users/holim/Downloads/20240101 PNW.pptx`
 - Existing CLI guide: `/Users/holim/Workspaces/my-repo/khen/docs/CLI_PPT_GENERATOR_GUIDE.md`
@@ -108,6 +113,7 @@
 - Golden verification PPTX SHA-256: `2b0f4990dd88765b40d7fe30b4c050d69530217e6b1df1d0c34b4e5a11221501`
 
 ## Visual/Browser Findings
+
 - Sample PPTX `/Users/holim/Downloads/20240101 PNW.pptx` observations from OOXML:
   - 19 slides, standard 16:9 dimensions (`9144000 x 5143500` EMU, equivalent to 10 x 5.625 inches in Khen's layout model).
   - Slides 1 and 10 are cover/title slides.
@@ -126,5 +132,20 @@
   - No overflow/wrap warning overlay is rendered.
   - No machine-readable report accompanies the PNG.
 
+## 2026-06-08 Overflow Regression Finding
+
+- User-created `.planning/cli-redo/verification/test-error.txt` intentionally combines the Mandarin line `奇异恩典 何等甘甜 我罪已得赦免 前我失丧 今被寻回`.
+- The current CLI report at `tmp/khen-cli-redo/analyze-report.json` has zero warnings/errors for that input, even though the web UI should flag the line as wrapping.
+- This confirms Phase 3/CLI overflow detection from `spec.md` remains unimplemented after the first CLI slice.
+- The desired warning should use `code: "TEXT_WRAP"` and include the source line number, content type, slide index, and source text so an AI agent can edit the lyrics without relying only on preview pixels.
+
+## 2026-06-08 Follow-Up Scope
+
+- User wants lint fixed now, batch tests added now, and docs updated with lyric repair guidance.
+- User clarified overflow detection should report all wrapped text, including cover text. The report should not decide whether the wrap is unacceptable; users/agents can add manual `\n` breaks or leave the text if it looks visually acceptable.
+- Normalized PPTX comparison remains useful but is not current priority. Keep it documented as a TODO rather than implementing now.
+- Current `.eslintrc.json` is legacy config while the project uses ESLint 9 and Next 16. The existing `npm run lint` script uses `next lint`, which fails before linting.
+
 ---
-*Update this file after every 2 view/browser/search operations.*
+
+_Update this file after every 2 view/browser/search operations._

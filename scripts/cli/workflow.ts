@@ -15,6 +15,16 @@ type SectionPresetOverride = {
   presetId: string;
 };
 
+type TextOverflowDetector = (args: {
+  previewConfig: any;
+  lineMappings: any[];
+  mainLines: string[];
+  secondaryLines: string[];
+}) => Promise<{
+  warnings: Array<Record<string, any>>;
+  overflowSlideIndices: number[];
+}>;
+
 export type WorkflowOptions = {
   main: string;
   secondary?: string;
@@ -26,6 +36,7 @@ export type WorkflowOptions = {
   previewGrid?: string;
   report?: string;
   sectionPresets: string[];
+  textOverflowDetector?: TextOverflowDetector;
 };
 
 export type CliReport = {
@@ -50,6 +61,7 @@ export type CliReport = {
     previewGrid?: string;
     report?: string;
   };
+  overflowSlideIndices: number[];
   sections: Array<{
     index: number;
     name: string;
@@ -523,6 +535,16 @@ export async function analyzeWorkflow(
     secondaryLyric,
     mergedSettings,
   );
+  const textOverflowDetector =
+    options.textOverflowDetector ??
+    (await import("./text-overflow")).detectTextOverflowWarnings;
+  const overflowResult = await textOverflowDetector({
+    previewConfig,
+    lineMappings: lineMapper.getAllMappings(),
+    mainLines: strippedPrimaryLyric.split("\n"),
+    secondaryLines: strippedSecondaryLyric.split("\n"),
+  });
+  warnings.push(...overflowResult.warnings);
 
   const outputs: CliReport["outputs"] = {};
   if (options.previewGrid) {
@@ -531,6 +553,7 @@ export async function analyzeWorkflow(
     outputs.previewGrid = await generatePreviewImage(
       previewConfig,
       options.previewGrid,
+      { overflowSlideIndices: new Set(overflowResult.overflowSlideIndices) },
     );
   }
 
@@ -552,6 +575,7 @@ export async function analyzeWorkflow(
       hasCover: summary.hasCover,
     },
     outputs,
+    overflowSlideIndices: overflowResult.overflowSlideIndices,
     sections: buildSectionsReport(
       previewConfig,
       lineMapper.getAllMappings(),

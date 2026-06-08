@@ -3,33 +3,10 @@
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { parseCliArgs, showHelp } from "./cli/args";
+import { buildVariantWorkflowOptions, parseVariant } from "./cli/batch";
 import { shouldPrintReportToStdout } from "./cli/output";
 import { analyzeWorkflow, generateWorkflow, listPresets } from "./cli/workflow";
 import type { WorkflowOptions } from "./cli/workflow";
-
-function parseVariant(value: string): { name: string; preset: string } {
-  const separatorIndex = value.indexOf("=");
-  if (separatorIndex === -1) {
-    throw new Error(
-      `Invalid --variant "${value}". Expected format: onsite=onsite-chinese`,
-    );
-  }
-
-  return {
-    name: value.slice(0, separatorIndex).trim(),
-    preset: value.slice(separatorIndex + 1).trim(),
-  };
-}
-
-function suffixPath(
-  filePath: string | undefined,
-  suffix: string,
-): string | undefined {
-  if (!filePath) return undefined;
-  const extension = path.extname(filePath);
-  const base = filePath.slice(0, filePath.length - extension.length);
-  return `${base}-${suffix}${extension}`;
-}
 
 async function main() {
   const options = parseCliArgs(process.argv.slice(2));
@@ -71,15 +48,9 @@ async function main() {
     const reports = [];
     for (const variant of options.variants.map(parseVariant)) {
       reports.push(
-        await generateWorkflow({
-          ...workflowOptions,
-          preset: variant.preset,
-          filename: workflowOptions.filename
-            ? `${workflowOptions.filename}-${variant.name}`
-            : undefined,
-          report: undefined,
-          previewGrid: suffixPath(workflowOptions.previewGrid, variant.name),
-        }),
+        await generateWorkflow(
+          buildVariantWorkflowOptions(workflowOptions, variant),
+        ),
       );
     }
 

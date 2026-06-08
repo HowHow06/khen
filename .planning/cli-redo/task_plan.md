@@ -6,7 +6,7 @@ Build and document an AI-agent-friendly CLI version of Khen's PPT generator that
 
 ## Current Phase
 
-Phase 9
+Phase 11
 
 ## Phases
 
@@ -79,6 +79,27 @@ Phase 9
 - [x] Run TypeScript and Jest checks
 - **Status:** complete
 
+### Phase 10: CLI Text-Wrap Detection
+
+- [x] Confirm `test-error.txt` currently misses the wrapped Mandarin line warning
+- [x] Add CLI-safe overflow/wrap detector based on the web UI measurement logic
+- [x] Include `TEXT_WRAP` warnings in `analyze` and `generate` reports
+- [x] Update CLI docs/report schema to explain `TEXT_WRAP`
+- [x] Add regression tests for `test-error.txt`
+- [x] Run TypeScript, Jest, and fixture smoke checks
+- **Status:** complete
+
+### Phase 11: Lint, Overflow Scope, Repair Docs, Batch Tests
+
+- [x] Preserve user's decision that overflow detection should report all wrapped text, including cover text
+- [x] Fix the lint script for the installed Next/ESLint versions
+- [x] Extend `TEXT_WRAP` warnings to cover text and other line-mapped special text, not only normal lyric lines
+- [x] Document how agents should repair wrapped lyrics/cover text by inserting manual line breaks or accepting visually OK wraps
+- [x] Record normalized PPTX comparison as a future TODO, not current priority
+- [x] Add regression tests for `batch`
+- [x] Run lint, TypeScript, Jest, and CLI smoke checks
+- **Status:** complete
+
 ## Key Questions
 
 1. What CLI work already exists, and should it be continued or replaced?
@@ -98,6 +119,8 @@ Phase 9
 | Add provided PPTX as a golden verification fixture                   | It directly captures the mixed Chinese/English preset workflow the CLI must reproduce                                                            |
 | Build the new CLI alongside the old script                           | Keeps existing `generate-ppt-from-lyrics.ts` behavior available while the agent-focused CLI matures                                              |
 | Suppress stdout when `--report` is provided                          | Report files are easier for agents to consume than noisy terminal JSON                                                                           |
+| Port web wrap detection into a CLI utility                           | The web UI already flags overlong lines; CLI reports need the same signal for agents                                                             |
+| Report all wrapped text, including cover text                        | User wants agents/users to decide whether to manually break or accept each wrap                                                                  |
 
 ## Errors Encountered
 
@@ -108,6 +131,9 @@ Phase 9
 | `tsx` failed in sandbox with `listen EPERM` on IPC pipe         | 1       | Reran smoke tests outside sandbox with approval                                            |
 | Golden fixture PPTX hash does not match byte-for-byte yet       | 1       | Confirmed slide count and extracted slide text match; byte determinism remains future work |
 | `npm run lint` fails because `next lint` is not supported here  | 1       | TypeScript and Jest checks passed; lint script needs a future package-script update        |
+| Playwright `page.evaluate` saw `__name is not defined`          | 1       | Switched browser-side detector to raw JavaScript string evaluation                         |
+| Jest sandbox cannot launch Chromium                             | 1       | Added test-only detector injection and kept real browser verification as CLI smoke         |
+| ESLint 9/Next 16 flat config surfaced React Compiler errors     | 1       | Kept Next lint rules but disabled compiler-only rules that block existing legacy patterns  |
 
 ## Notes
 

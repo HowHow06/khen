@@ -151,6 +151,36 @@
   - `scripts/cli/workflow.ts`
   - `scripts/khen-ppt.ts`
 
+### Phase 10: CLI Text-Wrap Detection
+
+- **Status:** complete
+- Actions taken:
+  - Restored planning context after user reported missing wrapped-line warnings.
+  - Read `test-error.txt` and confirmed line 4 is the intended wrapped Mandarin lyric.
+  - Read the generated `tmp/khen-cli-redo/analyze-report.json`; it has zero warnings/errors for that wrapped line.
+  - Re-read `spec.md`/planning search results and confirmed CLI overflow detection was planned but not yet implemented.
+  - Re-read the web UI overflow hook in `lib/hooks/use-text-overflow-detection.ts` as the source behavior to port.
+  - Added `scripts/cli/text-overflow.ts`, a Playwright-backed CLI text wrap detector based on the web UI measurement algorithm.
+  - Wired overflow detection into `analyzeWorkflow`; reports now include `TEXT_WRAP` warnings and `overflowSlideIndices`.
+  - Updated preview-grid rendering to show amber outlines and `WRAP` badges on detected overflow slides.
+  - Updated README and CLI guide to explain `TEXT_WRAP`, `overflowSlideIndices`, the preview badge, and the `test-error.txt` fixture.
+  - Added a regression assertion for `test-error.txt` in `__tests__/cli-workflow.test.ts`.
+  - Added test-only detector injection so Jest can validate report plumbing without launching Chromium in the sandbox.
+  - Verified the real CLI smoke outside the sandbox: `test-error.txt` now reports `TEXT_WRAP` for line 4 main and secondary text, and preview grid shows `WRAP` badges.
+  - Ran `npm run type-check` successfully.
+  - Ran `npm test -- --runInBand` successfully: 5 suites, 9 tests passed.
+- Files created/modified:
+  - `.planning/cli-redo/task_plan.md`
+  - `.planning/cli-redo/findings.md`
+  - `.planning/cli-redo/progress.md`
+  - `.planning/cli-redo/verification/test-error.txt`
+  - `README.md`
+  - `docs/CLI_PPT_GENERATOR_GUIDE.md`
+  - `__tests__/cli-workflow.test.ts`
+  - `scripts/cli/text-overflow.ts`
+  - `scripts/cli/workflow.ts`
+  - `scripts/preview-image-generator.ts`
+
 ## Test Results
 
 | Test                       | Input                                                                                                                                                       | Expected                                         | Actual                                                          | Status  |
@@ -166,11 +196,16 @@
 | Preview grid               | Fixture `analyze --preview-grid`                                                                                                                            | PNG generated and readable                       | Generated 2100px-wide PNG; English line breaks render correctly | Pass    |
 | Batch smoke                | `batch --variant onsite=onsite-chinese --variant live=live-chinese`                                                                                         | Variant files and combined report generated      | Passed outside sandbox                                          | Pass    |
 | Quiet report               | Requested `analyze ... --report /private/tmp/khen-cli-redo/analyze-report.json --json`                                                                      | Report file written, no terminal JSON            | Passed outside sandbox                                          | Pass    |
-| Lint script                | `npm run lint`                                                                                                                                              | ESLint runs                                      | Failed: `next lint` invalid project directory                   | Blocked |
+| Lint script                | `npm run lint`                                                                                                                                              | ESLint runs                                      | Passed with 5 existing warnings                                 | Pass    |
+| Combined check             | `npm run check`                                                                                                                                             | Lint and type-check pass                         | Passed with 5 existing lint warnings                            | Pass    |
 | CLI args tests             | `npm test -- --runInBand`                                                                                                                                   | Analyze command and default command parse        | Passed                                                          | Pass    |
 | CLI preset tests           | `npm test -- --runInBand`                                                                                                                                   | Preset display names and aliases resolve         | Passed                                                          | Pass    |
 | CLI output tests           | `npm test -- --runInBand`                                                                                                                                   | `--report` suppresses stdout policy              | Passed                                                          | Pass    |
 | CLI workflow fixture test  | `npm test -- --runInBand`                                                                                                                                   | 19 slides, mixed presets, no warnings/errors     | Passed                                                          | Pass    |
+| Text-wrap fixture smoke    | `analyze --main .planning/cli-redo/verification/test-error.txt --preview-grid tmp/khen-cli-redo/preview.png --report tmp/khen-cli-redo/analyze-report.json` | `TEXT_WRAP` warning for line 4 and preview badge | Passed outside sandbox                                          | Pass    |
+| Updated Jest suite         | `npm test -- --runInBand`                                                                                                                                   | Regression suite passes                          | 5 suites, 9 tests passed                                        | Pass    |
+| Updated Jest suite         | `npm test -- --runInBand`                                                                                                                                   | Batch and workflow regressions pass              | 6 suites, 13 tests passed                                       | Pass    |
+| Batch smoke                | `batch --variant onsite=onsite-chinese --variant live=live-chinese`                                                                                         | Combined batch report and variant PPTX outputs   | Passed outside sandbox                                          | Pass    |
 
 ## Error Log
 
@@ -182,13 +217,56 @@
 | 2026-06-08 09:34 +08 | New `tsx` CLI smoke tests failed in sandbox with `listen EPERM`        | 1       | Reran relevant CLI commands with approved unsandboxed execution                              |
 | 2026-06-08 09:34 +08 | Golden fixture PPTX byte hash differed from reference                  | 1       | Verified slide count and extracted text match; deterministic PPTX output remains future work |
 | 2026-06-08 10:15 +08 | `npm run lint` failed because `next lint` treats `lint` as a directory | 1       | Recorded as package-script issue; TypeScript and Jest checks passed                          |
+| 2026-06-08 15:25 +08 | Playwright browser page saw `__name is not defined`                    | 1       | Evaluated browser detector as raw JavaScript instead of a transpiled function                |
+| 2026-06-08 15:26 +08 | Jest sandbox could not launch Chromium                                 | 1       | Added test-only detector injection; kept real browser coverage as CLI smoke                  |
+| 2026-06-08 15:28 +08 | Inline `node -e` summary command hit zsh template literal substitution | 1       | Re-ran with string concatenation instead of template literals                                |
+| 2026-06-08 15:31 +08 | Prettier could not infer parser for `.gitignore`                       | 1       | Stopped formatting `.gitignore` with Prettier; left content unchanged except normal ignore   |
+| 2026-06-08 15:32 +08 | Flat Next lint surfaced React Compiler errors in legacy app code       | 1       | Disabled compiler-only lint rules in flat config; lint now passes with warnings              |
+| 2026-06-08 15:33 +08 | `rg` pattern with backticks triggered shell command substitution       | 1       | Re-ran with single-quoted pattern                                                            |
 
 ## 5-Question Reboot Check
 
 | Question             | Answer                                                                                                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Where am I?          | Phase 9 complete                                                                                                                                                    |
-| Where am I going?    | Next work: deterministic PPTX comparison, Playwright overflow detection, and lint-script repair                                                                     |
+| Where am I?          | Phase 11 complete                                                                                                                                                   |
+| Where am I going?    | Next work: optional normalized PPTX comparison, if/when prioritized                                                                                                 |
 | What's the goal?     | Build and document an AI-agent-friendly CLI version of Khen's PPT generator that can analyze lyrics, generate preview grids, apply presets, and generate PPTX files |
 | What have I learned? | See findings.md                                                                                                                                                     |
 | What have I done?    | Created planning files, investigated existing CLI/generator/preview/overflow code, inspected sample PPTX, smoke-tested current CLI, and wrote spec.md               |
+
+### Phase 11: Lint, Overflow Scope, Repair Docs, Batch Tests
+
+- **Status:** complete
+- Actions taken:
+  - Restored planning context after user prioritized lint, full overflow scope, repair docs, and batch tests.
+  - Inspected `.gitignore`; it now ignores `tmp/`, which matches generated CLI smoke outputs and will be preserved.
+  - Inspected `package.json`, `.eslintrc.json`, and available eslint config files. Current lint script is still `next lint`, and no flat `eslint.config.*` exists yet.
+  - Captured user decision: `TEXT_WRAP` should include all wrapped text, including cover text, and the user/agent decides whether to manually line-break or accept the visual result.
+  - Added `eslint.config.mjs` using `eslint-config-next/core-web-vitals` flat config and changed `npm run lint` to `eslint .`.
+  - Disabled React Compiler-only lint rules that block existing legacy React patterns while keeping Next linting active.
+  - Preserved `.gitignore` `tmp/` ignore for generated CLI smoke outputs.
+  - Extended `scripts/cli/text-overflow.ts` so cover text can produce `TEXT_WRAP` warnings with `lineType: "cover"` and `sourceText`.
+  - Suppressed duplicate secondary warnings when the secondary source line is identical to the main source line.
+  - Added `scripts/cli/batch.ts` and `__tests__/cli-batch.test.ts` for variant parsing, preview suffixes, and per-variant workflow options.
+  - Updated CLI docs and README with agent repair guidance for `TEXT_WRAP`, including manual line breaks and accepting visually OK wraps.
+  - Documented `--fail-on-warning` as a strict-mode gate to keep, but not as the default repair workflow.
+  - Added normalized PPTX comparison to CLI guide as a future TODO, not current priority.
+  - Ran `npm run lint` successfully with warnings only.
+  - Ran `npm run type-check` successfully.
+  - Ran `npm run check` successfully; lint still reports 5 existing warnings but exits 0.
+  - Ran `npm test -- --runInBand` successfully: 6 suites, 13 tests passed.
+  - Ran real `batch` smoke outside the sandbox; batch report wrote onsite/live variant outputs with no errors.
+- Files created/modified:
+  - `.planning/cli-redo/task_plan.md`
+  - `.planning/cli-redo/findings.md`
+  - `.planning/cli-redo/progress.md`
+  - `.gitignore`
+  - `package.json`
+  - `eslint.config.mjs`
+  - `README.md`
+  - `docs/CLI_PPT_GENERATOR_GUIDE.md`
+  - `__tests__/cli-batch.test.ts`
+  - `__tests__/cli-workflow.test.ts`
+  - `scripts/cli/batch.ts`
+  - `scripts/cli/text-overflow.ts`
+  - `scripts/khen-ppt.ts`

@@ -187,6 +187,8 @@ Use the preview grid when an agent needs visual feedback before creating the fin
 - Verify English songs ignore pinyin when an English preset is applied.
 - Locate the slide number that needs lyric edits.
 
+When `analyze` detects wrapped text, the preview grid marks affected slides with an amber outline and `WRAP` badge. The JSON report remains the source of truth for the exact line numbers.
+
 The preview grid is an inspection aid, not a byte-for-byte substitute for PowerPoint rendering. For final acceptance, inspect the generated PPTX as well.
 
 ## Report JSON
@@ -195,16 +197,17 @@ The preview grid is an inspection aid, not a byte-for-byte substitute for PowerP
 
 Top-level fields:
 
-| Field          | How To Read It                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `version`      | Report schema version. Currently `1`.                                                                              |
-| `input`        | The resolved input paths and preset arguments. `preset` is the resolved internal preset ID.                        |
-| `summary`      | High-level counts: lyric lines, song sections, subsections, generated slide count, and whether a cover exists.     |
-| `outputs`      | Paths written by the command, such as `pptx`, `previewGrid`, and `report`.                                         |
-| `sections`     | One entry per `----` song section. Shows the section name, resolved preset ID, and slide indices.                  |
-| `lineMappings` | 1-based lyric line numbers mapped to generated slides. Useful for tracing problematic lyrics back to source lines. |
-| `warnings`     | Non-fatal issues, including lyric syntax warnings and secondary lyric line-count mismatches.                       |
-| `errors`       | Fatal validation issues copied from warnings whose type is `error`.                                                |
+| Field                  | How To Read It                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `version`              | Report schema version. Currently `1`.                                                                               |
+| `input`                | The resolved input paths and preset arguments. `preset` is the resolved internal preset ID.                         |
+| `summary`              | High-level counts: lyric lines, song sections, subsections, generated slide count, and whether a cover exists.      |
+| `outputs`              | Paths written by the command, such as `pptx`, `previewGrid`, and `report`.                                          |
+| `sections`             | One entry per `----` song section. Shows the section name, resolved preset ID, and slide indices.                   |
+| `lineMappings`         | 1-based lyric line numbers mapped to generated slides. Useful for tracing problematic lyrics back to source lines.  |
+| `overflowSlideIndices` | Slide indices where text wrapping was detected. This includes lyric, pinyin, translation, and cover text.           |
+| `warnings`             | Non-fatal issues, including lyric syntax warnings, secondary lyric line-count mismatches, and `TEXT_WRAP` warnings. |
+| `errors`               | Fatal validation issues copied from warnings whose type is `error`.                                                 |
 
 Example checks an agent can perform:
 
@@ -215,7 +218,55 @@ warnings.length == 0
 outputs.previewGrid exists before asking a vision model to inspect it
 ```
 
-`lineMappings[].slideIndex` is the zero-based slide index from the underlying mapper. `sections[].slideIndices` are human-facing one-based slide numbers.
+`lineMappings[].slideIndex`, `warnings[].slideIndex`, and `overflowSlideIndices[]` use the same slide index convention as the line mapper. `sections[].slideIndices` are human-facing one-based slide numbers.
+
+### `TEXT_WRAP` Warnings
+
+`TEXT_WRAP` means a slide text part rendered taller than its single-line measurement, which is the same kind of warning surfaced by the web UI line-number highlighting. It can point to normal lyrics, secondary lyrics, or cover text.
+
+Example:
+
+```json
+{
+  "type": "warning",
+  "code": "TEXT_WRAP",
+  "message": "Line 4 may wrap on slide 2",
+  "lineNumber": 4,
+  "contentType": "main",
+  "slideIndex": 2,
+  "lineType": "normal",
+  "text": "奇异恩典 何等甘甜 我罪已得赦免 前我失丧 今被寻回",
+  "sourceText": "奇异恩典 何等甘甜 我罪已得赦免 前我失丧 今被寻回"
+}
+```
+
+Agents should use `lineNumber`, `lineType`, `contentType`, `text`, and `sourceText` to decide whether to edit the source lyrics. A Mandarin line may produce both a `main` warning and a `secondary` pinyin warning for the same source line. Cover warnings use `lineType: "cover"` and point to the `# ... ## ...` source line.
+
+### Repair Loop For Agents
+
+When `warnings[]` contains `TEXT_WRAP`:
+
+1. Read `lineNumber`, `lineType`, `contentType`, `text`, and `sourceText`.
+2. Inspect the preview grid slide if `outputs.previewGrid` exists.
+3. If the wrap is visually bad, edit the source line by adding a manual line break.
+4. For normal lyrics, split the long lyric line into two lyric lines.
+5. For cover text, split the title/subtitle in the cover source line, for example by inserting `\n` where the title should break.
+6. Rerun `analyze`.
+7. Repeat until warnings are gone or the remaining wraps are visually acceptable.
+
+`TEXT_WRAP` is a warning, not an automatic failure. It tells the user or agent where to inspect; the correct action can be “fix it” or “leave it because it looks fine.”
+
+### Strict Mode
+
+Keep `--fail-on-warning`, but treat it as a deliberate strict-mode gate. It exits with code `2` when any warning exists, including `TEXT_WRAP`, secondary line-count mismatch, and syntax warnings.
+
+Recommended use:
+
+- Use plain `analyze` while repairing lyrics because some wraps may be visually acceptable.
+- Use `--fail-on-warning` only when a workflow requires zero warnings before proceeding.
+- Do not use it as the default for mixed-language or cover-heavy decks unless the agent is expected to fix every reported wrap.
+
+For normal agent operation, read `warnings[]`, inspect `outputs.previewGrid`, decide whether each warning matters, edit the source when needed, then rerun `analyze`.
 
 ## Acceptance Fixture
 
@@ -254,6 +305,32 @@ npx tsx scripts/khen-ppt.ts generate \
   --report /private/tmp/khen-cli-redo/generate-report.json
 ```
 
+## Error Fixture
+
+The wrapped-line regression fixture is:
+
+```bash
+npx tsx scripts/khen-ppt.ts analyze \
+  --main .planning/cli-redo/verification/test-error.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
+  --auto-pinyin \
+  --preview-grid tmp/khen-cli-redo/preview.png \
+  --report tmp/khen-cli-redo/analyze-report.json
+```
+
+Expected behavior:
+
+- `warnings[]` contains `TEXT_WRAP` for line 4 main lyrics.
+- `warnings[]` also contains `TEXT_WRAP` for line 4 secondary pinyin when `--auto-pinyin` is used.
+- `warnings[]` contains `TEXT_WRAP` for wrapped cover text, including line 21 in this fixture.
+- `overflowSlideIndices[]` includes slides with wrapped lyric or cover text.
+- The preview grid marks wrapped slides with the amber `WRAP` badge.
+
+## Future TODOs
+
+- Add normalized PPTX comparison for generated decks: slide count, text, fonts, sizes, colors, and layout. Byte-for-byte PPTX equality is still not the priority because zip metadata and generated IDs can differ even when the deck is visually equivalent.
+
 ## Troubleshooting
 
 ### No JSON Appears In Terminal
@@ -277,6 +354,10 @@ Then use one of the display names, IDs, or aliases from the output.
 ### Secondary Line Count Mismatch
 
 This warning means rendered main and secondary lyrics may not align. Use `--auto-pinyin` for Mandarin lyrics, provide a matching `--secondary` file, or apply an English preset override to sections that should ignore secondary lyrics.
+
+### Text Wrap Warning
+
+`TEXT_WRAP` means a lyric, secondary lyric, translation, or cover text part is too long for the current preset/textbox. Split that source line manually and rerun `analyze`. If the warning is for `contentType: "secondary"`, the pinyin or translation generated from that same source line is also too long.
 
 ### Preview Grid Missing
 

@@ -37,6 +37,8 @@ npx tsx scripts/khen-ppt.ts analyze \
 
 Read `/private/tmp/khen-cli-redo/analyze-report.json` to understand the result. When `--report` is set, the CLI writes JSON to the file and keeps terminal output quiet, even if `--json` is passed.
 
+Use `warnings[]` in the report to find text that needs inspection. `TEXT_WRAP` warnings identify source lyric, secondary lyric, translation, or cover lines that may wrap in the generated slide layout, and preview grids mark affected slides with a `WRAP` badge.
+
 For full CLI behavior, presets, report schema, preview-grid usage, and fixture verification, read [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md).
 
 ## Getting Started
