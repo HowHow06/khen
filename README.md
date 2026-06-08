@@ -1,21 +1,47 @@
-# Khen: My Web-Based Tool Suite
+# Khen
 
-Welcome to Khen, a versatile web-based tool suite designed to streamline and enrich your digital tasks. At the heart of Khen lies a commitment to solving real-world problems through the power of programming. The star of the show is our PPT Generator tool, crafted to significantly reduce the time and effort involved in creating PowerPoint presentations for praise and worship songs, making it a game-changer for church services.
+Khen is a Next.js tool suite focused on creating PowerPoint presentations for praise and worship songs. The main feature is the PPT Generator, which turns formatted lyrics into `.pptx` files with configurable layouts for onsite projection and online/live use.
 
-## 🌟 Highlight: PPT Generator Tool
+## PPT Generator
 
-Creating PowerPoint presentations for each praise and worship session can be daunting, especially when handling a vast selection of songs. The PPT Generator tool within Khen addresses this challenge head-on, offering a quick and efficient way to generate presentations by simply inserting song lyrics. It's more than just a tool; it's a solution designed to save time, allowing you to focus on the essence of worship.
+The PPT Generator supports:
 
-## 🔧 Features
+- Multi-song medleys using `----` song sections
+- Cover slides using `# Title ## Subtitle`
+- Verse/chorus/bridge subsections using `---`
+- Mandarin lyrics with pinyin secondary lyrics
+- English songs that ignore secondary lyrics
+- Presets for onsite and online/live decks
+- Preview grid images for checking slide layout before generating the PPTX
+- JSON reports that agents can read to understand slide counts, section presets, line mappings, warnings, and output paths
 
-- **PPT Generator**: Automate the creation of PowerPoint presentations for songs with ease.
-- **User-Friendly Interface**: Designed with simplicity in mind, ensuring accessibility for all users.
-- **Expandable Suite**: While the PPT Generator takes center stage, Khen is built to grow, with plans to introduce more tools tailored to your needs.
+## For AI Agents
 
-## 🚀 Getting Started
+Use the CLI when automating the worship lyric workflow. The agent-facing entry point is:
 
+```bash
+npx tsx scripts/khen-ppt.ts <command> [options]
+```
 
-**Note**: This project is using Node.js version **18.20.2**. Recommended compatible versions are **18.17.0+** or **20.3.0+** (as required by Next.js 14).
+Common analyze command:
+
+```bash
+npx tsx scripts/khen-ppt.ts analyze \
+  --main .planning/cli-redo/verification/test-input.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
+  --auto-pinyin \
+  --preview-grid /private/tmp/khen-cli-redo/preview.png \
+  --report /private/tmp/khen-cli-redo/analyze-report.json
+```
+
+Read `/private/tmp/khen-cli-redo/analyze-report.json` to understand the result. When `--report` is set, the CLI writes JSON to the file and keeps terminal output quiet, even if `--json` is passed.
+
+For full CLI behavior, presets, report schema, preview-grid usage, and fixture verification, read [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md).
+
+## Getting Started
+
+**Node.js requirement:** `>=20.9.0`
 
 Setting up Khen is straightforward, ensuring you can get up and running with minimal fuss:
 
@@ -47,20 +73,31 @@ cp .env.example .env.local
 Launch Khen with the following command:
 
 ```bash
-npm run start
+npm run dev
 ```
 
 The application will be available at `http://localhost:3000` or the port specified in your `.env` file.
 
-## 📚 Documentation: PPT Generator Tool
+## Documentation
 
 For more detailed information on each tool within Khen, including walkthroughs and tips, refer to:
 
 - [PPT Generator User Guide](./docs/PPT_GENERATOR_USER_GUIDE.md) - Comprehensive guide for the web application
-- [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md) - Command-line interface for offline PPT generation
+- [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md) - Agent-friendly command-line interface for analysis, preview grids, reports, and PPTX generation
 - [External Guide](https://season-breeze-210.notion.site/PPT-Control-and-Making-Training-a5a2e6329d5b4e5e871910024d6c6a2e?pvs=4) - Additional training materials
 
-## 🙌 Contributing
+## Development Commands
+
+```bash
+npm run dev          # Start the Next.js dev server
+npm run build        # Build static export
+npm test             # Run Jest tests
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript checks
+npm run check        # Run lint and type-check
+```
+
+## Contributing
 
 Khen is a personal passion project, but collaboration is the key to improvement. Whether it's suggesting new features, improving existing tools, or fixing bugs, your contributions are welcome. Feel free to fork the repository and submit pull requests.
 

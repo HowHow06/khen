@@ -39,7 +39,7 @@ async function loadFontCSS(): Promise<string> {
               : "font/woff";
             cssContent = cssContent.replace(
               `url("${urlPath}")`,
-              `url("data:${mimeType};base64,${base64}")`
+              `url("data:${mimeType};base64,${base64}")`,
             );
           } catch {
             // Font file not found, keep original URL (will use local font)
@@ -133,7 +133,9 @@ function layoutToInches(layout: string): [number, number] {
   }
 }
 
-function normalizedColorToCSS(color: string | { type: string; color: string; alpha: number }): string {
+function normalizedColorToCSS(
+  color: string | { type: string; color: string; alpha: number },
+): string {
   if (typeof color === "string") {
     return color.startsWith("#") ? color : `#${color}`;
   } else {
@@ -169,19 +171,25 @@ function removeNumbering(text: string): string {
 }
 
 // Convert points to pixels based on slide dimensions
-function pointsToPx(points: number, dimensions: [number, number], slideWidth: number): number {
+function pointsToPx(
+  points: number,
+  dimensions: [number, number],
+  slideWidth: number,
+): number {
   return ((points * POINTS_TO_INCHES) / dimensions[0]) * slideWidth;
 }
 
 function getTextPartStyleCSS(
   style: any,
   dimensions: [number, number],
-  slideWidth: number
+  slideWidth: number,
 ): string {
   const styles: string[] = [];
 
   if (style.fontSize) {
-    styles.push(`font-size: ${pointsToPx(style.fontSize, dimensions, slideWidth)}px`);
+    styles.push(
+      `font-size: ${pointsToPx(style.fontSize, dimensions, slideWidth)}px`,
+    );
   }
   if (style.color) {
     styles.push(`color: ${normalizedColorToCSS(style.color)}`);
@@ -193,10 +201,14 @@ function getTextPartStyleCSS(
     styles.push("font-weight: bold");
   }
   if (style.charSpacing) {
-    styles.push(`letter-spacing: ${pointsToPx(style.charSpacing, dimensions, slideWidth)}px`);
+    styles.push(
+      `letter-spacing: ${pointsToPx(style.charSpacing, dimensions, slideWidth)}px`,
+    );
   }
   if (style.lineSpacing) {
-    styles.push(`line-height: ${pointsToPx(style.lineSpacing, dimensions, slideWidth)}px`);
+    styles.push(
+      `line-height: ${pointsToPx(style.lineSpacing, dimensions, slideWidth)}px`,
+    );
   }
 
   return styles.join("; ");
@@ -205,22 +217,28 @@ function getTextPartStyleCSS(
 function renderTextObject(
   object: InternalSlideObject,
   dimensions: [number, number],
-  slideWidth: number
+  slideWidth: number,
 ): string {
-  if (object.kind !== "text" || !object.text || object.text.length === 0) return "";
+  if (object.kind !== "text" || !object.text || object.text.length === 0)
+    return "";
 
   // Calculate positions - x, y, w might be percentage strings like "30%" or numbers (inches)
   const xPct = calculatePercentage(object.style.x, dimensions[0]);
   const yPct = calculatePercentage(object.style.y, dimensions[1]);
   const wPct = calculatePercentage(object.style.w, dimensions[0]);
-  
+
   // Height might be 0 or undefined - in that case, let it auto-size
   const rawH = object.style.h;
-  const hasHeight = rawH !== undefined && rawH !== 0 && rawH !== "0" && rawH !== "0%";
+  const hasHeight =
+    rawH !== undefined && rawH !== 0 && rawH !== "0" && rawH !== "0%";
   const hPct = hasHeight ? calculatePercentage(rawH, dimensions[1]) : 0;
 
   // Get container style - this includes font size, color, etc.
-  const containerStyleCSS = getTextPartStyleCSS(object.style, dimensions, slideWidth);
+  const containerStyleCSS = getTextPartStyleCSS(
+    object.style,
+    dimensions,
+    slideWidth,
+  );
 
   // Determine horizontal alignment
   const textAlign = object.style.align || "center";
@@ -231,8 +249,15 @@ function renderTextObject(
     .map((part) => {
       // Merge object.style with part.style (part overrides)
       const mergedStyle = { ...object.style, ...part.style };
-      const partStyleCSS = getTextPartStyleCSS(mergedStyle, dimensions, slideWidth);
-      return `<span style="${partStyleCSS}">${escapeHtml(part.text)}</span>`;
+      const partStyleCSS = getTextPartStyleCSS(
+        mergedStyle,
+        dimensions,
+        slideWidth,
+      );
+      const shouldBreakLine =
+        (part as any).breakLine === true ||
+        (part.style as any).breakLine === true;
+      return `<span style="${partStyleCSS}">${escapeHtml(part.text)}</span>${shouldBreakLine ? "<br>" : ""}`;
     })
     .join("");
 
@@ -250,14 +275,18 @@ function renderTextObject(
     hasHeight ? `height: ${hPct}%` : "",
     "box-sizing: border-box",
     "transform: translateY(-50%)", // Center text on y position
-  ].filter(Boolean).join("; ");
+  ]
+    .filter(Boolean)
+    .join("; ");
 
   const innerStyles = [
     containerStyleCSS,
     "width: 100%",
     "line-height: 1.2", // Consistent line height
     `text-align: ${textAlign}`,
-  ].filter(Boolean).join("; ");
+  ]
+    .filter(Boolean)
+    .join("; ");
 
   return `<div style="${outerStyles}"><div style="${innerStyles}">${textParts}</div></div>`;
 }
@@ -266,7 +295,7 @@ function renderSlide(
   slide: InternalSlide,
   masterSlide: InternalMasterSlide | undefined,
   dimensions: [number, number],
-  slideWidth: number
+  slideWidth: number,
 ): string {
   // Get background from slide or master slide
   const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
@@ -274,12 +303,15 @@ function renderSlide(
   const masterBackgroundImage = masterSlide?.backgroundImage;
 
   let bgImageStyle = "";
-  
+
   // Check slide background image first
   if (slideBackgroundImage) {
     if (typeof slideBackgroundImage === "string") {
       // Already a data URL or path
-      if (slideBackgroundImage.startsWith("data:") || slideBackgroundImage.startsWith("image/")) {
+      if (
+        slideBackgroundImage.startsWith("data:") ||
+        slideBackgroundImage.startsWith("image/")
+      ) {
         bgImageStyle = `background-image: url("data:${slideBackgroundImage}");`;
       } else {
         bgImageStyle = `background-image: url("${slideBackgroundImage}");`;
@@ -298,17 +330,21 @@ function renderSlide(
   const slideHeight = slideWidth / aspectRatio;
 
   // Render master slide objects first (background elements)
-  const masterObjects = masterSlide?.objects
-    ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
-    .join("") ?? "";
+  const masterObjects =
+    masterSlide?.objects
+      ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
+      .join("") ?? "";
 
   // Render slide objects on top
-  const slideObjects = slide.objects
-    ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
-    .join("") ?? "";
+  const slideObjects =
+    slide.objects
+      ?.map((obj) => renderTextObject(obj, dimensions, slideWidth))
+      .join("") ?? "";
 
   // Default to black background if no color specified (common for PPT slides)
-  const bgColor = backgroundColor ? normalizedColorToCSS(backgroundColor) : "#000000";
+  const bgColor = backgroundColor
+    ? normalizedColorToCSS(backgroundColor)
+    : "#000000";
 
   return `
     <div style="
@@ -330,12 +366,18 @@ function renderSlide(
   `;
 }
 
-function generatePreviewHtml(config: InternalPresentation, fontCSS: string): string {
+function generatePreviewHtml(
+  config: InternalPresentation,
+  fontCSS: string,
+): string {
   const dimensions = layoutToInches(config.layout);
   const slideWidth = 480; // Increased from 320 for better visibility
 
   // Group slides by section
-  const slidesBySection: Record<string, Array<{ slide: InternalSlide; index: number }>> = {};
+  const slidesBySection: Record<
+    string,
+    Array<{ slide: InternalSlide; index: number }>
+  > = {};
   config.slides.forEach((slide, index) => {
     const sectionName = slide.sectionName || "Slides";
     if (!slidesBySection[sectionName]) {
@@ -458,7 +500,7 @@ function generatePreviewHtml(config: InternalPresentation, fontCSS: string): str
 
 export async function generatePreviewImage(
   config: InternalPresentation,
-  outputPath: string
+  outputPath: string,
 ): Promise<string> {
   // Load font CSS with embedded base64 fonts
   const fontCSS = await loadFontCSS();
@@ -470,12 +512,14 @@ export async function generatePreviewImage(
 
   // Set content and wait for rendering
   await page.setContent(html, { waitUntil: "domcontentloaded" });
-  
+
   // Wait for fonts to load and content to render
   await page.waitForTimeout(500);
 
   // Take full page screenshot
-  const screenshotPath = outputPath.endsWith(".png") ? outputPath : `${outputPath}.png`;
+  const screenshotPath = outputPath.endsWith(".png")
+    ? outputPath
+    : `${outputPath}.png`;
 
   await page.screenshot({
     path: screenshotPath,

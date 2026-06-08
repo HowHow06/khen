@@ -1,448 +1,291 @@
 # CLI PPT Generator Guide
 
-This guide explains how to use the command-line interface (CLI) script to generate PowerPoint presentations from lyrics files without using the web application.
+This guide explains how AI agents and humans should use the Khen PPT CLI to analyze lyrics, generate preview grids, and create PowerPoint files without opening the web app.
 
-## Table of Contents
+The current agent-facing entry point is:
 
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Command Line Options](#command-line-options)
-- [Usage Examples](#usage-examples)
-- [Built-in Presets](#built-in-presets)
-- [Configuration File](#configuration-file)
-- [Lyrics File Format](#lyrics-file-format)
-- [Preview Mode](#preview-mode)
-- [Troubleshooting](#troubleshooting)
+```bash
+npx tsx scripts/khen-ppt.ts <command> [options]
+```
 
----
+The older `scripts/generate-ppt-from-lyrics.ts` script is kept for compatibility, but new automation should use `scripts/khen-ppt.ts`.
 
 ## Prerequisites
 
-Before using the CLI script, ensure you have:
+- Node.js `>=20.9.0`
+- Project dependencies installed with `npm install`
+- Run commands from the repository root
 
-1. **Node.js** version 20.9.0 or higher installed
-2. **Dependencies installed** - Run `npm install` in the project root
-
-You can verify your Node.js version with:
+Check the runtime:
 
 ```bash
-node --version  # Should output v20.x.x or higher
+node --version
+npm install
 ```
 
----
+If `npx tsx` fails with `listen EPERM` inside an agent sandbox, rerun with the sandbox permission needed for `tsx`. That error is the sandbox blocking the runner, not the PPT CLI failing.
 
-## Quick Start
+## Commands
 
-The simplest way to generate a PPT from a lyrics file:
+### `presets`
+
+Lists preset IDs, display names, aliases, and whether the preset ignores secondary lyrics.
 
 ```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts --main path/to/lyrics.txt
+npx tsx scripts/khen-ppt.ts presets
 ```
 
-This will:
+Use this when an agent needs to resolve a human preset name such as `Default Onsite Chinese` or a short alias such as `onsite-chinese`.
 
-- Read the lyrics from the specified file
-- Generate a PowerPoint presentation with default settings
-- Save the `.pptx` file in the current directory
+### `analyze`
 
----
-
-## Command Line Options
-
-| Option          | Short | Required | Default                       | Description                                               |
-| --------------- | ----- | -------- | ----------------------------- | --------------------------------------------------------- |
-| `--main`        | `-m`  | Yes      | -                             | Path to the main lyrics file                              |
-| `--secondary`   | `-s`  | No       | Same as main                  | Path to secondary lyrics file (e.g., pinyin, translation) |
-| `--auto-pinyin` | `-y`  | No       | `false`                       | Auto-generate pinyin as secondary lyrics from main lyrics |
-| `--config`      | `-c`  | No       | Default settings              | Path to a settings JSON file                              |
-| `--output`      | `-o`  | No       | Current directory (`.`)       | Output directory for generated files                      |
-| `--filename`    | `-f`  | No       | Auto-generated with timestamp | Output filename (without extension)                       |
-| `--preview`     | `-p`  | No       | `false`                       | Generate preview image (PNG) instead of PPT               |
-| `--help`        | `-h`  | No       | -                             | Display help message                                      |
-
-### View Help
-
-To see all available options:
+Builds the same slide model used for generation, writes an optional JSON report, and can render an optional preview grid image. It does not write a PPTX.
 
 ```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts --help
-```
-
----
-
-## Usage Examples
-
-### Basic Usage
-
-Generate a PPT from a single lyrics file:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts --main songs/amazing-grace.txt
-```
-
-### With Secondary Lyrics
-
-Generate a PPT with main lyrics and secondary content (e.g., pinyin or translation):
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/chinese-song.txt \
-  --secondary songs/chinese-song-pinyin.txt
-```
-
-### Auto-Generate Pinyin
-
-Automatically generate pinyin romanization from Chinese lyrics:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/chinese-song.txt \
-  --auto-pinyin
-```
-
-This is particularly useful for Chinese songs when you don't have a separate pinyin file. The pinyin is generated using the `pinyin-pro` library with tone marks removed.
-
-### Custom Output Location
-
-Save the generated PPT to a specific directory:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/worship.txt \
-  --output ./generated-ppts
-```
-
-### Custom Filename
-
-Specify a custom filename for the output:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/worship.txt \
-  --filename "Sunday Worship Songs"
-```
-
-### With Custom Settings
-
-Use a custom configuration file:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/worship.txt \
-  --config my-settings.json
-```
-
-### Full Example
-
-Combining all options:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/chinese-hymn.txt \
-  --secondary songs/chinese-hymn-pinyin.txt \
-  --config church-settings.json \
-  --output ./sunday-service \
-  --filename "2024-01-07 Hymns"
-```
-
-Or with auto-generated pinyin:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/chinese-hymn.txt \
+npx tsx scripts/khen-ppt.ts analyze \
+  --main .planning/cli-redo/verification/test-input.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
   --auto-pinyin \
-  --config scripts/presets/onsite-chinese.json \
-  --output ./sunday-service \
-  --filename "2024-01-07 Hymns"
+  --preview-grid /private/tmp/khen-cli-redo/preview.png \
+  --report /private/tmp/khen-cli-redo/analyze-report.json
 ```
 
----
+Use this before generating when an agent needs to inspect slide count, section preset assignment, line mappings, warnings, or preview layout.
 
-## Built-in Presets
+### `generate`
 
-The CLI comes with pre-configured presets for common use cases. These are located in `scripts/presets/`.
-
-### Available Presets
-
-| Preset | File | Use Case |
-|--------|------|----------|
-| Onsite Chinese | `onsite-chinese.json` | Full-screen projection for Chinese songs with pinyin |
-| Live Chinese | `live-chinese.json` | Green screen overlay for live streaming Chinese songs |
-| Onsite English | `onsite-english.json` | Full-screen projection for English songs |
-| Live English | `live-english.json` | Green screen overlay for live streaming English songs |
-
-### Using Presets
+Creates a PPTX and can also write the same report and preview grid as `analyze`.
 
 ```bash
-# Chinese song for onsite projection
-npx tsx scripts/generate-ppt-from-lyrics.ts \
+npx tsx scripts/khen-ppt.ts generate \
+  --main .planning/cli-redo/verification/test-input.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
+  --auto-pinyin \
+  --output /private/tmp/khen-cli-redo \
+  --filename "20240101 PNW" \
+  --report /private/tmp/khen-cli-redo/generate-report.json
+```
+
+Use this when the lyrics and presets are ready enough to create the final deck.
+
+### `batch`
+
+Generates multiple PPTX variants from the same lyrics. Each `--variant` is `name=preset`. The `name` becomes a suffix on the output filename and preview grid path.
+
+```bash
+npx tsx scripts/khen-ppt.ts batch \
   --main lyrics.txt \
-  --config scripts/presets/onsite-chinese.json
-
-# Chinese song for live streaming
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main lyrics.txt \
-  --config scripts/presets/live-chinese.json
-
-# English song for onsite projection
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main lyrics.txt \
-  --config scripts/presets/onsite-english.json
-
-# English song for live streaming
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main lyrics.txt \
-  --config scripts/presets/live-english.json
+  --auto-pinyin \
+  --variant onsite=onsite-chinese \
+  --variant live=live-chinese \
+  --output /private/tmp/khen-cli-redo \
+  --filename sunday-songs \
+  --report /private/tmp/khen-cli-redo/batch-report.json
 ```
 
-### Preset Characteristics
+Use this for the normal Khen workflow of generating both onsite and online/live decks from the same lyrics.
 
-**Onsite Presets:**
-- Solid black background
-- White text with drop shadow
-- Centered positioning for projection screens
+## Options
 
-**Live Presets:**
-- Green screen background with black cover overlay
-- Text positioned at bottom of screen
-- Filename automatically appends `(live)` suffix
+| Option                | Applies To                     | What It Does                                                                                                   |
+| --------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `--main`, `-m`        | `analyze`, `generate`, `batch` | Required path to the primary lyrics file.                                                                      |
+| `--secondary`, `-s`   | `analyze`, `generate`, `batch` | Optional secondary lyrics file, usually pinyin or translation.                                                 |
+| `--auto-pinyin`, `-y` | `analyze`, `generate`, `batch` | Generates secondary pinyin from the primary lyrics. Use for Mandarin songs when no secondary file is supplied. |
+| `--preset`            | `analyze`, `generate`          | Applies one preset to the whole deck. Accepts display names, IDs, or aliases.                                  |
+| `--section-preset`    | `analyze`, `generate`          | Overrides one song section. Format: `2=Default Onsite English` or `Song Name=onsite-english`. May be repeated. |
+| `--variant`           | `batch`                        | Adds one generated variant. Format: `onsite=onsite-chinese`. May be repeated.                                  |
+| `--config`, `-c`      | `analyze`, `generate`, `batch` | Merges a settings JSON file after the preset. Useful for exported web-app settings.                            |
+| `--output`, `-o`      | `generate`, `batch`            | Output directory for PPTX files. Created automatically.                                                        |
+| `--filename`, `-f`    | `generate`, `batch`            | Base filename without extension. Khen filename prefix/suffix settings still apply.                             |
+| `--preview-grid`      | `analyze`, `generate`, `batch` | Writes a PNG contact-sheet preview of all generated slides.                                                    |
+| `--report`            | `analyze`, `generate`, `batch` | Writes the JSON report to this file. Created parent directories automatically.                                 |
+| `--json`              | all report commands            | Prints JSON to stdout only when `--report` is not set. When `--report` is set, stdout stays quiet.             |
+| `--fail-on-warning`   | `analyze`, `generate`, `batch` | Exits with code `2` when warnings exist. Errors exit with code `1`.                                            |
+| `--help`, `-h`        | all                            | Prints command help.                                                                                           |
 
-**Chinese vs English:**
-- Chinese presets use Microsoft YaHei font with 2 textboxes (for lyrics + pinyin)
-- English presets use Ebrima/Segoe Print fonts with single textbox
+## Presets
 
-You can copy any preset and customize it to match your specific needs.
+Run `presets` for the canonical list. Current built-in CLI presets:
 
----
+| Display Name             | ID                    | Common Aliases                             | Secondary Lyrics |
+| ------------------------ | --------------------- | ------------------------------------------ | ---------------- |
+| `Default Onsite Chinese` | `onsiteChinesePreset` | `onsite-chinese`, `default-onsite-chinese` | Used for pinyin. |
+| `Default Onsite English` | `onsiteEnglishPreset` | `onsite-english`, `default-onsite-english` | Ignored.         |
+| `Default Live Chinese`   | `liveChinesePreset`   | `live-chinese`, `online-chinese`           | Used for pinyin. |
+| `Default Live English`   | `liveEnglishPreset`   | `live-english`, `online-english`           | Ignored.         |
 
-## Configuration File
+Preset names are case-insensitive and can be written with spaces or dashes.
 
-You can export settings from the web application and use them with the CLI script.
+## Section Preset Overrides
 
-### Exporting Settings from Web App
+The primary use case is a mixed-language medley:
 
-1. Open the PPT Generator web application
-2. Configure your desired settings (fonts, colors, layout, etc.)
-3. Click the export settings button to download a JSON file
-4. Use this JSON file with the `--config` option
-
-### Settings File Structure
-
-A settings JSON file has the following structure:
-
-```json
-{
-  "general": {
-    "mainBackgroundColor": "#000000",
-    "sectionsAutoNumbering": true,
-    "lineCountPerTextbox": 1,
-    "textboxCountPerContentPerSlide": 2
-  },
-  "file": {
-    "filename": "My Presentation",
-    "filenamePrefix": "",
-    "filenameSuffix": ""
-  },
-  "content": {
-    "main": {
-      "text": {
-        "mainFontFace": "Microsoft YaHei",
-        "mainFontSize": 44,
-        "mainFontColor": "#FFFFFF"
-      }
-    }
-  },
-  "cover": {
-    "main": {
-      "coverTitleFont": "Microsoft YaHei",
-      "coverTitleFontSize": 80
-    }
-  }
-}
+```bash
+--preset "Default Onsite Chinese" \
+--section-preset "2=Default Onsite English"
 ```
 
-> **Note:** You don't need to specify all settings. Any missing settings will use default values.
+This means:
 
----
+- Section 1 uses `Default Onsite Chinese`.
+- Section 2 uses `Default Onsite English`.
+- Section numbering is based on `----` song section markers in the main lyrics.
+- English preset sections ignore secondary lyrics, so auto-generated pinyin does not render for that song.
 
-## Lyrics File Format
+You can also target by section name:
 
-The lyrics file uses a simple text format with special markers for sections and formatting.
-
-### Basic Format
-
-```
----- Song Title
-# 奇异恩典
---- Verse 1
-奇异恩典 何等甘甜
-我罪已得赦免
---- Chorus
-赞美主 赞美主
-全地都当赞美主
-***
+```bash
+--section-preset "What a friend we have in Jesus=Default Onsite English"
 ```
 
-### Special Markers
+When an override is applied, the CLI injects the same lyrics-overwrite JSON that the web app uses internally. Existing inline JSON overwrite lines after `----` are preserved and merged.
 
-| Marker | Description |
-|--------|-------------|
-| `----` | Section marker - creates a new song section (4 dashes) |
-| `---` | Subsection marker - marks verse, chorus, bridge, etc. (3 dashes) |
-| `# Title` | Cover slide main title |
-| `# Title ## Subtitle` | Cover slide with main and secondary title |
-| `***` | Creates an empty/blank slide |
-| `**` | Page break - starts a new slide |
+## Lyrics Format
 
-### Example Structure
+The CLI uses the same syntax as the web PPT generator.
 
-```
+```text
 ---- 奇异恩典
-# 奇异恩典
---- 第一节
-奇异恩典 何等甘甜
-我罪已得赦免
-前我失丧 今被寻回
-瞎眼今得看见
---- 副歌
-赞美主 赞美主
-全地都当赞美主
---- 结尾
+# 奇异恩典 ## Amazing Grace
+--- Verse 1
 奇异恩典 何等甘甜
 我罪已得赦免
 ***
+---- What a friend we have in Jesus
+# What a friend we have in Jesus
+--- 1
+What a friend we have in Jesus
+all our sins and griefs to bear
+***
 ```
 
-### Inline Settings Override
+Important markers:
 
-You can override settings for specific sections using JSON blocks placed immediately after a section marker (`----`):
+| Marker                | Meaning                                                                     |
+| --------------------- | --------------------------------------------------------------------------- |
+| `---- Song Name`      | Starts a song section. Section preset overrides count these markers.        |
+| `# Title ## Subtitle` | Creates a cover slide. The title and subtitle must be on the same line.     |
+| `--- Verse`           | Starts a subsection such as verse, chorus, bridge, or ending.               |
+| `**`                  | Starts a new slide.                                                         |
+| `***`                 | Creates an empty slide.                                                     |
+| `@key: value`         | Metadata line, not rendered.                                                |
+| `{...}`               | JSON settings overwrite, usually immediately after a `----` section marker. |
 
+For deeper lyric syntax details, see [PPT Generator User Guide](./PPT_GENERATOR_USER_GUIDE.md).
+
+## Preview Grid
+
+`--preview-grid` writes a PNG image containing the rendered slide previews in a grid.
+
+Use the preview grid when an agent needs visual feedback before creating the final deck:
+
+- Check whether long lyric lines wrap unexpectedly.
+- Verify Mandarin lyrics and pinyin appear together.
+- Verify English songs ignore pinyin when an English preset is applied.
+- Locate the slide number that needs lyric edits.
+
+The preview grid is an inspection aid, not a byte-for-byte substitute for PowerPoint rendering. For final acceptance, inspect the generated PPTX as well.
+
+## Report JSON
+
+`--report` writes structured JSON for agents. When `--report` is present, the CLI does not print the report to the terminal, even if `--json` is also passed.
+
+Top-level fields:
+
+| Field          | How To Read It                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `version`      | Report schema version. Currently `1`.                                                                              |
+| `input`        | The resolved input paths and preset arguments. `preset` is the resolved internal preset ID.                        |
+| `summary`      | High-level counts: lyric lines, song sections, subsections, generated slide count, and whether a cover exists.     |
+| `outputs`      | Paths written by the command, such as `pptx`, `previewGrid`, and `report`.                                         |
+| `sections`     | One entry per `----` song section. Shows the section name, resolved preset ID, and slide indices.                  |
+| `lineMappings` | 1-based lyric line numbers mapped to generated slides. Useful for tracing problematic lyrics back to source lines. |
+| `warnings`     | Non-fatal issues, including lyric syntax warnings and secondary lyric line-count mismatches.                       |
+| `errors`       | Fatal validation issues copied from warnings whose type is `error`.                                                |
+
+Example checks an agent can perform:
+
+```text
+summary.slideCount == expected slide count
+sections[1].preset == "onsiteEnglishPreset"
+warnings.length == 0
+outputs.previewGrid exists before asking a vision model to inspect it
 ```
----- Song Section
-{"general":{"presetChosen":"Preset1"}}
---- Verse 1
-Lyrics go here...
-```
 
-For more details on lyrics formatting, see the [PPT Generator User Guide](./PPT_GENERATOR_USER_GUIDE.md).
+`lineMappings[].slideIndex` is the zero-based slide index from the underlying mapper. `sections[].slideIndices` are human-facing one-based slide numbers.
 
----
+## Acceptance Fixture
 
-## Preview Mode
-
-Preview mode generates a JSON file containing information about the slides that would be created, without generating the actual PPT file. This is useful for:
-
-- Verifying your lyrics file is structured correctly
-- Checking how many slides will be generated
-- Sharing a visual preview without opening PowerPoint
-- Debugging issues with your configuration
-
-### Generate Preview Image
+The current CLI verification fixture is:
 
 ```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main songs/worship.txt \
-  --preview
+npx tsx scripts/khen-ppt.ts analyze \
+  --main .planning/cli-redo/verification/test-input.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
+  --auto-pinyin \
+  --preview-grid /private/tmp/khen-cli-redo/preview.png \
+  --report /private/tmp/khen-cli-redo/analyze-report.json \
+  --json
 ```
 
-### Preview Output
+Expected behavior:
 
-The preview generates a **PNG image** showing all slides in a grid layout, organized by section. The image includes:
+- The command writes `/private/tmp/khen-cli-redo/analyze-report.json`.
+- The command writes `/private/tmp/khen-cli-redo/preview.png`.
+- The terminal does not print the JSON report because `--report` is present.
+- Section 1 uses `onsiteChinesePreset`.
+- Section 2 uses `onsiteEnglishPreset`.
+- The generated slide model matches the referenced `20240101 PNW.pptx` look for the fixture lyrics.
 
-- A header with "Khen PPT Preview" title and slide count
-- Slides grouped by section with section headers
-- Each slide rendered with actual text styling and positioning
-- Slide numbers for reference
-
-This is the same visual output as the "Export Image" button in the web application.
-
-**Note:** Preview image generation requires Playwright. If not installed, run:
+To generate the corresponding PPTX:
 
 ```bash
-npx playwright install chromium
+npx tsx scripts/khen-ppt.ts generate \
+  --main .planning/cli-redo/verification/test-input.txt \
+  --preset "Default Onsite Chinese" \
+  --section-preset "2=Default Onsite English" \
+  --auto-pinyin \
+  --output /private/tmp/khen-cli-redo \
+  --filename "20240101 PNW" \
+  --report /private/tmp/khen-cli-redo/generate-report.json
 ```
-
----
 
 ## Troubleshooting
 
-### Common Issues
+### No JSON Appears In Terminal
 
-#### "Main lyrics file is required"
-
-You must provide a lyrics file using the `--main` option:
+If `--report` is set, this is expected. Read the report file instead:
 
 ```bash
-# Wrong
-npx tsx scripts/generate-ppt-from-lyrics.ts
-
-# Correct
-npx tsx scripts/generate-ppt-from-lyrics.ts --main lyrics.txt
+less /private/tmp/khen-cli-redo/analyze-report.json
 ```
 
-#### "Could not load config file"
+### Unknown Preset
 
-The configuration file path is incorrect or the file contains invalid JSON:
-
-1. Verify the file path is correct
-2. Validate your JSON using a JSON validator
-3. Ensure the file is readable
-
-#### Output directory doesn't exist
-
-The script does not create directories automatically. Create the output directory first:
+Run:
 
 ```bash
-mkdir -p ./output
-npx tsx scripts/generate-ppt-from-lyrics.ts --main lyrics.txt --output ./output
+npx tsx scripts/khen-ppt.ts presets
 ```
 
-#### Node.js version error
+Then use one of the display names, IDs, or aliases from the output.
 
-Ensure you're using Node.js 20.9.0 or higher:
+### Secondary Line Count Mismatch
 
-```bash
-# Check version
-node --version
+This warning means rendered main and secondary lyrics may not align. Use `--auto-pinyin` for Mandarin lyrics, provide a matching `--secondary` file, or apply an English preset override to sections that should ignore secondary lyrics.
 
-# If using nvm
-nvm use 22
+### Preview Grid Missing
 
-# If using nvs
-nvs use 22
-```
+Confirm the path was passed to `--preview-grid` and check `outputs.previewGrid` in the report. Parent directories are created automatically.
 
-### Debug Output
+### Wrong Section Uses English Or Chinese Settings
 
-The script may output some debug information during generation (like `parsedOverwrites` and `logging mergedSettings`). This is normal behavior from the underlying library and can be ignored.
+Check `sections[]` in the report. Section indices are based on `----` markers, not `---` verse markers.
 
----
+### Final PPTX Looks Different From Preview
 
-## Sample Files
-
-Sample files are provided to help you get started:
-
-```
-scripts/samples/
-├── sample-lyrics-chinese.txt  # Chinese lyrics example (奇异恩典)
-├── sample-settings.json       # Sample configuration file
-└── README.md                  # Quick start guide for samples
-```
-
-Try generating a PPT with the sample files:
-
-```bash
-npx tsx scripts/generate-ppt-from-lyrics.ts \
-  --main scripts/samples/sample-lyrics-chinese.txt \
-  --config scripts/samples/sample-settings.json \
-  --output scripts/samples \
-  --filename "奇异恩典"
-```
-
----
-
-## See Also
-
-- [Sample Files README](../scripts/samples/README.md) - Quick start with sample files
-- [PPT Generator User Guide](./PPT_GENERATOR_USER_GUIDE.md) - Full documentation for the web application
-- [AGENTS.md](../AGENTS.md) - Development guidelines and project overview
+The preview grid is produced from the same slide model, but browser image rendering and PowerPoint rendering are not identical. Use the preview grid for line wrapping and layout triage, then inspect the PPTX for final acceptance.
