@@ -6,7 +6,7 @@
 import { chromium } from "playwright";
 import path from "path";
 import fs from "fs/promises";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 
 // Get the project root directory (where public folder is located)
 const __filename = fileURLToPath(import.meta.url);
@@ -91,10 +91,19 @@ interface InternalSlideObject {
   };
 }
 
+type InternalImageSrc =
+  | string
+  | {
+      kind: string;
+      path?: string;
+      data?: string;
+    }
+  | null;
+
 interface InternalSlide {
   masterName?: string | null;
   backgroundColor?: string;
-  backgroundImage?: string;
+  backgroundImage?: InternalImageSrc;
   sectionName?: string;
   objects?: InternalSlideObject[];
 }
@@ -103,11 +112,7 @@ interface InternalMasterSlide {
   name?: string;
   objects?: InternalSlideObject[];
   backgroundColor?: string;
-  backgroundImage?: {
-    kind: string;
-    path?: string;
-    data?: string;
-  } | null;
+  backgroundImage?: InternalImageSrc;
 }
 
 interface InternalPresentation {
@@ -144,6 +149,37 @@ function normalizedColorToCSS(
     const b = parseInt(color.color.substring(4, 6), 16);
     return `rgba(${r}, ${g}, ${b}, ${1 - color.alpha / 100})`;
   }
+}
+
+function normalizeImageUrlForCss(imageValue: string): string {
+  const trimmed = imageValue.trim();
+  if (!trimmed) {
+    return "";
+  }
+
+  if (trimmed.startsWith("data:")) {
+    return trimmed;
+  }
+
+  if (/^[a-z0-9.+-]+\/[a-z0-9.+-]+;base64,/i.test(trimmed)) {
+    return `data:${trimmed}`;
+  }
+
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+    return pathToFileURL(path.join(PROJECT_ROOT, "public", trimmed)).href;
+  }
+
+  return trimmed;
+}
+
+function getBackgroundImageUrl(image?: InternalImageSrc): string {
+  if (!image) {
+    return "";
+  }
+
+  return typeof image === "string"
+    ? normalizeImageUrlForCss(image)
+    : normalizeImageUrlForCss(image.data ?? image.path ?? "");
 }
 
 // Calculate percentage - value can be inches (number) or already a percentage string
@@ -300,32 +336,9 @@ function renderSlide(
 ): string {
   // Get background from slide or master slide
   const backgroundColor = slide.backgroundColor ?? masterSlide?.backgroundColor;
-  const slideBackgroundImage = slide.backgroundImage;
-  const masterBackgroundImage = masterSlide?.backgroundImage;
-
-  let bgImageStyle = "";
-
-  // Check slide background image first
-  if (slideBackgroundImage) {
-    if (typeof slideBackgroundImage === "string") {
-      // Already a data URL or path
-      if (
-        slideBackgroundImage.startsWith("data:") ||
-        slideBackgroundImage.startsWith("image/")
-      ) {
-        bgImageStyle = `background-image: url("data:${slideBackgroundImage}");`;
-      } else {
-        bgImageStyle = `background-image: url("${slideBackgroundImage}");`;
-      }
-    }
-  } else if (masterBackgroundImage) {
-    // Check master slide background image
-    if (masterBackgroundImage.kind === "path" && masterBackgroundImage.path) {
-      bgImageStyle = `background-image: url("${masterBackgroundImage.path}");`;
-    } else if (masterBackgroundImage.data) {
-      bgImageStyle = `background-image: url("data:${masterBackgroundImage.data}");`;
-    }
-  }
+  const bgImageUrl =
+    getBackgroundImageUrl(slide.backgroundImage) ||
+    getBackgroundImageUrl(masterSlide?.backgroundImage);
 
   const aspectRatio = dimensions[0] / dimensions[1];
   const slideHeight = slideWidth / aspectRatio;
@@ -352,15 +365,23 @@ function renderSlide(
       width: ${slideWidth}px;
       height: ${slideHeight}px;
       background-color: ${bgColor};
-      ${bgImageStyle}
-      background-size: cover;
-      background-position: center;
       position: relative;
       white-space: pre-wrap;
       overflow: hidden;
       border-radius: 8px;
       box-shadow: ${hasOverflow ? "0 0 0 4px rgba(245, 158, 11, 0.95), 0 0 0 1px rgba(0,0,0,0.1)" : "0 0 0 1px rgba(0,0,0,0.1)"};
     ">
+      ${
+        bgImageUrl
+          ? `<img src="${bgImageUrl.replace(/"/g, "&quot;")}" style="
+              position: absolute;
+              inset: 0;
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            " />`
+          : ""
+      }
       ${masterObjects}
       ${slideObjects}
       ${
@@ -534,6 +555,20 @@ export async function generatePreviewImage(
 
   // Set content and wait for rendering
   await page.setContent(html, { waitUntil: "domcontentloaded" });
+
+  await page.evaluate(async () => {
+    await Promise.all(
+      Array.from(document.images).map((image) => {
+        if (image.complete) {
+          return Promise.resolve();
+        }
+        return new Promise<void>((resolve) => {
+          image.addEventListener("load", () => resolve(), { once: true });
+          image.addEventListener("error", () => resolve(), { once: true });
+        });
+      }),
+    );
+  });
 
   // Wait for fonts to load and content to render
   await page.waitForTimeout(500);

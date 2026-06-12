@@ -2,10 +2,14 @@ import { execFile } from "child_process";
 import { mkdir, readFile, stat } from "fs/promises";
 import path from "path";
 import { promisify } from "util";
+import { inflateSync } from "zlib";
 
 const execFileAsync = promisify(execFile);
 
 type CliReport = {
+  input?: {
+    preset?: string | null;
+  };
   summary?: {
     slideCount?: number;
   };
@@ -24,6 +28,9 @@ const rootDir = process.cwd();
 const npxBinary = process.platform === "win32" ? "npx.cmd" : "npx";
 const runId = new Date().toISOString().replace(/[:.]/g, "-");
 const outputDir = path.join("tmp", "khen-cli-redo", "test-cli", runId);
+const pngSignature = Buffer.from([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+]);
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -79,6 +86,144 @@ async function readJson<T>(filePath: string): Promise<T> {
 async function assertNonEmptyFile(filePath: string) {
   const fileStat = await stat(filePath);
   assert(fileStat.size > 0, `Expected ${filePath} to be non-empty.`);
+}
+
+function paethPredictor(left: number, up: number, upperLeft: number) {
+  const estimate = left + up - upperLeft;
+  const distanceLeft = Math.abs(estimate - left);
+  const distanceUp = Math.abs(estimate - up);
+  const distanceUpperLeft = Math.abs(estimate - upperLeft);
+
+  if (distanceLeft <= distanceUp && distanceLeft <= distanceUpperLeft) {
+    return left;
+  }
+  if (distanceUp <= distanceUpperLeft) {
+    return up;
+  }
+  return upperLeft;
+}
+
+function decodePngRgb(buffer: Buffer) {
+  assert(
+    buffer.subarray(0, pngSignature.length).equals(pngSignature),
+    "Expected a PNG file.",
+  );
+
+  let offset = pngSignature.length;
+  let width = 0;
+  let height = 0;
+  let bitDepth = 0;
+  let colorType = 0;
+  const idatChunks: Buffer[] = [];
+
+  while (offset < buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    const type = buffer.toString("ascii", offset + 4, offset + 8);
+    const data = buffer.subarray(offset + 8, offset + 8 + length);
+
+    if (type === "IHDR") {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      bitDepth = data[8];
+      colorType = data[9];
+    } else if (type === "IDAT") {
+      idatChunks.push(data);
+    } else if (type === "IEND") {
+      break;
+    }
+
+    offset += length + 12;
+  }
+
+  assert(bitDepth === 8, `Unsupported PNG bit depth: ${bitDepth}.`);
+  assert(
+    colorType === 2 || colorType === 6,
+    `Unsupported PNG color type: ${colorType}.`,
+  );
+
+  const bytesPerPixel = colorType === 6 ? 4 : 3;
+  const stride = width * bytesPerPixel;
+  const inflated = inflateSync(Buffer.concat(idatChunks));
+  const pixels = Buffer.alloc(width * height * bytesPerPixel);
+  let sourceOffset = 0;
+
+  for (let y = 0; y < height; y++) {
+    const filter = inflated[sourceOffset++];
+    const rowStart = y * stride;
+    const previousRowStart = rowStart - stride;
+
+    for (let x = 0; x < stride; x++) {
+      const raw = inflated[sourceOffset++];
+      const left =
+        x >= bytesPerPixel ? pixels[rowStart + x - bytesPerPixel] : 0;
+      const up = y > 0 ? pixels[previousRowStart + x] : 0;
+      const upperLeft =
+        y > 0 && x >= bytesPerPixel
+          ? pixels[previousRowStart + x - bytesPerPixel]
+          : 0;
+
+      switch (filter) {
+        case 0:
+          pixels[rowStart + x] = raw;
+          break;
+        case 1:
+          pixels[rowStart + x] = (raw + left) & 0xff;
+          break;
+        case 2:
+          pixels[rowStart + x] = (raw + up) & 0xff;
+          break;
+        case 3:
+          pixels[rowStart + x] = (raw + Math.floor((left + up) / 2)) & 0xff;
+          break;
+        case 4:
+          pixels[rowStart + x] =
+            (raw + paethPredictor(left, up, upperLeft)) & 0xff;
+          break;
+        default:
+          throw new Error(`Unsupported PNG filter type: ${filter}.`);
+      }
+    }
+  }
+
+  return {
+    width,
+    height,
+    getPixel: (x: number, y: number) => {
+      const pixelOffset = (y * width + x) * bytesPerPixel;
+      return {
+        r: pixels[pixelOffset],
+        g: pixels[pixelOffset + 1],
+        b: pixels[pixelOffset + 2],
+      };
+    },
+  };
+}
+
+async function assertLivePreviewHasBlackBand(filePath: string) {
+  const png = decodePngRgb(await readFile(filePath));
+  let firstGreenX = Number.POSITIVE_INFINITY;
+  let firstGreenY = Number.POSITIVE_INFINITY;
+
+  for (let y = 0; y < png.height; y++) {
+    for (let x = 0; x < png.width; x++) {
+      const pixel = png.getPixel(x, y);
+      if (pixel.r < 10 && pixel.g > 240 && pixel.b < 10) {
+        firstGreenX = Math.min(firstGreenX, x);
+        firstGreenY = Math.min(firstGreenY, y);
+      }
+    }
+  }
+
+  assert(
+    Number.isFinite(firstGreenX) && Number.isFinite(firstGreenY),
+    "Expected live preview to contain green-screen slide pixels.",
+  );
+
+  const blackBandPixel = png.getPixel(firstGreenX + 80, firstGreenY + 220);
+  assert(
+    blackBandPixel.r < 20 && blackBandPixel.g < 20 && blackBandPixel.b < 20,
+    "Expected live preview to render the black lower-band background image.",
+  );
 }
 
 function hasTextWrapWarning(
@@ -170,6 +315,7 @@ async function runAnalyzeSmoke() {
 
 async function runBatchSmoke() {
   const reportPath = path.join(outputDir, "batch-report.json");
+  const previewPath = path.join(outputDir, "batch-preview.png");
 
   await runCli([
     "batch",
@@ -186,6 +332,8 @@ async function runBatchSmoke() {
     outputDir,
     "--filename",
     "batch-fixture",
+    "--preview-grid",
+    previewPath,
     "--report",
     reportPath,
     "--json",
@@ -207,6 +355,10 @@ async function runBatchSmoke() {
       `Batch variant ${index + 1} did not record a PPTX output path.`,
     );
     assert(
+      report.outputs?.previewGrid,
+      `Batch variant ${index + 1} did not record a preview grid output path.`,
+    );
+    assert(
       (report.summary?.slideCount ?? 0) > 0,
       `Batch variant ${index + 1} should generate at least one slide.`,
     );
@@ -214,7 +366,14 @@ async function runBatchSmoke() {
 
   for (const report of reports) {
     await assertNonEmptyFile(report.outputs!.pptx!);
+    await assertNonEmptyFile(report.outputs!.previewGrid!);
   }
+
+  const liveReport = reports.find(
+    (report) => report.input?.preset === "liveChinesePreset",
+  );
+  assert(liveReport?.outputs?.previewGrid, "Expected a live variant report.");
+  await assertLivePreviewHasBlackBand(liveReport.outputs.previewGrid);
 }
 
 async function main() {

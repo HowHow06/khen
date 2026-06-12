@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { hydrateCliImageSettings } from "./assets";
 import { getPresetInfoById, resolvePresetId } from "./presets";
 
 type PptSettingsState = Record<string, any> & {
@@ -502,6 +503,7 @@ export async function analyzeWorkflow(
     options.config,
     options.preset,
   );
+  await hydrateCliImageSettings(settings);
 
   if (sectionPresetOverrides.length > 0) {
     settings.general.useDifferentSettingForEachSection = true;
@@ -615,6 +617,7 @@ export async function generateWorkflow(
     options.config,
     options.preset,
   );
+  await hydrateCliImageSettings(settings);
   if (sectionPresetOverrides.length > 0) {
     settings.general.useDifferentSettingForEachSection = true;
   }

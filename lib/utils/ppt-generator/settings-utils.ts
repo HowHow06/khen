@@ -16,6 +16,13 @@ export const getBase64FromImageField = async (
 
   let image: string | File | Blob = imageValue;
   if (typeof image === "string") {
+    if (
+      image.startsWith("data:") ||
+      /^[a-z0-9.+-]+\/[a-z0-9.+-]+;base64,/i.test(image)
+    ) {
+      return image;
+    }
+
     try {
       image = await getBlobFromUrl(image);
     } catch (error) {
