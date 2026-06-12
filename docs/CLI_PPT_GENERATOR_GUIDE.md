@@ -261,6 +261,88 @@ Why this works:
 - unexpected pinyin or secondary text on the cover,
 - semantically awkward long lines that technically fit but read poorly.
 
+## Standard Worship Workflow: Onsite + Live Chinese
+
+For normal church worship use, assume **two deliverables by default** unless the operator explicitly asks for only one:
+
+- `Default Onsite Chinese` for in-room projection
+- `Default Live Chinese` for the live-stream operator using green-screen / chroma workflow
+
+These two presets are intentionally different. Even with the same lyric file, they may produce different:
+
+- backgrounds,
+- text sizes,
+- vertical positions,
+- slide densities,
+- slide counts.
+
+### Standard CLI sequence
+
+1. List presets when needed:
+
+```bash
+npx tsx scripts/khen-ppt.ts presets
+```
+
+2. Analyze the onsite deck first:
+
+```bash
+npx tsx scripts/khen-ppt.ts analyze \
+  --main lyrics.txt \
+  --preset "Default Onsite Chinese" \
+  --auto-pinyin \
+  --preview-grid /tmp/onsite-preview.png \
+  --report /tmp/onsite-report.json
+```
+
+3. Repair lyric line breaks or cover overrides if the onsite preview is visually weak.
+4. Analyze the live deck using the **same lyric content**:
+
+```bash
+npx tsx scripts/khen-ppt.ts analyze \
+  --main lyrics.txt \
+  --preset "Default Live Chinese" \
+  --auto-pinyin \
+  --preview-grid /tmp/live-preview.png \
+  --report /tmp/live-report.json
+```
+
+5. Compare the onsite and live previews before generating PPTX files.
+6. Only after both previews are acceptable should the workflow continue to `generate`.
+
+### What to check in each version
+
+For `Default Onsite Chinese`, prioritize:
+
+- large readable lyrics for the room,
+- natural two-line grouping,
+- clean cover slides,
+- semantic line breaks when long phrases should stay on the same slide.
+
+For `Default Live Chinese`, prioritize:
+
+- green / chroma-ready background,
+- lower text placement appropriate for live compositing,
+- smaller text and pinyin sizing,
+- simpler slide density that is easy for the live operator to advance.
+
+### Important trap: preset differences can be hidden by lyric-level settings
+
+Top JSON settings and inline section overrides can partially hide the visual differences between onsite and live presets.
+If onsite and live previews look suspiciously similar:
+
+- check whether the lyric file contains a top-level JSON block,
+- check for section-local inline overrides after `---- Song Name`,
+- rerun a stripped-input comparison when you need to inspect the preset behavior itself.
+
+A stripped-input comparison means keeping the same lyric content while temporarily removing top JSON and section-local inline overrides.
+
+This is especially useful when validating:
+
+- whether the live preset really shows green-screen output,
+- whether the live preset lowers and shrinks the lyric block as expected,
+- whether onsite-only cover tuning is masking the live preset behavior.
+
 ## Preview Grid
 
 `--preview-grid` writes a PNG image containing the rendered slide previews in a grid.
