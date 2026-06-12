@@ -1,6 +1,11 @@
 import { parseArgs } from "util";
 
-export type CliCommand = "analyze" | "generate" | "batch" | "presets";
+export type CliCommand =
+  | "analyze"
+  | "generate"
+  | "batch"
+  | "presets"
+  | "override-schema";
 
 export type ParsedCliArgs = {
   command: CliCommand;
@@ -17,6 +22,7 @@ export type ParsedCliArgs = {
   variants: string[];
   json: boolean;
   failOnWarning: boolean;
+  detail: boolean;
   help: boolean;
 };
 
@@ -25,6 +31,7 @@ const commands = new Set<CliCommand>([
   "generate",
   "batch",
   "presets",
+  "override-schema",
 ]);
 
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
@@ -50,6 +57,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       variant: { type: "string", multiple: true, default: [] },
       json: { type: "boolean", default: false },
       "fail-on-warning": { type: "boolean", default: false },
+      detail: { type: "boolean", default: false },
       help: { type: "boolean", short: "h", default: false },
     },
     strict: true,
@@ -70,6 +78,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     variants: values.variant as string[],
     json: values.json as boolean,
     failOnWarning: values["fail-on-warning"] as boolean,
+    detail: values.detail as boolean,
     help: values.help as boolean,
   };
 }
@@ -86,6 +95,8 @@ Commands:
   generate    Generate a PPTX, with optional report and preview grid
   batch       Generate multiple preset variants from the same lyrics
   presets     List available preset aliases
+  override-schema
+              Print the inline JSON override schema
 
 Options:
   --main, -m              Path to main lyrics file
@@ -100,6 +111,7 @@ Options:
   --report                Path to write report JSON
   --json                  Print report JSON to stdout only when --report is not set
   --fail-on-warning       Exit non-zero when warnings are present
+  --detail                (override-schema) Print full field metadata instead of the simplified summary
   --help, -h              Show this help
 
 Examples:

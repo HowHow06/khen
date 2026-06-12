@@ -37,6 +37,28 @@ npx tsx scripts/khen-ppt.ts presets
 
 Use this when an agent needs to resolve a human preset name such as `Default Onsite Chinese` or a short alias such as `onsite-chinese`.
 
+### `override-schema`
+
+Prints the inline JSON override schema. By default the output is a simplified summary with field names, value types, and examples only — useful for a quick reference before writing overrides by hand.
+
+```bash
+npx tsx scripts/khen-ppt.ts override-schema
+```
+
+To write the schema to a file instead of stdout:
+
+```bash
+npx tsx scripts/khen-ppt.ts override-schema \
+  --report tmp/khen-cli-redo/inline-override-schema.json
+```
+
+Add `--detail` to include full field metadata (display names, default values, ranges, enums, and pattern constraints):
+
+```bash
+npx tsx scripts/khen-ppt.ts override-schema --detail \
+  --report tmp/khen-cli-redo/inline-override-schema-detail.json
+```
+
 ### `analyze`
 
 Builds the same slide model used for generation, writes an optional JSON report, and can render an optional preview grid image. It does not write a PPTX.
@@ -364,17 +386,17 @@ The preview grid is an inspection aid, not a byte-for-byte substitute for PowerP
 
 Top-level fields:
 
-| Field                  | How To Read It                                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `version`              | Report schema version. Currently `1`.                                                                               |
-| `input`                | The resolved input paths and preset arguments. `preset` is the resolved internal preset ID.                         |
-| `summary`              | High-level counts: lyric lines, song sections, subsections, generated slide count, and whether a cover exists.      |
-| `outputs`              | Paths written by the command, such as `pptx`, `previewGrid`, and `report`.                                          |
-| `sections`             | One entry per `----` song section. Shows the section name, resolved preset ID, and slide indices.                   |
-| `lineMappings`         | 1-based lyric line numbers mapped to generated slides. Useful for tracing problematic lyrics back to source lines.  |
-| `overflowSlideIndices` | Slide indices where text wrapping was detected. This includes lyric, pinyin, translation, and cover text.           |
-| `warnings`             | Non-fatal issues, including lyric syntax warnings, secondary lyric line-count mismatches, and `TEXT_WRAP` warnings. |
-| `errors`               | Fatal validation issues copied from warnings whose type is `error`.                                                 |
+| Field                  | How To Read It                                                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`              | Report schema version. Currently `1`.                                                                                                           |
+| `input`                | The resolved input paths and preset arguments. `preset` is the resolved internal preset ID.                                                     |
+| `summary`              | High-level counts: lyric lines, song sections, subsections, generated slide count, and whether a cover exists.                                  |
+| `outputs`              | Paths written by the command, such as `pptx`, `previewGrid`, and `report`.                                                                      |
+| `sections`             | One entry per `----` song section. Shows the section name, resolved preset ID, and slide indices.                                               |
+| `lineMappings`         | 1-based lyric line numbers mapped to generated slides. Useful for tracing problematic lyrics back to source lines.                              |
+| `overflowSlideIndices` | Slide indices where text wrapping was detected. This includes lyric, pinyin, translation, and cover text.                                       |
+| `warnings`             | Non-fatal issues, including lyric syntax warnings, secondary lyric line-count mismatches, inline override validation, and `TEXT_WRAP` warnings. |
+| `errors`               | Fatal validation issues copied from warnings whose type is `error`.                                                                             |
 
 Example checks an agent can perform:
 
@@ -422,6 +444,29 @@ When `warnings[]` contains `TEXT_WRAP`:
 7. Repeat until warnings are gone or the remaining wraps are visually acceptable.
 
 `TEXT_WRAP` is a warning, not an automatic failure. It tells the user or agent where to inspect; the correct action can be “fix it” or “leave it because it looks fine.”
+
+### Inline Override Warnings
+
+`analyze`, `generate`, and `batch` validate inline JSON override lines before applying CLI-injected section preset overrides.
+
+Common warning codes:
+
+| Code                               | Meaning                                                                                    |
+| ---------------------------------- | ------------------------------------------------------------------------------------------ |
+| `INLINE_OVERRIDE_JSON_INVALID`     | The line starts/ends like JSON but cannot be parsed.                                       |
+| `INLINE_OVERRIDE_LOCATION_INVALID` | The JSON line is not before the first `----` or immediately after a `----` section marker. |
+| `INLINE_OVERRIDE_KEY_UNKNOWN`      | The JSON contains a key Khen does not recognize or will not apply in that location.        |
+| `INLINE_OVERRIDE_VALUE_INVALID`    | The value has the wrong type, range, enum value, or color format.                          |
+| `INLINE_OVERRIDE_PRESET_INVALID`   | `general.presetChosen` is not one of the internal preset IDs.                              |
+
+Important: inline `general.presetChosen` must use internal preset IDs such as `onsiteChinesePreset`, not display names like `Default Onsite Chinese` and not CLI aliases like `onsite-chinese`.
+
+Dump the valid shape whenever unsure:
+
+```bash
+npx tsx scripts/khen-ppt.ts override-schema \
+  --report tmp/khen-cli-redo/inline-override-schema.json
+```
 
 ### Repair Loop For Long Titles And Cover Slides
 

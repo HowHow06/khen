@@ -1,6 +1,10 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { hydrateCliImageSettings } from "./assets";
+import {
+  buildInlineOverrideSchema,
+  validateInlineOverrides,
+} from "./inline-overrides";
 import { getPresetInfoById, resolvePresetId } from "./presets";
 
 type PptSettingsState = Record<string, any> & {
@@ -497,6 +501,7 @@ export async function analyzeWorkflow(
 ): Promise<CliReport> {
   const runtime = await loadRuntimeModules();
   const { primaryLyric, secondaryLyric } = await loadLyrics(runtime, options);
+  const inlineOverrideWarnings = validateInlineOverrides(primaryLyric);
   const sectionPresetOverrides = options.sectionPresets.map(parseSectionPreset);
   const { settings, resolvedPresetId } = await loadSettings(
     runtime,
@@ -537,6 +542,7 @@ export async function analyzeWorkflow(
     secondaryLyric,
     mergedSettings,
   );
+  warnings.push(...inlineOverrideWarnings);
   const textOverflowDetector =
     options.textOverflowDetector ??
     (await import("./text-overflow")).detectTextOverflowWarnings;
@@ -679,4 +685,8 @@ export function listPresets() {
     aliases: getPresetInfoById(id)?.aliases ?? [],
     ignoresSecondary: getPresetInfoById(id)?.ignoresSecondary ?? false,
   }));
+}
+
+export function getInlineOverrideSchema({ detailed = false } = {}) {
+  return buildInlineOverrideSchema({ detailed });
 }

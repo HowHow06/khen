@@ -37,4 +37,24 @@ describe("khen-ppt CLI args", () => {
     expect(parsed.main).toBe("lyrics.txt");
     expect(parsed.output).toBe(".");
   });
+
+  it("parses the override-schema command without a main file", () => {
+    const parsed = parseCliArgs([
+      "override-schema",
+      "--report",
+      "tmp/override-schema.json",
+    ]);
+
+    expect(parsed.command).toBe("override-schema");
+    expect(parsed.report).toBe("tmp/override-schema.json");
+    expect(parsed.main).toBeUndefined();
+    expect(parsed.detail).toBe(false);
+  });
+
+  it("parses override-schema --detail flag", () => {
+    const parsed = parseCliArgs(["override-schema", "--detail"]);
+
+    expect(parsed.command).toBe("override-schema");
+    expect(parsed.detail).toBe(true);
+  });
 });

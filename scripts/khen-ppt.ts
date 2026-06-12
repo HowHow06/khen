@@ -5,7 +5,12 @@ import path from "path";
 import { parseCliArgs, showHelp } from "./cli/args";
 import { buildVariantWorkflowOptions, parseVariant } from "./cli/batch";
 import { shouldPrintReportToStdout } from "./cli/output";
-import { analyzeWorkflow, generateWorkflow, listPresets } from "./cli/workflow";
+import {
+  analyzeWorkflow,
+  generateWorkflow,
+  getInlineOverrideSchema,
+  listPresets,
+} from "./cli/workflow";
 import type { WorkflowOptions } from "./cli/workflow";
 
 async function main() {
@@ -18,6 +23,18 @@ async function main() {
 
   if (options.command === "presets") {
     console.log(JSON.stringify(listPresets(), null, 2));
+    return;
+  }
+
+  if (options.command === "override-schema") {
+    const schema = getInlineOverrideSchema({ detailed: options.detail });
+    if (options.report) {
+      await mkdir(path.dirname(options.report), { recursive: true });
+      await writeFile(options.report, JSON.stringify(schema, null, 2));
+      return;
+    }
+
+    console.log(JSON.stringify(schema, null, 2));
     return;
   }
 
