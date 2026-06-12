@@ -51,6 +51,43 @@ Line one`);
     ]);
   });
 
+  it("warns when section override is missing useMainSectionSettings key", () => {
+    const cases = [
+      // No general key at all
+      '{"cover":{"main":{"coverTitleFontSize":58}}}',
+      // general present but useMainSectionSettings key is absent
+      '{"general":{"presetChosen":"onsiteChinesePreset"}}',
+    ];
+
+    for (const json of cases) {
+      const warnings = validateInlineOverrides(`---- Song\n${json}\n# Song ## Test\n--- Verse\nLine one`);
+      expect(warnings).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: "INLINE_OVERRIDE_MISSING_REQUIRED_FIELD",
+            path: "general.useMainSectionSettings",
+          }),
+        ]),
+      );
+    }
+  });
+
+  it("does not warn when useMainSectionSettings is explicitly set regardless of value", () => {
+    const cases = [
+      '{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteChinesePreset"}}',
+      '{"general":{"useMainSectionSettings":true,"presetChosen":"onsiteChinesePreset"}}',
+    ];
+
+    for (const json of cases) {
+      const warnings = validateInlineOverrides(`---- Song\n${json}\n# Song ## Test\n--- Verse\nLine one`);
+      expect(warnings).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: "INLINE_OVERRIDE_MISSING_REQUIRED_FIELD" }),
+        ]),
+      );
+    }
+  });
+
   it("keeps valid section overrides quiet", () => {
     const warnings = validateInlineOverrides(`---- Song
 {"general":{"useMainSectionSettings":false,"presetChosen":"onsiteChinesePreset"},"cover":{"main":{"coverTitlePositionY":33,"coverTitleFontSize":74}}}

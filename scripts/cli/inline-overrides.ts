@@ -462,7 +462,7 @@ function validateSectionObject(
     ];
   }
 
-  return Object.entries(value).flatMap(([key, categoryValue]) => {
+  const fieldWarnings = Object.entries(value).flatMap(([key, categoryValue]) => {
     const path = pathPrefix ? `${pathPrefix}.${key}` : key;
     switch (key) {
       case SETTING_CATEGORY.GENERAL:
@@ -498,6 +498,30 @@ function validateSectionObject(
         ];
     }
   });
+
+  const obj = value as Record<string, any>;
+  const generalSection = obj[SETTING_CATEGORY.GENERAL];
+  if (
+    !validatePlainObject(generalSection, location, "general") ||
+    !Object.prototype.hasOwnProperty.call(generalSection, "useMainSectionSettings")
+  ) {
+    const path = pathPrefix
+      ? `${pathPrefix}.general.useMainSectionSettings`
+      : "general.useMainSectionSettings";
+    fieldWarnings.push(
+      warning({
+        code: "INLINE_OVERRIDE_MISSING_REQUIRED_FIELD",
+        message: `Section override is missing "general.useMainSectionSettings: false". Without it, the section override will be silently ignored.`,
+        lineNumber: location.lineNumber,
+        path,
+        expected: false,
+        actual: generalSection?.useMainSectionSettings,
+        scope: location.scope,
+      }),
+    );
+  }
+
+  return fieldWarnings;
 }
 
 function validateGlobalObject(

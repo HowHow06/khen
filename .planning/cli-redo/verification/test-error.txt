@@ -18,6 +18,7 @@
 我罪已得赦免
 ***
 ---- What a friend we have in Jesus
+{"cover":{"main":{"coverTitlePositionY":26,"coverTitleFontSize":58},"secondary":{"coverTitlePositionY":74,"coverTitleFontSize":18}}}
 # What a friend we have in Jesus
 --- 1
 What a friend we have in Jesus
