@@ -176,6 +176,91 @@ Important markers:
 
 For deeper lyric syntax details, see [PPT Generator User Guide](./PPT_GENERATOR_USER_GUIDE.md).
 
+## How To Section New Lyrics
+
+When formatting a brand-new song for the CLI, prefer this workflow:
+
+1. Start each song with `---- 中文标题 English Title`.
+2. Add the cover line as `# 中文标题 ## English Title`.
+3. Add confirmed metadata lines immediately after the cover when available.
+4. Split the song into musical sections using `--- Verse`, `--- Chorus`, `--- Bridge`, `--- Coda`, `--- Ending`, or numbered variants such as `--- Verse 2`.
+5. Let the preset auto-split most lyric slides. Do not add `**` every two lines by default.
+6. Only introduce manual line breaks when:
+   - the meaning reads more naturally as two stacked lines on one slide, or
+   - `analyze` / preview shows wrapping or visual imbalance.
+
+### Practical segmentation rules
+
+- Prefer section boundaries that match the actual song structure, not arbitrary fixed line counts.
+- Within a section, keep adjacent lines together when they form one lyrical thought.
+- For Mandarin onsite slides, a common good result is two short lyric lines per slide after auto-splitting.
+- When one long lyric thought should stay on the same slide, split it into two physical lines instead of forcing a new slide.
+
+Example:
+
+```text
+--- Verse
+大山可以挪开
+小山可以迁移
+但主的慈爱
+却永远不离开
+尝尽祢的美善
+深知与我同在
+因主的慈爱
+比生命更美好
+```
+
+In this example, `但主的慈爱 / 却永远不离开` and `因主的慈爱 / 比生命更美好` read more naturally as two stacked lines on the same slide than as one long line.
+
+## Inline Override Rules
+
+Inline JSON overwrite lines are usually placed immediately after a `---- Song Name` section marker.
+
+### Recommended minimum template for section-specific overrides
+
+When the goal is to override a specific song section while preserving the correct base preset, use this minimum pattern:
+
+```text
+{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteChinesePreset"}}
+```
+
+Why this matters:
+
+- `useMainSectionSettings:false` tells Khen not to keep inheriting the main section settings blindly for that song.
+- `presetChosen:"onsiteChinesePreset"` makes the base preset explicit, so the override has a clear settings base to merge onto.
+- Without those fields, a partial overwrite can become ambiguous: the CLI may not know whether the song should continue using the main section settings as-is, and humans reading the lyric file cannot tell which preset the override is intended to modify.
+
+### When to use inline override vs `--config`
+
+- Use inline override when only one song or one section needs custom behavior.
+- Use `--config` when the whole deck needs a different settings baseline.
+- It is valid to combine a global preset with a section-local inline override.
+
+### Long cover title example
+
+This is a concrete example of a good section-local cover fix for a long Chinese title with an English subtitle:
+
+```text
+---- 我的心祢要称颂耶和华 Praise The Lord, O My Soul
+{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteChinesePreset"},"cover":{"main":{"coverTitlePositionY":33,"coverTitleFontSize":74},"secondary":{"coverTitlePositionY":66,"coverTitleFontSize":46}}}
+# 我的心\\n祢要称颂耶和华 ## Praise The Lord, O My Soul
+```
+
+Why this works:
+
+- `\\n` splits the long Chinese title into two visual lines on the same cover slide.
+- `cover.main` reduces crowding by controlling the main title size and vertical position.
+- `cover.secondary` moves the English subtitle lower so it does not clash with the Chinese title.
+
+### Important preview note
+
+`analyze` may still report zero warnings even when a cover is visually suboptimal. Always inspect the preview grid for:
+
+- title and subtitle collision,
+- missing or clipped subtitle text,
+- unexpected pinyin or secondary text on the cover,
+- semantically awkward long lines that technically fit but read poorly.
+
 ## Preview Grid
 
 `--preview-grid` writes a PNG image containing the rendered slide previews in a grid.
@@ -255,6 +340,16 @@ When `warnings[]` contains `TEXT_WRAP`:
 7. Repeat until warnings are gone or the remaining wraps are visually acceptable.
 
 `TEXT_WRAP` is a warning, not an automatic failure. It tells the user or agent where to inspect; the correct action can be “fix it” or “leave it because it looks fine.”
+
+### Repair Loop For Long Titles And Cover Slides
+
+Cover tuning often needs one or more of these changes together:
+
+1. Insert `\\n` inside the cover title source line to create a deliberate two-line title.
+2. Add a section-local inline override with explicit `general.useMainSectionSettings:false` and `general.presetChosen`.
+3. Adjust `cover.main.coverTitlePositionY` and `cover.main.coverTitleFontSize`.
+4. Adjust `cover.secondary.coverTitlePositionY` and `cover.secondary.coverTitleFontSize`.
+5. Rerun `analyze` with `--preview-grid` and inspect the cover visually, even if `warnings[]` is empty.
 
 ### Strict Mode
 
