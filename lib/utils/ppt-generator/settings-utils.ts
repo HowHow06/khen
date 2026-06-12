@@ -23,6 +23,20 @@ export const getBase64FromImageField = async (
       return image;
     }
 
+    if (typeof window === "undefined" && image.startsWith("/")) {
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        const filePath = path.join(process.cwd(), "public", image);
+        const fileBuffer = await fs.readFile(filePath);
+        const ext = path.extname(image).toLowerCase();
+        const mimeType = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+        return `data:${mimeType};base64,${fileBuffer.toString("base64")}`;
+      } catch (e) {
+        // Fallback to fetch if filesystem read fails
+      }
+    }
+
     try {
       image = await getBlobFromUrl(image);
     } catch (error) {
