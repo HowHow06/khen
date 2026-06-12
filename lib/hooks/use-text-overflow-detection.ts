@@ -1,5 +1,6 @@
 "use client";
 
+import { CONTENT_BOUNDS_WARNING_THRESHOLD } from "@/lib/constant/content-bounds";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import {
   calculatePercentage,
@@ -25,11 +26,14 @@ export const useTextOverflowDetection = ({
   lineMapper,
   mainLines,
   secondaryLines,
+  contentWidthPxBySlideIdx,
 }: {
   previewConfig: InternalPresentation | undefined;
   lineMapper: LineToSlideMapper;
   mainLines: string[];
   secondaryLines: string[];
+  /** Pre-computed content-box width in px per slide (0-based). null = no constraint. */
+  contentWidthPxBySlideIdx?: (number | null)[];
 }) => {
   const [overflowWarnings, setOverflowWarnings] = useState<LyricWarning[]>([]);
   const [overflowSlideIndices, setOverflowSlideIndices] = useState<Set<number>>(
@@ -88,8 +92,12 @@ export const useTextOverflowDetection = ({
       // Filter text objects only
       const textObjects = slide.objects.filter((o) => o.kind === "text");
 
-      // Build a set of wrapping text strings for this slide
+      const slideContentWidthPx =
+        contentWidthPxBySlideIdx?.[slideIdx] ?? null;
+
+      // Build sets of problematic text strings for this slide
       const wrappingTexts = new Set<string>();
+      const nearBoundaryTexts = new Set<string>();
 
       for (let objIdx = 0; objIdx < textObjects.length; objIdx++) {
         const textObj = textObjects[objIdx];
@@ -166,14 +174,19 @@ export const useTextOverflowDetection = ({
 
           const multiLineHeight = measurer.offsetHeight;
           const singleLineHeight = singleLineMeasurer.offsetHeight;
+          const singleLineWidth = singleLineMeasurer.offsetWidth;
 
-          // If the multi-line rendered height is taller than single-line,
-          // the text is wrapping
           if (
             multiLineHeight > singleLineHeight * 1.1 && // 10% tolerance
             singleLineHeight > 0
           ) {
             wrappingTexts.add(part.text.trim());
+            overflowSlides.add(slideIndex);
+          } else if (
+            slideContentWidthPx !== null &&
+            singleLineWidth > slideContentWidthPx * CONTENT_BOUNDS_WARNING_THRESHOLD
+          ) {
+            nearBoundaryTexts.add(part.text.trim());
             overflowSlides.add(slideIndex);
           }
 
@@ -183,38 +196,48 @@ export const useTextOverflowDetection = ({
         }
       }
 
-      // Match wrapping text to line numbers using the original lyrics
-      // This avoids the mapping issue with interleaved secondary text objects
-      if (wrappingTexts.size > 0) {
-        for (const mapping of lineMappings) {
-          const lineIdx = mapping.lineNumber;
+      for (const mapping of lineMappings) {
+        const lineIdx = mapping.lineNumber;
 
-          // Check main lines
-          if (mainLines && lineIdx >= 0 && lineIdx < mainLines.length) {
-            const originalLine = mainLines[lineIdx]?.trim();
-            if (originalLine && wrappingTexts.has(originalLine)) {
+        if (mainLines && lineIdx >= 0 && lineIdx < mainLines.length) {
+          const originalLine = mainLines[lineIdx]?.trim();
+          if (originalLine) {
+            if (wrappingTexts.has(originalLine)) {
               warnings.push({
                 type: "warning",
                 message: `Line ${lineIdx + 1} may wrap`,
-                lineNumber: lineIdx + 1, // Convert to 1-based
+                lineNumber: lineIdx + 1,
+                contentType: "main",
+              });
+              overflowSlides.add(slideIndex);
+            } else if (nearBoundaryTexts.has(originalLine)) {
+              warnings.push({
+                type: "warning",
+                message: `Line ${lineIdx + 1} may exceed the visible content boundary`,
+                lineNumber: lineIdx + 1,
                 contentType: "main",
               });
               overflowSlides.add(slideIndex);
             }
           }
+        }
 
-          // Check secondary lines
-          if (
-            secondaryLines &&
-            lineIdx >= 0 &&
-            lineIdx < secondaryLines.length
-          ) {
-            const secondaryLine = secondaryLines[lineIdx]?.trim();
-            if (secondaryLine && wrappingTexts.has(secondaryLine)) {
+        if (secondaryLines && lineIdx >= 0 && lineIdx < secondaryLines.length) {
+          const secondaryLine = secondaryLines[lineIdx]?.trim();
+          if (secondaryLine) {
+            if (wrappingTexts.has(secondaryLine)) {
               warnings.push({
                 type: "warning",
                 message: `Line ${lineIdx + 1} may wrap`,
-                lineNumber: lineIdx + 1, // Convert to 1-based
+                lineNumber: lineIdx + 1,
+                contentType: "secondary",
+              });
+              overflowSlides.add(slideIndex);
+            } else if (nearBoundaryTexts.has(secondaryLine)) {
+              warnings.push({
+                type: "warning",
+                message: `Line ${lineIdx + 1} may exceed the visible content boundary`,
+                lineNumber: lineIdx + 1,
                 contentType: "secondary",
               });
               overflowSlides.add(slideIndex);
@@ -229,7 +252,7 @@ export const useTextOverflowDetection = ({
 
     setOverflowWarnings(warnings);
     setOverflowSlideIndices(overflowSlides);
-  }, [previewConfig, lineMapper, mainLines, secondaryLines]);
+  }, [previewConfig, lineMapper, mainLines, secondaryLines, contentWidthPxBySlideIdx]);
 
   // Run measurement when previewConfig changes (debounced)
   useEffect(() => {

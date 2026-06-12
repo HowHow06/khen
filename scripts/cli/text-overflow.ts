@@ -1,4 +1,5 @@
 import { chromium } from "playwright";
+import { CONTENT_BOUNDS_WARNING_THRESHOLD } from "../../lib/constant/content-bounds";
 import type { InternalPresentation } from "../../lib/react-pptx-preview/normalizer";
 import type { LineToSlideMapping } from "../../lib/utils/ppt-generator/line-to-slide-mapper";
 import { LineType } from "../../lib/utils/ppt-generator/line-to-slide-mapper";
@@ -20,6 +21,8 @@ type DetectTextOverflowOptions = {
   lineMappings: LineToSlideMapping[];
   mainLines: string[];
   secondaryLines: string[];
+  /** Pre-computed content-box width in px per slide (0-based). null = no constraint. */
+  contentWidthPxBySlideIdx?: (number | null)[];
 };
 
 type BrowserDetectionResult = {
@@ -35,6 +38,8 @@ const browserDetector = `({
   measurementSlideWidth,
   pointsToInches,
   reportableLineTypes,
+  contentWidthPxBySlideIdx,
+  contentBoundsThreshold,
 }) => {
   const layoutToInches = (layout) => {
     switch (layout) {
@@ -129,6 +134,8 @@ const browserDetector = `({
       .sort((a, b) => a.lineNumber - b.lineNumber);
     const textObjects = slide.objects.filter((object) => object.kind === "text");
     const wrappingTexts = new Set();
+    const nearBoundaryTexts = new Set();
+    const slideContentWidthPx = contentWidthPxBySlideIdx[slideIdx] ?? null;
 
     textObjects.forEach((textObject) => {
       const wPercentage = calculatePercentage(textObject.style.w, dimensions[0]);
@@ -194,6 +201,7 @@ const browserDetector = `({
 
         const multiLineHeight = measurer.offsetHeight;
         const singleLineHeight = singleLineMeasurer.offsetHeight;
+        const singleLineWidth = singleLineMeasurer.offsetWidth;
 
         if (
           singleLineHeight > 0 &&
@@ -201,14 +209,18 @@ const browserDetector = `({
         ) {
           wrappingTexts.add(text);
           overflowSlideIndices.add(slideIndex);
+        } else if (
+          slideContentWidthPx !== null &&
+          singleLineWidth > slideContentWidthPx * contentBoundsThreshold
+        ) {
+          nearBoundaryTexts.add(text);
+          overflowSlideIndices.add(slideIndex);
         }
 
         root.removeChild(measurer);
         root.removeChild(singleLineMeasurer);
       });
     });
-
-    if (wrappingTexts.size === 0) return;
 
     slideLineMappings.forEach((mapping) => {
       const mainLine = mainLines[mapping.lineNumber]?.trim();
@@ -223,6 +235,29 @@ const browserDetector = `({
             });
           }
         }
+        for (const boundaryText of nearBoundaryTexts) {
+          if (lineMatchesWrappedText(mainLine, boundaryText)) {
+            const key = "boundary:main:" + mapping.lineNumber + ":" + mapping.slideIndex;
+            if (!seenWarnings.has(key)) {
+              warnings.push({
+                type: "warning",
+                code: "TEXT_NEAR_BOUNDARY",
+                message:
+                  "Line " +
+                  (mapping.lineNumber + 1) +
+                  " may exceed the visible content boundary on slide " +
+                  mapping.slideIndex,
+                lineNumber: mapping.lineNumber + 1,
+                contentType: "main",
+                slideIndex: mapping.slideIndex,
+                lineType: mapping.lineType,
+                text: boundaryText,
+                sourceText: mainLine,
+              });
+              seenWarnings.add(key);
+            }
+          }
+        }
       }
 
       const secondaryLine = secondaryLines[mapping.lineNumber]?.trim();
@@ -235,6 +270,29 @@ const browserDetector = `({
               sourceLine: secondaryLine,
               wrappedText: wrappingText,
             });
+          }
+        }
+        for (const boundaryText of nearBoundaryTexts) {
+          if (lineMatchesWrappedText(secondaryLine, boundaryText)) {
+            const key = "boundary:secondary:" + mapping.lineNumber + ":" + mapping.slideIndex;
+            if (!seenWarnings.has(key)) {
+              warnings.push({
+                type: "warning",
+                code: "TEXT_NEAR_BOUNDARY",
+                message:
+                  "Line " +
+                  (mapping.lineNumber + 1) +
+                  " may exceed the visible content boundary on slide " +
+                  mapping.slideIndex,
+                lineNumber: mapping.lineNumber + 1,
+                contentType: "secondary",
+                slideIndex: mapping.slideIndex,
+                lineType: mapping.lineType,
+                text: boundaryText,
+                sourceText: secondaryLine,
+              });
+              seenWarnings.add(key);
+            }
           }
         }
       }
@@ -256,6 +314,7 @@ export async function detectTextOverflowWarnings({
   lineMappings,
   mainLines,
   secondaryLines,
+  contentWidthPxBySlideIdx,
 }: DetectTextOverflowOptions): Promise<BrowserDetectionResult> {
   const browser = await chromium.launch();
 
@@ -274,6 +333,8 @@ export async function detectTextOverflowWarnings({
       measurementSlideWidth: MEASUREMENT_SLIDE_WIDTH,
       pointsToInches: POINTS_TO_INCHES,
       reportableLineTypes: [LineType.NORMAL, LineType.COVER],
+      contentWidthPxBySlideIdx,
+      contentBoundsThreshold: CONTENT_BOUNDS_WARNING_THRESHOLD,
     });
 
     return (await page.evaluate(

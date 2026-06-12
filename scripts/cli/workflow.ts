@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
+import { PRESET_CONTENT_BOUNDS } from "../../lib/constant/content-bounds";
 import { hydrateCliImageSettings } from "./assets";
 import {
   buildInlineOverrideSchema,
@@ -543,6 +544,28 @@ export async function analyzeWorkflow(
     mergedSettings,
   );
   warnings.push(...inlineOverrideWarnings);
+  const sectionsForBounds = buildSectionsReport(
+    previewConfig,
+    lineMapper.getAllMappings(),
+    sectionPresetOverrides,
+    resolvedPresetId,
+  );
+  const MEASUREMENT_SLIDE_WIDTH = 800;
+  const contentWidthPxBySlideIdx = previewConfig.slides.map(
+    (_: unknown, slideIdx: number) => {
+      const slideIndex = slideIdx + 1;
+      const section = sectionsForBounds.find((s) =>
+        s.slideIndices.includes(slideIndex),
+      );
+      const presetId = section?.preset ?? null;
+      const bounds =
+        presetId != null ? PRESET_CONTENT_BOUNDS[presetId] : undefined;
+      return bounds != null
+        ? (bounds.widthPercent / 100) * MEASUREMENT_SLIDE_WIDTH
+        : null;
+    },
+  );
+
   const textOverflowDetector =
     options.textOverflowDetector ??
     (await import("./text-overflow")).detectTextOverflowWarnings;
@@ -551,6 +574,7 @@ export async function analyzeWorkflow(
     lineMappings: lineMapper.getAllMappings(),
     mainLines: strippedPrimaryLyric.split("\n"),
     secondaryLines: strippedSecondaryLyric.split("\n"),
+    contentWidthPxBySlideIdx,
   });
   warnings.push(...overflowResult.warnings);
 

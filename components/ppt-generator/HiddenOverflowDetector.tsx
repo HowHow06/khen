@@ -1,11 +1,14 @@
 "use client";
 
+import { PRESET_CONTENT_BOUNDS } from "@/lib/constant/content-bounds";
 import { useTextOverflowDetection } from "@/lib/hooks/use-text-overflow-detection";
 import { InternalPresentation } from "@/lib/react-pptx-preview/normalizer";
 import { LineToSlideMapper } from "@/lib/utils/ppt-generator/line-to-slide-mapper";
 import { generatePreviewConfig } from "@/lib/utils/ppt-generator/ppt-preview";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePptGeneratorFormContext } from "../context/PptGeneratorFormContext";
+
+const MEASUREMENT_SLIDE_WIDTH = 800;
 
 const DEBOUNCE_MS = 800;
 
@@ -71,12 +74,25 @@ const HiddenOverflowDetector = () => {
     [secondaryText],
   );
 
+  // Compute content-box width constraints per slide from the resolved preset.
+  // The background image is always stored as a data URL (not a path) after
+  // getBase64FromImageField, so we look up by preset ID instead.
+  const contentWidthPxBySlideIdx = useMemo(() => {
+    if (!previewConfig) return undefined;
+    const presetId = settingsValues?.general?.presetChosen as string | undefined;
+    const bounds = presetId != null ? PRESET_CONTENT_BOUNDS[presetId] : undefined;
+    if (!bounds) return undefined;
+    const widthPx = (bounds.widthPercent / 100) * MEASUREMENT_SLIDE_WIDTH;
+    return previewConfig.slides.map(() => widthPx);
+  }, [previewConfig, settingsValues]);
+
   // Run overflow detection on previewConfig
   const { overflowWarnings, overflowSlideIndices } = useTextOverflowDetection({
     previewConfig,
     lineMapper: overflowMapperRef.current,
     mainLines,
     secondaryLines,
+    contentWidthPxBySlideIdx,
   });
 
   // Push results to context
