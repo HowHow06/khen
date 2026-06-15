@@ -51,6 +51,44 @@ Line one`);
     ]);
   });
 
+  it("keeps valid slide overrides quiet in the middle of lyrics", () => {
+    const warnings = validateInlineOverrides(`---- Song
+# Song ## Test
+--- Verse
+第一行
+{"$scope":"slide","preset":"onsiteEnglishPreset"}
+So we say
+"Merry Christmas" Today`);
+
+    expect(warnings).toHaveLength(0);
+  });
+
+  it("validates slide override preset ids and keys", () => {
+    const warnings = validateInlineOverrides(`---- Song
+# Song ## Test
+--- Verse
+第一行
+{"$scope":"slide","preset":"Default Onsite English","nonsense":true}
+So we say`);
+
+    expect(warnings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "INLINE_OVERRIDE_PRESET_INVALID",
+          lineNumber: 5,
+          path: "preset",
+          scope: "slide",
+        }),
+        expect.objectContaining({
+          code: "INLINE_OVERRIDE_KEY_UNKNOWN",
+          lineNumber: 5,
+          path: "nonsense",
+          scope: "slide",
+        }),
+      ]),
+    );
+  });
+
   it("warns when section override is missing useMainSectionSettings key", () => {
     const cases = [
       // No general key at all
@@ -145,6 +183,9 @@ Line one
     );
     expect(schema.sectionOverride.cover.main.coverTitleFontSize).toBe("number");
     expect(schema.sectionOverride.content.main.text.fontSize).toBe("number");
+    expect(schema.slideOverride.$scope).toBe("slide");
+    expect(schema.slideOverride.preset).toContain("onsiteEnglishPreset");
+    expect(schema.slideOverride.content.main.text.fontSize).toBe("number");
     expect(
       schema.sectionOverride.content.main.textbox["textbox<number>"]
         .textboxPositionY,
@@ -164,6 +205,9 @@ Line one
     expect(schema.sectionOverride.content.main.text.fontSize.type).toBe(
       "number",
     );
+    expect(schema.slideOverride.$scope.const).toBe("slide");
+    expect(schema.slideOverride.preset.enum).toContain("onsiteEnglishPreset");
+    expect(schema.slideOverride.content.main.text.fontSize.type).toBe("number");
     expect(
       schema.sectionOverride.content.main.textbox["textbox<number>"]
         .textboxPositionY.type,

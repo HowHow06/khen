@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { mkdtemp, readFile } from "fs/promises";
+import { mkdtemp, readFile, writeFile } from "fs/promises";
 import os from "os";
 import path from "path";
 import { analyzeWorkflow } from "../scripts/cli/workflow";
@@ -102,7 +102,7 @@ describe("khen-ppt analyze workflow", () => {
       }),
     });
 
-    expect(report.summary.slideCount).toBe(18);
+    expect(report.summary.slideCount).toBe(21);
     expect(report.overflowSlideIndices).toContain(2);
     expect(report.overflowSlideIndices).toContain(9);
     expect(report.warnings).toEqual(
@@ -133,5 +133,48 @@ describe("khen-ppt analyze workflow", () => {
 
     const savedReport = JSON.parse(await readFile(reportPath, "utf-8"));
     expect(savedReport.warnings).toEqual(report.warnings);
+  });
+
+  it("reports inline slide override directives without counting them as rendered lyrics", async () => {
+    const outputDir = await mkdtemp(path.join(os.tmpdir(), "khen-cli-test-"));
+    const lyricPath = path.join(outputDir, "lyrics.txt");
+    const reportPath = path.join(outputDir, "report.json");
+    await writeFile(
+      lyricPath,
+      `---- Song
+# Song ## Test
+--- Verse
+第一行
+{"$scope":"slide","preset":"onsiteEnglishPreset"}
+So we say
+"Merry Christmas" Today
+第二行
+***`,
+    );
+
+    const report = await analyzeWorkflow({
+      main: lyricPath,
+      autoPinyin: true,
+      output: outputDir,
+      preset: "Default Onsite Chinese",
+      report: reportPath,
+      sectionPresets: [],
+      textOverflowDetector: noOverflowDetector,
+    });
+
+    expect(report.warnings).toHaveLength(0);
+    expect(report.lineMappings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          lineNumber: 5,
+          lineType: "slide_override",
+          isSpecialLine: true,
+        }),
+      ]),
+    );
+    expect(report.summary.mainLineCount).toBe(8);
+
+    const savedReport = JSON.parse(await readFile(reportPath, "utf-8"));
+    expect(savedReport.lineMappings).toEqual(report.lineMappings);
   });
 });

@@ -14,12 +14,14 @@ import {
   getLyricsSummary,
   validateLyrics,
 } from "@/lib/utils/ppt-generator/lyric-validation";
+import { removeAllOverwritesFromLyrics } from "@/lib/utils/ppt-generator/lyrics-overwrite";
 import { generatePpt } from "@/lib/utils/ppt-generator/ppt-generation";
 import {
   combineWithDefaultSettings,
   generatePptSettingsInitialState,
   getPreset,
 } from "@/lib/utils/ppt-generator/settings-generator";
+import { stripSlideOverridesFromLyrics } from "@/lib/utils/ppt-generator/slide-overwrite";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, {
   Dispatch,
@@ -165,8 +167,12 @@ export const PptGeneratorFormProvider: React.FC<
       const {
         general: { ignoreSubcontent, useDifferentSettingForEachSection },
       } = submittedValues;
-      const primaryLinesArray = mainText.split("\n");
-      const secondaryLinesArray = secondaryText.split("\n");
+      const primaryLinesArray = stripSlideOverridesFromLyrics(
+        removeAllOverwritesFromLyrics(mainText),
+      ).split("\n");
+      const secondaryLinesArray = stripSlideOverridesFromLyrics(
+        removeAllOverwritesFromLyrics(secondaryText),
+      ).split("\n");
       const shouldIgnoreSubcontent =
         ignoreSubcontent && !useDifferentSettingForEachSection;
 

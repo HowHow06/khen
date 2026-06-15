@@ -99,6 +99,7 @@ type RuntimeModules = {
     suffix: string | undefined;
   }) => { fileName: string };
   removeAllOverwritesFromLyrics: (lyrics: string) => string;
+  stripSlideOverridesFromLyrics: (lyrics: string) => string;
   validateLyrics: (lyrics: string) => any[];
   getLyricsSummary: (lyrics: string) => {
     lineCount: number;
@@ -126,6 +127,8 @@ export async function loadRuntimeModules(): Promise<RuntimeModules> {
     await import("../../lib/utils/ppt-generator/settings-utils");
   const { removeAllOverwritesFromLyrics } =
     await import("../../lib/utils/ppt-generator/lyrics-overwrite");
+  const { stripSlideOverridesFromLyrics } =
+    await import("../../lib/utils/ppt-generator/slide-overwrite");
   const { validateLyrics, getLyricsSummary } =
     await import("../../lib/utils/ppt-generator/lyric-validation");
   const presets = await import("../../lib/presets/ppt-generator");
@@ -140,6 +143,7 @@ export async function loadRuntimeModules(): Promise<RuntimeModules> {
     mergeOverwritesFromLyrics,
     parsePptFilename,
     removeAllOverwritesFromLyrics,
+    stripSlideOverridesFromLyrics,
     validateLyrics,
     getLyricsSummary,
     presets: presets as Record<string, PptSettingsState>,
@@ -480,12 +484,12 @@ function buildWarnings(
     }));
 
   const shouldIgnoreSecondary = settings.general?.ignoreSubcontent === true;
-  const mainLineCount = runtime
-    .removeAllOverwritesFromLyrics(effectivePrimaryLyric)
-    .split("\n").length;
-  const secondaryLineCount = runtime
-    .removeAllOverwritesFromLyrics(secondaryLyric)
-    .split("\n").length;
+  const mainLineCount = runtime.stripSlideOverridesFromLyrics(
+    runtime.removeAllOverwritesFromLyrics(effectivePrimaryLyric),
+  ).split("\n").length;
+  const secondaryLineCount = runtime.stripSlideOverridesFromLyrics(
+    runtime.removeAllOverwritesFromLyrics(secondaryLyric),
+  ).split("\n").length;
   if (!shouldIgnoreSecondary && mainLineCount !== secondaryLineCount) {
     warnings.push({
       type: "warning",
@@ -532,7 +536,11 @@ export async function analyzeWorkflow(
   );
   const strippedSecondaryLyric =
     runtime.removeAllOverwritesFromLyrics(secondaryLyric);
-  const summary = runtime.getLyricsSummary(strippedPrimaryLyric);
+  const renderedPrimaryLyric =
+    runtime.stripSlideOverridesFromLyrics(strippedPrimaryLyric);
+  const renderedSecondaryLyric =
+    runtime.stripSlideOverridesFromLyrics(strippedSecondaryLyric);
+  const summary = runtime.getLyricsSummary(renderedPrimaryLyric);
   const mergedSettings = runtime.mergeOverwritesFromLyrics(
     settings,
     effectivePrimaryLyric,
@@ -599,8 +607,8 @@ export async function analyzeWorkflow(
       sectionPresets: options.sectionPresets,
     },
     summary: {
-      mainLineCount: strippedPrimaryLyric.split("\n").length,
-      secondaryLineCount: strippedSecondaryLyric.split("\n").length,
+      mainLineCount: renderedPrimaryLyric.split("\n").length,
+      secondaryLineCount: renderedSecondaryLyric.split("\n").length,
       songCount: summary.songCount,
       subsectionCount: summary.subsectionCount,
       slideCount: previewConfig.slides.length,

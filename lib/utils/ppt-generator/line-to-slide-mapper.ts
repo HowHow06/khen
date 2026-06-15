@@ -20,6 +20,7 @@ export enum LineType {
   EMPTY_SLIDE = "empty_slide",
   FILL_SLIDE = "fill_slide",
   METADATA = "metadata",
+  SLIDE_OVERRIDE = "slide_override",
   SKIPPED = "skipped", // line was merged into previous slide
 }
 

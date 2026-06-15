@@ -6,7 +6,7 @@ Build and document an AI-agent-friendly CLI version of Khen's PPT generator that
 
 ## Current Phase
 
-Phase 12
+Phase 15
 
 ## Phases
 
@@ -110,6 +110,36 @@ Phase 12
 - [x] Run the new smoke test outside the sandbox when `tsx` or Chromium is blocked by sandbox permissions
 - **Status:** complete
 
+### Phase 13: Plan Inline Per-Slide Overrides
+
+- [x] Investigate how current global/section inline JSON overrides are parsed, stripped, validated, and merged
+- [x] Inspect slide allocation/grouping in `create-slides-from-lyrics-v2.ts`
+- [x] Decide recommended per-slide directive semantics
+- [x] Identify whether the feature affects the web UI
+- [x] Define implementation phases and test strategy
+- **Status:** complete
+
+### Phase 14: Deep Implementation Design for Per-Slide Overrides
+
+- [x] Map exact generator insertion point for pending slide override config
+- [x] Map reporting, line-count, overflow, and web-preview side effects
+- [x] Define compatibility rules so existing global/section overwrites stay intact
+- [x] Define test matrix before implementation
+- [x] Update findings/progress with recommended design and safeguards
+- **Status:** complete
+
+### Phase 15: Implement Inline Per-Slide Overrides
+
+- [x] Add shared slide override parser/runtime helper
+- [x] Add generator classification, pending override state, and `slide_override` line mapping
+- [x] Support one-slide preset shorthand and explicit setting overrides
+- [x] Update CLI inline override validation/schema/report handling
+- [x] Update web submit line-count check to ignore non-rendered directives
+- [x] Add Jest coverage and update CLI smoke assertions
+- [x] Update README and CLI guide
+- [x] Run Jest, check, and real CLI smoke
+- **Status:** complete
+
 ## Key Questions
 
 1. What CLI work already exists, and should it be continued or replaced?
@@ -120,18 +150,24 @@ Phase 12
 
 ## Decisions Made
 
-| Decision                                                             | Rationale                                                                                                                                        |
-| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Keep work limited to planning files for this turn                    | User explicitly asked to investigate, gather specs, and not modify implementation yet                                                            |
-| Put planning output under `.planning/cli-redo`                       | User requested this exact destination                                                                                                            |
-| Continue and refactor the existing CLI rather than restart from zero | Existing CLI already generates PPTX and preview PNG successfully; missing pieces are structured report, validation, overflow, and batch workflow |
-| Make report JSON the primary AI-agent interface                      | Agents need deterministic line/slide/warning data instead of relying only on pixels                                                              |
-| Add provided PPTX as a golden verification fixture                   | It directly captures the mixed Chinese/English preset workflow the CLI must reproduce                                                            |
-| Build the new CLI alongside the old script                           | Keeps existing `generate-ppt-from-lyrics.ts` behavior available while the agent-focused CLI matures                                              |
-| Suppress stdout when `--report` is provided                          | Report files are easier for agents to consume than noisy terminal JSON                                                                           |
-| Port web wrap detection into a CLI utility                           | The web UI already flags overlong lines; CLI reports need the same signal for agents                                                             |
-| Report all wrapped text, including cover text                        | User wants agents/users to decide whether to manually break or accept each wrap                                                                  |
-| Add a real `test:cli` script outside Jest                            | Jest mocks the overflow detector because sandboxed Chromium is unreliable; the CLI smoke proves the actual terminal + Playwright path works      |
+| Decision                                                             | Rationale                                                                                                                                                     |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keep work limited to planning files for this turn                    | User explicitly asked to investigate, gather specs, and not modify implementation yet                                                                         |
+| Put planning output under `.planning/cli-redo`                       | User requested this exact destination                                                                                                                         |
+| Continue and refactor the existing CLI rather than restart from zero | Existing CLI already generates PPTX and preview PNG successfully; missing pieces are structured report, validation, overflow, and batch workflow              |
+| Make report JSON the primary AI-agent interface                      | Agents need deterministic line/slide/warning data instead of relying only on pixels                                                                           |
+| Add provided PPTX as a golden verification fixture                   | It directly captures the mixed Chinese/English preset workflow the CLI must reproduce                                                                         |
+| Build the new CLI alongside the old script                           | Keeps existing `generate-ppt-from-lyrics.ts` behavior available while the agent-focused CLI matures                                                           |
+| Suppress stdout when `--report` is provided                          | Report files are easier for agents to consume than noisy terminal JSON                                                                                        |
+| Port web wrap detection into a CLI utility                           | The web UI already flags overlong lines; CLI reports need the same signal for agents                                                                          |
+| Report all wrapped text, including cover text                        | User wants agents/users to decide whether to manually break or accept each wrap                                                                               |
+| Add a real `test:cli` script outside Jest                            | Jest mocks the overflow detector because sandboxed Chromium is unreliable; the CLI smoke proves the actual terminal + Playwright path works                   |
+| Model per-slide overrides as an explicit next-slide directive        | A slide can contain multiple lyric lines; attaching settings to the next generated slide is clearer than trying to infer intent from arbitrary JSON placement |
+| Implement per-slide override in shared generation code               | CLI and web preview/generation both use `createPptInstance`/`createSlidesFromLyricsRefactored`; a true slide-level behavior belongs at that layer             |
+| Keep legacy global/section JSON semantics unchanged                  | Existing JSON before the first `----` and immediately after a `----` already powers CLI and web overrides; per-slide support should not reinterpret those lines |
+| Require `"$scope":"slide"` for mid-lyric slide directives            | Random mid-lyric JSON should continue warning as an invalid location unless it explicitly opts into slide override behavior                                  |
+| Reuse preset-to-section conversion for slide preset shorthand        | Existing preset handling already converts full presets into section-shaped settings; per-slide preset should reuse that path for parity                       |
+| Preserve source line mapping for directive-aware generation          | The generator must see slide directives and map real source lines; rendered line counts can strip directives separately                                      |
 
 ## Errors Encountered
 
@@ -147,6 +183,8 @@ Phase 12
 | ESLint 9/Next 16 flat config surfaced React Compiler errors     | 1       | Kept Next lint rules but disabled compiler-only rules that block existing legacy patterns                                                       |
 | Jest does not prove real Playwright text measurement            | 1       | Added `npm run test:cli`, a separate smoke test that shells out to the CLI and runs the real browser-backed detector                            |
 | New `test:cli` initially assumed all variants have 19 slides    | 1       | Relaxed batch smoke to require successful non-empty PPTX outputs and positive slide counts because live presets legitimately change slide count |
+| Raw mid-lyric JSON currently has no slide-level meaning         | 1       | Plan a new directive parser/classification so the JSON is consumed and does not render as lyric text                                            |
+| Probed for non-existent `__tests__/cli-workflow-overflow.test.ts` | 1       | Confirmed overflow workflow coverage lives in `__tests__/cli-workflow.test.ts`                                                |
 
 ## Notes
 

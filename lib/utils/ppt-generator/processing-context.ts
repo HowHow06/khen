@@ -1,4 +1,5 @@
 import { PptMainSectionInfo } from "@/lib/types";
+import type { SlideOverride } from "./slide-overwrite";
 
 /**
  * Processing context data interface for all state variables
@@ -14,6 +15,7 @@ export interface ProcessingContextData {
   currentSectionMetadataWeight: number;
   currentMainSectionInfo: PptMainSectionInfo;
   currentSectionName?: string;
+  pendingSlideOverride?: SlideOverride;
   insertedIndex: number[];
   mainSectionsInfo: PptMainSectionInfo[];
 }
@@ -40,6 +42,7 @@ export class ProcessingContext {
         endLineIndex: -1,
       },
       currentSectionName: undefined,
+      pendingSlideOverride: undefined,
       insertedIndex: [],
       mainSectionsInfo: [],
     };
@@ -86,6 +89,10 @@ export class ProcessingContext {
     return this.data.currentSectionName;
   }
 
+  get pendingSlideOverride(): SlideOverride | undefined {
+    return this.data.pendingSlideOverride;
+  }
+
   get insertedIndex(): number[] {
     return [...this.data.insertedIndex];
   }
@@ -117,6 +124,18 @@ export class ProcessingContext {
 
   setCurrentSectionName(name: string | undefined): void {
     this.data.currentSectionName = name;
+  }
+
+  setPendingSlideOverride(override: SlideOverride): void {
+    this.data.pendingSlideOverride = override;
+  }
+
+  clearPendingSlideOverride(): void {
+    this.data.pendingSlideOverride = undefined;
+  }
+
+  hasPendingSlideOverride(): boolean {
+    return this.data.pendingSlideOverride !== undefined;
   }
 
   addToCurrentSectionCoverWeight(value: number): void {

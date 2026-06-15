@@ -28,7 +28,7 @@ const presetIds = [
 const contentTypes = Object.values(CONTENT_TYPE);
 
 type InlineOverrideLocation = {
-  scope: "global" | "section" | "unrecognized";
+  scope: "global" | "section" | "slide" | "unrecognized";
   lineNumber: number;
   sectionIndex?: number;
 };
@@ -71,6 +71,10 @@ function validatePlainObject(
   location: InlineOverrideLocation,
   path: string,
 ): value is Record<string, any> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isPlainObject(value: unknown): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
@@ -611,6 +615,94 @@ function validateGlobalObject(
   });
 }
 
+function validateSlideObject(
+  value: unknown,
+  location: InlineOverrideLocation,
+): Warning[] {
+  if (!validatePlainObject(value, location, "slide override")) {
+    return [
+      warning({
+        code: "INLINE_OVERRIDE_VALUE_INVALID",
+        message: "Inline slide override should be an object.",
+        lineNumber: location.lineNumber,
+        expected: "object",
+        actual: describeValue(value),
+        scope: location.scope,
+      }),
+    ];
+  }
+
+  return Object.entries(value).flatMap(([key, categoryValue]) => {
+    switch (key) {
+      case "$scope":
+        if (categoryValue !== "slide") {
+          return [
+            warning({
+              code: "INLINE_OVERRIDE_VALUE_INVALID",
+              message: 'Inline slide override "$scope" should be "slide".',
+              lineNumber: location.lineNumber,
+              path: "$scope",
+              expected: "slide",
+              actual: categoryValue,
+              scope: location.scope,
+            }),
+          ];
+        }
+        return [];
+      case "preset":
+        if (typeof categoryValue !== "string") {
+          return [
+            warning({
+              code: "INLINE_OVERRIDE_VALUE_INVALID",
+              message: `Inline slide override "preset" should be a string, but got ${describeValue(categoryValue)}.`,
+              lineNumber: location.lineNumber,
+              path: "preset",
+              expected: "string",
+              actual: categoryValue,
+              scope: location.scope,
+            }),
+          ];
+        }
+        if (!presetIds.includes(categoryValue)) {
+          return [
+            warning({
+              code: "INLINE_OVERRIDE_PRESET_INVALID",
+              message:
+                'Inline slide override "preset" should use an internal preset id, not a display name or alias.',
+              lineNumber: location.lineNumber,
+              path: "preset",
+              expected: presetIds,
+              actual: categoryValue,
+              scope: location.scope,
+            }),
+          ];
+        }
+        return [];
+      case SETTING_CATEGORY.GENERAL:
+        return validateFields({
+          value: categoryValue,
+          meta: PPT_GENERATION_COMBINED_SECTION_SETTINGS,
+          path: key,
+          location,
+        });
+      case SETTING_CATEGORY.COVER:
+        return validateCover(categoryValue, location);
+      case SETTING_CATEGORY.CONTENT:
+        return validateContent(categoryValue, location);
+      default:
+        return [
+          warning({
+            code: "INLINE_OVERRIDE_KEY_UNKNOWN",
+            message: `Inline slide override key "${key}" is not allowed. Use $scope, preset, general, cover, or content.`,
+            lineNumber: location.lineNumber,
+            path: key,
+            scope: location.scope,
+          }),
+        ];
+    }
+  });
+}
+
 function locateInlineOverrides(lyrics: string) {
   const lines = lyrics.split("\n");
   const locations: Array<InlineOverrideLocation & { jsonText: string }> = [];
@@ -660,18 +752,6 @@ function locateInlineOverrides(lyrics: string) {
 
 export function validateInlineOverrides(lyrics: string): Warning[] {
   return locateInlineOverrides(lyrics).flatMap((location) => {
-    if (location.scope === "unrecognized") {
-      return [
-        warning({
-          code: "INLINE_OVERRIDE_LOCATION_INVALID",
-          message:
-            "Inline JSON override was not before the first section or immediately after a section marker, so Khen will not apply it.",
-          lineNumber: location.lineNumber,
-          scope: location.scope,
-        }),
-      ];
-    }
-
     let parsed: unknown;
     try {
       parsed = JSON.parse(location.jsonText);
@@ -686,9 +766,34 @@ export function validateInlineOverrides(lyrics: string): Warning[] {
       ];
     }
 
-    return location.scope === "global"
-      ? validateGlobalObject(parsed, location)
-      : validateSectionObject(parsed, location);
+    if (location.scope === "unrecognized") {
+      if (isPlainObject(parsed) && parsed.$scope === "slide") {
+        return validateSlideObject(parsed, {
+          ...location,
+          scope: "slide",
+        });
+      }
+
+      return [
+        warning({
+          code: "INLINE_OVERRIDE_LOCATION_INVALID",
+          message:
+            'Inline JSON override was not before the first section, immediately after a section marker, or marked with "$scope":"slide", so Khen will not apply it.',
+          lineNumber: location.lineNumber,
+          scope: location.scope,
+        }),
+      ];
+    }
+
+    if (location.scope === "global") {
+      return validateGlobalObject(parsed, location);
+    }
+
+    if (location.scope === "slide") {
+      return validateSlideObject(parsed, location);
+    }
+
+    return validateSectionObject(parsed, location);
   });
 }
 
@@ -829,6 +934,10 @@ const schemaExamples = {
     '{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteChinesePreset"},"cover":{"main":{"coverTitleFontSize":74,"coverTitlePositionY":33}}}',
   contentFontSize:
     '{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteEnglishPreset"},"content":{"main":{"text":{"fontSize":40}}}}',
+  slidePreset:
+    '{"$scope":"slide","preset":"onsiteEnglishPreset"}',
+  slideExplicit:
+    '{"$scope":"slide","general":{"ignoreSubcontent":true,"lineCountPerTextbox":2,"textboxCountPerContentPerSlide":1},"content":{"main":{"text":{"font":"Ebrima","fontSize":44}}}}',
 };
 
 export function buildInlineOverrideSchema({ detailed = false } = {}) {
@@ -837,6 +946,8 @@ export function buildInlineOverrideSchema({ detailed = false } = {}) {
       "Place one JSON object before the first ---- section marker to override deck-level settings.",
     section:
       "Place one JSON object immediately after a ---- section marker to override that song section.",
+    slide:
+      'Place one JSON object with "$scope":"slide" immediately before the first lyric line that should use the override. It applies to the next generated content slide only.',
   };
   const presetChosen = {
     note: "Inline JSON must use internal preset ids, not display names or CLI aliases.",
@@ -845,6 +956,13 @@ export function buildInlineOverrideSchema({ detailed = false } = {}) {
 
   if (!detailed) {
     const simplifiedSectionOverride = {
+      general: simplifiedFieldsSchema(PPT_GENERATION_COMBINED_SECTION_SETTINGS),
+      cover: simplifiedCoverSchema(),
+      content: simplifiedContentSchema(),
+    };
+    const simplifiedSlideOverride = {
+      $scope: "slide",
+      preset: presetIds,
       general: simplifiedFieldsSchema(PPT_GENERATION_COMBINED_SECTION_SETTINGS),
       cover: simplifiedCoverSchema(),
       content: simplifiedContentSchema(),
@@ -865,11 +983,25 @@ export function buildInlineOverrideSchema({ detailed = false } = {}) {
         },
       },
       sectionOverride: simplifiedSectionOverride,
+      slideOverride: simplifiedSlideOverride,
       examples: schemaExamples,
     };
   }
 
   const sectionOverride = {
+    general: fieldsSchema(PPT_GENERATION_COMBINED_SECTION_SETTINGS),
+    cover: coverSchema(),
+    content: contentSchema(),
+  };
+  const slideOverride = {
+    $scope: {
+      type: "string",
+      const: "slide",
+    },
+    preset: {
+      type: "string",
+      enum: presetIds,
+    },
     general: fieldsSchema(PPT_GENERATION_COMBINED_SECTION_SETTINGS),
     cover: coverSchema(),
     content: contentSchema(),
@@ -891,6 +1023,7 @@ export function buildInlineOverrideSchema({ detailed = false } = {}) {
       },
     },
     sectionOverride,
+    slideOverride,
     examples: schemaExamples,
   };
 }

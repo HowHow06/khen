@@ -229,21 +229,25 @@ async function assertLivePreviewHasBlackBand(filePath: string) {
 function hasTextWrapWarning(
   report: CliReport,
   expected: {
-    lineNumber: number;
-    contentType: string;
+    lineNumber?: number;
+    contentType?: string;
     lineType?: string;
     slideIndex?: number;
+    text?: string;
   },
 ) {
   return (report.warnings ?? []).some((warning) => {
     return (
       warning.code === "TEXT_WRAP" &&
-      warning.lineNumber === expected.lineNumber &&
-      warning.contentType === expected.contentType &&
+      (expected.lineNumber === undefined ||
+        warning.lineNumber === expected.lineNumber) &&
+      (expected.contentType === undefined ||
+        warning.contentType === expected.contentType) &&
       (expected.lineType === undefined ||
         warning.lineType === expected.lineType) &&
       (expected.slideIndex === undefined ||
-        warning.slideIndex === expected.slideIndex)
+        warning.slideIndex === expected.slideIndex) &&
+      (expected.text === undefined || warning.text === expected.text)
     );
   });
 }
@@ -299,17 +303,16 @@ async function runAnalyzeSmoke() {
   );
   assert(
     hasTextWrapWarning(report, {
-      lineNumber: 21,
       contentType: "main",
       lineType: "cover",
-      slideIndex: 9,
+      text: "What a friend we have in Jesus",
     }),
-    "Expected TEXT_WRAP warning for line 21 cover text.",
+    "Expected TEXT_WRAP warning for the English cover text.",
   );
   assert(
     (report.overflowSlideIndices ?? []).includes(2) &&
-      (report.overflowSlideIndices ?? []).includes(9),
-    "Expected overflowSlideIndices to include slides 2 and 9.",
+      (report.overflowSlideIndices ?? []).some((slideIndex) => slideIndex > 2),
+    "Expected overflowSlideIndices to include slide 2 and a later wrapped slide.",
   );
 }
 

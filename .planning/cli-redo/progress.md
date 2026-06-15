@@ -228,13 +228,16 @@
 | 2026-06-08 15:33 +08 | `rg` pattern with backticks triggered shell command substitution       | 1       | Re-ran with single-quoted pattern                                                            |
 | 2026-06-08 17:00 +08 | `npm run test:cli` failed in sandbox with `listen EPERM`               | 1       | Reran with approved unsandboxed execution for `tsx` and Playwright                           |
 | 2026-06-08 17:00 +08 | New CLI smoke assumed every batch variant has 19 slides                | 1       | Relaxed the batch smoke to assert positive slide count plus non-empty PPTX outputs           |
+| 2026-06-15 13:29 +08 | Probed for `__tests__/cli-workflow-overflow.test.ts`, which does not exist | 1       | Confirmed overflow workflow coverage is in `__tests__/cli-workflow.test.ts`                  |
+| 2026-06-15 14:52 +08 | `npm run test:cli` failed in sandbox with `listen EPERM`               | 1       | Reran outside sandbox with approval                                                          |
+| 2026-06-15 14:52 +08 | CLI smoke expected the English cover wrap at old line 21/slide 9       | 1       | Updated smoke to assert the cover `TEXT_WRAP` by text/type instead of stale fixed position   |
 
 ## 5-Question Reboot Check
 
 | Question             | Answer                                                                                                                                                              |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Where am I?          | Phase 12 complete                                                                                                                                                   |
-| Where am I going?    | Next work: optional normalized PPTX comparison, if/when prioritized                                                                                                 |
+| Where am I?          | Phase 15 complete                                                                                                                                                   |
+| Where am I going?    | Next work: user review or future normalized PPTX comparison TODO                                                                                                     |
 | What's the goal?     | Build and document an AI-agent-friendly CLI version of Khen's PPT generator that can analyze lyrics, generate preview grids, apply presets, and generate PPTX files |
 | What have I learned? | See findings.md                                                                                                                                                     |
 | What have I done?    | Created planning files, investigated existing CLI/generator/preview/overflow code, inspected sample PPTX, smoke-tested current CLI, and wrote spec.md               |
@@ -289,3 +292,88 @@
   - `docs/CLI_PPT_GENERATOR_GUIDE.md`
   - `package.json`
   - `scripts/test-khen-ppt-cli.ts`
+
+### Phase 13: Plan Inline Per-Slide Overrides
+
+- **Status:** complete
+- Actions taken:
+  - Restored planning context after user asked to plan inline per-slide overrides for rare English slides inside a Mandarin song.
+  - Inspected current global/section inline override parsing and validation.
+  - Inspected shared slide allocation in `lib/utils/ppt-generator/create-slides-from-lyrics-v2.ts`.
+  - Confirmed slide grouping is controlled by `lineCountPerTextbox * textboxCountPerContentPerSlide`, so a per-slide override should target the next generated slide, not only the next source line.
+  - Confirmed a raw mid-lyric JSON line currently has no safe slide-level meaning and risks being treated as normal lyric content by the shared generator.
+  - Recommended an explicit slide directive syntax, e.g. `{"$scope":"slide", ...}`, placed immediately before the first lyric line it affects.
+  - Captured that implementation in shared generator code will affect web preview/generation too, which is likely desirable for output parity.
+  - Identified web follow-up points: lyric validation, inline override schema docs, and sync-overwrite helpers should recognize/preserve slide directives.
+- Proposed implementation phases:
+  1. Extend inline override parser/schema to recognize `scope: slide` directives and validate them separately from global/section overrides.
+  2. Add `SLIDE_OVERRIDE` line classification and mapper line type so directive lines are consumed, reported, and not rendered.
+  3. Add pending-slide-override state to `ProcessingContext`.
+  4. Apply the pending override before `calculateSlidePosition` for the next content line, so layout fields such as `lineCountPerTextbox` can affect grouping.
+  5. Clear the pending override after one generated content slide.
+  6. Update `removeAllOverwritesFromLyrics`, lyric validation, and CLI analyze reports so slide directives are preserved/recognized correctly.
+  7. Add Jest coverage for one Mandarin section with one English-only slide and `TEXT_WRAP`/preview smoke coverage where useful.
+  8. Update README and CLI guide with syntax, schema, examples, and web UI impact.
+- Files modified:
+  - `.planning/cli-redo/task_plan.md`
+  - `.planning/cli-redo/findings.md`
+  - `.planning/cli-redo/progress.md`
+
+### Phase 14: Deep Implementation Design for Per-Slide Overrides
+
+- **Status:** complete
+- Timestamp: 2026-06-15 13:29 +0800
+- Actions taken:
+  - Restored planning context after compaction and user asked to explore implementation without implementing.
+  - Re-read `.planning/cli-redo/task_plan.md`, `.planning/cli-redo/findings.md`, and `.planning/cli-redo/progress.md`.
+  - Inspected current global/section overwrite parser in `lib/utils/ppt-generator/lyrics-overwrite.ts`.
+  - Inspected CLI inline override validation and schema in `scripts/cli/inline-overrides.ts`.
+  - Inspected shared generation flow in `lib/utils/ppt-generator/create-slides-from-lyrics-v2.ts`, including classification, slide position, special-line processing, and content grouping.
+  - Inspected `ProcessingContext`, `LineToSlideMapper`, `PptConfigurationBuilder`, settings generator/diff helpers, CLI workflow reporting, web overflow detection, and web sync-overwrite behavior.
+  - Confirmed the safest design is an explicit `{"$scope":"slide",...}` directive consumed by the shared generator, not a new CLI-only preprocessing step.
+  - Confirmed existing `removeAllOverwritesFromLyrics` should continue stripping only global/section overwrites for generator input, so slide directives remain visible to `createPptInstance`.
+  - Identified a reporting-only need to strip slide directives from rendered line counts and summaries while preserving original source line mappings for warnings.
+  - Captured a concrete implementation plan, web impact notes, compatibility safeguards, and test matrix in `findings.md`.
+  - Did not implement code or run project tests because the user explicitly asked to explore and plan only.
+- Files modified:
+  - `.planning/cli-redo/task_plan.md`
+  - `.planning/cli-redo/findings.md`
+  - `.planning/cli-redo/progress.md`
+
+### Phase 15: Implement Inline Per-Slide Overrides
+
+- **Status:** complete
+- Timestamp: 2026-06-15 14:52 +0800
+- Actions taken:
+  - Added `lib/utils/ppt-generator/slide-overwrite.ts` for shared slide directive parsing, stripping, and one-slide settings application.
+  - Added `LineType.SLIDE_OVERRIDE` and pending slide override state in `ProcessingContext`.
+  - Updated `create-slides-from-lyrics-v2.ts` so `{"$scope":"slide",...}` is consumed, mapped, and applied to the next generated content slide only.
+  - Updated `getIsNormalLine` so slide directives cannot be grouped into lyric textboxes.
+  - Updated CLI inline override validation and `override-schema` output for `slideOverride`.
+  - Updated CLI workflow rendered line counts while preserving source-aligned line mappings for overflow reports.
+  - Updated web submit-time line-count comparison to ignore global/section overwrites and slide directives.
+  - Added `__tests__/slide-overrides.test.ts`.
+  - Extended CLI inline override and workflow tests.
+  - Updated `README.md`, `docs/CLI_PPT_GENERATOR_GUIDE.md`, and `scripts/test-khen-ppt-cli.ts`.
+  - Ran focused Jest tests: passed.
+  - Ran full Jest suite: 10 suites, 35 tests passed.
+  - Ran `npm run check`: passed with 5 existing lint warnings.
+  - Ran `npm run test:cli`: sandbox failed with `listen EPERM`; approved outside-sandbox rerun passed.
+- Files modified:
+  - `.planning/cli-redo/task_plan.md`
+  - `.planning/cli-redo/findings.md`
+  - `.planning/cli-redo/progress.md`
+  - `README.md`
+  - `docs/CLI_PPT_GENERATOR_GUIDE.md`
+  - `components/context/PptGeneratorFormContext.tsx`
+  - `lib/utils/ppt-generator/create-slides-from-lyrics-v2.ts`
+  - `lib/utils/ppt-generator/line-to-slide-mapper.ts`
+  - `lib/utils/ppt-generator/processing-context.ts`
+  - `lib/utils/ppt-generator/settings-utils.ts`
+  - `lib/utils/ppt-generator/slide-overwrite.ts`
+  - `scripts/cli/inline-overrides.ts`
+  - `scripts/cli/workflow.ts`
+  - `scripts/test-khen-ppt-cli.ts`
+  - `__tests__/cli-inline-overrides.test.ts`
+  - `__tests__/cli-workflow.test.ts`
+  - `__tests__/slide-overrides.test.ts`

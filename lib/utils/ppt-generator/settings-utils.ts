@@ -6,6 +6,7 @@ import {
 } from "@/lib/constant";
 import { FieldTypeToTypeScriptType } from "@/lib/types";
 import { getBase64, getBlobFromUrl } from "@/lib/utils/general";
+import { isSlideOverrideCandidateLine } from "./slide-overwrite";
 
 export const getBase64FromImageField = async (
   imageValue: FieldTypeToTypeScriptType[SETTING_FIELD_TYPE.IMAGE],
@@ -56,6 +57,10 @@ export const getBase64FromImageField = async (
  * Check whether the given line is any special type (empty slide, fill slide, cover, section etc.)
  */
 export function getIsNormalLine(line: string): boolean {
+  if (isSlideOverrideCandidateLine(line)) {
+    return false;
+  }
+
   for (const key in LYRIC_SECTION) {
     const syntax = LYRIC_SECTION[key as keyof typeof LYRIC_SECTION];
     if (line.startsWith(syntax)) {

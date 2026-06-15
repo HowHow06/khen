@@ -25,7 +25,10 @@ import {
   removeIdenticalWords,
   startsWithNumbering,
 } from "@/lib/utils/general";
-import { getSectionSettingsInitialValue } from "./settings-generator";
+import {
+  generateSectionSettingsFromFullSettings,
+  getSectionSettingsInitialValue,
+} from "./settings-generator";
 import pptxgenjs from "pptxgenjs";
 import { LineToSlideMapper, LineType } from "./line-to-slide-mapper";
 import {
@@ -40,6 +43,11 @@ import {
   getSectionColorSlideMasterTitle,
   getSectionImageSlideMasterTitle,
 } from "./settings-utils";
+import {
+  applySlideOverrideToSectionSettings,
+  isSlideOverrideCandidateLine,
+  parseSlideOverride,
+} from "./slide-overwrite";
 
 /**
  * Line classification enum for better readability
@@ -52,6 +60,7 @@ export enum LineClassification {
   FILL_SLIDE = "FILL_SLIDE",
   NORMAL = "NORMAL",
   METADATA = "METADATA",
+  SLIDE_OVERRIDE = "SLIDE_OVERRIDE",
 }
 
 /**
@@ -119,13 +128,25 @@ export function createSlidesFromLyricsRefactored({
       currentSectionSetting!,
       mainConfig,
     );
+    const effectiveConfig = getEffectiveConfigForLine({
+      lineInfo,
+      currentSectionSetting,
+      settingValues,
+      mainConfig,
+      baseConfig: currentRelevantConfig,
+      configBuilder,
+      context,
+    });
+    const isUsingPendingSlideOverride =
+      effectiveConfig !== currentRelevantConfig &&
+      isContentClassification(lineInfo.classification);
 
     // Calculate slide position
     const position = calculateSlidePosition(
       index,
       lineInfo.classification,
       context,
-      currentRelevantConfig,
+      effectiveConfig,
       pres,
     );
 
@@ -149,7 +170,7 @@ export function createSlidesFromLyricsRefactored({
         lineInfo,
         index,
         position,
-        currentRelevantConfig,
+        effectiveConfig,
         context,
         pres,
         lineMapper,
@@ -164,12 +185,16 @@ export function createSlidesFromLyricsRefactored({
       primaryLinesArray: arr,
       secondaryLinesArray,
       position,
-      config: currentRelevantConfig,
+      config: effectiveConfig,
       context,
       pres,
       settingValues,
       lineMapper,
     });
+
+    if (isUsingPendingSlideOverride) {
+      context.clearPendingSlideOverride();
+    }
   });
 
   // Finalize the last section
@@ -247,6 +272,14 @@ function classifyLine(line: string): LineInfo {
     };
   }
 
+  if (isSlideOverrideCandidateLine(line)) {
+    return {
+      classification: LineClassification.SLIDE_OVERRIDE,
+      processedText: trimmedLine,
+      isCover: false,
+    };
+  }
+
   return {
     classification: LineClassification.NORMAL,
     processedText: trimmedLine,
@@ -268,7 +301,15 @@ function isSpecialSlide(classification: LineClassification): boolean {
   return (
     classification === LineClassification.EMPTY_SLIDE ||
     classification === LineClassification.FILL_SLIDE ||
-    classification === LineClassification.METADATA
+    classification === LineClassification.METADATA ||
+    classification === LineClassification.SLIDE_OVERRIDE
+  );
+}
+
+function isContentClassification(classification: LineClassification): boolean {
+  return (
+    classification === LineClassification.NORMAL ||
+    classification === LineClassification.COVER
   );
 }
 
@@ -436,6 +477,76 @@ function calculateSlidePosition(
   };
 }
 
+function getBaseSectionSettingForSlideOverride({
+  settingValues,
+  mainConfig,
+  currentSectionSetting,
+}: {
+  settingValues: PptSettingsStateType;
+  mainConfig: MainPptConfig;
+  currentSectionSetting: SectionSettingsType | undefined;
+}): SectionSettingsType {
+  if (
+    mainConfig.useDifferentSettingForEachSection &&
+    currentSectionSetting &&
+    !currentSectionSetting.general?.useMainSectionSettings
+  ) {
+    return currentSectionSetting;
+  }
+
+  const baseSectionSettings =
+    generateSectionSettingsFromFullSettings(settingValues);
+  baseSectionSettings.general.useMainSectionSettings = false;
+  baseSectionSettings.general.useMainBackgroundImage = true;
+  baseSectionSettings.general.useMainBackgroundColor = true;
+  return baseSectionSettings;
+}
+
+function getEffectiveConfigForLine({
+  lineInfo,
+  currentSectionSetting,
+  settingValues,
+  mainConfig,
+  baseConfig,
+  configBuilder,
+  context,
+}: {
+  lineInfo: LineInfo;
+  currentSectionSetting: SectionSettingsType | undefined;
+  settingValues: PptSettingsStateType;
+  mainConfig: MainPptConfig;
+  baseConfig: DerivedPptConfig;
+  configBuilder: PptConfigurationBuilder;
+  context: ProcessingContext;
+}): DerivedPptConfig {
+  if (
+    !context.hasPendingSlideOverride() ||
+    !isContentClassification(lineInfo.classification)
+  ) {
+    return baseConfig;
+  }
+
+  const override = context.pendingSlideOverride;
+  if (!override) {
+    return baseConfig;
+  }
+
+  const baseSectionSettings = getBaseSectionSettingForSlideOverride({
+    settingValues,
+    mainConfig,
+    currentSectionSetting,
+  });
+  const overrideSectionSettings = applySlideOverrideToSectionSettings({
+    baseSectionSettings,
+    override,
+  });
+
+  return configBuilder.buildSectionConfig(overrideSectionSettings, {
+    ...mainConfig,
+    useDifferentSettingForEachSection: true,
+  });
+}
+
 /**
  * Get the current section setting
  */
@@ -561,6 +672,29 @@ function processSpecialSlide(
         index,
         lineMapper.currentSlideIndex,
         LineType.FILL_SLIDE,
+        context.currentSectionName,
+      );
+    }
+    return;
+  }
+
+  if (lineInfo.classification === LineClassification.SLIDE_OVERRIDE) {
+    const slideOverride = parseSlideOverride(lineInfo.processedText);
+    if (slideOverride) {
+      context.setPendingSlideOverride(slideOverride);
+    }
+
+    context.addToCurrentSectionMetadataWeight(
+      position.indexInCurrentSlide === 0
+        ? -1
+        : position.remainingLineCountBeforeInsert - 1,
+    );
+
+    if (lineMapper) {
+      lineMapper.addMapping(
+        index,
+        lineMapper.currentSlideIndex,
+        LineType.SLIDE_OVERRIDE,
         context.currentSectionName,
       );
     }

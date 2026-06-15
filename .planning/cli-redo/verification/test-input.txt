@@ -40,3 +40,38 @@ who will all our sorrows share
 Jesus knows our every weakness
 take it to the Lord in prayer
 ***
+---- 一同齐声宣扬 Let’s Proclaim
+# 一同齐声宣扬 ## Let’s Proclaim
+--- Verse
+耶稣降生 普天同庆
+两千年前 为你为我
+小小君王 在马槽里  
+天使天军 报好消息
+--- Chorus
+让我们一同齐声宣扬
+传报大好的消息
+耶稣降生在世上
+使你我有盼望
+黑暗中
+充满亮光
+让我们一同齐声赞美
+名叫平安的君王
+耶稣降生在世上
+一切再也不一样
+{"$scope":"slide","preset":"onsiteEnglishPreset"}
+So we say 
+"Merry Christmas" Today
+***
+---- Second way
+{"general":{"useMainSectionSettings":false,"presetChosen":"onsiteEnglishPreset"}}
+# Testing Song
+--- 1
+What a friend we have in Jesus
+all our sins and griefs to bear
+What a privilege to carry
+everything to God in prayer
+O what peace we often forfeit
+O what needless pain we bear
+all because we do not carry
+everything to God in prayer
+***

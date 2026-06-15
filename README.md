@@ -46,6 +46,14 @@ npx tsx scripts/khen-ppt.ts override-schema \
   --report /private/tmp/khen-cli-redo/inline-override-schema.json
 ```
 
+For a rare English slide inside a Mandarin song, use an inline per-slide directive immediately before that lyric block:
+
+```text
+{"$scope":"slide","preset":"onsiteEnglishPreset"}
+```
+
+The directive is consumed, reported as `lineType: "slide_override"`, and applies only to the next generated content slide.
+
 For full CLI behavior, presets, report schema, preview-grid usage, fixture verification, sectioning guidance for new lyrics, and inline override examples for long cover titles, read [CLI PPT Generator Guide](./docs/CLI_PPT_GENERATOR_GUIDE.md).
 
 To verify the real agent workflow end to end, run:

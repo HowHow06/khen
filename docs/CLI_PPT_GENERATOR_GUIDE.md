@@ -195,6 +195,7 @@ Important markers:
 | `***`                 | Creates an empty slide.                                                     |
 | `@key: value`         | Metadata line, not rendered.                                                |
 | `{...}`               | JSON settings overwrite, usually immediately after a `----` section marker. |
+| `{"$scope":"slide"}`  | JSON settings override for the next generated content slide only.           |
 
 For deeper lyric syntax details, see [PPT Generator User Guide](./PPT_GENERATOR_USER_GUIDE.md).
 
@@ -257,6 +258,38 @@ Why this matters:
 - Use inline override when only one song or one section needs custom behavior.
 - Use `--config` when the whole deck needs a different settings baseline.
 - It is valid to combine a global preset with a section-local inline override.
+
+### Per-slide overrides
+
+Use a per-slide override when most of a song should keep its section preset, but one generated slide needs different behavior. The common case is a Mandarin song with one or two English lyric lines that should ignore pinyin.
+
+Place the directive immediately before the first lyric line that should use it:
+
+```text
+讓我們一同齊聲讚美
+名叫平安的君王
+耶穌降生在世上
+一切再也不一樣
+{"$scope":"slide","preset":"onsiteEnglishPreset"}
+So we say
+"Merry Christmas" Today
+```
+
+Rules:
+
+- `"$scope":"slide"` is required. Random JSON in the middle of lyrics still produces an `INLINE_OVERRIDE_LOCATION_INVALID` warning.
+- `preset` must be an internal preset ID such as `onsiteEnglishPreset`, not `Default Onsite English` or `onsite-english`.
+- The directive is consumed and does not render as lyric text.
+- It applies to exactly the next generated content slide, then the song returns to its normal section settings.
+- If the directive appears after a partial slide has already started, Khen starts the overridden lyrics on a new slide.
+
+You can also use explicit settings:
+
+```text
+{"$scope":"slide","general":{"ignoreSubcontent":true,"lineCountPerTextbox":2,"textboxCountPerContentPerSlide":1},"content":{"main":{"text":{"font":"Ebrima","fontSize":44}}}}
+```
+
+In reports, the directive appears in `lineMappings[]` as `lineType: "slide_override"` so agents can tell it was consumed intentionally.
 
 ### Long cover title example
 
@@ -454,12 +487,12 @@ Common warning codes:
 | Code                               | Meaning                                                                                    |
 | ---------------------------------- | ------------------------------------------------------------------------------------------ |
 | `INLINE_OVERRIDE_JSON_INVALID`     | The line starts/ends like JSON but cannot be parsed.                                       |
-| `INLINE_OVERRIDE_LOCATION_INVALID` | The JSON line is not before the first `----` or immediately after a `----` section marker. |
+| `INLINE_OVERRIDE_LOCATION_INVALID` | The JSON line is not before the first `----`, after a `----`, or marked with `"$scope":"slide"`. |
 | `INLINE_OVERRIDE_KEY_UNKNOWN`      | The JSON contains a key Khen does not recognize or will not apply in that location.        |
 | `INLINE_OVERRIDE_VALUE_INVALID`    | The value has the wrong type, range, enum value, or color format.                          |
-| `INLINE_OVERRIDE_PRESET_INVALID`   | `general.presetChosen` is not one of the internal preset IDs.                              |
+| `INLINE_OVERRIDE_PRESET_INVALID`   | `general.presetChosen` or slide `preset` is not one of the internal preset IDs.            |
 
-Important: inline `general.presetChosen` must use internal preset IDs such as `onsiteChinesePreset`, not display names like `Default Onsite Chinese` and not CLI aliases like `onsite-chinese`.
+Important: inline `general.presetChosen` and slide `preset` must use internal preset IDs such as `onsiteChinesePreset`, not display names like `Default Onsite Chinese` and not CLI aliases like `onsite-chinese`.
 
 Dump the valid shape whenever unsure:
 
