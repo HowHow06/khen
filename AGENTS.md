@@ -287,6 +287,3 @@ If you see errors like `Cannot access 'X' before initialization`:
 1. Trace the import chain from the error stack
 2. Check if any module is importing from a directory path instead of a specific file
 3. Replace with direct file imports
-
-## Telegram Message Delivery Rule
-- **Telegram (Interactive Chat & DMs):** CRITICAL MESSAGE DELIVERY RULE: ALL outgoing messages, status updates, and replies to Howard or users in interactive Telegram channels MUST be explicitly sent using the `message` tool (`action="send"`). Standard assistant text output generated outside of a tool call is NOT automatically forwarded by OpenClaw to Telegram, causing turns to complete silently with no queued reply payload. Always call `message` (`action="send"`) for your final response.
