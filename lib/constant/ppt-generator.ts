@@ -79,6 +79,7 @@ export const CUSTOM_PINYIN_MAP_SIMPLIFIED = {
   降服: "xiáng fú",
   得着: "dé zháo",
   差派: "chāi pài",
+  差祂: "chāi tā",
   朝阳: "zhāo yáng",
   不着: "bù zháo",
   祢: "nǐ",
